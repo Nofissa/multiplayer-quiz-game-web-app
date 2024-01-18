@@ -2,10 +2,10 @@ import { Component } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
 @Component({
-    selector: 'app-game-page',
-    templateUrl: './game-page.component.html',
-    styleUrls: ['./game-page.component.scss'],
+    selector: 'app-admin-page',
+    templateUrl: './admin-page.component.html',
+    styleUrls: ['./admin-page.component.scss'],
 })
-export class GamePageComponent {
+export class AdminPageComponent {
     message: BehaviorSubject<string> = new BehaviorSubject<string>('');
 }
