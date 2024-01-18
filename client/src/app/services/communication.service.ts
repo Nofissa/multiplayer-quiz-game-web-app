@@ -13,15 +13,37 @@ export class CommunicationService {
 
     constructor(private readonly http: HttpClient) {}
 
-    basicGet(): Observable<Message> {
-        return this.http.get<Message>(`${this.baseUrl}/example`).pipe(catchError(this.handleError<Message>('basicGet')));
+    get(url: string): Observable<Message> {
+        return this.http.get<Message>(`${this.baseUrl}/${url}`).pipe(catchError(this.handleError<Message>('GET')));
     }
 
-    basicPost(message: Message): Observable<HttpResponse<string>> {
-        return this.http.post(`${this.baseUrl}/example/send`, message, { observe: 'response', responseType: 'text' });
+    post(url: string, message: Message): Observable<HttpResponse<string>> {
+        return this.http
+            .post(`${this.baseUrl}${url}`, message, { observe: 'response', responseType: 'text' })
+            .pipe(catchError(this.handleError<HttpResponse<string>>('POST')));
+    }
+
+    put(url: string, message: Message): Observable<HttpResponse<string>> {
+        return this.http
+            .put(`${this.baseUrl}${url}`, message, { observe: 'response', responseType: 'text' })
+            .pipe(catchError(this.handleError<HttpResponse<string>>('PUT')));
+    }
+
+    patch(url: string, message: Message): Observable<HttpResponse<string>> {
+        return this.http
+            .patch(`${this.baseUrl}${url}`, message, { observe: 'response', responseType: 'text' })
+            .pipe(catchError(this.handleError<HttpResponse<string>>('PATCH')));
+    }
+
+    delete(url: string): Observable<HttpResponse<string>> {
+        return this.http
+            .delete(`${this.baseUrl}${url}`, { observe: 'response', responseType: 'text' })
+            .pipe(catchError(this.handleError<HttpResponse<string>>('DELETE')));
     }
 
     private handleError<T>(request: string, result?: T): (error: Error) => Observable<T> {
-        return () => of(result as T);
+        return (): Observable<T> => {
+            return of(result as T);
+        };
     }
 }
