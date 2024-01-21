@@ -1,16 +1,53 @@
-<div class="container justified">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<div class="container-justified">
     <h1 class="header-item">Vue de jeu du joueur</h1>
-    <img src="https://bit.ly/3QofL1J" alt="Logo Projet" />
-    <section id="server-message" class="justified">
+    <div class="question-box">
+        La question sera ici
+    </div>
+    <div class="answer-box1" [class.border-highlight]="isSelected(1)" (click)="toggleAnswerBox(1)" (keydown)="handleKeyboardEvent($event)" tabindex="0">
+        Réponse 1
+    </div>
+    <div class="answer-box2" [class.border-highlight]="isSelected(2)" (click)="toggleAnswerBox(2)" (keydown)="handleKeyboardEvent($event)" tabindex="0">
+        La réponse 2
+    </div>
+    <div class="boxes-below"></div>
+    <div class="answer-box3" [class.border-highlight]="isSelected(3)" (click)="toggleAnswerBox(3)" (keydown)="handleKeyboardEvent($event)" tabindex="0">
+        La réponse 3
+    </div>
+    <div class="answer-box4" [class.border-highlight]="isSelected(4)" (click)="toggleAnswerBox(4)" (keydown)="handleKeyboardEvent($event)" tabindex="0">
+        La réponse 4
+    </div>
+    <div class="chat-box">
+        <div class="messages">
+            Messages envoyés
+        </div>
+        <textarea class="write-message" placeholder="Envoyer un message"></textarea>
+    </div>
+    <span class="ff-circle">
+        <div class="centered-text">
+            <button onclick="location.href = '/home';" >Abandonner</button> <!--redirige vers home si pas en mode test, sinon creation-->
+        </div>
+    </span>
+    <span class="timer-circle">
+        <div class="centered-text">
+            Il reste {{secondsLeft}} seconde(s)
+        </div>
+    </span>
+    <div class="value-circle">
+        <div class="centered-text">
+            Valeur
+        </div>
+    </div>
+    <div class="score-circle">
+        <div class="centered-text">
+            Pointage
+        </div>
+    </div>
+    <!-- <button onclick="" >Valider les choix</button> -->
+    <!-- <section id="server-message" class="justified">
         <div class="justified">
         </div>
-    </section>
-
-    <footer class="footer-item">
-        <h4 class="team-name">Équipe 206</h4>
-        <p>
-            <span>Loris Ponderand</span>, <span>Imed-Eddine Bennour</span>, <span>Nofissa Khaif</span>,
-            <span>Romaine Brand</span>, <span>Dimitri Mansour</span>, <span>Jérémie Bolduc</span>
-        </p>
-    </footer>
+    </section> -->
 </div>
