@@ -7,17 +7,17 @@
         La question sera ici
     </div>
     <div class="answer-box1" [class.border-highlight]="isSelected(1)" (click)="toggleAnswerBox(1)" (keydown)="handleKeyboardEvent($event)" tabindex="0">
-        Réponse 1
+        1. Réponse 1
     </div>
     <div class="answer-box2" [class.border-highlight]="isSelected(2)" (click)="toggleAnswerBox(2)" (keydown)="handleKeyboardEvent($event)" tabindex="0">
-        La réponse 2
+        2. La réponse 2
     </div>
     <div class="boxes-below"></div>
     <div class="answer-box3" [class.border-highlight]="isSelected(3)" (click)="toggleAnswerBox(3)" (keydown)="handleKeyboardEvent($event)" tabindex="0">
-        La réponse 3
+        3. La réponse 3
     </div>
     <div class="answer-box4" [class.border-highlight]="isSelected(4)" (click)="toggleAnswerBox(4)" (keydown)="handleKeyboardEvent($event)" tabindex="0">
-        La réponse 4
+        4. La réponse 4
     </div>
     <div class="chat-box">
         <div class="messages">
@@ -31,19 +31,13 @@
         </div>
     </span>
     <span class="timer-circle">
-        <div class="centered-text">
-            Il reste {{secondsLeft}} seconde(s)
-        </div>
+        <div class="centered-text">Il reste {{secondsLeft}} seconde(s)</div>
     </span>
     <div class="value-circle">
-        <div class="centered-text">
-            Valeur
-        </div>
+        <div class="centered-text">Valeur</div>
     </div>
     <div class="score-circle">
-        <div class="centered-text">
-            Pointage
-        </div>
+        <div class="centered-text">Pointage</div>
     </div>
     <!-- <button onclick="" >Valider les choix</button> -->
     <!-- <section id="server-message" class="justified">
