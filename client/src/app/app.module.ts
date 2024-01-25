@@ -19,6 +19,7 @@ import { QuestionComponent } from './components/question/question.component';
 import { UpsertQuestionDialogComponent } from './components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
 import { ConfirmationDialogComponent } from './components/dialogs/confirmation-dialog/confirmation-dialog.component';
 import { ShareTestComponent } from './components/share-test/share-test.component';
+import { QuestionBankComponent } from './components/question-bank/question-bank.component';
 
 /**
  * Main module that is used in main.ts.
@@ -38,6 +39,7 @@ import { ShareTestComponent } from './components/share-test/share-test.component
         QuestionComponent,
         ConfirmationDialogComponent,
         ShareTestComponent,
+        QuestionBankComponent,
     ],
     imports: [
         AppRoutingModule,
