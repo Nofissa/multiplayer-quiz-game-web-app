@@ -1,0 +1,16 @@
+.Quiz-edit-fields-containers {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    
+}
+
+.flex-column {
+    display: flex;
+    flex-direction: column;
+}
+
+textarea {
+    border: none;
+    size-adjust: to-upper-case($string: "A");
+}
