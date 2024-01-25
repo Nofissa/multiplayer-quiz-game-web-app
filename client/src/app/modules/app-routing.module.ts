@@ -2,9 +2,9 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AdminPageComponent } from '@app/pages/admin-page/admin-page.component';
 import { CreateGamePageComponent } from '@app/pages/create-game-page/create-game-page.component';
-import { CreationQuizPageComponent } from '@app/pages/creation-quiz-page/creation-quiz-page.component';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
+import { QCMCreationPageComponent } from '@app/pages/qcmcreation-page/qcmcreation-page.component';
 
 const routes: Routes = [
     { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -12,8 +12,8 @@ const routes: Routes = [
     { path: 'admin', component: AdminPageComponent },
     { path: 'create-game', component: CreateGamePageComponent },
     { path: 'game', component: GamePageComponent },
+    { path: 'QCMCreation', component: QCMCreationPageComponent },
     { path: '**', redirectTo: '/home' },
-    { path: 'creation-page', component: CreationQuizPageComponent },
 ];
 
 @NgModule({
