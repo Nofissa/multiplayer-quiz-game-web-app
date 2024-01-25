@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/member-ordering */
 import { Component, HostListener } from '@angular/core';
 import { Subscription, map, take, timer } from 'rxjs';
+import { frequenceOneSecond } from './game-page.constants';
 
 @Component({
     selector: 'app-game-page',
@@ -10,8 +11,6 @@ import { Subscription, map, take, timer } from 'rxjs';
 export class GamePageComponent {
     // message: BehaviorSubject<string> = new BehaviorSubject<string>('');
     secondsLeft: number = 0;
-    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-    frequenceOneSecond: number = 1000;
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     timerDuration: number = 60;
     selectedAnswerBoxes: number[] = [];
@@ -29,7 +28,7 @@ export class GamePageComponent {
 
     // timer inspired from ChatGPT and https://www.codeproject.com/Questions/5349203/How-to-make-5-minute-countdown-timer-with-rxjs-and
     startTimer() {
-        const countdown$ = timer(0, this.frequenceOneSecond).pipe(
+        const countdown$ = timer(0, frequenceOneSecond).pipe(
             take(this.timerDuration + 1),
             map((secondsElapsed) => this.timerDuration - secondsElapsed),
         );
@@ -80,7 +79,7 @@ export class GamePageComponent {
         }
     }
 
-    @HostListener('keydown', ['$event'])
+    @HostListener('window:keydown', ['$event'])
     handleKeyboardEvent(event: KeyboardEvent): void {
         switch (event.key) {
             case this.firstBoxHotkey: {
