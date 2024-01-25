@@ -1,6 +1,4 @@
-.Quiz-edit-fields-containers {
-    display: flex;
-    flex-direction: row;
+#editable-textfields-containers {
     justify-content: space-evenly;
     
 }
@@ -10,7 +8,18 @@
     flex-direction: column;
 }
 
+.flex-row {
+    display: flex;
+    flex-direction: row;
+}
+
 textarea {
     border: none;
     size-adjust: to-upper-case($string: "A");
 }
+
+.question {
+ background-color: red;
+ border: 1px;
+}
+

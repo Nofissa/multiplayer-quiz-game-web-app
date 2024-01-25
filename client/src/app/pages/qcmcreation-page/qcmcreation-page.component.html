@@ -1,14 +1,17 @@
-<h1 class="header-item">Bienvenue au cours {{ title }}</h1>
+<h1 class="header-item">Build-a-Quiz</h1>
 <main>
-    <div class="Quiz-edit-fields-containers">
+    <div id="editable-textfields-containers" class="flex-row">
         <div class="flex-column">
-        <textarea> Hello 1 </textarea>
-        <textarea> Hello 2 </textarea>
+        <textarea> Quiz Name </textarea>
+        <textarea> Quiz description </textarea>
         </div>
         <div>
             <textarea> Timer 1 </textarea>
         </div>
 
     </div>
-    <p>This page works</p>
+    <div id="question-container" class="flex-column">
+
+    </div>
+    <button (click)="addQuestion()">addQuestion</button>
 </main>

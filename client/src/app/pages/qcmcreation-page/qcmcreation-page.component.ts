@@ -7,4 +7,20 @@ import { Component } from '@angular/core';
 })
 export class QCMCreationPageComponent {
     title = 'hi';
+
+    createQuestionHTML(question: string) {
+        const object = document.createElement('div');
+        object.setAttribute('class', 'question');
+        const questionText = document.createElement('p');
+        questionText.textContent = question;
+        object.appendChild(questionText);
+        return object;
+    }
+
+    addQuestion() {
+        const container = document.getElementById('question-container');
+        if (container) {
+            container.appendChild(this.createQuestionHTML('hi'));
+        }
+    }
 }
