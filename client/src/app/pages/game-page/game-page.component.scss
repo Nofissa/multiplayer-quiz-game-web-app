@@ -76,7 +76,7 @@
     padding: 10px;
 }
 
-.write-message{
+  .write-message {
     flex: 0.2;
     padding: 10px;
     resize: none;
@@ -134,6 +134,14 @@
     display: inline-block;
   }
   
-  .border-highlight {
+  .highlight-selected {
     border: 5px solid blue;
+  }
+
+  .highlight-validated {
+    border: 5px solid rgb(220, 237, 113);
+  }
+
+  .disable-click {
+    pointer-events: none;
   }
