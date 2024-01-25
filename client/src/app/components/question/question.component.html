@@ -1,0 +1,36 @@
+<div *ngIf="!isDeleted">
+    <div class="container">
+        <div class="question-body column">
+            <div *ngIf="mode === modes.Admin" class="overlay">
+                <div class="actions">
+                    <div class="action-wrapper" (click)="openEditQuestionDialog()">
+                        <mat-icon aria-hidden="false" class="action action-admin action-edit" aria-label="Modifier"
+                            fontIcon="edit"></mat-icon>
+                    </div>
+                    <div class="action-wrapper" (click)="openDeleteQuestionDialog()">
+                        <mat-icon aria-hidden="false" class="action action-admin action-delete" aria-label="Supprimer"
+                            fontIcon="delete"></mat-icon>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="mode === modes.Sharing" class="action-wrapper" (click)="share()">
+                <mat-icon aria-hidden="false" aria-label="Partager" fontIcon="my_library_add"
+                    class="action action-share"></mat-icon>
+            </div>
+            <div class="question-content">
+                <span class="text-centered">{{ question.question }}</span>
+            </div>
+            <div *ngIf="mode===modes.Admin" class="last-modified-wrapper">
+                <span class="text-centered">
+                    <span>Modifiée le:</span>
+                    <span class="last-modified-date-text">
+                        {{
+                        question.lastModified.toLocaleString('fr-CA',
+                        { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' })
+                        }}
+                    </span>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>

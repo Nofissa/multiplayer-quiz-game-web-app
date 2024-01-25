@@ -1,16 +1,11 @@
 <div class="container justified">
-    <h1 class="header-item">Vue de création d'une partie</h1>
-    <img src="https://bit.ly/3QofL1J" alt="Logo Projet" />
-    <section id="server-message" class="justified">
-        <div class="justified">
+    <section class="justified">
+        <app-share-test>
+        </app-share-test>
+        <div class="justified"
+            style="display: flex; justify-content: center; align-items: center; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+            <app-question-list [mode]="questionListModes.Sharing"></app-question-list>
         </div>
     </section>
 
-    <footer class="footer-item">
-        <h4 class="team-name">Équipe 206</h4>
-        <p>
-            <span>Loris Ponderand</span>, <span>Imed-Eddine Bennour</span>, <span>Nofissa Khaif</span>,
-            <span>Romaine Brand</span>, <span>Dimitri Mansour</span>, <span>Jérémie Bolduc</span>
-        </p>
-    </footer>
 </div>
