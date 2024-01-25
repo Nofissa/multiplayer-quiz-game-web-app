@@ -6,3 +6,21 @@ body {
     background-color: var(--back-color);
     color: aliceblue;
 }
+
+.button {
+    padding: 8px 22px;
+    border-radius: 6px;
+    background-color: aliceblue;
+    transition: all 0.2s ease;
+    margin-top: 10px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.justified {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
