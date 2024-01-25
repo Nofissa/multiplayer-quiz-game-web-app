@@ -4,13 +4,14 @@
 }
 
 .logo {
-    width: 500px;
-    height: 500px;
+    width: 30rem;
+    height: 30rem;
+
 }
 
 .container {
-    min-height: 100vh;
-    height: auto;
+
+
 }
 
 .justified {
@@ -58,6 +59,7 @@
 
 
 .footer-item {
+
     display: flex;
     flex-direction: row;
     width: 100%;
@@ -73,8 +75,12 @@
 }
 
 .server-message {
+
     justify-content: center;
     width: 20%;
     min-width: min-content;
 }
  
+body {
+    height: 100vh;
+}
