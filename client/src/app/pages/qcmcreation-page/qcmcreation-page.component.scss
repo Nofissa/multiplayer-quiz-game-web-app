@@ -16,10 +16,7 @@
 textarea {
     border: none;
     size-adjust: to-upper-case($string: "A");
+    background-color: var(--back-color);
 }
 
-.question {
- background-color: red;
- border: 1px;
-}
 

@@ -1,17 +1,24 @@
 <h1 class="header-item">Build-a-Quiz</h1>
-<main>
-    <div id="editable-textfields-containers" class="flex-row">
-        <div class="flex-column">
-        <textarea> Quiz Name </textarea>
-        <textarea> Quiz description </textarea>
+<body class="flex-row">
+    <form id="quiz-creation-form" class="flex-column">
+        <div id="text-editables" class="flex-row">
+            <div class="flex-column">
+                <textarea>
+                    HIIII
+                </textarea>
+                <textarea>
+                    HELLO
+                </textarea>
+            </div>
+            <textarea>
+                TIMEER
+            </textarea>
         </div>
-        <div>
-            <textarea> Timer 1 </textarea>
+        <div id="questions-container">
+
         </div>
+        <button type="submit" (click)="addQuestion()">addQuestion</button>
+    </form>
+    <app-question-list></app-question-list>
 
-    </div>
-    <div id="question-container" class="flex-column">
-
-    </div>
-    <button (click)="addQuestion()">addQuestion</button>
-</main>
+</body>
