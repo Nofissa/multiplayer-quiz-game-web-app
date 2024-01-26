@@ -15,8 +15,24 @@
 
 textarea {
     border: none;
-    size-adjust: to-upper-case($string: "A");
     background-color: var(--back-color);
+    overflow: hidden;
+    color: white;
+    size-adjust: none;
+    height: 40px;
+    width: 100px;
+    font-size: 16px;
 }
 
 
+body {
+    justify-content: space-evenly;
+    display: flex;
+    flex-direction: row;
+
+
+}
+
+form {
+    width: max-content;
+}
