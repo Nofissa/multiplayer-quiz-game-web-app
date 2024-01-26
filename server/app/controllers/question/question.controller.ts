@@ -1,7 +1,7 @@
 import { Course } from '@app/model/database/course';
 import { CreateQuestionDto } from '@app/model/dto/question/create-question.dto';
 import { UpdateQuestionDto } from '@app/model/dto/question/update-question.dto';
-import { QuizService } from '@app/services/question/question.service';
+import { QuestionService } from '@app/services/question/question.service';
 import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Res } from '@nestjs/common';
 import { ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
@@ -9,7 +9,7 @@ import { Response } from 'express';
 @ApiTags('Questions')
 @Controller('questions')
 export class QuestionController {
-    constructor(private readonly questionService: QuizService) {}
+    constructor(private readonly questionService: QuestionService) {}
 
     @ApiOkResponse({
         description: 'Returns all questions',
