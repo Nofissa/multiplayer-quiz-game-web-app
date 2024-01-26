@@ -1,18 +1,17 @@
 import { Course } from '@app/model/database/course';
-import { CreateQuestionDto } from '@app/model/dto/question/create-question.dto';
-import { UpdateQuestionDto } from '@app/model/dto/question/update-question.dto';
-import { QuizService } from '@app/services/question/question.service';
+import { UpsertQuizDto } from '@app/model/dto/quiz/upsert-quiz.dto';
+import { QuizService } from '@app/services/quiz/quiz.service';
 import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Res } from '@nestjs/common';
 import { ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 
-@ApiTags('Questions')
-@Controller('questions')
-export class QuestionController {
-    constructor(private readonly questionService: QuizService) {}
+@ApiTags('Quiz')
+@Controller('quiz')
+export class QuizController {
+    constructor(private readonly quizService: QuizService) {}
 
     @ApiOkResponse({
-        description: 'Returns all questions',
+        description: 'Returns all quiz',
         type: Course,
         isArray: true,
     })
@@ -22,8 +21,8 @@ export class QuestionController {
     @Get('/')
     async getAllQuestions(@Res() response: Response) {
         try {
-            const allQuestions = await this.questionService.getAllQuestions();
-            response.status(HttpStatus.OK).json(allQuestions);
+            const allQuiz = await this.quizService.getAllQuestions();
+            response.status(HttpStatus.OK).json(allQuiz);
         } catch (error) {
             response.status(HttpStatus.NOT_FOUND).send(error.message);
         }
@@ -36,9 +35,9 @@ export class QuestionController {
         description: 'Return NOT_FOUND http status when request fails',
     })
     @Post('/')
-    async addQuestion(@Body() dto: CreateQuestionDto, @Res() response: Response) {
+    async addQuestion(@Body() dto: UpsertQuizDto, @Res() response: Response) {
         try {
-            await this.questionService.addQuestion(dto);
+            await this.quizService.addQuiz(dto);
             response.status(HttpStatus.CREATED).send();
         } catch (error) {
             response.status(HttpStatus.NOT_FOUND).send(error.message);
@@ -46,16 +45,16 @@ export class QuestionController {
     }
 
     @ApiOkResponse({
-        description: 'Modify a question',
+        description: 'Modify a quiz',
         type: Course,
     })
     @ApiNotFoundResponse({
         description: 'Return NOT_FOUND http status when request fails',
     })
     @Put('/')
-    async modifyQuestion(@Body() dto: UpdateQuestionDto, @Res() response: Response) {
+    async modifyQuestion(@Body() dto: UpsertQuizDto, @Res() response: Response) {
         try {
-            await this.questionService.modifyQuestion(dto);
+            await this.quizService.modifyQuiz(dto);
             response.status(HttpStatus.OK).send();
         } catch (error) {
             response.status(HttpStatus.NOT_FOUND).send(error.message);
@@ -71,7 +70,7 @@ export class QuestionController {
     @Delete('/:id')
     async deleteQuestionById(@Param('id') id: string, @Res() response: Response) {
         try {
-            await this.questionService.deleteQuestionById(id);
+            await this.quizService.deleteQuestionById(id);
             response.status(HttpStatus.OK).send();
         } catch (error) {
             response.status(HttpStatus.NOT_FOUND).send(error.message);

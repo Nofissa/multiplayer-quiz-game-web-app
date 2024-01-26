@@ -2,14 +2,13 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
-import { Question, QuestionDocument } from '@app/model/database/question';
-import { CreateQuestionDto } from '@app/model/dto/question/create-question.dto';
-import { UpdateQuestionDto } from '@app/model/dto/question/update-question.dto';
+import { Quiz, QuizDocument } from '@app/model/database/quiz';
+import { QuestionDto, UpsertQuizDto } from '@app/model/dto/quiz/upsert-quiz.dto';
 
 @Injectable()
 export class QuizService {
     constructor(
-        @InjectModel(Question.name) public model: Model<QuestionDocument>,
+        @InjectModel(Quiz.name) public model: Model<QuizDocument>,
         private readonly logger: Logger,
     ) {
         this.start();
@@ -23,7 +22,7 @@ export class QuizService {
     }
 
     async populateDB(): Promise<void> {
-        const questions: CreateQuestionDto[] = [
+        const questions: QuestionDto[] = [
             {
                 question: 'Quelle est la valeur de la constante R dans la formule pV = nRT',
                 incorrectAnswers: ['3.14 V/m^2', '2.72 C/s', '6.022x10^23 mol/N'],
@@ -38,17 +37,34 @@ export class QuizService {
             },
         ];
 
+        const quizzes: Quiz[] = [
+            {
+                titre: 'Quiz 1',
+                description : 'Quiz 1 description',
+                questions: questions,
+                lastModified: new Date(),
+                isHidden: true,
+            },
+            {
+                titre: 'Quiz 2',
+                description : 'Quiz 2 description',
+                questions: questions,
+                lastModified: new Date('2024-01-20 18:43:27'),
+                isHidden: false,
+            }
+        ];
+        
         this.logger.log('THIS ADDS DATA TO THE DATABASE, DO NOT USE OTHERWISE');
-        await this.model.insertMany(questions);
+        await this.model.insertMany(quizzes);
     }
 
-    async getAllQuestions(): Promise<Question[]> {
+    async getAllQuestions(): Promise<Quiz[]> {
         return await this.model.find({}).sort({ lastModified: 1 });
     }
 
-    async addQuestion(dto: CreateQuestionDto): Promise<void> {
-        if ((await this.validateQuestionInsertion(dto)) === false) {
-            return Promise.reject('Invalid question');
+    async addQuiz(dto: UpsertQuizDto): Promise<void> {
+        if ((await this.validateQuizInsertion(dto)) === false) {
+            return Promise.reject('Invalid quiz');
         }
 
         dto.lastModified = new Date();
@@ -60,9 +76,9 @@ export class QuizService {
         }
     }
 
-    async modifyQuestion(dto: UpdateQuestionDto): Promise<void> {
-        if ((await this.validateQuestionInsertion(dto)) === false) {
-            return Promise.reject('Invalid question');
+    async modifyQuiz(dto: UpsertQuizDto): Promise<void> {
+        if ((await this.validateQuizInsertion(dto)) === false) {
+            return Promise.reject('Invalid quiz');
         }
 
         dto.lastModified = new Date();
@@ -70,7 +86,7 @@ export class QuizService {
         try {
             await this.model.replaceOne(dto);
         } catch (error) {
-            return Promise.reject(`Failed to insert course: ${error}`);
+            return Promise.reject(`Failed to insert quiz: ${error}`);
         }
     }
 
@@ -78,13 +94,13 @@ export class QuizService {
         try {
             await this.model.findByIdAndDelete(id);
         } catch (error) {
-            return Promise.reject(`Failed to insert course: ${error}`);
+            return Promise.reject(`Failed to insert quiz: ${error}`);
         }
     }
 
-    async validateQuestionInsertion(dto: CreateQuestionDto): Promise<boolean> {
-        const regex = new RegExp(`^${dto.question}$`, 'i'); // for case unsentiveness
+    async validateQuizInsertion(dto: UpsertQuizDto): Promise<boolean> {
+        const regex = new RegExp(`^${dto.titre}$`, 'i'); // for case unsentiveness
 
-        return await this.model.findOne({ question: { $regex: regex } });
+        return await this.model.findOne({ titre: { $regex: regex } });
     }
 }
