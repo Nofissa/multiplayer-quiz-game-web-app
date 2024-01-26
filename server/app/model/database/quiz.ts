@@ -55,4 +55,4 @@ export class Quiz {
     _id?: string;
 }
 
-export const questionSchema = SchemaFactory.createForClass(Quiz);
+export const quizSchema = SchemaFactory.createForClass(Quiz);
