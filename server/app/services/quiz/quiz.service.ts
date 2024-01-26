@@ -1,9 +1,8 @@
+import { Quiz, QuizDocument } from '@app/model/database/quiz';
+import { QuestionDto, UpsertQuizDto } from '@app/model/dto/quiz/upsert-quiz.dto';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-
-import { Quiz, QuizDocument } from '@app/model/database/quiz';
-import { QuestionDto, UpsertQuizDto } from '@app/model/dto/quiz/upsert-quiz.dto';
 
 @Injectable()
 export class QuizService {
