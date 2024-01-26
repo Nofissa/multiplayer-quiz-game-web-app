@@ -19,6 +19,14 @@ export class Question {
     @ApiProperty()
     @Prop({ required: true })
     lastModified: Date;
+
+    @ApiProperty()
+    @Prop({ required: true })
+    pointValue: number; 
+
+    @ApiProperty()
+    @Prop({ required: true })
+    timeInSeconds: number;
 }
 
 @Schema()

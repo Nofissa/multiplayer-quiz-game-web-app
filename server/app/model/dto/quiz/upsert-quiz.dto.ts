@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsArray, IsBoolean, IsDate, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsBoolean, IsDate, IsNumber, IsOptional, IsString } from 'class-validator';
 export class QuestionDto {
     @ApiProperty()
     @IsString()
@@ -20,10 +20,16 @@ export class QuestionDto {
     @IsOptional()
     lastModified: Date;
     
+    @ApiProperty()
+    @IsNumber()
+    pointValue: number; 
+
+    @ApiProperty()
+    @IsNumber()
+    timeInSeconds: number;
 }
 
 export class UpsertQuizDto {
- 
     @ApiProperty()
     @IsString()
     titre: string;

@@ -21,7 +21,7 @@ export class QuizController {
     @Get('/')
     async getAllQuestions(@Res() response: Response) {
         try {
-            const allQuiz = await this.quizService.getAllQuestions();
+            const allQuiz = await this.quizService.getAllQuizzes();
             response.status(HttpStatus.OK).json(allQuiz);
         } catch (error) {
             response.status(HttpStatus.NOT_FOUND).send(error.message);
@@ -62,7 +62,7 @@ export class QuizController {
     }
 
     @ApiOkResponse({
-        description: 'Delete a question',
+        description: 'Delete a quiz',
     })
     @ApiNotFoundResponse({
         description: 'Return NOT_FOUND http status when request fails',
