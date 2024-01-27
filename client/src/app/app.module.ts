@@ -21,6 +21,7 @@ import { AdminPageComponent } from './pages/admin-page/admin-page.component';
 import { CreateGamePageComponent } from './pages/create-game-page/create-game-page.component';
 import { QCMCreationPageComponent } from './pages/qcmcreation-page/qcmcreation-page.component';
 import { TimerDialComponent } from './components/timer-dial/timer-dial.component';
+import { CreateQuestionModalComponent } from './components/create-question-modal/create-question-modal.component';
 
 /**
  * Main module that is used in main.ts.
@@ -42,6 +43,7 @@ import { TimerDialComponent } from './components/timer-dial/timer-dial.component
         ConfirmationDialogComponent,
         ShareTestComponent,
         TimerDialComponent,
+        CreateQuestionModalComponent,
     ],
     imports: [
         AppRoutingModule,

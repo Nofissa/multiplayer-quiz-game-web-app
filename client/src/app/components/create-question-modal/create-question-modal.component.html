@@ -1,0 +1,17 @@
+<dialog id="question-creation-modal">
+    <h2>Créer une question</h2>
+    <label for="select-number-answers">Nombre de réponses</label>
+    <select id="select-number-answers" [(ngModel)]="selectedNumber" (change)="setUpModal()">
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+    </select>
+
+    <label for="input-new-question">Question</label>
+    <input type="text" id="input-new-question" placeholder="Votre question"/>
+    
+    <label for="input-right-answer">Réponses</label>
+    <input type="text" id="input-right-answer" placeholder="Votre réponse"/>
+
+    <input type="submit" id="submit-create-question" (click)="submitNewQeustion()">
+</dialog>

@@ -1,23 +1,20 @@
 
-<body>
+<div id="quiz-creation-page">
     <form id="quiz-creation-form" class="flex-column">
         <h1 class="header-item">Build-a-Quiz</h1>
         <div id="text-editables" class="flex-row">
             <div class="flex-column">
-                <textarea>
-                    HIIII
-                </textarea>
-                <textarea>
-                    HELLO
-                </textarea>
+                <input id="title" type="text" class="text-edit" placeholder="Votre titre ici" required/>
+                <textarea id="description" class="text-edit" placeholder="Votre description ici" required></textarea>
             </div>
             <app-timer-dial></app-timer-dial>
         </div>
         <div id="questions-container">
-
+            <p>helloooooo</p>
         </div>
-        <button type="submit" (click)="addQuestion()">addQuestion</button>
+        <button (click)="addQuestion()">addQuestion</button>
     </form>
     <app-question-list></app-question-list>
+    <app-create-question-modal></app-create-question-modal>
+</div>
 
-</body>

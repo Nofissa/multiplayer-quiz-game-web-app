@@ -10,7 +10,6 @@ export class QCMCreationPageComponent {
 
     createQuestionHTML(question: string) {
         const object = document.createElement('div');
-        object.setAttribute('class', 'question');
         const questionText = document.createElement('p');
         questionText.textContent = question;
         object.appendChild(questionText);
@@ -18,9 +17,9 @@ export class QCMCreationPageComponent {
     }
 
     addQuestion() {
-        const container = document.getElementById('question-container');
-        if (container) {
-            container.appendChild(this.createQuestionHTML('hi'));
+        const modal = document.getElementById('question-creation-modal');
+        if (modal) {
+            modal.setAttribute('visibility', 'visible');
         }
     }
 }
