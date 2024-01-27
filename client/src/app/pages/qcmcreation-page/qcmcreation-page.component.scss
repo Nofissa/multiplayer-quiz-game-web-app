@@ -34,5 +34,11 @@ body {
 }
 
 form {
-    width: max-content;
+    width: 50%;
+    align-items: center;
+}
+
+#text-editables {
+    width: 100%;
+    justify-content : space-evenly;
 }
