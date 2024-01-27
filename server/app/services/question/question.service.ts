@@ -7,7 +7,7 @@ import { CreateQuestionDto } from '@app/model/dto/question/create-question.dto';
 import { UpdateQuestionDto } from '@app/model/dto/question/update-question.dto';
 
 @Injectable()
-export class QuizService {
+export class QuestionService {
     constructor(
         @InjectModel(Question.name) public model: Model<QuestionDocument>,
         private readonly logger: Logger,

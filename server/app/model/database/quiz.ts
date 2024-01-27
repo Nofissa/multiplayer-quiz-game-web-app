@@ -19,6 +19,14 @@ export class Question {
     @ApiProperty()
     @Prop({ required: true })
     lastModified: Date;
+
+    @ApiProperty()
+    @Prop({ required: true })
+    pointValue: number; 
+
+    @ApiProperty()
+    @Prop({ required: true })
+    timeInSeconds: number;
 }
 
 @Schema()
@@ -47,4 +55,4 @@ export class Quiz {
     _id?: string;
 }
 
-export const questionSchema = SchemaFactory.createForClass(Quiz);
+export const quizSchema = SchemaFactory.createForClass(Quiz);
