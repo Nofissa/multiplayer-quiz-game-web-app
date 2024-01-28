@@ -16,7 +16,7 @@ export class Question {
 
     @ApiProperty()
     @Prop({ required: true })
-    correctAnswer: string;
+    correctAnswer: string[];
 
     @ApiProperty()
     @Prop({ required: true })
