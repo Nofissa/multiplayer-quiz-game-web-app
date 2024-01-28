@@ -4,7 +4,8 @@
         </app-share-test>
         <div class="justified"
             style="display: flex; justify-content: center; align-items: center; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);">
-            <app-question-bank [mode]="questionListModes.Sharing"></app-question-bank>
+            <app-question-bank
+                [options]="{ create: true, edit: true, delete: true, share: true, displayLastModified: true }"></app-question-bank>
         </div>
     </section>
 

@@ -11,6 +11,7 @@ import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog
 export class UpsertQuestionDialogComponent {
     formGroup: FormGroup;
     incorrectAnswersArray: FormArray;
+    correctAnswersArray: FormArray;
 
     constructor(
         private formBuilder: FormBuilder,
@@ -21,16 +22,26 @@ export class UpsertQuestionDialogComponent {
             this.data.question.incorrectAnswers.map((answer) => this.formBuilder.control(answer, Validators.required)),
             Validators.required,
         ) as FormArray;
+        this.correctAnswersArray = this.formBuilder.array(
+            this.data.question.incorrectAnswers.map((answer) => this.formBuilder.control(answer, Validators.required)),
+            Validators.required,
+        ) as FormArray;
 
         this.formGroup = this.formBuilder.group({
             question: [this.data.question.question, Validators.required],
             incorrectAnswers: this.incorrectAnswersArray,
-            correctAnswer: [this.data.question.correctAnswer, Validators.required],
+            correctAnswers: this.correctAnswersArray,
+            pointValue: [this.data.question.pointValue, Validators.required],
+            timeInSeconds: [this.data.question.timeInSeconds, Validators.required],
         });
     }
 
     get incorrectAnswersControls(): FormControl[] {
         return this.incorrectAnswersArray.controls as FormControl[];
+    }
+
+    get correctAnswersControls(): FormControl[] {
+        return this.correctAnswersArray.controls as FormControl[];
     }
 
     cancel(): void {

@@ -43,6 +43,7 @@
     .overlay {
         bottom: 0%;
         background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0));
+        backdrop-filter: blur(2px);
     }
 }
 
@@ -54,7 +55,7 @@
     width: 100%;
     height: 100%;
     bottom: 100%;
-    backdrop-filter: blur(2px);
+    border-radius: 12px;
     z-index: 2;
     transition: all 0.5s;
 }
@@ -66,7 +67,7 @@
     justify-content: flex-end;
     color: #717171;
     font-size: 0.75rem;
-    padding: 0px 5px;
+    padding: 2px 8px;
     z-index: 1;
 }
 
@@ -77,7 +78,7 @@
 .actions {
     display: flex;
     justify-content: space-around;
-    width: 33%;
+    width: 50%;
 }
 
 .action-wrapper {
@@ -88,28 +89,24 @@
     position: absolute;
     height: fit-content;
     width: fit-content;
+    top: 50%;
+    transform: translate(-50%, -50%) scale(1);
     font-size: 2rem;
     transition: all 0.25s;
 }
 
+.shared {
+    position: absolute;
+    height: fit-content;
+    width: fit-content;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2rem;
+}
+
 .action:hover {
     cursor: pointer;
-    transform: scale(1.15);
-}
-
-.action-admin {
-    top: 50%;
-    transform: translate(-50%, -50%) scale(1);
-}
-
-.action-admin:hover {
     transform: translate(-50%, -50%) scale(1.1); /* Scale to 1.5 on hover */
-}
-
-.action-share {
-    top: 0%;
-    right: 2%;
-    z-index: 1;
 }
 
 .active {
@@ -117,7 +114,7 @@
 }
 
 .action-share:hover {
-    // color: var(--answer-color-green);
+    color: var(--answer-color-green);
 }
 
 .action-edit:hover {
@@ -127,3 +124,4 @@
 .action-delete:hover {
     color: var(--answer-color-red);
 }
+

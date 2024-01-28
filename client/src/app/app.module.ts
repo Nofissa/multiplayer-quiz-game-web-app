@@ -35,11 +35,11 @@ import { QuestionBankComponent } from './components/question-bank/question-bank.
         GamePageComponent,
         MainPageComponent,
         UpsertQuestionDialogComponent,
+        QuestionBankComponent,
         QuestionListComponent,
         QuestionComponent,
         ConfirmationDialogComponent,
         ShareTestComponent,
-        QuestionBankComponent,
     ],
     imports: [
         AppRoutingModule,

@@ -1,8 +1,9 @@
 <div class="list scrollable column">
-    <app-question *ngFor="let question of questions" [question]="question" [mode]="mode"></app-question>
+    <app-question *ngFor="let question of questions" [question]="question" [options]="options"
+        [interactionService]="interactionService"></app-question>
 </div>
-<div *ngIf="mode === modes.Admin" class="actions">
-    <div class="action-wrapper" (click)="openAddQuestionDialog()">
+<div *ngIf="options.create" class="actions">
+    <div class="action-wrapper" (click)="invokeOnAddQuestion()">
         <mat-icon aria-hidden="false" class="action action-add" aria-label="Ajouter" fontIcon="add_circle"></mat-icon>
     </div>
 </div>

@@ -7,14 +7,25 @@
                 <textarea matInput formControlName="question" value="{{ data.question.question }}">
                 </textarea>
             </mat-form-field>
-            <mat-form-field appearance="outline">
+            <mat-form-field *ngFor="let correctAnswer of correctAnswersControls; let i = index"
+                appearance="outline">
                 <mat-label>Bonne Réponse</mat-label>
-                <input matInput type="text" formControlName="correctAnswer" value="{{ data.question.correctAnswer }}">
+                <input matInput type="text" [formControl]="correctAnswer">
             </mat-form-field>
             <mat-form-field *ngFor="let incorrectAnswer of incorrectAnswersControls; let i = index"
                 appearance="outline">
                 <mat-label>Mauvaise Réponse</mat-label>
                 <input matInput type="text" [formControl]="incorrectAnswer">
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+                <mat-label>Nombre de points</mat-label>
+                <input matInput type="number" min="0" formControlName="pointValue"
+                    value="{{ data.question.pointValue }}">
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+                <mat-label>Temps alloué (secondes)</mat-label>
+                <input matInput type="number" min="1" formControlName="timeInSeconds"
+                    value="{{ data.question.timeInSeconds }}">
             </mat-form-field>
         </div>
     </mat-dialog-content>

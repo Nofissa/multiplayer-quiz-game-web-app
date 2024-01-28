@@ -1,7 +1,9 @@
 export interface Question {
+    _id: string;
     question: string;
     incorrectAnswers: string[];
-    correctAnswer: string;
+    correctAnswers: string[];
+    pointValue: number;
+    timeInSeconds: number;
     lastModified: Date;
-    _id: string;
 }

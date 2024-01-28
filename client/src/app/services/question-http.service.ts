@@ -54,8 +54,8 @@ export class QuestionHttpService {
 
     private handleError<T>(errorMessage: string): (error: HttpErrorResponse) => Observable<T> {
         // eslint-disable-next-line no-unused-vars
-        return (_: HttpErrorResponse): Observable<T> => {
-            return throwError(() => new Error(errorMessage));
+        return (httpErrorResponse: HttpErrorResponse): Observable<T> => {
+            return throwError(() => new Error(`${errorMessage}: ${httpErrorResponse.error.message}`));
         };
     }
 }

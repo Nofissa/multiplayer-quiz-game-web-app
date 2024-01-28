@@ -3,7 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { of } from 'rxjs';
 import { QuestionComponent } from './question.component';
-import { QuestionListModes } from '@app/enums/question-list-modes';
+import { QuestionListEnabledFeatures } from '@app/enums/question-list-features';
 import { QuestionHttpService } from '@app/services/question-http.service';
 import { QuestionSharingService } from '@app/services/question-sharing.service';
 import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
@@ -39,10 +39,10 @@ describe('QuestionComponent', () => {
             _id: '1',
             question: 'Sample Question',
             incorrectAnswers: ['Incorrect Answer 1', 'Incorrect Answer 2', 'Incorrect Answer 3'],
-            correctAnswer: 'Correct Answer',
+            correctAnswers: 'Correct Answer',
             lastModified: new Date(),
         };
-        component.mode = QuestionListModes.Sharing;
+        component.mode = QuestionListEnabledFeatures.Share;
         fixture.detectChanges();
     });
 
@@ -55,7 +55,7 @@ describe('QuestionComponent', () => {
             _id: '1',
             question: 'Updated Question',
             incorrectAnswers: ['Updated Answer 1', 'Updated Answer 2', 'Updated Answer 3'],
-            correctAnswer: 'Updated Correct Answer',
+            correctAnswers: 'Updated Correct Answer',
             lastModified: new Date(component.question.lastModified),
         };
         const question = structuredClone(component.question);
@@ -78,14 +78,14 @@ describe('QuestionComponent', () => {
             ...component.question,
             question: mockResult.question,
             incorrectAnswers: mockResult.incorrectAnswers,
-            correctAnswer: mockResult.correctAnswer,
+            correctAnswer: mockResult.correctAnswers,
         });
 
         expect(mockQuestionHttpService.updateQuestion).toHaveBeenCalledWith({
             ...component.question,
             question: mockResult.question,
             incorrectAnswers: mockResult.incorrectAnswers,
-            correctAnswer: mockResult.correctAnswer,
+            correctAnswers: mockResult.correctAnswers,
         });
 
         expect(mockQuestionSharingService.share).toHaveBeenCalled();

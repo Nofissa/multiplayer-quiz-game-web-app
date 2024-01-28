@@ -1,6 +1,6 @@
-import { Question } from "@app/interfaces/question";
+import { Question } from '@app/interfaces/question';
 
 export interface UpsertQuestionDialogData {
-    title: string,
+    title: string;
     question: Question;
 }

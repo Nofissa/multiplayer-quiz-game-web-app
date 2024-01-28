@@ -1,36 +1,36 @@
-<div *ngIf="!isDeleted">
-    <div class="container">
-        <div class="question-body column">
-            <div *ngIf="mode === modes.Admin" class="overlay">
-                <div class="actions">
-                    <div class="action-wrapper" (click)="openEditQuestionDialog()">
-                        <mat-icon aria-hidden="false" class="action action-admin action-edit" aria-label="Modifier"
-                            fontIcon="edit"></mat-icon>
-                    </div>
-                    <div class="action-wrapper" (click)="openDeleteQuestionDialog()">
-                        <mat-icon aria-hidden="false" class="action action-admin action-delete" aria-label="Supprimer"
-                            fontIcon="delete"></mat-icon>
-                    </div>
+<div class="container">
+    <div class="question-body column">
+        <div *ngIf="options.edit || options.delete || options.share" class="overlay">
+            <div class="actions">
+                <div *ngIf="options.edit" class="action-wrapper" (click)="invokeOnEditQuestion()">
+                    <mat-icon aria-hidden="true" aria-label="Modifier" fontIcon="edit"
+                        class="action action-edit"></mat-icon>
+                </div>
+                <div *ngIf="options.delete" class="action-wrapper" (click)="invokeOnDeleteQuestion()">
+                    <mat-icon aria-hidden="true" aria-label="Supprimer" fontIcon="delete"
+                        class="action action-delete"></mat-icon>
+                </div>
+                <div *ngIf="options.share" class="action-wrapper" (click)="share()">
+                    <mat-icon *ngIf="!isShared" aria-hidden="true" aria-label="Partager" fontIcon="playlist_add"
+                        class="action action-share"></mat-icon>
+                    <mat-icon *ngIf="isShared" aria-hidden="true" aria-label="Partager" fontIcon="playlist_add_check"
+                        class="shared"></mat-icon>
                 </div>
             </div>
-            <div *ngIf="mode === modes.Sharing" class="action-wrapper" (click)="share()">
-                <mat-icon aria-hidden="false" aria-label="Partager" fontIcon="my_library_add"
-                    class="action action-share"></mat-icon>
-            </div>
-            <div class="question-content">
-                <span class="text-centered">{{ question.question }}</span>
-            </div>
-            <div *ngIf="mode===modes.Admin" class="last-modified-wrapper">
-                <span class="text-centered">
-                    <span>Modifiée le:</span>
-                    <span class="last-modified-date-text">
-                        {{
-                        question.lastModified.toLocaleString('fr-CA',
-                        { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' })
-                        }}
-                    </span>
+        </div>
+        <div class="question-content">
+            <span class="text-centered">{{ question.question }}</span>
+        </div>
+        <div *ngIf="options.displayLastModified" class="last-modified-wrapper">
+            <span class="text-centered">
+                <span>Modifiée le:</span>
+                <span class="last-modified-date-text">
+                    {{
+                    question.lastModified.toLocaleString('fr-CA',
+                    { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' })
+                    }}
                 </span>
-            </div>
+            </span>
         </div>
     </div>
 </div>
