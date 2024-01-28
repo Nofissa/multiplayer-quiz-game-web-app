@@ -19,11 +19,35 @@ export class CreateQuestionModalComponent {
 
     openModal() {
         const modal = document.getElementById('question-creation-modal');
-        if (modal) modal.setAttribute('visibility', 'visible');
+        if (modal) modal.setAttribute('display', 'flex');
+    }
+
+    createAnswerHTML(answerNumber: number) {
+        const answerDiv = document.createElement('div');
+        answerDiv.classList.add('flex-row');
+        const answerArea = document.createElement('textarea');
+        const questionNumber = document.createElement('p');
+        questionNumber.textContent = '#' + answerNumber;
+        answerArea.id = 'answer' + answerNumber;
+        answerDiv.appendChild(answerArea);
+        return answerDiv;
     }
 
     setUpModal() {
-        window.console.log(this.selectedNumber);
+        const answersDiv = document.getElementById('modal-answers-container');
+
+        if (answersDiv) {
+            while (answersDiv.children.length > this.selectedNumber) {
+                const child = answersDiv.lastChild;
+                if (child) {
+                    answersDiv.removeChild(child);
+                }
+            }
+            for (let i = answersDiv.children.length; i < this.selectedNumber; i++) {
+                answersDiv.appendChild(this.createAnswerHTML(i));
+            }
+        }
+
         this.selectedNumber = 0;
     }
 }
