@@ -43,20 +43,20 @@ export class QuizService {
         const quizzes: Quiz[] = [
             {
                 titre: 'Quiz 1',
-                description : 'Quiz 1 description',
-                questions: questions,
+                description: 'Quiz 1 description',
+                questions,
                 lastModified: new Date(),
                 isHidden: true,
             },
             {
                 titre: 'Quiz 2',
-                description : 'Quiz 2 description',
-                questions: questions,
+                description: 'Quiz 2 description',
+                questions,
                 lastModified: new Date('2024-01-20 18:43:27'),
                 isHidden: false,
-            }
+            },
         ];
-        
+
         this.logger.log('THIS ADDS DATA TO THE DATABASE, DO NOT USE OTHERWISE');
         await this.model.insertMany(quizzes);
     }
@@ -78,7 +78,7 @@ export class QuizService {
             return Promise.reject(`Failed to insert Quiz: ${error}`);
         }
     }
-    //TODO : retourner modify quiz 
+
     async modifyQuiz(dto: UpsertQuizDto): Promise<Quiz> {
         if ((await this.validateQuizInsertion(dto)) === false) {
             return Promise.reject('Invalid quiz');
@@ -87,12 +87,13 @@ export class QuizService {
         dto.lastModified = new Date();
 
         try {
-            return await this.model.findOneAndReplace({_id: dto._id}, dto, {new : true});
+            // eslint-disable-next-line no-underscore-dangle
+            return await this.model.findOneAndReplace({ _id: dto._id }, dto, { new: true });
         } catch (error) {
             return Promise.reject(`Failed to insert quiz: ${error}`);
         }
     }
-    //TODO : retourner deleted quiz 
+
     async deleteQuizById(id: string): Promise<Quiz> {
         try {
             return await this.model.findByIdAndDelete(id, { new: true });
@@ -100,34 +101,26 @@ export class QuizService {
             return Promise.reject(`Failed to delete quiz: ${error}`);
         }
     }
-    
+
     async modifyQuestionInQuiz(id: string, questionId: string): Promise<Question> {
         try {
-            return await this.model.findOneAndUpdate(
-                { _id: id },
-                { $set: { questions: {_id : questionId } } },
-                { new: true },)
+            return await this.model.findOneAndUpdate({ _id: id }, { $set: { questions: { _id: questionId } } }, { new: true });
         } catch (error) {
             return Promise.reject(`Failed to modify question: ${error}`);
-        }    
+        }
     }
 
     async deleteQuestionInQuizbyId(id: string, questionId: string): Promise<Question> {
         try {
-            return await this.model.findOneAndUpdate(
-                { _id: id },
-                { $pull: { questions: { _id: questionId } } },
-                { new: true },
-            );
+            return await this.model.findOneAndUpdate({ _id: id }, { $pull: { questions: { _id: questionId } } }, { new: true });
         } catch (error) {
             return Promise.reject(`Failed to delete question: ${error}`);
         }
     }
-    //TODO : valider les autre requis 
+
     async validateQuizInsertion(dto: UpsertQuizDto): Promise<boolean> {
         const regex = new RegExp(`^${dto.titre}$`, 'i'); // for case unsentiveness
-        
-        
+
         return await this.model.findOne({ titre: { $regex: regex } });
     }
 }

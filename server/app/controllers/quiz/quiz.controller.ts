@@ -55,7 +55,7 @@ export class QuizController {
     @Put('/')
     async modifyQuiz(@Body() dto: UpsertQuizDto, @Res() response: Response) {
         try {
-            const quiz : Quiz = await this.quizService.modifyQuiz(dto);
+            const quiz: Quiz = await this.quizService.modifyQuiz(dto);
             response.status(HttpStatus.OK).json(quiz);
         } catch (error) {
             response.status(HttpStatus.NOT_FOUND).send(error.message);
@@ -66,15 +66,13 @@ export class QuizController {
         description: 'Modify a question in a quiz',
         type: Course,
     })
-
     @ApiNotFoundResponse({
         description: 'Return NOT_FOUND http status when request fails',
     })
-
     @Put('/:id/questions/:questionId')
-    async modifyQuestionInQuiz(@Param('id') quizId: string,@Param('questionId') questionId :string, @Res() response: Response) {
+    async modifyQuestionInQuiz(@Param('id') quizId: string, @Param('questionId') questionId: string, @Res() response: Response) {
         try {
-            const question : Question = await this.quizService.modifyQuestionInQuiz(quizId, questionId);
+            const question: Question = await this.quizService.modifyQuestionInQuiz(quizId, questionId);
             response.status(HttpStatus.OK).json(question);
         } catch (error) {
             response.status(HttpStatus.NOT_FOUND).send(error.message);
@@ -85,20 +83,17 @@ export class QuizController {
         description: 'Delete a question in a quiz ',
         type: Course,
     })
-
     @ApiNotFoundResponse({
         description: 'Return NOT_FOUND http status when request fails',
     })
-
     @Delete('/:id/questions/:questionId')
-
-    async deleteQuestionInQuiz(@Param('id') quizId: string,@Param('questionId') questionId :string, @Res() response: Response) {
+    async deleteQuestionInQuiz(@Param('id') quizId: string, @Param('questionId') questionId: string, @Res() response: Response) {
         try {
-            const question : Question = await this.quizService.deleteQuestionInQuizbyId(quizId, questionId);
+            const question: Question = await this.quizService.deleteQuestionInQuizbyId(quizId, questionId);
             response.status(HttpStatus.OK).json(question);
         } catch (error) {
             response.status(HttpStatus.NOT_FOUND).send(error.message);
-        }   
+        }
     }
 
     @ApiOkResponse({
