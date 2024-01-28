@@ -30,18 +30,33 @@ export class CreateQuestionModalComponent {
         const checkBox = document.createElement('input');
         const rangeBar = document.createElement('input');
 
+        const minLabel = document.createElement('span');
+        const maxLabel = document.createElement('span');
+
         checkBox.type = 'checkbox';
         checkBox.name = 'trueOrFalse';
         checkBox.value = `${answerNumber}`;
 
         rangeBar.type = 'range';
         rangeBar.style.display = 'none';
+        rangeBar.min = '0';
+        rangeBar.max = '100';
+        rangeBar.step = '10';
+
+        minLabel.textContent = '0';
+        maxLabel.textContent = '100';
+        minLabel.style.display = 'none';
+        maxLabel.style.display = 'none';
 
         checkBox.addEventListener('click', () => {
             if (rangeBar.style.display !== 'none') {
-                rangeBar.style.display = 'none'; // Hide the range bar
+                rangeBar.style.display = 'none';
+                minLabel.style.display = 'none';
+                maxLabel.style.display = 'none';
             } else {
-                rangeBar.style.display = 'flex'; // Show the range bar
+                rangeBar.style.display = 'flex';
+                minLabel.style.display = 'flex';
+                maxLabel.style.display = 'flex';
             }
         });
 
@@ -52,7 +67,9 @@ export class CreateQuestionModalComponent {
         answerDiv.appendChild(questionNumber);
         answerDiv.appendChild(answerArea);
         answerDiv.appendChild(checkBox);
+        answerDiv.appendChild(minLabel);
         answerDiv.appendChild(rangeBar);
+        answerDiv.appendChild(maxLabel);
         return answerDiv;
     }
 
