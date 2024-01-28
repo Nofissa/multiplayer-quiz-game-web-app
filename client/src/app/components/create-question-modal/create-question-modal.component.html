@@ -3,10 +3,10 @@
   
     <form [formGroup]="questionForm" (ngSubmit)="submitNewQuestion()">
       <label for="input-new-question">Question</label>
-      <input type="text" id="input-new-question" placeholder="Votre question" formControlName="question"/>
+      <input type="text" id="input-new-question" placeholder="Votre question" formControlName="question" maxlength="500" minlength="1" required/>
   
       <label for="select-number-answers">Nombre de réponses</label>
-      <select id="select-number-answers" formControlName="selectedNumber" (change)="setUpModal()">
+      <select id="select-number-answers" formControlName="selectedNumber" (change)="setUpModal()" required>
         <option value="2">2</option>
         <option value="3">3</option>
         <option value="4">4</option>
@@ -14,10 +14,10 @@
   
       <div formArrayName="answers" id="modal-answers-container" class="creation-answers-container flex-column">
         <div *ngFor="let answer of answers.controls; let i = index" [formGroupName]="i" class="flex-row">
-          <p># {{ i + 1 }}</p>
-          <textarea formControlName="answerText" placeholder="Votre réponse" required></textarea>
-          <input type="checkbox" formControlName="isCorrect"/>
-          <input type="range" formControlName="rangeValue" min="0" max="100" step="10"/>
+            <p># {{ i + 1 }}</p>
+            <textarea formControlName="answerText" placeholder="Votre réponse" maxlength="500" minlength="1" required></textarea>
+            <input type="checkbox" formControlName="isCorrect"/>
+            <input type="range" formControlName="rangeValue" min="0" max="100" step="10"/>
         </div>
       </div>
       <input type="submit" id="submit-create-question" value="Submit">
