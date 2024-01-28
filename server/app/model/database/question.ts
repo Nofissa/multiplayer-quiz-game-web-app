@@ -19,7 +19,7 @@ export class Question {
 
     @ApiProperty()
     @Prop({ required: true })
-    correctAnswer: string;
+    correctAnswers: string[];
 
     @ApiProperty()
     @Prop({ required: true })

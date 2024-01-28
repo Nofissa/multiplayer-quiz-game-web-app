@@ -17,9 +17,9 @@ export class UpsertQuestionDto {
     incorrectAnswers: string[];
 
     @ApiProperty()
-    @IsString()
-    @IsNotEmpty({ message: 'correctAnswer must not be empty' })
-    correctAnswer: string;
+    @IsArray()
+    @ArrayNotEmpty({ message: 'correctAnswers must not be empty' })
+    correctAnswers: string[];
 
     @ApiProperty()
     @IsNumber()
