@@ -22,20 +22,29 @@ export class CreateQuestionModalComponent {
         if (modal) modal.setAttribute('display', 'flex');
     }
 
+    createPointSelectHTML(answerNumber: number) {
+        return answerNumber;
+    }
+
     createAnswerHTML(answerNumber: number) {
         const answerDiv = document.createElement('div');
         answerDiv.classList.add('flex-row');
         const answerArea = document.createElement('textarea');
         const questionNumber = document.createElement('p');
-        questionNumber.textContent = '#' + answerNumber;
+        const checkBox = document.createElement('input');
+        checkBox.setAttribute('type', 'checkbox');
+        checkBox.name = 'trueOrFalse';
+        checkBox.value = `${answerNumber}`;
+        questionNumber.textContent = '# ' + answerNumber;
         answerArea.id = 'answer' + answerNumber;
+        answerDiv.appendChild(questionNumber);
         answerDiv.appendChild(answerArea);
+        answerDiv.appendChild(checkBox);
         return answerDiv;
     }
 
     setUpModal() {
         const answersDiv = document.getElementById('modal-answers-container');
-
         if (answersDiv) {
             while (answersDiv.children.length > this.selectedNumber) {
                 const child = answersDiv.lastChild;
@@ -47,7 +56,6 @@ export class CreateQuestionModalComponent {
                 answersDiv.appendChild(this.createAnswerHTML(i));
             }
         }
-
         this.selectedNumber = 0;
     }
 }
