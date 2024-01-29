@@ -66,10 +66,6 @@ export class QuizService {
     }
 
     async addQuiz(dto: UpsertQuizDto): Promise<void> {
-        if ((await this.validateQuizInsertion(dto)) === false) {
-            return Promise.reject('Invalid quiz');
-        }
-
         dto.lastModified = new Date();
 
         try {
@@ -80,10 +76,6 @@ export class QuizService {
     }
 
     async modifyQuiz(dto: UpsertQuizDto): Promise<Quiz> {
-        if ((await this.validateQuizInsertion(dto)) === false) {
-            return Promise.reject('Invalid quiz');
-        }
-
         dto.lastModified = new Date();
 
         try {
@@ -116,11 +108,5 @@ export class QuizService {
         } catch (error) {
             return Promise.reject(`Failed to delete question: ${error}`);
         }
-    }
-
-    async validateQuizInsertion(dto: UpsertQuizDto): Promise<boolean> {
-        const regex = new RegExp(`^${dto.titre}$`, 'i'); // for case unsentiveness
-
-        return await this.model.findOne({ titre: { $regex: regex } });
     }
 }

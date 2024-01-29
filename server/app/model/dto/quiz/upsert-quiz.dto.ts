@@ -8,10 +8,10 @@ enum ValidationValues {
     MaxPointValue = 100,
     MinTimeInSeconds = 10,
     MaxTimeInSeconds = 60,
-    MaxLenghtTitle = 100,
-    MinLenghtTitle = 10,
-    MaxLenghtDescription = 500,
-    MinLenghtDescription = 10,
+    MinLengthTitle = 10,
+    MaxLengthTitle = 100,
+    MinLengthDescription = 10,
+    MaxLengthDescription = 500,
 }
 
 export class QuestionDto {
@@ -51,14 +51,14 @@ export class QuestionDto {
 export class UpsertQuizDto {
     @ApiProperty()
     @IsString()
-    @MaxLength(ValidationValues.MaxLenghtTitle, { message: 'Title must be 100 characters long maximum' })
-    @MinLength(ValidationValues.MinLenghtTitle, { message: 'Title must be 10 characters long minimum' })
+    @MaxLength(ValidationValues.MaxLengthTitle, { message: 'Title must be 100 characters long maximum' })
+    @MinLength(ValidationValues.MinLengthTitle, { message: 'Title must be 10 characters long minimum' })
     titre: string;
 
     @ApiProperty()
     @IsString()
-    @MaxLength(ValidationValues.MaxLenghtDescription, { message: 'Description must be 100 characters long maximum' })
-    @MinLength(ValidationValues.MinLenghtDescription, { message: 'Description must be 10 characters long minimum' })
+    @MaxLength(ValidationValues.MaxLengthDescription, { message: 'Description must be 100 characters long maximum' })
+    @MinLength(ValidationValues.MinLengthDescription, { message: 'Description must be 10 characters long minimum' })
     description: string;
 
     @ApiProperty()

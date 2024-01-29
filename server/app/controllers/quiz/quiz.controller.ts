@@ -12,7 +12,7 @@ export class QuizController {
     constructor(private readonly quizService: QuizService) {}
 
     @ApiOkResponse({
-        description: 'Returns all quiz',
+        description: 'Returns quizzes',
         type: Course,
         isArray: true,
     })
@@ -20,7 +20,7 @@ export class QuizController {
         description: 'Return NOT_FOUND http status when request fails',
     })
     @Get('/')
-    async getAllQuestions(@Res() response: Response) {
+    async getAllQuizzes(@Res() response: Response) {
         try {
             const allQuiz = await this.quizService.getAllQuizzes();
             response.status(HttpStatus.OK).json(allQuiz);
