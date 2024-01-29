@@ -1,4 +1,4 @@
-import { Question, Quiz, QuizDocument } from '@app/model/database/quiz';
+import { Quiz, QuizDocument } from '@app/model/database/quiz';
 import { QuestionDto, UpsertQuizDto } from '@app/model/dto/quiz/upsert-quiz.dto';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -25,17 +25,17 @@ export class QuizService {
             {
                 question: 'Quelle est la valeur de la constante R dans la formule pV = nRT',
                 incorrectAnswers: ['3.14 V/m^2', '2.72 C/s', '6.022x10^23 mol/N'],
-                correctAnswers: ['8.31 J/mol/K'],
+                correctAnswer: '8.31 J/mol/K',
                 lastModified: new Date(),
-                pointValue: 10,
+                pointValue: 1,
                 timeInSeconds: 10,
             },
             {
                 question: "En quelle année la compagnie d'automobile Volkswagen a-t-elle été fondée?",
                 incorrectAnswers: ['1928', '1987', '1947'],
-                correctAnswers: ['1937'],
+                correctAnswer: '1937',
                 lastModified: new Date('2024-01-20 18:43:27'),
-                pointValue: 10,
+                pointValue: 1,
                 timeInSeconds: 10,
             },
         ];
@@ -75,11 +75,11 @@ export class QuizService {
         try {
             await this.model.create(dto);
         } catch (error) {
-            return Promise.reject(`Failed to insert Quiz: ${error}`);
+            return Promise.reject(`Failed to insert course: ${error}`);
         }
     }
     //TODO : retourner modify quiz 
-    async modifyQuiz(dto: UpsertQuizDto): Promise<Quiz> {
+    async modifyQuiz(dto: UpsertQuizDto): Promise<void> {
         if ((await this.validateQuizInsertion(dto)) === false) {
             return Promise.reject('Invalid quiz');
         }
@@ -87,46 +87,22 @@ export class QuizService {
         dto.lastModified = new Date();
 
         try {
-            return await this.model.findOneAndReplace({_id: dto._id}, dto, {new : true});
+            await this.model.replaceOne(dto);
         } catch (error) {
             return Promise.reject(`Failed to insert quiz: ${error}`);
         }
     }
     //TODO : retourner deleted quiz 
-    async deleteQuizById(id: string): Promise<Quiz> {
+    async deleteQuestionById(id: string): Promise<void> {
         try {
-            return await this.model.findByIdAndDelete(id, { new: true });
+            await this.model.findByIdAndDelete(id);
         } catch (error) {
-            return Promise.reject(`Failed to delete quiz: ${error}`);
-        }
-    }
-    
-    async modifyQuestionInQuiz(id: string, questionId: string): Promise<Question> {
-        try {
-            return await this.model.findOneAndUpdate(
-                { _id: id },
-                { $set: { questions: {_id : questionId } } },
-                { new: true },)
-        } catch (error) {
-            return Promise.reject(`Failed to modify question: ${error}`);
-        }    
-    }
-
-    async deleteQuestionInQuizbyId(id: string, questionId: string): Promise<Question> {
-        try {
-            return await this.model.findOneAndUpdate(
-                { _id: id },
-                { $pull: { questions: { _id: questionId } } },
-                { new: true },
-            );
-        } catch (error) {
-            return Promise.reject(`Failed to delete question: ${error}`);
+            return Promise.reject(`Failed to insert quiz: ${error}`);
         }
     }
     //TODO : valider les autre requis 
     async validateQuizInsertion(dto: UpsertQuizDto): Promise<boolean> {
         const regex = new RegExp(`^${dto.titre}$`, 'i'); // for case unsentiveness
-        
         
         return await this.model.findOne({ titre: { $regex: regex } });
     }
