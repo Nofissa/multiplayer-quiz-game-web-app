@@ -1,0 +1,13 @@
+<div class="bouttons-quiz">
+    <button mat-fab extended color="primary" routerLink="/create-game">
+        <mat-icon>add</mat-icon>
+        Ajouter un quiz
+    </button>
+    <button mat-fab extended color="accent">
+        <mat-icon>file_upload</mat-icon>
+        Importer un quiz
+    </button>
+</div>
+<div *ngFor="let quiz of quizzes" class="quizzes-container">
+    <app-quiz [quiz]="quiz"></app-quiz>
+</div>
