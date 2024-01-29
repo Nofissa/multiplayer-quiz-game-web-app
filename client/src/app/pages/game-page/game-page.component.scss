@@ -5,7 +5,7 @@
     border: 1px solid black;
     padding: 10px;
     margin: 10px;
-    background-color: #d9d9d9;
+    background-color: aliceblue;
     overflow-wrap: break-word;
     overflow-y: auto;
   }
@@ -19,6 +19,7 @@
     padding: 10px;
     margin: 10px;
     background-color: #dc4d66;
+    overflow-wrap: break-word;
   }
 
   .answer-box2 {
@@ -30,6 +31,7 @@
     padding: 10px;
     margin: 10px;
     background-color: #63c5ea;
+    overflow-wrap: break-word;
   }
 
   .answer-box3 {
@@ -41,6 +43,7 @@
     padding: 10px;
     margin: 10px;
     background-color: #9cd172;
+    overflow-wrap: break-word;
   }
 
   .answer-box4 {
@@ -52,6 +55,7 @@
     padding: 10px;
     margin: 10px;
     background-color: #e69d2f;
+    overflow-wrap: break-word;
   }
 
   .boxes-below {
@@ -62,15 +66,15 @@
     display: flex;
     flex-direction: column;
     position: fixed;
-    right: 0;
-    bottom: 30%;
+    right: 1%;
+    bottom: 15%;
     border-radius: 25px;
     width: 25%;
-    height: 60%;
+    height: 75%;
     border: 1px solid black;
     padding: 10px;
     margin: 10px;
-    background-color: #d9d9d9;
+    background-color: aliceblue;
   }
 
   .messages {
@@ -86,12 +90,8 @@
 
   .ff-circle {
     position: fixed;
-    bottom: 2%;
-    right: 2%;
-    height: 7%;
-    width: 7%;
-    background-color: #b70909;
-    border-radius: 50%;
+    bottom: 6%;
+    right: 7%;
     display: inline-block;
   }
 
@@ -128,7 +128,7 @@
   .score-circle {
     position: fixed;
     bottom: 2%;
-    right: 12%;
+    right: 16%;
     height: 9%;
     width: 9%;
     background-color: #dfc623;
@@ -147,3 +147,9 @@
   .disable-click {
     pointer-events: none;
   }
+
+  .font-color{
+    font-weight: bold;
+    color: black;
+  }
+

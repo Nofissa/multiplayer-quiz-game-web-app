@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/member-ordering */
 import { Component, HostListener } from '@angular/core';
 import { Subscription, map, take, timer } from 'rxjs';
 import { frequenceOneSecond } from './game-page.constants';
@@ -20,6 +19,45 @@ export class GamePageComponent {
     thirdBoxHotkey: string = '3';
     fourthBoxHotkey: string = '4';
     private timerSubscription: Subscription;
+
+    @HostListener('window:keydown', ['$event'])
+    handleKeyboardEvent(event: KeyboardEvent): void {
+        const focusedElement = document.activeElement as HTMLElement;
+
+        if (focusedElement.tagName.toLowerCase() === 'textarea') {
+            return;
+        }
+
+        switch (event.key) {
+            case this.firstBoxHotkey: {
+                event.preventDefault();
+                this.toggleAnswerBox(parseInt(this.firstBoxHotkey, 10));
+                break;
+            }
+            case this.secondBoxHotkey: {
+                event.preventDefault();
+                this.toggleAnswerBox(parseInt(this.secondBoxHotkey, 10));
+                break;
+            }
+            case this.thirdBoxHotkey: {
+                event.preventDefault();
+                this.toggleAnswerBox(parseInt(this.thirdBoxHotkey, 10));
+                break;
+            }
+            case this.fourthBoxHotkey: {
+                event.preventDefault();
+                this.toggleAnswerBox(parseInt(this.fourthBoxHotkey, 10));
+                break;
+            }
+            case 'Enter': {
+                this.validateChoices();
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+    }
 
     // eslint-disable-next-line @angular-eslint/use-lifecycle-interface
     ngOnInit() {
@@ -76,39 +114,6 @@ export class GamePageComponent {
             const box4 = document.getElementsByClassName('answer-box4');
             box4[0].classList.add('disable-click');
             this.stopTimer();
-        }
-    }
-
-    @HostListener('window:keydown', ['$event'])
-    handleKeyboardEvent(event: KeyboardEvent): void {
-        switch (event.key) {
-            case this.firstBoxHotkey: {
-                event.preventDefault();
-                this.toggleAnswerBox(parseInt(this.firstBoxHotkey, 10));
-                break;
-            }
-            case this.secondBoxHotkey: {
-                event.preventDefault();
-                this.toggleAnswerBox(parseInt(this.secondBoxHotkey, 10));
-                break;
-            }
-            case this.thirdBoxHotkey: {
-                event.preventDefault();
-                this.toggleAnswerBox(parseInt(this.thirdBoxHotkey, 10));
-                break;
-            }
-            case this.fourthBoxHotkey: {
-                event.preventDefault();
-                this.toggleAnswerBox(parseInt(this.fourthBoxHotkey, 10));
-                break;
-            }
-            case 'Enter': {
-                this.validateChoices();
-                break;
-            }
-            default: {
-                break;
-            }
         }
     }
 }
