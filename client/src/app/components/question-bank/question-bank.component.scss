@@ -13,3 +13,11 @@
     display: block;
     text-align: center;
 }
+
+.title-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 5vh;
+    max-height: 50px;
+}

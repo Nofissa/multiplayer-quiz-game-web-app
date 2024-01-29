@@ -16,28 +16,28 @@ export class QuestionHttpService {
     getAllQuestions(): Observable<Question[]> {
         return this.http.get<Question[]>(this.baseUrl).pipe(
             map((questions) => this.convertAllLastModifiedToDate(questions)),
-            catchError(this.handleError<Question[]>('Error getting questions')),
+            catchError(this.handleError<Question[]>()),
         );
     }
 
     createQuestion(question: Question): Observable<Question> {
         return this.http.post<Question>(this.baseUrl, question).pipe(
             map((createdQuestion) => this.convertLastModifiedToDate(createdQuestion)),
-            catchError(this.handleError<Question>('Error creating question')),
+            catchError(this.handleError<Question>()),
         );
     }
 
     updateQuestion(question: Question): Observable<Question> {
         return this.http.put<Question>(this.baseUrl, question).pipe(
             map((updatedQuestion) => this.convertLastModifiedToDate(updatedQuestion)),
-            catchError(this.handleError<Question>('Error updating question')),
+            catchError(this.handleError<Question>()),
         );
     }
 
     deleteQuestionById(id: string): Observable<Question> {
         return this.http.delete<Question>(`${this.baseUrl}/${id}`).pipe(
             map((deletedQuestion) => this.convertLastModifiedToDate(deletedQuestion)),
-            catchError(this.handleError<Question>('Error deleting question')),
+            catchError(this.handleError<Question>()),
         );
     }
 
@@ -52,10 +52,9 @@ export class QuestionHttpService {
         return questions.map(this.convertLastModifiedToDate);
     }
 
-    private handleError<T>(errorMessage: string): (error: HttpErrorResponse) => Observable<T> {
-        // eslint-disable-next-line no-unused-vars
+    private handleError<T>(): (error: HttpErrorResponse) => Observable<T> {
         return (httpErrorResponse: HttpErrorResponse): Observable<T> => {
-            return throwError(() => new Error(`${errorMessage}: ${httpErrorResponse.error.message}`));
+            return throwError(() => new Error(httpErrorResponse.message));
         };
     }
 }

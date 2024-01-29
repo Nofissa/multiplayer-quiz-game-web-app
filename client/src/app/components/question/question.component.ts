@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 import { Component, Input } from '@angular/core';
 import { Question } from '@app/interfaces/question';
 import { QuestionListOptions } from '@app/interfaces/question-list-options';

@@ -61,10 +61,9 @@ export class QuestionBankComponent implements OnInit {
             question: {
                 _id: '',
                 question: '',
-                incorrectAnswers: ['', '', ''],
+                incorrectAnswers: [''],
                 correctAnswers: [''],
                 pointValue: 0,
-                timeInSeconds: 0,
                 lastModified: new Date(),
             },
         };
@@ -103,7 +102,6 @@ export class QuestionBankComponent implements OnInit {
                     incorrectAnswers: result.incorrectAnswers,
                     correctAnswers: result.correctAnswers,
                     pointValue: result.pointValue,
-                    timeInSeconds: result.timeInSeconds,
                 });
             }
         });

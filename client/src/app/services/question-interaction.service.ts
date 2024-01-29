@@ -1,5 +1,7 @@
+import { Injectable } from '@angular/core';
 import { Question } from '@app/interfaces/question';
 
+@Injectable()
 export class QuestionInteractionService {
     private onAddQuestion: () => void;
     private onEditQuestion: (question: Question) => void;

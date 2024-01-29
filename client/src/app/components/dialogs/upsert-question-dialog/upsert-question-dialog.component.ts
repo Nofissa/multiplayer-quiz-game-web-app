@@ -1,7 +1,10 @@
 import { Component, Inject } from '@angular/core';
-import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog-data';
+
+const POINT_VALUE_BASE_MULTIPLE = 10;
+const MAX_CHOICE_COUNT = 4;
 
 @Component({
     selector: 'app-upsert-question-dialog',
@@ -9,6 +12,7 @@ import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog
     styleUrls: ['./upsert-question-dialog.component.scss'],
 })
 export class UpsertQuestionDialogComponent {
+    maxChoiceCount = MAX_CHOICE_COUNT;
     formGroup: FormGroup;
     incorrectAnswersArray: FormArray;
     correctAnswersArray: FormArray;
@@ -23,7 +27,7 @@ export class UpsertQuestionDialogComponent {
             Validators.required,
         ) as FormArray;
         this.correctAnswersArray = this.formBuilder.array(
-            this.data.question.incorrectAnswers.map((answer) => this.formBuilder.control(answer, Validators.required)),
+            this.data.question.correctAnswers.map((answer) => this.formBuilder.control(answer, Validators.required)),
             Validators.required,
         ) as FormArray;
 
@@ -31,8 +35,7 @@ export class UpsertQuestionDialogComponent {
             question: [this.data.question.question, Validators.required],
             incorrectAnswers: this.incorrectAnswersArray,
             correctAnswers: this.correctAnswersArray,
-            pointValue: [this.data.question.pointValue, Validators.required],
-            timeInSeconds: [this.data.question.timeInSeconds, Validators.required],
+            pointValue: [this.data.question.pointValue, [Validators.required, this.multipleOfTenValidator()]],
         });
     }
 
@@ -44,13 +47,41 @@ export class UpsertQuestionDialogComponent {
         return this.correctAnswersArray.controls as FormControl[];
     }
 
-    cancel(): void {
+    getChoiceCount(): number {
+        return this.correctAnswersControls.length + this.incorrectAnswersControls.length;
+    }
+
+    addCorrectAnswer() {
+        this.correctAnswersArray.push(this.formBuilder.control('', Validators.required));
+    }
+
+    removeCorrectAnswerAt(index: number) {
+        this.correctAnswersArray.removeAt(index);
+    }
+
+    addIncorrectAnswer() {
+        this.incorrectAnswersArray.push(this.formBuilder.control('', Validators.required));
+    }
+
+    removeIncorrectAnswerAt(index: number) {
+        this.incorrectAnswersArray.removeAt(index);
+    }
+
+    cancel() {
         this.dialogRef.close();
     }
 
-    submit(): void {
+    submit() {
         if (this.formGroup.valid) {
             this.dialogRef.close(this.formGroup.value);
         }
+    }
+
+    private multipleOfTenValidator(): ValidatorFn {
+        return (control: AbstractControl): ValidationErrors | null => {
+            const value = control.value;
+
+            return value % POINT_VALUE_BASE_MULTIPLE === 0 ? null : { notMultipleOfTen: true };
+        };
     }
 }

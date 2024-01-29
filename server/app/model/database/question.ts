@@ -16,7 +16,15 @@ export class Question {
 
     @ApiProperty()
     @Prop({ required: true })
-    correctAnswer: string;
+    correctAnswers: string[];
+
+    @ApiProperty()
+    @Prop({ required: true })
+    pointValue: number;
+
+    @ApiProperty()
+    @Prop({ required: true })
+    timeInSeconds: number;
 
     @ApiProperty()
     @Prop({ required: true })
