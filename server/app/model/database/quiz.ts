@@ -14,7 +14,7 @@ export class Question {
 
     @ApiProperty()
     @Prop({ required: true })
-    correctAnswer: string;
+    correctAnswers: string[];
 
     @ApiProperty()
     @Prop({ required: true })
@@ -27,6 +27,9 @@ export class Question {
     @ApiProperty()
     @Prop({ required: true })
     timeInSeconds: number;
+
+    @ApiProperty()
+    _id?: string;
 }
 
 @Schema()
