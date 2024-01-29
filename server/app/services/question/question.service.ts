@@ -29,7 +29,6 @@ export class QuestionService {
                 incorrectAnswers: ['3.14 V/m^2', '2.72 C/s', '6.022x10^23 mol/N'],
                 correctAnswers: ['8.31 J/mol/K'],
                 pointValue: 1,
-                timeInSeconds: 10,
                 lastModified: new Date(),
             },
             {
@@ -37,7 +36,6 @@ export class QuestionService {
                 incorrectAnswers: ['1928', '1987', '1947'],
                 correctAnswers: ['1937'],
                 pointValue: 1,
-                timeInSeconds: 10,
                 lastModified: new Date('2024-01-20 18:43:27'),
             },
         ];

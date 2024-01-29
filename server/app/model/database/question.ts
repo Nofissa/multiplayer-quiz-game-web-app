@@ -26,10 +26,6 @@ export class Question {
     pointValue: number;
 
     @ApiProperty()
-    @Prop({ required: true })
-    timeInSeconds: number;
-
-    @ApiProperty()
     @Prop({ required: false })
     lastModified: Date;
 }
