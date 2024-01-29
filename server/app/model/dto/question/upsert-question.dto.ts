@@ -1,4 +1,5 @@
-import { IsMultipleOf } from '@app/validators/is-multiple-of-ten.validator';
+import { ArrayNoEmptyValues } from '@app/validators/array-no-empty-values.validator';
+import { IsMultipleOf } from '@app/validators/is-multiple-of.validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { ArrayMaxSize, ArrayNotEmpty, IsArray, IsDate, IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
@@ -25,6 +26,7 @@ export class UpsertQuestionDto {
     @ArrayMaxSize(ValidationValues.MaxSizeAnswerArray, {
         message: `incorrectAnswers size must be lesser or equal to ${ValidationValues.MaxSizeAnswerArray}`,
     })
+    @ArrayNoEmptyValues()
     incorrectAnswers: string[];
 
     @ApiProperty()
@@ -33,6 +35,7 @@ export class UpsertQuestionDto {
     @ArrayMaxSize(ValidationValues.MaxSizeAnswerArray, {
         message: `correctAnswers size must be lesser or equal to ${ValidationValues.MaxSizeAnswerArray}`,
     })
+    @ArrayNoEmptyValues()
     correctAnswers: string[];
 
     @ApiProperty()
