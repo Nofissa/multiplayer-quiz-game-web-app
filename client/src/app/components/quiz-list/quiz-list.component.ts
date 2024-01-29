@@ -21,84 +21,89 @@ export class QuizListComponent implements OnInit {
 
     private fetchQuizzes() {
         const quiz1: Quiz = {
-            titre: 'General Knowledge Quiz',
-            description: 'Test your general knowledge with these questions.',
+            titre: 'Math Quiz',
+            description: 'Test your math skills',
             questions: [
                 {
-                    question: 'What is the capital of France?',
-                    incorrectAnswers: ['Berlin', 'Madrid', 'Rome'],
-                    correctAnswer: 'Paris',
+                    _id: '1',
+                    question: 'What is 5 + 7?',
+                    incorrectAnswers: ['10', '12', '15'],
+                    correctAnswers: ['12'],
+                    pointValue: 1,
                     lastModified: new Date(),
-                    _id: 'question1_id',
                 },
                 {
-                    question: 'Which planet is known as the Red Planet?',
-                    incorrectAnswers: ['Venus', 'Jupiter', 'Saturn'],
-                    correctAnswer: 'Mars',
+                    _id: '2',
+                    question: 'Solve for x: 2x - 8 = 10',
+                    incorrectAnswers: ['3', '4', '6'],
+                    correctAnswers: ['9'],
+                    pointValue: 2,
                     lastModified: new Date(),
-                    _id: 'question2_id',
                 },
-                // Add more questions as needed
             ],
             isHidden: false,
             lastModified: new Date(),
-            _id: 'quiz1_id',
+            _id: 'quiz123',
         };
-
-        this.quizzes.push(quiz1);
 
         const quiz2: Quiz = {
             titre: 'Science Quiz',
-            description: 'Test your knowledge in science and technology.',
+            description: 'Test your science knowledge',
             questions: [
                 {
+                    _id: '3',
                     question: 'What is the chemical symbol for water?',
-                    incorrectAnswers: ['CO2', 'O2', 'CH4'],
-                    correctAnswer: 'H2O',
+                    incorrectAnswers: ['H2O', 'CO2', 'O2'],
+                    correctAnswers: ['H2O'],
+                    pointValue: 1,
                     lastModified: new Date(),
-                    _id: 'question1_id',
                 },
                 {
+                    _id: '4',
                     question: 'Who developed the theory of relativity?',
-                    incorrectAnswers: ['Isaac Newton', 'Galileo Galilei', 'Stephen Hawking'],
-                    correctAnswer: 'Albert Einstein',
+                    incorrectAnswers: ['Isaac Newton', 'Albert Einstein', 'Galileo Galilei'],
+                    correctAnswers: ['Albert Einstein'],
+                    pointValue: 2,
                     lastModified: new Date(),
-                    _id: 'question2_id',
                 },
-                // Add more questions as needed
             ],
             isHidden: true,
             lastModified: new Date(),
-            _id: 'quiz2_id',
+            _id: 'quiz456',
         };
 
-        this.quizzes.push(quiz2);
-
         const quiz3: Quiz = {
-            titre: 'Programming Concepts Quiz',
-            description: 'Test your understanding of programming concepts.',
+            titre: 'History Quiz',
+            description: 'Test your knowledge of historical events',
             questions: [
                 {
-                    question: 'What is the purpose of a loop in programming?',
-                    incorrectAnswers: ['To create a variable', 'To define a function', 'To perform arithmetic operations'],
-                    correctAnswer: 'To repeat a block of code',
+                    _id: '5',
+                    question: 'In which year did World War II end?',
+                    incorrectAnswers: ['1943', '1945', '1950'],
+                    correctAnswers: ['1945'],
+                    pointValue: 1,
                     lastModified: new Date(),
-                    _id: 'question1_id',
                 },
                 {
-                    question: 'What does the acronym HTML stand for?',
-                    incorrectAnswers: ['High-Level Text Management Language', 'HyperLink and Text Markup Language', 'Home Tool Markup Language'],
-                    correctAnswer: 'HyperText Markup Language',
+                    _id: '6',
+                    question: 'Who was the first President of the United States?',
+                    incorrectAnswers: ['Thomas Jefferson', 'George Washington', 'John Adams'],
+                    correctAnswers: ['George Washington'],
+                    pointValue: 2,
                     lastModified: new Date(),
-                    _id: 'question2_id',
                 },
-                // Add more questions as needed
             ],
             isHidden: false,
             lastModified: new Date(),
-            _id: 'quiz3_id',
+            _id: 'quiz789',
         };
 
+        console.log(quiz1);
+        console.log(quiz2);
+        console.log(quiz3);
+
+        this.quizzes.push(quiz1);
+        this.quizzes.push(quiz2);
         this.quizzes.push(quiz3);
 
         this.quizHttpService.getAllQuizzes().subscribe((quizzes: Quiz[]) => {

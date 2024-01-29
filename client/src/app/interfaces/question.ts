@@ -1,12 +1,4 @@
 export interface Question {
-<<<<<<< HEAD
-    question: string;
-    incorrectAnswers: string[];
-    correctAnswer: string;
-    lastModified: Date;
-    _id: string;
-}
-=======
     _id: string;
     question: string;
     incorrectAnswers: string[];
@@ -14,4 +6,3 @@ export interface Question {
     pointValue: number;
     lastModified: Date;
 }
->>>>>>> origin/dev
