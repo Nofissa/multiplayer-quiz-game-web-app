@@ -1,3 +1,4 @@
+// import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 
@@ -58,4 +59,8 @@ export class CreateQuestionModalComponent implements OnInit {
     openModal() {
         // Your existing openModal logic
     }
+
+    // onDrop(event: CdkDragDrop<any[]>) {
+    //     moveItemInArray(this.answers.controls, event.previousIndex, event.currentIndex);
+    // }
 }

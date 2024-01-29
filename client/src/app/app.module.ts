@@ -17,7 +17,6 @@ import { UpsertQuestionDialogComponent } from './components/dialogs/upsert-quest
 import { QuestionListComponent } from './components/question-list/question-list.component';
 import { QuestionComponent } from './components/question/question.component';
 import { ShareTestComponent } from './components/share-test/share-test.component';
-import { TimerDialComponent } from './components/timer-dial/timer-dial.component';
 import { AppRoutingModule } from './modules/app-routing.module';
 import { AdminPageComponent } from './pages/admin-page/admin-page.component';
 import { CreateGamePageComponent } from './pages/create-game-page/create-game-page.component';
@@ -42,7 +41,6 @@ import { QCMCreationPageComponent } from './pages/qcmcreation-page/qcmcreation-p
         QuestionComponent,
         ConfirmationDialogComponent,
         ShareTestComponent,
-        TimerDialComponent,
         CreateQuestionModalComponent,
     ],
     imports: [

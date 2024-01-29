@@ -12,12 +12,11 @@
         <option value="4">4</option>
       </select>
   
-      <div formArrayName="answers" id="modal-answers-container" class="creation-answers-container flex-column">
+      <div formArrayName="answers" id="modal-answers-container" class="creation-answers-container flex-column" >
         <div *ngFor="let answer of answers.controls; let i = index" [formGroupName]="i" class="flex-row">
             <p># {{ i + 1 }}</p>
             <textarea formControlName="answerText" placeholder="Votre réponse" maxlength="500" minlength="1" required></textarea>
             <input type="checkbox" formControlName="isCorrect"/>
-            <input type="range" formControlName="rangeValue" min="0" max="100" step="10"/>
         </div>
       </div>
       <input type="submit" id="submit-create-question" value="Submit">

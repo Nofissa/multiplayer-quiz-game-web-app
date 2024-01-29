@@ -1,20 +1,22 @@
 
 <div id="quiz-creation-page">
-    <form id="quiz-creation-form" class="flex-column">
+    <form [formGroup]="quizForm" class="flex-column" (ngSubmit)="submitQuiz()">
         <h1 class="header-item">Build-a-Quiz</h1>
         <div id="text-editables" class="flex-row">
             <div class="flex-column">
-                <input id="title" type="text" class="text-edit" placeholder="Votre titre ici" required/>
-                <textarea id="description" class="text-edit" placeholder="Votre description ici" required></textarea>
+                <input id="title" type="text" class="text-edit" placeholder="Votre titre ici" formControlName="quizTitle" required/>
+                <textarea id="description" class="text-edit" placeholder="Votre description ici" formControlName="quizDescritpion" required></textarea>
             </div>
-            <app-timer-dial></app-timer-dial>
+            <div id="timer">
+                <img id="timer-img" src='/assets/img/timer.png' alt="timer"/>
+                <input id="timer-input" type="text" placeholder="s" formControlName="answerTime" required/>
+            </div>
         </div>
-        <div id="questions-container">
-            <p>helloooooo</p>
+        <div id="questions-container" formArrayName="questions" class="flex-column">
+            
         </div>
-        <button (click)="addQuestion()">addQuestion</button>
+        <input type="submit"/>
     </form>
     <app-question-list></app-question-list>
-    <app-create-question-modal></app-create-question-modal>
 </div>
 
