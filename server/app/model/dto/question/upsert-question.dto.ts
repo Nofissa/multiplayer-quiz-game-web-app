@@ -1,4 +1,4 @@
-import { IsMultipleOfTen } from '@app/validators/is-multiple-of-ten';
+import { IsMultipleOf } from '@app/validators/is-multiple-of-ten.validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { ArrayMaxSize, ArrayNotEmpty, IsArray, IsDate, IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
@@ -7,6 +7,7 @@ enum ValidationValues {
     MinPointValue = 10,
     MaxPointValue = 100,
     MaxSizeAnswerArray = 3,
+    MultipleOfPointValue = 10,
 }
 
 export class UpsertQuestionDto {
@@ -38,7 +39,7 @@ export class UpsertQuestionDto {
     @IsNumber()
     @Min(ValidationValues.MinPointValue, { message: `pointValue must be greater or equal to ${ValidationValues.MinPointValue}` })
     @Max(ValidationValues.MaxPointValue, { message: `pointValue must be lesser or equal to ${ValidationValues.MaxPointValue}` })
-    @IsMultipleOfTen()
+    @IsMultipleOf(ValidationValues.MultipleOfPointValue)
     pointValue: number;
 
     @ApiProperty()
