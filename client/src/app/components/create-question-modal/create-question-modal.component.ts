@@ -1,4 +1,5 @@
 // import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 
@@ -9,7 +10,7 @@ import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 })
 export class CreateQuestionModalComponent implements OnInit {
     questionForm: FormGroup;
-
+    index: number[] = [1, 2, 3, 4];
     constructor(private formBuilder: FormBuilder) {}
 
     get answers(): FormArray {
@@ -60,7 +61,9 @@ export class CreateQuestionModalComponent implements OnInit {
         // Your existing openModal logic
     }
 
-    // onDrop(event: CdkDragDrop<any[]>) {
-    //     moveItemInArray(this.answers.controls, event.previousIndex, event.currentIndex);
-    // }
+    drop(event: CdkDragDrop<number[]>): void {
+        window.console.log('dro', event);
+        moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+    }
+
 }

@@ -11,14 +11,24 @@
         <option value="3">3</option>
         <option value="4">4</option>
       </select>
+
+      <div cdkDropListGroup>
+        <div cdkDropList [cdkDropListData]="index" (cdkDropListDropped)="drop($event)">
+            <div *ngFor="let ind of index" cdkDrag class="flex-row">
+              <p># {{ ind }}</p>
+              <textarea formControlName="answerText" placeholder="Votre réponse" maxlength="500" minlength="1" required></textarea>
+              <input type="checkbox" formControlName="isCorrect"/>
+            </div>
+          </div>
+      </div>
   
-      <div formArrayName="answers" id="modal-answers-container" class="creation-answers-container flex-column" >
+      <!-- <div formArrayName="answers" id="modal-answers-container" class="creation-answers-container flex-column" >
         <div *ngFor="let answer of answers.controls; let i = index" [formGroupName]="i" class="flex-row">
             <p># {{ i + 1 }}</p>
             <textarea formControlName="answerText" placeholder="Votre réponse" maxlength="500" minlength="1" required></textarea>
             <input type="checkbox" formControlName="isCorrect"/>
         </div>
-      </div>
+      </div> -->
       <input type="submit" id="submit-create-question" value="Submit">
     </form>
   </dialog>

@@ -1,3 +1,4 @@
+import { CdkDrag, CdkDropList, CdkDropListGroup } from '@angular/cdk/drag-drop';
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -55,6 +56,9 @@ import { QCMCreationPageComponent } from './pages/qcmcreation-page/qcmcreation-p
         MatIconModule,
         MatInputModule,
         ReactiveFormsModule,
+        CdkDropListGroup,
+        CdkDrag,
+        CdkDropList,
     ],
 
     providers: [],
