@@ -1,8 +1,35 @@
+@use '@angular/material' as mat;
+@include mat.core();
+
+$client-primary: mat.define-palette(mat.$indigo-palette);
+$client-accent: mat.define-palette(mat.$pink-palette, A200, A100, A400);
+$client-warn: mat.define-palette(mat.$red-palette);
+
+$client-theme: mat.define-light-theme((
+  color: (
+    primary: $client-primary,
+    accent: $client-accent,
+    warn: $client-warn,
+  )
+));
+
+@include mat.all-component-themes($client-theme);
+
 :root {
-    --back-color : #121212;
+    --main-bg-color: #121212;
+    --secondary-bg-color: #FFFFFF;
+    --main-fg-color: #FFFFFF;
+    --secondary-fg-color: #121212;
+    --answer-color-red: #DC4D66;
+    --answer-color-blue: #63C5EA;
+    --answer-color-green: #9CD172;
+    --answer-color-yellow: #E69D2E;
 }
 
+html, body { height: 100%; }
 body {
-    background-color: var(--back-color);
+    margin: 0;
+    background-color: var(--main-bg-color);
     color: aliceblue;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
 }
