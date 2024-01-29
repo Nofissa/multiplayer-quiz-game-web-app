@@ -1,4 +1,3 @@
-import { Course } from '@app/model/database/course';
 import { Question, Quiz } from '@app/model/database/quiz';
 import { UpsertQuizDto } from '@app/model/dto/quiz/upsert-quiz.dto';
 import { QuizService } from '@app/services/quiz/quiz.service';
@@ -13,7 +12,7 @@ export class QuizController {
 
     @ApiOkResponse({
         description: 'Returns quizzes',
-        type: Course,
+        type: Quiz,
         isArray: true,
     })
     @ApiNotFoundResponse({
@@ -47,7 +46,7 @@ export class QuizController {
 
     @ApiOkResponse({
         description: 'Modify a quiz',
-        type: Course,
+        type: Quiz,
     })
     @ApiNotFoundResponse({
         description: 'Return NOT_FOUND http status when request fails',
@@ -64,7 +63,7 @@ export class QuizController {
 
     @ApiOkResponse({
         description: 'Modify a question in a quiz',
-        type: Course,
+        type: Quiz,
     })
     @ApiNotFoundResponse({
         description: 'Return NOT_FOUND http status when request fails',
@@ -81,7 +80,7 @@ export class QuizController {
 
     @ApiOkResponse({
         description: 'Delete a question in a quiz ',
-        type: Course,
+        type: Quiz,
     })
     @ApiNotFoundResponse({
         description: 'Return NOT_FOUND http status when request fails',
