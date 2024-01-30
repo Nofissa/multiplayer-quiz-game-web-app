@@ -7,6 +7,9 @@ export type QuestionDocument = Question & Document;
 @Schema()
 export class Question {
     @ApiProperty()
+    _id?: string;
+
+    @ApiProperty()
     @Prop({ required: true })
     question: string;
 
@@ -16,14 +19,19 @@ export class Question {
 
     @ApiProperty()
     @Prop({ required: true })
-    correctAnswer: string;
+    correctAnswers: string[];
 
     @ApiProperty()
     @Prop({ required: true })
-    lastModified: Date;
+    pointValue: number;
 
     @ApiProperty()
-    _id?: string;
+    @Prop({ required: true })
+    timeInSeconds: number;
+
+    @ApiProperty()
+    @Prop({ required: false })
+    lastModified: Date;
 }
 
 export const questionSchema = SchemaFactory.createForClass(Question);

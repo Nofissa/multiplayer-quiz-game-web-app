@@ -26,10 +26,10 @@ $client-theme: mat.define-light-theme((
 @include mat.all-component-themes($client-theme);
 
 :root {
-    --main-bg-color: #101010;
+    --main-bg-color: #121212;
     --secondary-bg-color: #FFFFFF;
     --main-fg-color: #FFFFFF;
-    --secondary-fg-color: #101010;
+    --secondary-fg-color: #121212;
     --answer-color-red: #DC4D66;
     --answer-color-blue: #63C5EA;
     --answer-color-green: #9CD172;
@@ -39,8 +39,9 @@ $client-theme: mat.define-light-theme((
 html, body { height: 100%; }
 body {
     margin: 0;
+    background-color: var(--main-bg-color);
+    color: aliceblue;
     font-family: Roboto, "Helvetica Neue", sans-serif;
-    background-color: #121212;
 }
 
 .flex-row {

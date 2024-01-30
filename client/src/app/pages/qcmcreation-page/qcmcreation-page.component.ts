@@ -16,9 +16,10 @@ export class QCMCreationPageComponent implements OnInit {
     emptyQuestion: Question = {
         question: '',
         incorrectAnswers: [''],
-        correctAnswer: '',
+        correctAnswers: [''],
         lastModified: new Date(),
         _id: '',
+        pointValue: 0,
     };
     emptyDialogData: UpsertQuestionDialogData = {
         title: 'Créer une Question',

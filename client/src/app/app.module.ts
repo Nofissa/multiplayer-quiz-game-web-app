@@ -13,11 +13,8 @@ import { AppComponent } from '@app/pages/app/app.component';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { CreateQuestionModalComponent } from './components/create-question-modal/create-question-modal.component';
-import { ConfirmationDialogComponent } from './components/dialogs/confirmation-dialog/confirmation-dialog.component';
 import { UpsertQuestionDialogComponent } from './components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
 import { QuestionListComponent } from './components/question-list/question-list.component';
-import { QuestionComponent } from './components/question/question.component';
-import { ShareTestComponent } from './components/share-test/share-test.component';
 import { AppRoutingModule } from './modules/app-routing.module';
 import { AdminPageComponent } from './pages/admin-page/admin-page.component';
 import { CreateGamePageComponent } from './pages/create-game-page/create-game-page.component';
@@ -39,9 +36,6 @@ import { QCMCreationPageComponent } from './pages/qcmcreation-page/qcmcreation-p
         QCMCreationPageComponent,
         UpsertQuestionDialogComponent,
         QuestionListComponent,
-        QuestionComponent,
-        ConfirmationDialogComponent,
-        ShareTestComponent,
         CreateQuestionModalComponent,
     ],
     imports: [
