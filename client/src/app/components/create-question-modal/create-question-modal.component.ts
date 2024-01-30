@@ -65,5 +65,4 @@ export class CreateQuestionModalComponent implements OnInit {
         window.console.log('dro', event);
         moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
     }
-
 }

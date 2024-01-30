@@ -1,5 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
+import { UpsertQuestionDialogComponent } from '@app/components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
+import { Question } from '@app/interfaces/question';
+import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog-data';
 
 @Component({
     selector: 'app-qcmcreation-page',
@@ -9,8 +13,22 @@ import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 export class QCMCreationPageComponent implements OnInit {
     title = 'hi';
     quizForm: FormGroup;
+    emptyQuestion: Question = {
+        question: '',
+        incorrectAnswers: [''],
+        correctAnswer: '',
+        lastModified: new Date(),
+        _id: '',
+    };
+    emptyDialogData: UpsertQuestionDialogData = {
+        title: 'Créer une Question',
+        question: this.emptyQuestion,
+    };
 
-    constructor(private formBuilder: FormBuilder) {}
+    constructor(
+        private formBuilder: FormBuilder,
+        private dialog: MatDialog,
+    ) {}
 
     get questions(): FormArray {
         return this.quizForm.get('answers') as FormArray;
@@ -26,10 +44,9 @@ export class QCMCreationPageComponent implements OnInit {
     }
 
     addQuestion() {
-        const modal = document.getElementById('question-creation-modal');
-        if (modal) {
-            modal.setAttribute('visibility', 'visible');
-        }
+        this.dialog.open(UpsertQuestionDialogComponent, {
+            data: this.emptyDialogData,
+        });
     }
 
     submitQuiz() {

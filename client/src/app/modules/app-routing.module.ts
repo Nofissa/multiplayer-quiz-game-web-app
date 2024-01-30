@@ -12,7 +12,7 @@ const routes: Routes = [
     { path: 'admin', component: AdminPageComponent },
     { path: 'create-game', component: CreateGamePageComponent },
     { path: 'game', component: GamePageComponent },
-    { path: 'QCMCreation', component: QCMCreationPageComponent },
+    { path: 'qcm-creation', component: QCMCreationPageComponent },
     { path: '**', redirectTo: '/home' },
 ];
 
