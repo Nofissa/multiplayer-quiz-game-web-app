@@ -13,7 +13,10 @@
                     <div *ngFor="let correctAnswer of correctAnswersControls; let i = index" cdkDrag class="answers-wrapper">
                         <mat-form-field appearance="outline" class="answer">
                             <mat-label>Bonne Réponse {{ i + 1 }}</mat-label>
-                            <input matInput type="text" [formControl]="correctAnswer">
+                            <div class="flex-row">
+                                <input matInput type="text" [formControl]="correctAnswer">
+                                <input type="checkbox">
+                            </div>
                         </mat-form-field>
                         <div class="row-actions-wrapper">
                             <mat-icon *ngIf="correctAnswersControls.length > 1" aria-hidden="false" class="action action-remove"

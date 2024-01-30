@@ -17,6 +17,7 @@ export class UpsertQuestionDialogComponent {
     formGroup: FormGroup;
     incorrectAnswersArray: FormArray;
     correctAnswersArray: FormArray;
+    isCorrect: FormArray;
 
     constructor(
         private formBuilder: FormBuilder,
@@ -28,6 +29,10 @@ export class UpsertQuestionDialogComponent {
             Validators.required,
         ) as FormArray;
         this.correctAnswersArray = this.formBuilder.array(
+            this.data.question.correctAnswers.map((answer) => this.formBuilder.control(answer, Validators.required)),
+            Validators.required,
+        ) as FormArray;
+        this.isCorrect = this.formBuilder.array(
             this.data.question.correctAnswers.map((answer) => this.formBuilder.control(answer, Validators.required)),
             Validators.required,
         ) as FormArray;
@@ -50,7 +55,6 @@ export class UpsertQuestionDialogComponent {
 
     drop(event: CdkDragDrop<FormControl[]>): void {
         moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
-        window.console.log(this.correctAnswers);
     }
 
     getChoiceCount(): number {
