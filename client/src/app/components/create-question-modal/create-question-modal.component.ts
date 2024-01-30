@@ -64,5 +64,6 @@ export class CreateQuestionModalComponent implements OnInit {
     drop(event: CdkDragDrop<number[]>): void {
         window.console.log('dro', event);
         moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+        window.console.log(this.index);
     }
 }

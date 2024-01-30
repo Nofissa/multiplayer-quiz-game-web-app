@@ -2,6 +2,7 @@ import { Component, Inject } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog-data';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 const POINT_VALUE_BASE_MULTIPLE = 10;
 const MAX_CHOICE_COUNT = 4;
@@ -45,6 +46,11 @@ export class UpsertQuestionDialogComponent {
 
     get correctAnswersControls(): FormControl[] {
         return this.correctAnswersArray.controls as FormControl[];
+    }
+
+    drop(event: CdkDragDrop<FormControl[]>): void {
+        moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+        window.console.log(this.correctAnswers);
     }
 
     getChoiceCount(): number {
