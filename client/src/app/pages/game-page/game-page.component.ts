@@ -1,6 +1,8 @@
 import { Component, HostListener } from '@angular/core';
+import { QuestionHttpService } from '@app/services/question-http.service';
 import { Subscription, map, take, timer } from 'rxjs';
 import { frequenceOneSecond } from './game-page.constants';
+import { Question } from 'c:/Users/user/source/repos/LOG2990-206/client/src/app/interfaces/question';
 
 @Component({
     selector: 'app-game-page',
@@ -18,7 +20,10 @@ export class GamePageComponent {
     secondBoxHotkey: string = '2';
     thirdBoxHotkey: string = '3';
     fourthBoxHotkey: string = '4';
+    questions: Question[];
+    currentQuestionText: string;
     private timerSubscription: Subscription;
+    constructor(private questionHttpService: QuestionHttpService) {}
 
     @HostListener('window:keydown', ['$event'])
     handleKeyboardEvent(event: KeyboardEvent): void {
@@ -61,7 +66,19 @@ export class GamePageComponent {
 
     // eslint-disable-next-line @angular-eslint/use-lifecycle-interface
     ngOnInit() {
+        this.loadQuestions();
         this.startTimer();
+    }
+
+    loadQuestions(): void {
+        this.questionHttpService.getAllQuestions().subscribe({
+            next: (questions) => {
+                this.questions = questions;
+                if (questions && questions.length > 0) {
+                    this.currentQuestionText = questions[0].question;
+                }
+            },
+        });
     }
 
     // timer inspired from ChatGPT and https://www.codeproject.com/Questions/5349203/How-to-make-5-minute-countdown-timer-with-rxjs-and

@@ -5,7 +5,7 @@
 <div class="container-justified">
     <h1 class="header-item">Vue de jeu du joueur </h1>
     <div class="question-box font-color">
-        La question sera ici
+        {{currentQuestionText || 'loading question...'}}
     </div>
     <div class="answer-boxes font-color">
         <div class="answer-box1" [class.highlight-selected]="isSelected(1)" (click)="toggleAnswerBox(1)">
