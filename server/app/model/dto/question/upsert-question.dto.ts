@@ -7,6 +7,8 @@ import { ArrayMaxSize, ArrayNotEmpty, IsArray, IsDate, IsNotEmpty, IsNumber, IsO
 enum ValidationValues {
     MinPointValue = 10,
     MaxPointValue = 100,
+    MinTimeInSeconds = 10,
+    MaxTimeInSeconds = 60,
     MaxSizeAnswerArray = 3,
     MultipleOfPointValue = 10,
 }
@@ -44,6 +46,12 @@ export class UpsertQuestionDto {
     @Max(ValidationValues.MaxPointValue, { message: `pointValue must be lesser or equal to ${ValidationValues.MaxPointValue}` })
     @IsMultipleOf(ValidationValues.MultipleOfPointValue)
     pointValue: number;
+
+    @ApiProperty()
+    @IsNumber()
+    @Min(ValidationValues.MinTimeInSeconds, { message: `timeInSeconds must be greater or equal to ${ValidationValues.MinTimeInSeconds}` })
+    @Max(ValidationValues.MaxTimeInSeconds, { message: `timeInSeconds must be lesser or equal to ${ValidationValues.MaxTimeInSeconds}` })
+    timeInSeconds: number;
 
     @ApiProperty()
     @IsDate()
