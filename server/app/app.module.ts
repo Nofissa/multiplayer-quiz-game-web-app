@@ -4,6 +4,9 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { QuestionController } from './controllers/question/question.controller';
 import { Question, questionSchema } from './model/database/question';
 import { QuestionService } from './services/question/question.service';
+import { QuizController } from './controllers/quiz/quiz.controller';
+import { Quiz, quizSchema } from './model/database/quiz';
+import { QuizService } from './services/quiz/quiz.service';
 
 @Module({
     imports: [
@@ -15,9 +18,9 @@ import { QuestionService } from './services/question/question.service';
                 uri: config.get<string>('DATABASE_CONNECTION_STRING'), // Loaded from .env
             }),
         }),
-        MongooseModule.forFeature([{ name: Question.name, schema: questionSchema }]),
+        MongooseModule.forFeature([{ name: Question.name, schema: questionSchema }, { name: Quiz.name, schema: quizSchema }]),
     ],
-    controllers: [QuestionController],
-    providers: [QuestionService, Logger],
+    controllers: [QuestionController, QuizController],
+    providers: [QuestionService, QuizService, Logger],
 })
 export class AppModule {}
