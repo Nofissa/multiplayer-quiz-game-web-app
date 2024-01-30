@@ -7,6 +7,7 @@ import { QuestionService } from './services/question/question.service';
 import { QuizController } from './controllers/quiz/quiz.controller';
 import { Quiz, quizSchema } from './model/database/quiz';
 import { QuizService } from './services/quiz/quiz.service';
+import { AuthController } from './controllers/auth/auth.controller';
 
 @Module({
     imports: [
@@ -23,7 +24,7 @@ import { QuizService } from './services/quiz/quiz.service';
             { name: Quiz.name, schema: quizSchema },
         ]),
     ],
-    controllers: [QuestionController, QuizController],
+    controllers: [AuthController, QuestionController, QuizController],
     providers: [QuestionService, QuizService, Logger],
 })
 export class AppModule {}
