@@ -3,14 +3,13 @@ import { UserCredentialSet } from '@common/user-credential-set';
 import { Body, Controller, HttpStatus, Post, Res } from '@nestjs/common';
 import { ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
-import { sign, verify } from 'jsonwebtoken';
-import { readFileSync } from 'fs';
-
-const usersFilePath = 'assets/users.json';
+import { AuthService } from '@app/services/auth/auth.service';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
+    constructor(private readonly authService: AuthService) {}
+
     @ApiOkResponse({
         description: 'Returns a JWT upon successful authentication',
     })
@@ -18,24 +17,12 @@ export class AuthController {
         description: 'Return NOT_FOUND http status when request fails',
     })
     @Post('/login')
-    async login(@Body() credSet: UserCredentialSet, @Res() response: Response) {
+    async login(@Body() userCredentialSet: UserCredentialSet, @Res() response: Response) {
         try {
-            const credSets: UserCredentialSet[] = JSON.parse(readFileSync(usersFilePath).toString());
-            const matchingCredentialSet = credSets.find((x) => {
-                return x.username === credSet.username && x.password === credSet.password;
-            });
-
-            if (!matchingCredentialSet) {
-                throw new Error('Invalid credentials');
-            }
-
-            const payload: AuthPayload = {
-                token: sign({}, process.env.PRIVATE_RSA_KEY, { expiresIn: '6h', algorithm: 'RS256' }),
-            };
-
+            const payload = await this.authService.authenticate(userCredentialSet);
             response.status(HttpStatus.OK).json(payload);
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send(error.message);
+            response.status(HttpStatus.UNAUTHORIZED).send(error.message);
         }
     }
 
@@ -43,15 +30,10 @@ export class AuthController {
         description: 'Returns true if the token is valid, false otherwise',
     })
     @Post('/verify')
-    async verifyToken(@Body() payload: AuthPayload, @Res() response: Response) {
+    async verify(@Body() payload: AuthPayload, @Res() response: Response) {
         try {
-            const token = payload.token;
-            if (!token) {
-                throw new Error('Token not provided');
-            }
-
-            verify(token, process.env.PUBLIC_RSA_KEY);
-            response.status(HttpStatus.OK).send();
+            await this.authService.verifyAuth(payload);
+            response.status(HttpStatus.NO_CONTENT).send();
         } catch (error) {
             response.status(HttpStatus.NOT_FOUND).send(error.message);
         }
