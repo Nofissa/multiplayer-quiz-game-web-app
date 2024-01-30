@@ -18,7 +18,10 @@ import { QuizService } from './services/quiz/quiz.service';
                 uri: config.get<string>('DATABASE_CONNECTION_STRING'), // Loaded from .env
             }),
         }),
-        MongooseModule.forFeature([{ name: Question.name, schema: questionSchema }, { name: Quiz.name, schema: quizSchema }]),
+        MongooseModule.forFeature([
+            { name: Question.name, schema: questionSchema },
+            { name: Quiz.name, schema: quizSchema },
+        ]),
     ],
     controllers: [QuestionController, QuizController],
     providers: [QuestionService, QuizService, Logger],
