@@ -1,19 +1,22 @@
+import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, HostListener } from '@angular/core';
 import { QuestionHttpService } from '@app/services/question-http.service';
 import { Subscription, map, take, timer } from 'rxjs';
-import { frequenceOneSecond } from './game-page.constants';
+import { oneSecond } from './game-page.constants';
 import { Question } from 'c:/Users/user/source/repos/LOG2990-206/client/src/app/interfaces/question';
 
 @Component({
     selector: 'app-game-page',
     templateUrl: './game-page.component.html',
     styleUrls: ['./game-page.component.scss'],
+    // animation from ChatGPT
+    animations: [trigger('scale', [transition(':enter', [style({ transform: 'scale(0)' }), animate('2s', style({ transform: 'scale(1)' }))])])],
 })
 export class GamePageComponent {
     // message: BehaviorSubject<string> = new BehaviorSubject<string>('');
     secondsLeft: number = 0;
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-    timerDuration: number = 60;
+    timerDuration: number = 10;
     selectedAnswerBoxes: number[] = [];
     validatedAnswerBoxes: number[] = [];
     firstBoxHotkey: string = '1';
@@ -21,7 +24,12 @@ export class GamePageComponent {
     thirdBoxHotkey: string = '3';
     fourthBoxHotkey: string = '4';
     questions: Question[];
-    currentQuestionText: string;
+    displayQuestion: boolean = true;
+    currentQuestionIndex: number = 0;
+    timerStarted: boolean = false;
+    points: number = 0;
+    feedbackMessage: string;
+    feedbackMessageClass: string = 'feedback-message';
     private timerSubscription: Subscription;
     constructor(private questionHttpService: QuestionHttpService) {}
 
@@ -67,15 +75,19 @@ export class GamePageComponent {
     // eslint-disable-next-line @angular-eslint/use-lifecycle-interface
     ngOnInit() {
         this.loadQuestions();
+        // this.timerDuration = this.questions[this.currentQuestionIndex].timeInSeconds;
         this.startTimer();
     }
 
     loadQuestions(): void {
         this.questionHttpService.getAllQuestions().subscribe({
             next: (questions) => {
-                this.questions = questions;
-                if (questions && questions.length > 0) {
-                    this.currentQuestionText = questions[0].question;
+                this.questions = questions.map((question) => ({
+                    ...question,
+                    allAnswers: [...question.correctAnswers, ...question.incorrectAnswers],
+                }));
+                if (this.questions.length === 0) {
+                    this.displayQuestion = false;
                 }
             },
         });
@@ -83,7 +95,7 @@ export class GamePageComponent {
 
     // timer inspired from ChatGPT and https://www.codeproject.com/Questions/5349203/How-to-make-5-minute-countdown-timer-with-rxjs-and
     startTimer() {
-        const countdown$ = timer(0, frequenceOneSecond).pipe(
+        const countdown$ = timer(0, oneSecond).pipe(
             take(this.timerDuration + 1),
             map((secondsElapsed) => this.timerDuration - secondsElapsed),
         );
@@ -91,9 +103,21 @@ export class GamePageComponent {
         this.timerSubscription = countdown$.subscribe((secondsLeft: number) => {
             this.secondsLeft = secondsLeft;
             if (this.secondsLeft === 0) {
+                this.displayQuestion = false;
                 this.validateChoices();
+                setTimeout(() => {
+                    this.feedbackMessage = '';
+                    if (this.currentQuestionIndex < this.questions.length - 1) {
+                        this.removeBoxValidationHighlight();
+                        this.currentQuestionIndex++;
+                        this.startTimer();
+                    } else {
+                        this.displayQuestion = false;
+                    }
+                }, oneSecond);
             }
         });
+        this.timerStarted = true;
     }
 
     stopTimer() {
@@ -116,21 +140,69 @@ export class GamePageComponent {
 
     validateChoices() {
         for (const box of this.selectedAnswerBoxes) {
-            const selectedBox = document.getElementsByClassName('answer-box' + box);
-            selectedBox[0].classList.remove('highlight-selected');
-            selectedBox[0].classList.add('highlight-validated');
             this.validatedAnswerBoxes.push(box);
         }
         if (this.validatedAnswerBoxes.length !== 0) {
-            const box1 = document.getElementsByClassName('answer-box1');
-            box1[0].classList.add('disable-click');
-            const box2 = document.getElementsByClassName('answer-box2');
-            box2[0].classList.add('disable-click');
-            const box3 = document.getElementsByClassName('answer-box3');
-            box3[0].classList.add('disable-click');
-            const box4 = document.getElementsByClassName('answer-box4');
-            box4[0].classList.add('disable-click');
             this.stopTimer();
         }
+        this.checkAnswers();
+        if (this.secondsLeft !== 0) {
+            setTimeout(() => {
+                this.feedbackMessage = '';
+                // this.secondsLeft = 0;
+                if (this.currentQuestionIndex < this.questions.length - 1) {
+                    this.removeBoxValidationHighlight();
+                    this.currentQuestionIndex++;
+                    this.startTimer();
+                } else {
+                    this.displayQuestion = false;
+                }
+            }, oneSecond);
+        }
+    }
+
+    checkAnswers() {
+        const { correctAnswers, allAnswers, pointValue } = this.questions[this.currentQuestionIndex];
+        const selectedAnswers = this.selectedAnswerBoxes.map((box) => allAnswers[box - 1]);
+        let correct = false;
+        if (selectedAnswers.length !== 0) {
+            correct =
+                selectedAnswers.length === correctAnswers.length &&
+                selectedAnswers.every((selectedAnswer) => correctAnswers.includes(selectedAnswer));
+        }
+
+        if (correct) {
+            this.addBoxValidationHighlight('right');
+            this.points += pointValue;
+            this.feedbackMessage = 'Bonne réponse! :)';
+            this.feedbackMessageClass = 'correct-answer';
+        } else {
+            this.addBoxValidationHighlight('wrong');
+            this.feedbackMessage = 'Mauvaise réponse :(';
+            this.feedbackMessageClass = 'incorrect-answer';
+        }
+        this.displayQuestion = true;
+    }
+
+    addBoxValidationHighlight(state: string) {
+        this.selectedAnswerBoxes.forEach((box) => {
+            const selectedBox = document.getElementsByClassName('answer-box' + box);
+            selectedBox[0].classList.remove('highlight-selected');
+            selectedBox[0].classList.add('highlight-validated-' + state);
+        });
+    }
+
+    removeBoxValidationHighlight() {
+        this.validatedAnswerBoxes.forEach((box) => {
+            const validatedBox = document.getElementsByClassName('answer-box' + box);
+            validatedBox[0].classList.remove('highlight-validated-right');
+            validatedBox[0].classList.remove('highlight-validated-wrong');
+        });
+        this.selectedAnswerBoxes.length = 0;
+    }
+
+    // eslint-disable-next-line @angular-eslint/use-lifecycle-interface
+    ngOnDestroy() {
+        this.stopTimer();
     }
 }

@@ -5,6 +5,7 @@
     border: 1px solid black;
     padding: 10px;
     margin: 10px;
+    margin-left: 1.9%;
     background-color: aliceblue;
     overflow-wrap: break-word;
     overflow-y: auto;
@@ -103,9 +104,9 @@
 }
 
   .timer-circle {
-    position: fixed;
-    left: 28%;
-    top: 45%;
+    position: absolute;
+    left: 27.5%;
+    top: 47%;
     height: 10%;
     width: 10%;
     background-color: #9109b7;
@@ -115,9 +116,9 @@
   }
 
   .value-circle {
-    position: fixed;
-    left: 56%;
-    top: 10%;
+    position: absolute;
+    left: 58%;
+    top: 11%;
     height: 7%;
     width: 7%;
     background-color: #7bb917;
@@ -140,16 +141,47 @@
     border: 5px solid blue;
   }
 
-  .highlight-validated {
+  .highlight-validated-right {
     border: 5px solid rgb(220, 237, 113);
+  }
+
+  .highlight-validated-wrong {
+    border: 5px solid #680909;
   }
 
   .disable-click {
     pointer-events: none;
   }
 
-  .font-color{
+  .font-color {
     font-weight: bold;
     color: black;
   }
 
+  .feedback {
+    font-size: 44px;
+    position: fixed;
+    left: 30%;
+    bottom: 11%;
+    font-family: "Roboto", "Helvetica Neue", sans-serif;
+    font-weight: bold;
+  }
+
+  .correct-answer {
+    color: rgb(14, 182, 14);
+  }
+  
+  .incorrect-answer {
+    color: red;
+  }
+
+  .logo {
+    width: 5rem;
+    height: 5rem;
+    margin: 0.5%;
+    margin-bottom: 0;
+  }
+
+  .button {
+    margin-left: 0.8%;
+  }

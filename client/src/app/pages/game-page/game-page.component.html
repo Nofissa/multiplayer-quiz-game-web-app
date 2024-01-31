@@ -3,48 +3,52 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
 </head>
 <div class="container-justified">
-    <h1 class="header-item">Vue de jeu du joueur </h1>
-    <div class="question-box font-color">
-        {{currentQuestionText || 'loading question...'}}
-    </div>
-    <div class="answer-boxes font-color">
-        <div class="answer-box1" [class.highlight-selected]="isSelected(1)" (click)="toggleAnswerBox(1)">
-            1. La réponse 1
+    <div *ngIf="displayQuestion">
+        <img class="logo" src='/assets/img/logo.png' alt="Logo Projet" />
+            <div class="question-box font-color">
+                {{questions[currentQuestionIndex].question || 'Chargement de la question...'}}
+            </div>
+            <div class="answer-boxes font-color">
+                <div class="answer-box1" [class.highlight-selected]="isSelected(1)" (click)="toggleAnswerBox(1)">
+                    1. {{questions[currentQuestionIndex].allAnswers[0]}}
+                </div>
+                <div class="answer-box2" [class.highlight-selected]="isSelected(2)" (click)="toggleAnswerBox(2)">
+                    2. {{questions[currentQuestionIndex].allAnswers[1]}}
+                </div>
+                <div class="boxes-below"></div>
+                <div *ngIf="questions[currentQuestionIndex].allAnswers.length > 2" class="answer-box3" [class.highlight-selected]="isSelected(3)" (click)="toggleAnswerBox(3)">
+                    3. {{questions[currentQuestionIndex].allAnswers[2]}}
+                </div>
+                <div *ngIf="questions[currentQuestionIndex].allAnswers.length === 4" class="answer-box4" [class.highlight-selected]="isSelected(4)" (click)="toggleAnswerBox(4)">
+                    4. {{questions[currentQuestionIndex].allAnswers[3]}}
+                </div>
+            </div>
+            <div class="value-circle font-color">
+                <div class="centered-text">{{questions[currentQuestionIndex].pointValue}}</div>
+            </div>
+            <div>
+                <button class="button" (click)="validateChoices()">Valider les choix  <i class="fas fa-check-circle" style="color: green;"></i></button>
+            </div>
+            <div class="feedback" [class]="[feedbackMessageClass]">{{feedbackMessage}}</div>
+            <div class="chat-box">
+                <div class="messages font-color" style="color: black;">
+                    Messages envoyés
+                </div>
+                <textarea class="write-message" placeholder="Envoyer un message"></textarea>
+            </div>
+            <span class="ff-circle">
+                <div class="centered-text">
+                    <button style="background-color: red;" class="button" onclick="location.href = '/home';" >Abandonner</button> <!--redirige vers home si pas en mode test, sinon creation-->
+                </div>
+            </span>
+            <span class="timer-circle">
+                <div class="centered-text">Il reste {{secondsLeft}} seconde(s)</div>
+            </span>
+            <div class="score-circle font-color">
+                <div class="centered-text">{{points}} points</div>
+            </div>
         </div>
-        <div class="answer-box2" [class.highlight-selected]="isSelected(2)" (click)="toggleAnswerBox(2)">
-            2. La réponse 2
-        </div>
-        <div class="boxes-below"></div>
-        <div class="answer-box3" [class.highlight-selected]="isSelected(3)" (click)="toggleAnswerBox(3)">
-            3. La réponse 3
-        </div>
-        <div class="answer-box4" [class.highlight-selected]="isSelected(4)" (click)="toggleAnswerBox(4)">
-            4. La réponse 4
-        </div>
-    </div>
-    <div>
-        <button class="button" (click)="validateChoices()">Valider les choix  <i class="fas fa-check-circle" style="color: green;"></i></button>
-    </div>
-    <div class="chat-box">
-        <div class="messages font-color" style="color: black;">
-            Messages envoyés
-        </div>
-        <textarea class="write-message" placeholder="Envoyer un message"></textarea>
-    </div>
-    <span class="ff-circle">
-        <div class="centered-text">
-            <button style="background-color: red;" class="button" onclick="location.href = '/home';" >Abandonner</button> <!--redirige vers home si pas en mode test, sinon creation-->
-        </div>
-    </span>
-    <span class="timer-circle">
-        <div class="centered-text">Il reste {{secondsLeft}} seconde(s)</div>
-    </span>
-    <div class="value-circle font-color">
-        <div class="centered-text">Valeur</div>
-    </div>
-    <div class="score-circle font-color">
-        <div class="centered-text">Pointage</div>
-    </div>
+        <div *ngIf="!displayQuestion" [@scale]>LE QUIZ EST TERMINÉ. VOUS AVEZ OBTENU {{points}} POINTS</div>
     <!-- <section id="server-message" class="justified">
         <div class="justified">
         </div>

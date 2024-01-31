@@ -4,5 +4,7 @@ export interface Question {
     incorrectAnswers: string[];
     correctAnswers: string[];
     pointValue: number;
+    timeInSeconds: number;
     lastModified: Date;
+    allAnswers: string[];
 }

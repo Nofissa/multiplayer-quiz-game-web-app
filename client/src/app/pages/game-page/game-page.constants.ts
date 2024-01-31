@@ -1,1 +1,1 @@
-export const frequenceOneSecond = 1000;
+export const oneSecond = 1000;
