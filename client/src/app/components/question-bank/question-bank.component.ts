@@ -1,5 +1,4 @@
 /* eslint-disable no-underscore-dangle */
-import { HttpErrorResponse } from '@angular/common/http';
 import { Component, Input, OnInit } from '@angular/core';
 import { Question } from '@app/interfaces/question';
 import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
@@ -25,6 +24,7 @@ export class QuestionBankComponent implements OnInit {
 
     questions: Question[] = [];
 
+    // eslint-disable-next-line max-params
     constructor(
         readonly interactionService: QuestionInteractionService,
         private readonly questionHttpService: QuestionHttpService,
@@ -63,7 +63,8 @@ export class QuestionBankComponent implements OnInit {
                 question: '',
                 incorrectAnswers: [''],
                 correctAnswers: [''],
-                pointValue: 0,
+                pointValue: 10,
+                timeInSeconds: 10,
                 lastModified: new Date(),
             },
         };
@@ -78,9 +79,6 @@ export class QuestionBankComponent implements OnInit {
                 if (result) {
                     this.addQuestion(result);
                 }
-            },
-            error: (error: HttpErrorResponse) => {
-                console.error(error);
             },
         });
     }
