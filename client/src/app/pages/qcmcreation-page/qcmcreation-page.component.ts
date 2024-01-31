@@ -5,6 +5,7 @@ import { UpsertQuestionDialogComponent } from '@app/components/dialogs/upsert-qu
 import { Answer } from '@app/interfaces/answer';
 import { Question } from '@app/interfaces/question';
 import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog-data';
+// import { Quiz } from '@app/interfaces/quiz';
 
 @Component({
     selector: 'app-qcmcreation-page',
@@ -13,7 +14,9 @@ import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog
 })
 export class QCMCreationPageComponent implements OnInit {
     title = 'hi';
-    quizForm: FormGroup;
+    formGroup: FormGroup;
+    questionsArray: FormArray;
+
     emptyAnswer1: Answer = {
         answer: '',
         isCorrect: false,
@@ -28,7 +31,7 @@ export class QCMCreationPageComponent implements OnInit {
         lastModified: new Date(),
         _id: '',
         answerTime: 10,
-        pointValue: 0,
+        pointValue: 10,
     };
     emptyDialogData: UpsertQuestionDialogData = {
         title: 'Créer une Question',
@@ -41,15 +44,14 @@ export class QCMCreationPageComponent implements OnInit {
     ) {}
 
     get questions(): FormArray {
-        return this.quizForm.get('answers') as FormArray;
+        return this.formGroup.get('questions') as FormArray;
     }
 
     ngOnInit() {
-        this.quizForm = this.formBuilder.group({
-            quizTitle: ['', Validators.required],
-            quizDescritpion: ['', Validators.required],
+        this.formGroup = this.formBuilder.group({
+            title: ['', Validators.required],
+            descritpion: ['', Validators.required],
             questions: this.formBuilder.array([]),
-            answerTime: [10, Validators.required],
         });
     }
 
@@ -60,7 +62,7 @@ export class QCMCreationPageComponent implements OnInit {
     }
 
     submitQuiz() {
-        window.console.log('Form submitted:', this.quizForm.value);
+        window.console.log('Form submitted:', this.formGroup.value);
         // send info to where it needs to go
     }
 }

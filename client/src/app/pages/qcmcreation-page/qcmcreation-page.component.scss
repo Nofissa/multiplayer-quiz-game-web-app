@@ -13,17 +13,17 @@
     flex-direction: row;
 }
 
-.text-edit {
-    border: none;
-    background-color: var(--back-color);
-    overflow: hidden;
-    color: white;
-    size-adjust: none;
-    height: 40px;
-    margin: 2%;
-    font-size: 16px;
-    width: 100%;
-}
+// .text-edit {
+//     border: none;
+//     background-color: var(--back-color);
+//     overflow: hidden;
+//     color: white;
+//     size-adjust: none;
+//     height: 40px;
+//     margin: 2%;
+//     font-size: 16px;
+//     width: 100%;
+// }
 
 #description {
     overflow-y: scroll;
@@ -53,30 +53,4 @@ form {
     visibility: hidden;
 }
 
-#timer-input {
-    position: absolute;
-    top: 50%;
-    left: 38%;
-    background-color: var(--back-color);
-    color : white;
-    border : none;
-    outline: none;
-    z-index: 1;
-    width: 20px;
-    text-align: center;
-}
 
-#timer-img {
-    display: block;
-    height: 100px;
-    z-index: 0;
-    filter :invert(100%);
-
-}
-#timer {
-    display: inline-block;
-    position: relative; 
-    justify-content: center;
-    align-items: center;
-    margin : 0;
-}

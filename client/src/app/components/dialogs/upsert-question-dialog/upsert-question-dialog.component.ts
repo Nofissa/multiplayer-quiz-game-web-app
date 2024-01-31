@@ -5,10 +5,11 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog-data';
 import { Answer } from '@app/interfaces/answer';
 import { Question } from '@app/interfaces/question';
-import { QuestionHttpService } from '@app/services/question-http.service';
 
 const POINT_VALUE_BASE_MULTIPLE = 10;
 const MAX_CHOICE_COUNT = 4;
+const MIN_TIME = 10;
+const MAX_TIME = 60;
 
 @Component({
     selector: 'app-upsert-question-dialog',
@@ -19,14 +20,13 @@ export class UpsertQuestionDialogComponent {
     maxChoiceCount = MAX_CHOICE_COUNT;
     formGroup: FormGroup;
     answersArray: FormArray;
-    private minTime: number = 10;
-    private maxTime: number = 60;
+    private minTime: number = MIN_TIME;
+    private maxTime: number = MAX_TIME;
 
     constructor(
         private formBuilder: FormBuilder,
         public dialogRef: MatDialogRef<UpsertQuestionDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: UpsertQuestionDialogData,
-        private questionHTTPService: QuestionHttpService,
     ) {
         this.answersArray = this.formBuilder.array(
             this.data.question.answers.map((answer) => {
@@ -86,21 +86,9 @@ export class UpsertQuestionDialogComponent {
     submit() {
         if (this.formGroup.valid) {
             const question: Question = this.formGroup.value;
-
-            this.questionHTTPService.createQuestion(question).subscribe({
-                next: (createdQuestion) => {
-                    // Handle success
-                    window.alert('Question créée avec succès!');
-                    this.dialogRef.close(createdQuestion);
-                },
-                error: (error) => {
-                    // Handle error
-                    console.error('Error creating question', error);
-                    window.alert('Une erreur est survenue, veuillez réessayer');
-                },
-            });
+            this.dialogRef.close(question);
         } else {
-            window.alert("l'un des paramètres est erroné");
+            window.alert("l'un des paramètres est erroné, veuillez réessayer");
         }
     }
 

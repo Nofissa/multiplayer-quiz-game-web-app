@@ -1,22 +1,21 @@
 
 <div id="quiz-creation-page">
-    <form [formGroup]="quizForm" class="flex-column" (ngSubmit)="submitQuiz()">
+    <form [formGroup]="formGroup" class="flex-column" (ngSubmit)="submitQuiz()">
         <h1 class="header-item">Build-a-Quiz</h1>
-        <div id="text-editables" class="flex-row">
-            <div class="flex-column">
-                <input id="title" type="text" class="text-edit" placeholder="Votre titre ici" formControlName="quizTitle" required/>
-                <textarea id="description" class="text-edit" placeholder="Votre description ici" formControlName="quizDescritpion" required></textarea>
-            </div>
-            <div id="timer">
-                <img id="timer-img" src='/assets/img/timer.png' alt="timer"/>
-                <input id="timer-input" type="text" placeholder="s" formControlName="answerTime" required/>
-            </div>
-        </div>
+        <mat-form-field id="text-editables" class="flex-column">
+            <mat-label>Titre du Quiz</mat-label>
+            <input  matInput id="title" type="text" class="text-edit" placeholder="Votre titre ici" formControlName="title" required/>
+        </mat-form-field>
+        <mat-form-field id="text-editables" class="flex-column">
+            <mat-label>Description du Quiz</mat-label>
+            <textarea matInput id="description" class="text-edit" placeholder="Votre description ici" formControlName="descritpion" required></textarea>
+        </mat-form-field>
         <div id="questions-container" formArrayName="questions" class="flex-column">
+            
+            <mat-icon aria-hidden="false" aria-label="Ajouter une question" (click)="addQuestion()" font-icon="add"></mat-icon>
         </div>
         <input type="submit"/>
     </form>
-    <!-- <app-question-list></app-question-list> -->
-    <button (click)="addQuestion()">yo</button>
+    <app-question-list></app-question-list>
 </div>
 <!-- <app-create-question-modal ></app-create-question-modal> -->
