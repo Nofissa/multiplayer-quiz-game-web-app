@@ -20,11 +20,11 @@ export class QCMCreationPageComponent implements OnInit {
     };
     emptyAnswer2: Answer = {
         answer: '',
-        isCorrect: false,
+        isCorrect: true,
     };
     emptyQuestion: Question = {
         question: '',
-        answers: [],
+        answers: [this.emptyAnswer1, this.emptyAnswer2],
         lastModified: new Date(),
         _id: '',
         answerTime: 10,

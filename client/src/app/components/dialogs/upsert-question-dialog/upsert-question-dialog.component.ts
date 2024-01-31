@@ -16,6 +16,8 @@ export class UpsertQuestionDialogComponent {
     maxChoiceCount = MAX_CHOICE_COUNT;
     formGroup: FormGroup;
     answersArray: FormArray;
+    private minTime: number = 10;
+    private maxTime: number = 60;
 
     constructor(
         private formBuilder: FormBuilder,
@@ -35,7 +37,7 @@ export class UpsertQuestionDialogComponent {
         this.formGroup = this.formBuilder.group({
             question: [this.data.question.question, Validators.required],
             answers: this.answersArray,
-            answerTime: [this.data.question.answerTime, [Validators.required, this.multipleOfTenValidator()]],
+            answerTime: [this.data.question.answerTime, [Validators.required, this.timeValidator()]],
             pointValue: [this.data.question.pointValue, [Validators.required, this.multipleOfTenValidator()]],
         });
     }
@@ -48,14 +50,17 @@ export class UpsertQuestionDialogComponent {
         return this.formGroup.controls['answers'] as FormArray<FormGroup>;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    get getMaxTime() {
+        return this.maxTime;
+    }
+
+    get getMinTime() {
+        return this.minTime;
+    }
+
     drop(event: CdkDragDrop<any[]>): void {
         moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
     }
-
-    // getChoiceCount(): number {
-    //     return this.correctAnswersControls.length + this.incorrectAnswersControls.length;
-    // }
 
     addAnswer() {
         this.answersArray.push(
@@ -70,14 +75,6 @@ export class UpsertQuestionDialogComponent {
         this.answersArray.removeAt(index);
     }
 
-    // addIncorrectAnswer() {
-    //     this.incorrectAnswersArray.push(this.formBuilder.control('', Validators.required));
-    // }
-
-    // removeIncorrectAnswerAt(index: number) {
-    //     this.incorrectAnswersArray.removeAt(index);
-    // }
-
     cancel() {
         this.dialogRef.close();
     }
@@ -86,6 +83,8 @@ export class UpsertQuestionDialogComponent {
         console.log(this.formGroup);
         if (this.formGroup.valid) {
             this.dialogRef.close(this.formGroup.value);
+        } else {
+            window.alert("l'un des paramètres est erroné");
         }
     }
 
@@ -94,6 +93,14 @@ export class UpsertQuestionDialogComponent {
             const value = control.value;
 
             return value % POINT_VALUE_BASE_MULTIPLE === 0 ? null : { notMultipleOfTen: true };
+        };
+    }
+
+    private timeValidator(): ValidatorFn {
+        return (control: AbstractControl): ValidationErrors | null => {
+            const value = control.value;
+
+            return value >= this.minTime && value <= this.maxTime ? null : { notValidTime: true };
         };
     }
 }

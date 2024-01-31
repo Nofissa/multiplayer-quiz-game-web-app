@@ -25,10 +25,14 @@
                     </div>
                 </div>
             </div>
-              <mat-icon aria-hidden="false"
-              class="action"
-              aria-label="Ajouter" fontIcon="add" (click)="addAnswer()"></mat-icon>
-              <input matInput type="text" formControlName="answerTime">
+                <mat-icon aria-hidden="false"
+                class="action"
+                aria-label="Ajouter" fontIcon="add" (click)="addAnswer()"></mat-icon>
+                <mat-form-field appearance="outline" class="answer flex-row">
+                    <mat-slider id="timeRange" min="{{getMinTime}}" max="{{getMaxTime}}" discrete>
+                        <input matInput matSliderThumb formControlName="answerTime">
+                    </mat-slider>
+                </mat-form-field>
             <!-- <div *ngFor="let correctAnswer of correctAnswersControls; let i = index" class="answers-wrapper">
                 <mat-form-field appearance="outline" class="answer">
                     <mat-label>Bonne Réponse {{ i + 1 }}</mat-label>
@@ -58,7 +62,7 @@
             </div> -->
             <mat-form-field appearance="outline">
                 <mat-label>Nombre de points</mat-label>
-                <input matInput type="number" min="10" max="100" formControlName="pointValue"
+                <input matInput type="number" min="10" max="100" step="10" formControlName="pointValue"
                     value="{{ data.question.pointValue }}">
             </mat-form-field>
         </div>
