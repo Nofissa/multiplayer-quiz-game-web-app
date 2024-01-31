@@ -3,6 +3,9 @@ import { Component, Inject } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog-data';
+import { Answer } from '@app/interfaces/answer';
+import { Question } from '@app/interfaces/question';
+import { QuestionHttpService } from '@app/services/question-http.service';
 
 const POINT_VALUE_BASE_MULTIPLE = 10;
 const MAX_CHOICE_COUNT = 4;
@@ -23,15 +26,16 @@ export class UpsertQuestionDialogComponent {
         private formBuilder: FormBuilder,
         public dialogRef: MatDialogRef<UpsertQuestionDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: UpsertQuestionDialogData,
+        private questionHTTPService: QuestionHttpService,
     ) {
         this.answersArray = this.formBuilder.array(
             this.data.question.answers.map((answer) => {
                 return this.formBuilder.group({
                     answer: [answer.answer, Validators.required],
-                    isCorrect: [answer.isCorrect],
+                    isCorrect: [answer.isCorrect, Validators.required],
                 });
             }),
-            Validators.required,
+            [Validators.required, this.oneFalseValidator(), this.oneTrueValidator()],
         ) as FormArray<FormGroup>;
 
         this.formGroup = this.formBuilder.group({
@@ -80,12 +84,48 @@ export class UpsertQuestionDialogComponent {
     }
 
     submit() {
-        console.log(this.formGroup);
         if (this.formGroup.valid) {
-            this.dialogRef.close(this.formGroup.value);
+            const question: Question = this.formGroup.value;
+
+            this.questionHTTPService.createQuestion(question).subscribe({
+                next: (createdQuestion) => {
+                    // Handle success
+                    window.alert('Question créée avec succès!');
+                    this.dialogRef.close(createdQuestion);
+                },
+                error: (error) => {
+                    // Handle error
+                    console.error('Error creating question', error);
+                    window.alert('Une erreur est survenue, veuillez réessayer');
+                },
+            });
         } else {
             window.alert("l'un des paramètres est erroné");
         }
+    }
+
+    private oneTrueValidator(): ValidatorFn {
+        return (control: AbstractControl): ValidationErrors | null => {
+            const answerArray: Answer[] = control.value;
+            for (const answer of answerArray) {
+                if (answer.isCorrect) {
+                    return null;
+                }
+            }
+            return { noTrueAnswer: true };
+        };
+    }
+
+    private oneFalseValidator(): ValidatorFn {
+        return (control: AbstractControl): ValidationErrors | null => {
+            const answerArray: Answer[] = control.value;
+            for (const answer of answerArray) {
+                if (!answer.isCorrect) {
+                    return null;
+                }
+            }
+            return { noFalseAnswer: true };
+        };
     }
 
     private multipleOfTenValidator(): ValidatorFn {
