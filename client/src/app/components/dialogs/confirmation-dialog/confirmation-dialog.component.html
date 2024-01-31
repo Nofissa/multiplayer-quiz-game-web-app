@@ -1,0 +1,12 @@
+<h2 mat-dialog-title>{{ data.title }}</h2>
+<form>
+    <mat-dialog-content>
+        {{ data.prompt }}
+    </mat-dialog-content>
+    <mat-dialog-actions>
+        <div class="actions-wrapper">
+            <button mat-raised-button class="button-cancel" (click)="cancel()">Annuler</button>
+            <button mat-raised-button class="button-submit" (click)="submit()">Confirmer</button>
+        </div>
+    </mat-dialog-actions>
+</form>
