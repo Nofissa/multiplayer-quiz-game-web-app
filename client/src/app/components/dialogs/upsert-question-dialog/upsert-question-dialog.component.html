@@ -9,25 +9,26 @@
             </mat-form-field>
 
             <div cdkDropListGroup>
-                <div cdkDropList [cdkDropListData]="correctAnswersControls" (cdkDropListDropped)="drop($event)">
-                    <div *ngFor="let correctAnswer of correctAnswersControls; let i = index" cdkDrag class="answers-wrapper">
+                <div cdkDropList [cdkDropListData]="answers.controls" (cdkDropListDropped)="drop($event)">
+                    <div *ngFor="let answerGroup of answers.controls; let i = index" cdkDrag class="answers-wrapper">
                         <mat-form-field appearance="outline" class="answer">
                             <mat-label>Bonne Réponse {{ i + 1 }}</mat-label>
-                            <div class="flex-row">
-                                <input matInput type="text" [formControl]="correctAnswer">
-                                <input type="checkbox">
+                            <div class="flex-row" [formGroup]="answerGroup">
+                                <input matInput type="text" formControlName="answer">
+                                <input type="checkbox" formControlName="isCorrect">
                             </div>
                         </mat-form-field>
                         <div class="row-actions-wrapper">
-                            <mat-icon *ngIf="correctAnswersControls.length > 1" aria-hidden="false" class="action action-remove"
-                                aria-label="Retirer" fontIcon="remove" (click)="removeCorrectAnswerAt(i)"></mat-icon>
+                            <mat-icon *ngIf="answersControls.length > 1" aria-hidden="false" class="action action-remove"
+                                aria-label="Retirer" fontIcon="remove" (click)="removeAnswerAt(i)"></mat-icon>
                         </div>
                     </div>
                 </div>
             </div>
               <mat-icon aria-hidden="false"
               class="action"
-              aria-label="Ajouter" fontIcon="add" (click)="addCorrectAnswer()"></mat-icon>
+              aria-label="Ajouter" fontIcon="add" (click)="addAnswer()"></mat-icon>
+              <input matInput type="text" formControlName="answerTime">
             <!-- <div *ngFor="let correctAnswer of correctAnswersControls; let i = index" class="answers-wrapper">
                 <mat-form-field appearance="outline" class="answer">
                     <mat-label>Bonne Réponse {{ i + 1 }}</mat-label>
@@ -41,7 +42,7 @@
                         aria-label="Ajouter" fontIcon="add" (click)="addCorrectAnswer()"></mat-icon>
                 </div>
             </div-->
-            <div *ngFor="let incorrectAnswer of incorrectAnswersControls; let i = index" class="answers-wrapper">
+            <!-- <div *ngFor="let incorrectAnswer of incorrectAnswersControls; let i = index" class="answers-wrapper">
                 <mat-form-field appearance="outline" class="answer">
                     <mat-label>Mauvaise Réponse {{ i + 1 }}</mat-label>
                     <input matInput type="text" [formControl]="incorrectAnswer">
@@ -54,7 +55,7 @@
                         class="action action-add {{ i !== incorrectAnswersControls.length - 1 ? 'hidden' : '' }}"
                         aria-label="Ajouter" fontIcon="add" (click)="addIncorrectAnswer()"></mat-icon>
                 </div>
-            </div>
+            </div> -->
             <mat-form-field appearance="outline">
                 <mat-label>Nombre de points</mat-label>
                 <input matInput type="number" min="10" max="100" formControlName="pointValue"

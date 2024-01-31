@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { UpsertQuestionDialogComponent } from '@app/components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
+import { Answer } from '@app/interfaces/answer';
 import { Question } from '@app/interfaces/question';
 import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog-data';
 
@@ -13,12 +14,20 @@ import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog
 export class QCMCreationPageComponent implements OnInit {
     title = 'hi';
     quizForm: FormGroup;
+    emptyAnswer1: Answer = {
+        answer: '',
+        isCorrect: false,
+    };
+    emptyAnswer2: Answer = {
+        answer: '',
+        isCorrect: false,
+    };
     emptyQuestion: Question = {
         question: '',
-        incorrectAnswers: [''],
-        correctAnswers: [''],
+        answers: [],
         lastModified: new Date(),
         _id: '',
+        answerTime: 10,
         pointValue: 0,
     };
     emptyDialogData: UpsertQuestionDialogData = {

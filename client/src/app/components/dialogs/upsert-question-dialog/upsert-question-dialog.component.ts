@@ -1,8 +1,8 @@
-import { Component, Inject } from '@angular/core';
-import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog-data';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { Component, Inject } from '@angular/core';
+import { AbstractControl, FormArray, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog-data';
 
 const POINT_VALUE_BASE_MULTIPLE = 10;
 const MAX_CHOICE_COUNT = 4;
@@ -15,73 +15,75 @@ const MAX_CHOICE_COUNT = 4;
 export class UpsertQuestionDialogComponent {
     maxChoiceCount = MAX_CHOICE_COUNT;
     formGroup: FormGroup;
-    incorrectAnswersArray: FormArray;
-    correctAnswersArray: FormArray;
-    isCorrect: FormArray;
+    answersArray: FormArray;
 
     constructor(
         private formBuilder: FormBuilder,
         public dialogRef: MatDialogRef<UpsertQuestionDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: UpsertQuestionDialogData,
     ) {
-        this.incorrectAnswersArray = this.formBuilder.array(
-            this.data.question.incorrectAnswers.map((answer) => this.formBuilder.control(answer, Validators.required)),
+        this.answersArray = this.formBuilder.array(
+            this.data.question.answers.map((answer) => {
+                return this.formBuilder.group({
+                    answer: [answer.answer, Validators.required],
+                    isCorrect: [answer.isCorrect],
+                });
+            }),
             Validators.required,
-        ) as FormArray;
-        this.correctAnswersArray = this.formBuilder.array(
-            this.data.question.correctAnswers.map((answer) => this.formBuilder.control(answer, Validators.required)),
-            Validators.required,
-        ) as FormArray;
-        this.isCorrect = this.formBuilder.array(
-            this.data.question.correctAnswers.map((answer) => this.formBuilder.control(answer, Validators.required)),
-            Validators.required,
-        ) as FormArray;
+        ) as FormArray<FormGroup>;
 
         this.formGroup = this.formBuilder.group({
             question: [this.data.question.question, Validators.required],
-            incorrectAnswers: this.incorrectAnswersArray,
-            correctAnswers: this.correctAnswersArray,
+            answers: this.answersArray,
+            answerTime: [this.data.question.answerTime, [Validators.required, this.multipleOfTenValidator()]],
             pointValue: [this.data.question.pointValue, [Validators.required, this.multipleOfTenValidator()]],
         });
     }
 
-    get incorrectAnswersControls(): FormControl[] {
-        return this.incorrectAnswersArray.controls as FormControl[];
+    get answersControls() {
+        return this.answersArray.controls;
     }
 
-    get correctAnswersControls(): FormControl[] {
-        return this.correctAnswersArray.controls as FormControl[];
+    get answers() {
+        return this.formGroup.controls['answers'] as FormArray<FormGroup>;
     }
 
-    drop(event: CdkDragDrop<FormControl[]>): void {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    drop(event: CdkDragDrop<any[]>): void {
         moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
     }
 
-    getChoiceCount(): number {
-        return this.correctAnswersControls.length + this.incorrectAnswersControls.length;
+    // getChoiceCount(): number {
+    //     return this.correctAnswersControls.length + this.incorrectAnswersControls.length;
+    // }
+
+    addAnswer() {
+        this.answersArray.push(
+            this.formBuilder.group({
+                answer: ['', Validators.required],
+                isCorrect: [false],
+            }),
+        );
     }
 
-    addCorrectAnswer() {
-        this.correctAnswersArray.push(this.formBuilder.control('', Validators.required));
+    removeAnswerAt(index: number) {
+        this.answersArray.removeAt(index);
     }
 
-    removeCorrectAnswerAt(index: number) {
-        this.correctAnswersArray.removeAt(index);
-    }
+    // addIncorrectAnswer() {
+    //     this.incorrectAnswersArray.push(this.formBuilder.control('', Validators.required));
+    // }
 
-    addIncorrectAnswer() {
-        this.incorrectAnswersArray.push(this.formBuilder.control('', Validators.required));
-    }
-
-    removeIncorrectAnswerAt(index: number) {
-        this.incorrectAnswersArray.removeAt(index);
-    }
+    // removeIncorrectAnswerAt(index: number) {
+    //     this.incorrectAnswersArray.removeAt(index);
+    // }
 
     cancel() {
         this.dialogRef.close();
     }
 
     submit() {
+        console.log(this.formGroup);
         if (this.formGroup.valid) {
             this.dialogRef.close(this.formGroup.value);
         }
