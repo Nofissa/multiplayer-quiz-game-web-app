@@ -1,9 +1,10 @@
 <div class="bouttons-quiz">
-    <button mat-fab extended color="primary" routerLink="/create-game">
+    <button mat-fab extended color="primary" routerLink="/qcm-creation">
         <mat-icon>add</mat-icon>
         Ajouter un quiz
     </button>
-    <button mat-fab extended color="accent">
+    <input type="file" #fileInput style="display: none" (change)="importQuiz($event)" />
+    <button mat-fab extended color="accent" (click)="fileInput.click()">
         <mat-icon>file_upload</mat-icon>
         Importer un quiz
     </button>

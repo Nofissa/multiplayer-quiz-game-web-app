@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Router } from '@angular/router';
 import { Quiz } from '@app/interfaces/quiz';
 import { QuizHttpService } from '@app/services/quiz-http.service';
 import { saveAs } from 'file-saver';
@@ -14,30 +15,35 @@ export class QuizComponent {
     @Output()
     refresh = new EventEmitter<void>();
 
-    constructor(private readonly quizHttpService: QuizHttpService) {}
+    isDeleted: boolean = false;
 
-    deleteQuiz(quiz: Quiz) {
-        this.quizHttpService.deleteQuizById(quiz._id).subscribe(() => {
-            this.refresh.emit();
-        });
-        console.log('deleteQuiz' + quiz._id + ' ' + quiz.titre);
-    }
-    editQuiz(quiz: Quiz) {
-        this.quizHttpService.updateQuiz(quiz).subscribe(() => {
-            this.refresh.emit();
-        });
-        console.log('editQuiz' + quiz._id + ' ' + quiz.titre);
-    }
+    constructor(
+        private readonly quizHttpService: QuizHttpService,
+        private readonly router: Router,
+    ) {}
 
-    exportQuiz(quiz: Quiz) {
-        const blob = new Blob([JSON.stringify(quiz)], { type: 'text/json;charset=utf-8' });
-        saveAs(blob, `${quiz.titre}.json`);
+    deleteQuiz() {
+        this.quizHttpService.deleteQuizById(this.quiz._id).subscribe((quiz: Quiz) => {
+            if (quiz) {
+                this.isDeleted = true;
+            }
+        });
     }
 
-    onToggleChange(quiz: Quiz) {
-        this.quizHttpService.updateQuiz(quiz).subscribe(() => {
-            this.refresh.emit();
+    editQuiz() {
+        this.router.navigate([`/qcm-creation?quizId=${this.quiz._id}`]);
+    }
+
+    exportQuiz() {
+        const blob = new Blob([JSON.stringify(this.quiz)], { type: 'text/json;charset=utf-8' });
+        saveAs(blob, `${this.quiz.titre}.json`);
+    }
+
+    onToggleChange() {
+        this.quiz.isHidden = !this.quiz.isHidden;
+        console.log(this.quiz);
+        this.quizHttpService.updateQuiz(this.quiz).subscribe((quiz) => {
+            this.quiz = quiz;
         });
-        console.log('onToggleChange' + quiz._id + ' ' + quiz.titre);
     }
 }
