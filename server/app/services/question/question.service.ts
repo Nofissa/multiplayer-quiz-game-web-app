@@ -2,7 +2,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-
 import { Question, QuestionDocument } from '@app/model/database/question';
 import { UpsertQuestionDto } from '@app/model/dto/question/upsert-question.dto';
 
@@ -26,16 +25,24 @@ export class QuestionService {
         const questions: UpsertQuestionDto[] = [
             {
                 question: 'Quelle est la valeur de la constante R dans la formule pV = nRT',
-                incorrectAnswers: ['3.14 V/m^2', '2.72 C/s', '6.022x10^23 mol/N'],
-                correctAnswers: ['8.31 J/mol/K'],
+                answers: [
+                    { answer: '3.14 V/m^2', isCorrect: false },
+                    { answer: '2.72 C/s', isCorrect: false },
+                    { answer: '6.022x10^23 mol/N', isCorrect: false },
+                    { answer: '8.31 J/mol/K', isCorrect: true },
+                ],
                 pointValue: 100,
                 timeInSeconds: 10,
                 lastModified: new Date(),
             },
             {
                 question: "En quelle année la compagnie d'automobile Volkswagen a-t-elle été fondée?",
-                incorrectAnswers: ['1928', '1987', '1947'],
-                correctAnswers: ['1937'],
+                answers: [
+                    { answer: '1928', isCorrect: false },
+                    { answer: '1987', isCorrect: false },
+                    { answer: '1947', isCorrect: false },
+                    { answer: '1937', isCorrect: true },
+                ],
                 pointValue: 30,
                 timeInSeconds: 30,
                 lastModified: new Date('2024-01-20 18:43:27'),
