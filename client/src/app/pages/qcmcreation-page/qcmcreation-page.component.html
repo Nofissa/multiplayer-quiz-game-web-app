@@ -1,4 +1,3 @@
-
 <div id="quiz-creation-page">
     <form [formGroup]="formGroup" class="flex-column" (ngSubmit)="submitQuiz()">
         <h1 class="header-item">Build-a-Quiz</h1>
@@ -11,11 +10,10 @@
             <textarea matInput id="description" class="text-edit" placeholder="Votre description ici" formControlName="descritpion" required></textarea>
         </mat-form-field>
         <div id="questions-container" formArrayName="questions" class="flex-column">
-            
+            <app-question-list id="question-list" [questions]="questionsContainer" [interactionService]="questionInteractionService" [options]="{share: true, create: true, edit: true, delete: true}"></app-question-list>
             <mat-icon aria-hidden="false" aria-label="Ajouter une question" (click)="addQuestion()" font-icon="add"></mat-icon>
         </div>
         <input type="submit"/>
     </form>
-    <app-question-list></app-question-list>
+    <app-question-bank [options]="{share: true}"></app-question-bank>
 </div>
-<!-- <app-create-question-modal ></app-create-question-modal> -->

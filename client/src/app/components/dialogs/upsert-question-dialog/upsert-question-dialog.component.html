@@ -30,36 +30,9 @@
                 aria-label="Ajouter" fontIcon="add" (click)="addAnswer()"></mat-icon>
                 <mat-form-field appearance="outline" class="answer flex-row">
                     <mat-slider id="timeRange" min="{{getMinTime}}" max="{{getMaxTime}}" discrete>
-                        <input matInput matSliderThumb formControlName="answerTime">
+                        <input matInput matSliderThumb formControlName="timeInSeconds" value="{{ data.question.timeInSeconds }}">
                     </mat-slider>
                 </mat-form-field>
-            <!-- <div *ngFor="let correctAnswer of correctAnswersControls; let i = index" class="answers-wrapper">
-                <mat-form-field appearance="outline" class="answer">
-                    <mat-label>Bonne Réponse {{ i + 1 }}</mat-label>
-                    <input matInput type="text" [formControl]="correctAnswer">
-                </mat-form-field>
-                <div class="row-actions-wrapper">
-                    <mat-icon *ngIf="correctAnswersControls.length > 1" aria-hidden="false" class="action action-remove"
-                        aria-label="Retirer" fontIcon="remove" (click)="removeCorrectAnswerAt(i)"></mat-icon>
-                    <mat-icon *ngIf="getChoiceCount() < maxChoiceCount" aria-hidden="false"
-                        class="action action-add {{ i !== correctAnswersControls.length - 1 ? 'hidden' : '' }}"
-                        aria-label="Ajouter" fontIcon="add" (click)="addCorrectAnswer()"></mat-icon>
-                </div>
-            </div-->
-            <!-- <div *ngFor="let incorrectAnswer of incorrectAnswersControls; let i = index" class="answers-wrapper">
-                <mat-form-field appearance="outline" class="answer">
-                    <mat-label>Mauvaise Réponse {{ i + 1 }}</mat-label>
-                    <input matInput type="text" [formControl]="incorrectAnswer">
-                </mat-form-field>
-                <div class="row-actions-wrapper">
-                    <mat-icon *ngIf="incorrectAnswersControls.length > 1" aria-hidden="false"
-                        class="action action-remove" aria-label="Retirer" fontIcon="remove"
-                        (click)="removeIncorrectAnswerAt(i)"></mat-icon>
-                    <mat-icon *ngIf="getChoiceCount() < maxChoiceCount" aria-hidden="false"
-                        class="action action-add {{ i !== incorrectAnswersControls.length - 1 ? 'hidden' : '' }}"
-                        aria-label="Ajouter" fontIcon="add" (click)="addIncorrectAnswer()"></mat-icon>
-                </div>
-            </div> -->
             <mat-form-field appearance="outline">
                 <mat-label>Nombre de points</mat-label>
                 <input matInput type="number" min="10" max="100" step="10" formControlName="pointValue"

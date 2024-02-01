@@ -14,6 +14,8 @@ import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { CreateQuestionModalComponent } from './components/create-question-modal/create-question-modal.component';
 import { UpsertQuestionDialogComponent } from './components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
+import { ConfirmationDialogComponent } from './components/dialogs/confirmation-dialog/confirmation-dialog.component';
+import { QuestionBankComponent } from './components/question-bank/question-bank.component';
 import { QuestionListComponent } from './components/question-list/question-list.component';
 import { AppRoutingModule } from './modules/app-routing.module';
 import { AdminPageComponent } from './pages/admin-page/admin-page.component';
@@ -38,6 +40,8 @@ import { MatSliderModule } from '@angular/material/slider';
         UpsertQuestionDialogComponent,
         QuestionListComponent,
         CreateQuestionModalComponent,
+        ConfirmationDialogComponent,
+        QuestionBankComponent,
     ],
     imports: [
         AppRoutingModule,

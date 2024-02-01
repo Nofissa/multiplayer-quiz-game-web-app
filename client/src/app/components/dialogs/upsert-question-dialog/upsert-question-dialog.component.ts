@@ -2,9 +2,9 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Component, Inject } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog-data';
 import { Answer } from '@app/interfaces/answer';
 import { Question } from '@app/interfaces/question';
+import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog-data';
 
 const POINT_VALUE_BASE_MULTIPLE = 10;
 const MAX_CHOICE_COUNT = 4;
@@ -41,7 +41,7 @@ export class UpsertQuestionDialogComponent {
         this.formGroup = this.formBuilder.group({
             question: [this.data.question.question, Validators.required],
             answers: this.answersArray,
-            answerTime: [this.data.question.answerTime, [Validators.required, this.timeValidator()]],
+            timeInSeconds: [this.data.question.timeInSeconds, [Validators.required, this.timeValidator()]],
             pointValue: [this.data.question.pointValue, [Validators.required, this.multipleOfTenValidator()]],
         });
     }
@@ -62,6 +62,7 @@ export class UpsertQuestionDialogComponent {
         return this.minTime;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     drop(event: CdkDragDrop<any[]>): void {
         moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
     }

@@ -5,6 +5,6 @@ export interface Question {
     question: string;
     answers: Answer[];
     pointValue: number;
-    answerTime: number;
+    timeInSeconds: number;
     lastModified: Date;
 }
