@@ -13,7 +13,13 @@
     flex-direction: row;
 }
 
-#question-list {
+::ng-deep .add-icon {
+    align-self: center;
+    color: black;
+    margin: 20px;
+}
+
+#questions-container {
     width : 100%;
 }
 // .text-edit {

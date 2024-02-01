@@ -1,4 +1,51 @@
-<div class="list scrollable column">
+<div *ngIf="options.drag" CDKDropListGroup class="drag-container"> 
+    <!-- <app-question *ngFor="let question of questions" [question]="question" [options]="options"
+     [interactionService]="interactionService"></app-question>  -->
+    <div cdkDropList [cdkDropListData]="questions" (cdkDropListDropped)="drop($event)" class="list scrollable column"> 
+        <div *ngFor="let question of questions; let i = index" class="question-container" cdkDrag>
+            <div class="question-body column">
+                <div *ngIf="options.edit || options.delete || options.share" class="overlay">
+                    <div class="actions">
+                        <div *ngIf="options.edit" class="action-wrapper" (click)="invokeOnEditQuestion(question)">
+                            <mat-icon aria-hidden="true" aria-label="Modifier" fontIcon="edit"
+                                class="action action-edit"></mat-icon>
+                        </div>
+                        <div *ngIf="options.delete" class="action-wrapper" (click)="invokeOnDeleteQuestion(question)">
+                            <mat-icon aria-hidden="true" aria-label="Supprimer" fontIcon="delete"
+                                class="action action-delete"></mat-icon>
+                        </div>
+                        <div *ngIf="options.share" class="share-wrapper" (click)="share(question)">
+                            <mat-icon *ngIf="!isShared(question)" aria-hidden="true" aria-label="Partager"
+                                fontIcon="playlist_add" class="action action-share"></mat-icon>
+                            <mat-icon *ngIf="isShared(question)" aria-hidden="true" aria-label="Partagée"
+                                fontIcon="playlist_add_check" class="action shared-active"></mat-icon>
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="options.numberOrder" class="textIndex">
+                    <p>{{i+1}}</p>
+                </div>
+                <div class="question-content">
+                    <span class="text-centered">{{ question.question }}</span>
+                </div>
+                <div *ngIf="options.displayLastModified" class="last-modified-wrapper">
+                    <span class="text-centered">
+                        <span>Modifiée le:</span>
+                        <span class="last-modified-date-text">
+                            {{
+                            question.lastModified.toLocaleString('fr-CA',
+                            { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' })
+                            }}
+                        </span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div *ngIf="!options.drag"  class="list scrollable column">
     <!-- <app-question *ngFor="let question of questions" [question]="question" [options]="options"
      [interactionService]="interactionService"></app-question>  -->
     <div *ngFor="let question of questions" class="question-container">
@@ -38,6 +85,7 @@
         </div>
     </div>
 </div>
+
 <!-- <div *ngIf="options.create" class="list-footer">
     <div class="action-wrapper" (click)="invokeOnAddQuestion()">
         <mat-icon aria-hidden="false" class="action action-add" aria-label="Ajouter" fontIcon="add_circle"></mat-icon>

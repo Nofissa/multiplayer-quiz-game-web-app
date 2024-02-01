@@ -30,6 +30,10 @@
     padding: 10px;
 }
 
+.drag-container {
+    width: 100%;
+}
+
 .list > div {
     margin: 5px 0px;
 }
@@ -127,6 +131,11 @@
 
 .action-wrapper {
     position: relative;
+}
+
+.textIndex {
+    color: black;
+    align-self: center;
 }
 
 .action {
