@@ -79,11 +79,12 @@ export class QuizService {
         return await this.model.find({}).sort({ lastModified: 1 });
     }
 
-    async addQuiz(dto: QuizDto): Promise<void> {
+    async addQuiz(dto: QuizDto): Promise<Quiz> {
         dto.lastModification = new Date();
+        dto.isHidden = true;
 
         try {
-            await this.model.create(dto);
+            return await this.model.create(dto);
         } catch (error) {
             return Promise.reject(`Failed to insert Quiz: ${error}`);
         }

@@ -38,8 +38,8 @@ export class QuizController {
     @Post('/')
     async addQuiz(@Body() dto: QuizDto, @Res() response: Response) {
         try {
-            await this.quizService.addQuiz(dto);
-            response.status(HttpStatus.CREATED).send();
+            const createdQuiz = await this.quizService.addQuiz(dto);
+            response.status(HttpStatus.CREATED).json(createdQuiz);
         } catch (error) {
             response.status(HttpStatus.NOT_FOUND).send(error.message);
         }

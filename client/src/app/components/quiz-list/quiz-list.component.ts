@@ -22,8 +22,8 @@ export class QuizListComponent implements OnInit {
             const reader = new FileReader();
             reader.onload = (e) => {
                 const quiz: Quiz = JSON.parse(e.target?.result as string);
-                this.quizHttpService.createQuiz(quiz).subscribe(() => {
-                    this.fetchQuizzes();
+                this.quizHttpService.createQuiz(quiz).subscribe((createdQuiz: Quiz) => {
+                    this.quizzes.push(createdQuiz);
                 });
             };
             reader.readAsText(file);

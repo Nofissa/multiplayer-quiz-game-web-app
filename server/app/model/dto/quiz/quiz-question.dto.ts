@@ -1,14 +1,11 @@
-import { ArrayMaxSize, ArrayMinSize, IsArray, IsDate, IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min, ValidateNested } from 'class-validator';
+import { ValidationValues } from '@app/enums/validation-values';
+import { ChoiceDto } from '@app/model/dto/choice/choice.dto';
+import { IsMultipleOf } from '@app/validators/is-multiple-of.validator';
 import { QuestionType } from '@common/question-type';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsMultipleOf } from '@app/validators/is-multiple-of.validator';
-import { ChoiceDto } from '@app/model/dto/choice/choice.dto';
-import { ValidationValues } from '@app/enums/validation-values';
+import { ArrayMaxSize, ArrayMinSize, IsArray, IsDate, IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min, ValidateNested } from 'class-validator';
 
 export class QuizQuestionDto {
-    @IsString()
-    _id?: string;
-
     @IsString()
     @IsNotEmpty()
     type: QuestionType;
@@ -24,7 +21,6 @@ export class QuizQuestionDto {
     @IsMultipleOf(ValidationValues.MultipleOfPointValue)
     points: number;
 
-    @IsString({ each: true })
     @ApiProperty()
     @IsArray()
     @ArrayMinSize(ValidationValues.MinSizeAnswerArray, { message: `choices size must be greater or equal to ${ValidationValues.MinSizeAnswerArray}` })
