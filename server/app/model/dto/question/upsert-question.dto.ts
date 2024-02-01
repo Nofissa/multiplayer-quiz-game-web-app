@@ -1,16 +1,27 @@
-import { ArrayNoEmptyValues } from '@app/validators/array-no-empty-values.validator';
+// eslint-disable-next-line max-classes-per-file
 import { IsMultipleOf } from '@app/validators/is-multiple-of.validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { ArrayMaxSize, ArrayNotEmpty, IsArray, IsDate, IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
+import { ArrayMaxSize, ArrayMinSize, IsArray, IsBoolean, IsDate, IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
 
 enum ValidationValues {
     MinPointValue = 10,
     MaxPointValue = 100,
     MinTimeInSeconds = 10,
     MaxTimeInSeconds = 60,
-    MaxSizeAnswerArray = 3,
+    MinSizeAnswerArray = 2,
+    MaxSizeAnswerArray = 4,
     MultipleOfPointValue = 10,
+}
+
+export class AnswerDto {
+    @ApiProperty()
+    @IsString()
+    answer: string;
+
+    @ApiProperty()
+    @IsBoolean()
+    isCorrect: boolean;
 }
 
 export class UpsertQuestionDto {
@@ -24,21 +35,9 @@ export class UpsertQuestionDto {
 
     @ApiProperty()
     @IsArray()
-    @ArrayNotEmpty({ message: 'incorrectAnswers must not be empty' })
-    @ArrayMaxSize(ValidationValues.MaxSizeAnswerArray, {
-        message: `incorrectAnswers size must be lesser or equal to ${ValidationValues.MaxSizeAnswerArray}`,
-    })
-    @ArrayNoEmptyValues()
-    incorrectAnswers: string[];
-
-    @ApiProperty()
-    @IsArray()
-    @ArrayNotEmpty({ message: 'correctAnswers must not be empty' })
-    @ArrayMaxSize(ValidationValues.MaxSizeAnswerArray, {
-        message: `correctAnswers size must be lesser or equal to ${ValidationValues.MaxSizeAnswerArray}`,
-    })
-    @ArrayNoEmptyValues()
-    correctAnswers: string[];
+    @ArrayMinSize(ValidationValues.MinSizeAnswerArray, { message: `answers size must be greater or equal to ${ValidationValues.MinSizeAnswerArray}` })
+    @ArrayMaxSize(ValidationValues.MaxSizeAnswerArray, { message: `answers size must be lesser or equal to ${ValidationValues.MaxSizeAnswerArray}` })
+    answers: AnswerDto[];
 
     @ApiProperty()
     @IsNumber()

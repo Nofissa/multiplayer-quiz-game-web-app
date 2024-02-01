@@ -14,12 +14,11 @@ export class AuthController {
         description: 'Returns a JWT upon successful authentication',
     })
     @ApiNotFoundResponse({
-        description: 'Return NOT_FOUND http status when request fails',
+        description: 'Return UNAUTHORIZED http status when request fails',
     })
     @Post('/login')
     async login(@Body() userCredentialSet: UserCredentialSet, @Res() response: Response) {
         try {
-            console.log(userCredentialSet);
             const payload = await this.authService.authenticate(userCredentialSet);
             response.status(HttpStatus.OK).json(payload);
         } catch (error) {
@@ -30,13 +29,16 @@ export class AuthController {
     @ApiOkResponse({
         description: 'Returns true if the token is valid, false otherwise',
     })
+    @ApiNotFoundResponse({
+        description: 'Return UNAUTHORIZED http status when request fails',
+    })
     @Post('/verify')
     async verify(@Body() payload: AuthPayload, @Res() response: Response) {
         try {
             await this.authService.verifyAuth(payload);
             response.status(HttpStatus.NO_CONTENT).send();
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send(error.message);
+            response.status(HttpStatus.UNAUTHORIZED).send(error.message);
         }
     }
 }
