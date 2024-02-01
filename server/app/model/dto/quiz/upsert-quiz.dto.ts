@@ -14,7 +14,7 @@ export class UpsertQuizDto {
     @ApiProperty()
     @IsString()
     @MaxLength(ValidationValues.MaxLengthTitle, { message: 'Title must be 100 characters long maximum' })
-    titre: string;
+    title: string;
 
     @ApiProperty()
     @IsString()

@@ -9,7 +9,7 @@ export type QuizDocument = Quiz & Document;
 export class Quiz {
     @ApiProperty()
     @Prop({ required: true })
-    titre: string;
+    title: string;
 
     @ApiProperty()
     @Prop({ required: true })

@@ -52,14 +52,14 @@ export class QuizService {
 
         const quizzes: UpsertQuizDto[] = [
             {
-                titre: 'Quiz 1',
+                title: 'Quiz 1',
                 description: 'Quiz 1 description',
                 questions,
                 lastModified: new Date(),
                 isHidden: true,
             },
             {
-                titre: 'Quiz 2',
+                title: 'Quiz 2',
                 description: 'Quiz 2 description',
                 questions,
                 lastModified: new Date('2024-01-20 18:43:27'),
@@ -77,6 +77,12 @@ export class QuizService {
 
     async addQuiz(dto: UpsertQuizDto): Promise<void> {
         dto.lastModified = new Date();
+        // eslint-disable-next-line no-underscore-dangle
+        delete dto._id;
+        dto.questions.forEach((x) => {
+            // eslint-disable-next-line no-underscore-dangle
+            delete x._id;
+        });
 
         try {
             await this.model.create(dto);
