@@ -16,12 +16,6 @@ export class QuizListComponent implements OnInit {
         this.fetchQuizzes();
     }
 
-    private fetchQuizzes() {
-        this.quizHttpService.getAllQuizzes().subscribe((quizzes: Quiz[]) => {
-            this.quizzes = quizzes;
-        });
-    }
-
     importQuiz(event: Event) {
         const file = (event.target as HTMLInputElement)?.files?.[0];
         if (file) {
@@ -34,5 +28,11 @@ export class QuizListComponent implements OnInit {
             };
             reader.readAsText(file);
         }
+    }
+
+    private fetchQuizzes() {
+        this.quizHttpService.getAllQuizzes().subscribe((quizzes: Quiz[]) => {
+            this.quizzes = quizzes;
+        });
     }
 }
