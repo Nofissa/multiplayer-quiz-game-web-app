@@ -16,9 +16,6 @@ enum ValidationValues {
 
 export class AnswerDto {
     @ApiProperty()
-    _id?: string;
-
-    @ApiProperty()
     @IsString()
     answer: string;
 
@@ -39,7 +36,7 @@ export class UpsertQuestionDto {
     @ApiProperty()
     @IsArray()
     @ArrayMinSize(ValidationValues.MinSizeAnswerArray, { message: `answers size must be greater or equal to ${ValidationValues.MinSizeAnswerArray}` })
-    @ArrayMaxSize(ValidationValues.MinSizeAnswerArray, { message: `answers size must be lesser or equal to ${ValidationValues.MinSizeAnswerArray}` })
+    @ArrayMaxSize(ValidationValues.MaxSizeAnswerArray, { message: `answers size must be lesser or equal to ${ValidationValues.MaxSizeAnswerArray}` })
     answers: AnswerDto[];
 
     @ApiProperty()
