@@ -1,14 +1,14 @@
 /* eslint-disable no-underscore-dangle */
 import { Component, Input, OnInit } from '@angular/core';
-import { Question } from '@app/interfaces/question';
+import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
 import { UpsertQuestionDialogComponent } from '@app/components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
-import { MatDialog } from '@angular/material/dialog';
-import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog-data';
+import { Question } from '@app/interfaces/question';
 import { QuestionListOptions } from '@app/interfaces/question-list-options';
+import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog-data';
+import { QuestionHttpService } from '@app/services/question-http.service';
 import { QuestionInteractionService } from '@app/services/question-interaction.service';
 import { QuestionSharingService } from '@app/services/question-sharing.service';
-import { QuestionHttpService } from '@app/services/question-http.service';
 
 const NOT_FOUND_INDEX = -1;
 
@@ -60,14 +60,14 @@ export class QuestionBankComponent implements OnInit {
             title: 'Ajouter une question',
             question: {
                 _id: '',
-                question: '',
-                answers: [
-                    { answer: '', isCorrect: true },
-                    { answer: '', isCorrect: false },
+                type: 'QCM',
+                text: '',
+                choices: [
+                    { text: '', isCorrect: true },
+                    { text: '', isCorrect: false },
                 ],
-                pointValue: 10,
-                timeInSeconds: 10,
-                lastModified: new Date(),
+                points: 10,
+                lastModification: new Date(),
             },
         };
 
@@ -98,9 +98,9 @@ export class QuestionBankComponent implements OnInit {
             if (result) {
                 this.updateQuestion({
                     ...question,
-                    question: result.question,
-                    answers: result.answers,
-                    pointValue: result.pointValue,
+                    text: result.text,
+                    choices: result.choices,
+                    points: result.points,
                 });
             }
         });

@@ -27,7 +27,7 @@
             <div *ngIf="options.displayLastModified" class="last-modified-wrapper">
                 <span class="text-centered">
                     <span>Modifiée le:</span>
-                    <span class="last-modified-date-text">
+                    <span *ngIf="question.lastModification" class="last-modified-date-text">
                         {{
                         question.lastModification.toLocaleString('fr-CA',
                         { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' })
