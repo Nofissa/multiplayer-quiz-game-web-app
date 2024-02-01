@@ -4,7 +4,7 @@
         <div class="form-wrapper">
             <mat-form-field appearance="outline">
                 <mat-label>Question</mat-label>
-                <textarea matInput formControlName="question" value="{{ data.question.question }}">
+                <textarea matInput formControlName="question" value="{{ data.question.text }}">
                 </textarea>
             </mat-form-field>
             <div *ngFor="let correctAnswer of answersControls; let i = index" class="answers-wrapper">
@@ -23,7 +23,7 @@
             <mat-form-field appearance="outline">
                 <mat-label>Nombre de points</mat-label>
                 <input matInput type="number" min="10" max="100" formControlName="pointValue"
-                    value="{{ data.question.pointValue }}">
+                    value="{{ data.question.points }}">
             </mat-form-field>
         </div>
     </mat-dialog-content>

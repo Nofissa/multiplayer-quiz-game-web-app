@@ -1,10 +1,11 @@
-import { Answer } from './answer';
+import { QuestionType } from '@common/question-type';
+import { Choice } from './choice';
 
 export interface Question {
+    type: QuestionType;
+    text: string;
+    points: number;
+    choices: Choice[];
+    lastModification: Date | null;
     _id: string;
-    question: string;
-    answers: Answer[];
-    pointValue: number;
-    timeInSeconds: number;
-    lastModified: Date;
 }

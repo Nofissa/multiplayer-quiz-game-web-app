@@ -20,6 +20,13 @@ export class QuizHttpService {
         );
     }
 
+    getQuizById(id: string): Observable<Quiz> {
+        return this.http.get<Quiz>(`${this.baseUrl}/${id}`).pipe(
+            map((quiz: Quiz) => this.convertLastModifiedToDate(quiz)),
+            catchError(this.handleError<Quiz>('Error getting quiz')),
+        );
+    }
+
     createQuiz(quiz: Quiz): Observable<Quiz> {
         return this.http.post<Quiz>(this.baseUrl, quiz).pipe(
             map((createdQuiz: Quiz) => this.convertLastModifiedToDate(createdQuiz)),
@@ -41,10 +48,17 @@ export class QuizHttpService {
         );
     }
 
+    hideQuizById(id: string): Observable<Quiz> {
+        return this.http.patch<Quiz>(`${this.baseUrl}/hide/${id}`, {}).pipe(
+            map((hiddenQuiz: Quiz) => this.convertLastModifiedToDate(hiddenQuiz)),
+            catchError(this.handleError<Quiz>('Error hiding quiz')),
+        );
+    }
+
     private convertLastModifiedToDate(quiz: Quiz): Quiz {
         return {
             ...quiz,
-            lastModified: new Date(quiz.lastModified),
+            lastModification: new Date(quiz.lastModification),
         };
     }
 
