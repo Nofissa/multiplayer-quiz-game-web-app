@@ -1,36 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { Document } from 'mongoose';
+import { Question } from './question';
 
 export type QuizDocument = Quiz & Document;
-export class Question {
-    @ApiProperty()
-    @Prop({ required: true })
-    question: string;
-
-    @ApiProperty()
-    @Prop({ required: true })
-    incorrectAnswers: string[];
-
-    @ApiProperty()
-    @Prop({ required: true })
-    correctAnswers: string[];
-
-    @ApiProperty()
-    @Prop({ required: true })
-    lastModified: Date;
-
-    @ApiProperty()
-    @Prop({ required: true })
-    pointValue: number;
-
-    @ApiProperty()
-    @Prop({ required: true })
-    timeInSeconds: number;
-
-    @ApiProperty()
-    _id?: string;
-}
 
 @Schema()
 export class Quiz {

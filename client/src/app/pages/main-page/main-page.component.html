@@ -1,21 +1,20 @@
 <div class="container justified">
-    
-    <img class="logo" src='/assets/img/logo.png' alt="Logo Projet" /> 
+    <img class="logo" src='/assets/img/logo.png' alt="Logo Projet" />
     <section id="server-message" class="justified">
         <div class="justified">
             <button class="button" routerLink="/create-game">Créer une partie</button>
             <button class="button" routerLink="/game" disabled="True">Joindre une partie</button>
-            
-        </div>        
+
+        </div>
     </section>
     <footer class="footer-item">
-            <div class="trademark">
-            <h4 class="team-name">Équipe 206</h4> 
+        <div class="trademark">
+            <h4 class="team-name">Équipe 206</h4>
             <span>Loris Ponderant, Imed-Eddine Bennour, Nofissa Khaif,
-            Romaine Brand, Dimitri Mansour, Jérémie Bolduc</span>
-            </div>   
+                Romaine Brand, Dimitri Mansour, Jérémie Bolduc</span>
+        </div>
         <div class="admin-container">
-            <button class="button admin-button" routerLink="/admin">Administrer les jeux</button> 
-    </div>
+            <button class="button admin-button" (click)="promptAdminLogin()">Administrer les jeux</button>
+        </div>
     </footer>
 </div>
