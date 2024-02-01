@@ -22,14 +22,14 @@
                 </div>
             </div>
             <div class="question-content">
-                <span class="text-centered">{{ question.question }}</span>
+                <span class="text-centered">{{ question.text }}</span>
             </div>
             <div *ngIf="options.displayLastModified" class="last-modified-wrapper">
                 <span class="text-centered">
                     <span>Modifiée le:</span>
                     <span class="last-modified-date-text">
                         {{
-                        question.lastModified.toLocaleString('fr-CA',
+                        question.lastModification.toLocaleString('fr-CA',
                         { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' })
                         }}
                     </span>

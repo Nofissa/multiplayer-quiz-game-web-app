@@ -6,4 +6,6 @@ export interface Question {
     text: string;
     points: number;
     choices: choice[];
+    lastModification: Date | null;
+    _id: string;
 }
