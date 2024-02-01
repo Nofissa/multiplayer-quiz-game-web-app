@@ -5,7 +5,6 @@ import { IsArray, IsBoolean, IsDate, IsOptional, IsString, MaxLength, MinLength 
 import { UpsertQuestionDto } from '../question/upsert-question.dto';
 
 enum ValidationValues {
-    MinLengthTitle = 10,
     MaxLengthTitle = 100,
     MinLengthDescription = 10,
     MaxLengthDescription = 500,
@@ -15,7 +14,6 @@ export class UpsertQuizDto {
     @ApiProperty()
     @IsString()
     @MaxLength(ValidationValues.MaxLengthTitle, { message: 'Title must be 100 characters long maximum' })
-    @MinLength(ValidationValues.MinLengthTitle, { message: 'Title must be 10 characters long minimum' })
     titre: string;
 
     @ApiProperty()

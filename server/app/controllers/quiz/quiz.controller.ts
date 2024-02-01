@@ -7,7 +7,7 @@ import { ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from 
 import { Response } from 'express';
 
 @ApiTags('Quiz')
-@Controller('quiz')
+@Controller('quizzes')
 export class QuizController {
     constructor(private readonly quizService: QuizService) {}
 
