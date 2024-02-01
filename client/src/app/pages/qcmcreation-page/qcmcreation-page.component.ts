@@ -21,7 +21,7 @@ export class QCMCreationPageComponent implements OnInit {
     title = 'hi';
     formGroup: FormGroup;
     questionsContainer: Question[] = [];
-    quizId: string;
+    quizId: string = '';
     quiz: Quiz;
 
     emptyAnswer1: Answer = {
@@ -61,15 +61,14 @@ export class QCMCreationPageComponent implements OnInit {
 
     ngOnInit() {
         this.route.params.subscribe((params) => {
-            this.quizId = params['id'];
+            this.quizId = params['quizId'];
         });
 
         this.quizHttpServices.getQuizById(this.quizId).subscribe({
             next: (x: Quiz) => {
-                this.quiz = x;
-            },
-            error: () => {
-                return;
+                if (x) {
+                    this.quiz = x;
+                }
             },
         });
 
@@ -83,7 +82,7 @@ export class QCMCreationPageComponent implements OnInit {
         } else {
             this.formGroup = this.formBuilder.group({
                 title: ['', Validators.required],
-                descritpion: ['', Validators.required],
+                description: ['', Validators.required],
             });
         }
 
@@ -147,41 +146,35 @@ export class QCMCreationPageComponent implements OnInit {
         // validations de nom unique dans le back end
         if (this.questionsContainer.length !== 0) {
             const quiz: Quiz = {
-                _id: this.quizId,
                 title: this.formGroup.value.title,
                 description: this.formGroup.value.description,
                 questions: this.questionsContainer,
-                lastModified: new Date(),
                 isHidden: true,
+                lastModified: new Date(),
+                _id: '',
             };
-
-            try {
-                if (this.quiz) {
-                    this.quizHttpServices.updateQuiz(quiz).subscribe({
-                        next: (x: Quiz) => {
-                            this.quiz = x;
-                            window.alert('Le quiz est enregistré avec succès');
-                        },
-                        error: (e) => {
-                            window.console.log('une erreur est survenue', e);
-                            window.alert('La création du Quiz na pas pu être faite');
-                        },
-                    });
-                } else {
-                    this.quizHttpServices.createQuiz(quiz).subscribe({
-                        next: (x: Quiz) => {
-                            this.quiz = x;
-                            window.alert('Le quiz est enregistré avec succès');
-                        },
-                        error: (e) => {
-                            window.console.log('une erreur est survenue', e);
-                            window.alert('La création du Quiz na pas pu être faite');
-                        },
-                    });
-                }
-            } catch (e) {
-                window.alert('Un problème est survenu');
-                window.console.log('Server Error:', e);
+            if (this.quiz) {
+                this.quizHttpServices.updateQuiz(quiz).subscribe({
+                    next: (x: Quiz) => {
+                        this.quiz = x;
+                        window.alert('Le quiz est enregistré avec succès');
+                    },
+                    error: (e) => {
+                        window.alert('Le quiz na pas pu être modifié');
+                        window.console.log('lerreur est : ', e);
+                    },
+                });
+            } else {
+                this.quizHttpServices.createQuiz(quiz).subscribe({
+                    next: (x: Quiz) => {
+                        this.quiz = x;
+                        window.alert('Le quiz est enregistré avec succès');
+                    },
+                    error: (e) => {
+                        window.alert('Le quiz na pas pu être créer');
+                        window.console.log('lerreur est : ', e);
+                    },
+                });
             }
         } else {
             window.alert('Un paramètre du Quiz est erroné, veuillez y remédier');

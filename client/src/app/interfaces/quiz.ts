@@ -1,10 +1,10 @@
 import { Question } from './question';
 
 export interface Quiz {
-    _id: string;
     title: string;
     description: string;
     questions: Question[];
-    lastModified: Date;
     isHidden: boolean;
+    lastModified: Date;
+    _id: string;
 }

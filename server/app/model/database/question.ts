@@ -14,12 +14,8 @@ export class Question {
     question: string;
 
     @ApiProperty()
-    @Prop({ required: true })
-    incorrectAnswers: string[];
-
-    @ApiProperty()
-    @Prop({ required: true })
-    correctAnswers: string[];
+    @Prop({ type: [{ _id: false, answer: String, isCorrect: Boolean }], required: true })
+    answers: { answer: string; isCorrect: boolean }[];
 
     @ApiProperty()
     @Prop({ required: true })
