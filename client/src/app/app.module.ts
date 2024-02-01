@@ -22,10 +22,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MainPageComponent } from './pages/main-page/main-page.component';
-import { QuestionListComponent } from './components/question-list/question-list.component';
-import { UpsertQuestionDialogComponent } from './components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
 import { ConfirmationDialogComponent } from './components/dialogs/confirmation-dialog/confirmation-dialog.component';
 import { QuestionBankComponent } from './components/question-bank/question-bank.component';
 import { LoginDialogComponent } from './components/dialogs/login-dialog/login-dialog.component';
@@ -49,6 +45,7 @@ import { LoginDialogComponent } from './components/dialogs/login-dialog/login-di
         QuizListComponent,
         QuizComponent,
         LoginDialogComponent,
+        QuestionBankComponent,
     ],
     imports: [
         AppRoutingModule,

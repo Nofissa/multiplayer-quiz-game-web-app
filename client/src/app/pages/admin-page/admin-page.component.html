@@ -11,13 +11,15 @@
             </div>
         </mat-tab>
         <mat-tab label="Questions">
-            <div>Large content</div>
+            <app-question-bank
+                [options]="{ create: true, edit: true, delete: true, displayLastModified: true }"></app-question-bank>
         </mat-tab>
     </mat-tab-group>
     <footer class="footer-item">
         <h4 class="team-name">Équipe 206</h4>
         <p>
-            <span>Loris Ponderand</span>, <span>Imed-Eddine Bennour</span>, <span>Nofissa Khaif</span>, <span>Romaine Brand</span>,
+            <span>Loris Ponderand</span>, <span>Imed-Eddine Bennour</span>, <span>Nofissa Khaif</span>, <span>Romaine
+                Brand</span>,
             <span>Dimitri Mansour</span>, <span>Jérémie Bolduc</span>
         </p>
     </footer>
