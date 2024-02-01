@@ -1,4 +1,5 @@
-import { Question, Quiz } from '@app/model/database/quiz';
+import { Question } from '@app/model/database/question';
+import { Quiz } from '@app/model/database/quiz';
 import { UpsertQuizDto } from '@app/model/dto/quiz/upsert-quiz.dto';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Res } from '@nestjs/common';
