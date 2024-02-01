@@ -39,12 +39,13 @@ export class QuizComponent {
 
     exportQuiz() {
         const blob = new Blob([JSON.stringify(this.quiz)], { type: 'text/json;charset=utf-8' });
-        saveAs(blob, `${this.quiz.titre}.json`);
+        saveAs(blob, `${this.quiz.title}.json`);
     }
 
     onToggleChange() {
         this.quiz.isHidden = !this.quiz.isHidden;
-        this.quizHttpService.updateQuiz(this.quiz).subscribe((quiz) => {
+        // eslint-disable-next-line no-underscore-dangle
+        this.quizHttpService.hideQuizById(this.quiz._id).subscribe((quiz) => {
             this.quiz = quiz;
         });
     }
