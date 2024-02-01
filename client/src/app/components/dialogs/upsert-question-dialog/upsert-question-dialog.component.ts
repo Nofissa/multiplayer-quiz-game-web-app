@@ -6,10 +6,10 @@ import { Answer } from '@app/interfaces/answer';
 import { Question } from '@app/interfaces/question';
 import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog-data';
 
-const POINT_VALUE_BASE_MULTIPLE = 10;
 const MAX_CHOICE_COUNT = 4;
 const MIN_TIME = 10;
 const MAX_TIME = 60;
+const POINT_VALUE_BASE_MULTIPLE = 10;
 
 @Component({
     selector: 'app-upsert-question-dialog',

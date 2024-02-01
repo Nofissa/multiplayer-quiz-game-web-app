@@ -45,11 +45,13 @@ import { QCMCreationPageComponent } from './pages/qcmcreation-page/qcmcreation-p
         QCMCreationPageComponent,
         UpsertQuestionDialogComponent,
         QuestionListComponent,
+        ConfirmationDialogComponent,
         QuizListComponent,
         QuizComponent,
         LoginDialogComponent,
         QuestionListComponent,
         ConfirmationDialogComponent,
+        QuestionBankComponent,
         QuestionBankComponent,
     ],
     imports: [
