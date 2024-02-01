@@ -1,51 +1,14 @@
+/* eslint-disable no-restricted-imports */
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { ArrayMinSize, IsArray, IsBoolean, IsDate, IsNumber, IsOptional, IsString, Max, MaxLength, Min, MinLength } from 'class-validator';
+import { IsArray, IsBoolean, IsDate, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import { UpsertQuestionDto } from '../question/upsert-question.dto';
 
 enum ValidationValues {
-    MinSizeArray = 1,
-    MinPointValue = 10,
-    MaxPointValue = 100,
-    MinTimeInSeconds = 10,
-    MaxTimeInSeconds = 60,
     MinLengthTitle = 10,
     MaxLengthTitle = 100,
     MinLengthDescription = 10,
     MaxLengthDescription = 500,
-}
-
-export class QuestionDto {
-    @ApiProperty()
-    @IsString()
-    question: string;
-
-    @ApiProperty()
-    @IsArray()
-    @ArrayMinSize(ValidationValues.MinSizeArray, { message: 'At least one incorrect answer is required' })
-    incorrectAnswers: string[];
-
-    @ApiProperty()
-    @IsArray()
-    @ArrayMinSize(ValidationValues.MinSizeArray, { message: 'At least one correct answer is required' })
-    correctAnswers: string[];
-
-    @ApiProperty()
-    @IsDate()
-    @Type(() => Date)
-    @IsOptional()
-    lastModified: Date;
-
-    @ApiProperty()
-    @IsNumber()
-    @Max(ValidationValues.MaxPointValue, { message: 'Max value of pointValue is 100' })
-    @Min(ValidationValues.MinPointValue, { message: 'Min value of pointValue is 10' })
-    pointValue: number;
-
-    @ApiProperty()
-    @IsNumber()
-    @Max(ValidationValues.MaxTimeInSeconds, { message: 'Max value of timeInSeconds is 60 sec' })
-    @Min(ValidationValues.MinTimeInSeconds, { message: 'Min value of timeInSeconds is 10 sec' })
-    timeInSeconds: number;
 }
 
 export class UpsertQuizDto {
@@ -73,7 +36,7 @@ export class UpsertQuizDto {
 
     @ApiProperty()
     @IsArray()
-    questions: QuestionDto[];
+    questions: UpsertQuestionDto[];
 
     @ApiProperty()
     _id?: string;

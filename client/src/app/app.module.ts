@@ -10,15 +10,14 @@ import { CreateGamePageComponent } from './pages/create-game-page/create-game-pa
 import { GamePageComponent } from './pages/game-page/game-page.component';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MainPageComponent } from './pages/main-page/main-page.component';
 import { QuestionListComponent } from './components/question-list/question-list.component';
 import { UpsertQuestionDialogComponent } from './components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
-// import { ConfirmationDialogComponent } from './components/dialogs/confirmation-dialog/confirmation-dialog.component';
-// import { ShareTestComponent } from './components/share-test/share-test.component';
-// import { QuestionBankComponent } from './components/question-bank/question-bank.component';
+import { LoginDialogComponent } from './components/dialogs/login-dialog/login-dialog.component';
 
 /**
  * Main module that is used in main.ts.
@@ -34,10 +33,8 @@ import { UpsertQuestionDialogComponent } from './components/dialogs/upsert-quest
         GamePageComponent,
         MainPageComponent,
         UpsertQuestionDialogComponent,
-        // QuestionBankComponent,
+        LoginDialogComponent,
         QuestionListComponent,
-        // ConfirmationDialogComponent,
-        // ShareTestComponent,
     ],
     imports: [
         AppRoutingModule,
@@ -50,6 +47,7 @@ import { UpsertQuestionDialogComponent } from './components/dialogs/upsert-quest
         MatFormFieldModule,
         MatIconModule,
         MatInputModule,
+        MatSnackBarModule,
         ReactiveFormsModule,
     ],
     providers: [],
