@@ -23,6 +23,7 @@ export class QuizComponent {
     ) {}
 
     deleteQuiz() {
+        // eslint-disable-next-line no-underscore-dangle
         this.quizHttpService.deleteQuizById(this.quiz._id).subscribe((quiz: Quiz) => {
             if (quiz) {
                 this.isDeleted = true;
@@ -31,6 +32,7 @@ export class QuizComponent {
     }
 
     editQuiz() {
+        // eslint-disable-next-line no-underscore-dangle
         this.router.navigate([`/qcm-creation?quizId=${this.quiz._id}`]);
     }
 
@@ -41,7 +43,6 @@ export class QuizComponent {
 
     onToggleChange() {
         this.quiz.isHidden = !this.quiz.isHidden;
-        console.log(this.quiz);
         this.quizHttpService.updateQuiz(this.quiz).subscribe((quiz) => {
             this.quiz = quiz;
         });
