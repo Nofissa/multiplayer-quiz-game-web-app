@@ -60,7 +60,19 @@
     width: 20%;
     min-width: min-content;
 }
- 
-body {
-    height: 100vh;
+
+::ng-deep .login-failure-snackbar * {
+    background-color: aliceblue !important;
+}
+
+::ng-deep .login-failure-snackbar button {
+    color: var(--answer-color-blue) !important;
+}
+
+::ng-deep .login-failure-snackbar .mat-mdc-snack-bar-label {
+    color: #000000 !important;
+}
+
+::ng-deep .login-failure-snackbar .mat-mdc-button-touch-target {
+    height: auto !important;
 }
