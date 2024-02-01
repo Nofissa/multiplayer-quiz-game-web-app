@@ -10,7 +10,7 @@ import { Question } from 'c:/Users/user/source/repos/LOG2990-206/client/src/app/
     templateUrl: './game-page.component.html',
     styleUrls: ['./game-page.component.scss'],
     // animation from ChatGPT
-    animations: [trigger('scale', [transition(':enter', [style({ transform: 'scale(0)' }), animate('2s', style({ transform: 'scale(1)' }))])])],
+    animations: [trigger('scale', [transition(':enter', [style({ transform: 'scale(0)' }), animate('1s', style({ transform: 'scale(1)' }))])])],
 })
 export class GamePageComponent {
     // message: BehaviorSubject<string> = new BehaviorSubject<string>('');
@@ -75,7 +75,6 @@ export class GamePageComponent {
     // eslint-disable-next-line @angular-eslint/use-lifecycle-interface
     ngOnInit() {
         this.loadQuestions();
-        // this.timerDuration = this.questions[this.currentQuestionIndex].timeInSeconds;
         this.startTimer();
     }
 
@@ -95,6 +94,7 @@ export class GamePageComponent {
 
     // timer inspired from ChatGPT and https://www.codeproject.com/Questions/5349203/How-to-make-5-minute-countdown-timer-with-rxjs-and
     startTimer() {
+        // this.timerDuration = this.questions[this.currentQuestionIndex].timeInSeconds;
         const countdown$ = timer(0, oneSecond).pipe(
             take(this.timerDuration + 1),
             map((secondsElapsed) => this.timerDuration - secondsElapsed),

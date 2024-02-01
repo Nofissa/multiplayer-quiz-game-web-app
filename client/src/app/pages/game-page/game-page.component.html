@@ -6,7 +6,7 @@
     <div *ngIf="displayQuestion">
         <img class="logo" src='/assets/img/logo.png' alt="Logo Projet" />
             <div class="question-box font-color">
-                {{questions[currentQuestionIndex].question || 'Chargement de la question...'}}
+                {{questions[currentQuestionIndex].question}}
             </div>
             <div class="answer-boxes font-color">
                 <div class="answer-box1" [class.highlight-selected]="isSelected(1)" (click)="toggleAnswerBox(1)">
