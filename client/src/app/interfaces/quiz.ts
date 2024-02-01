@@ -1,10 +1,12 @@
 import { Question } from './question';
 
 export interface Quiz {
-    titre: string;
+    id: string;
+    title: string;
     description: string;
+    duration: number;
+    lastModification: Date;
     questions: Question[];
-    isHidden: boolean;
-    lastModified: Date;
+    isHidden: boolean | null;
     _id: string;
 }

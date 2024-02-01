@@ -44,7 +44,7 @@ export class QuestionHttpService {
     private convertLastModifiedToDate(question: Question): Question {
         return {
             ...question,
-            lastModified: new Date(question.lastModified),
+            lastModification: question.lastModification ? new Date(question.lastModification) : null,
         };
     }
 

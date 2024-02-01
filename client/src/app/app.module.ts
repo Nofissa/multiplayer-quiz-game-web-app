@@ -14,8 +14,10 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from '@app/modules/app-routing.module';
 import { AppComponent } from '@app/pages/app/app.component';
+import { ConfirmationDialogComponent } from './components/dialogs/confirmation-dialog/confirmation-dialog.component';
 import { LoginDialogComponent } from './components/dialogs/login-dialog/login-dialog.component';
 import { UpsertQuestionDialogComponent } from './components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
+import { QuestionBankComponent } from './components/question-bank/question-bank.component';
 import { QuestionListComponent } from './components/question-list/question-list.component';
 import { QuizListComponent } from './components/quiz-list/quiz-list.component';
 import { QuizComponent } from './components/quiz/quiz.component';
@@ -39,10 +41,11 @@ import { MainPageComponent } from './pages/main-page/main-page.component';
         MainPageComponent,
         UpsertQuestionDialogComponent,
         QuestionListComponent,
+        ConfirmationDialogComponent,
         QuizListComponent,
         QuizComponent,
         LoginDialogComponent,
-        QuestionListComponent,
+        QuestionBankComponent,
     ],
     imports: [
         AppRoutingModule,
