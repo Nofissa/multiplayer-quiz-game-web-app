@@ -1,5 +1,7 @@
-import { Question, Quiz, QuizDocument } from '@app/model/database/quiz';
-import { QuestionDto, UpsertQuizDto } from '@app/model/dto/quiz/upsert-quiz.dto';
+import { Question } from '@app/model/database/question';
+import { Quiz, QuizDocument } from '@app/model/database/quiz';
+import { UpsertQuestionDto } from '@app/model/dto/question/upsert-question.dto';
+import { UpsertQuizDto } from '@app/model/dto/quiz/upsert-quiz.dto';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -21,7 +23,7 @@ export class QuizService {
     }
 
     async populateDB(): Promise<void> {
-        const questions: QuestionDto[] = [
+        const questions: UpsertQuestionDto[] = [
             {
                 question: 'Quelle est la valeur de la constante R dans la formule pV = nRT',
                 incorrectAnswers: ['3.14 V/m^2', '2.72 C/s', '6.022x10^23 mol/N'],

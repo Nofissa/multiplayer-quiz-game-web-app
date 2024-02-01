@@ -19,6 +19,7 @@ export class AuthController {
     @Post('/login')
     async login(@Body() userCredentialSet: UserCredentialSet, @Res() response: Response) {
         try {
+            console.log(userCredentialSet);
             const payload = await this.authService.authenticate(userCredentialSet);
             response.status(HttpStatus.OK).json(payload);
         } catch (error) {
