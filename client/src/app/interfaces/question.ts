@@ -1,10 +1,8 @@
+import { Choice } from './choice';
+
 export interface Question {
-    _id: string;
-    question: string;
-    incorrectAnswers: string[];
-    correctAnswers: string[];
-    pointValue: number;
-    timeInSeconds: number;
-    lastModified: Date;
-    allAnswers: string[];
+    type: string;
+    text: string;
+    points: number;
+    choices: Choice[];
 }

@@ -1,9 +1,10 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, HostListener } from '@angular/core';
+import { Choice } from '@app/interfaces/choice';
+import { Question } from '@app/interfaces/question';
 import { QuestionHttpService } from '@app/services/question-http.service';
 import { Subscription, map, take, timer } from 'rxjs';
 import { oneSecond } from './game-page.constants';
-import { Question } from 'c:/Users/user/source/repos/LOG2990-206/client/src/app/interfaces/question';
 
 @Component({
     selector: 'app-game-page',
@@ -16,7 +17,7 @@ export class GamePageComponent {
     // message: BehaviorSubject<string> = new BehaviorSubject<string>('');
     secondsLeft: number = 0;
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-    timerDuration: number = 10;
+    timerDuration: number = 50;
     selectedAnswerBoxes: number[] = [];
     validatedAnswerBoxes: number[] = [];
     firstBoxHotkey: string = '1';
@@ -27,7 +28,7 @@ export class GamePageComponent {
     displayQuestion: boolean = true;
     currentQuestionIndex: number = 0;
     timerStarted: boolean = false;
-    points: number = 0;
+    score: number = 0;
     feedbackMessage: string;
     feedbackMessageClass: string = 'feedback-message';
     private timerSubscription: Subscription;
@@ -83,7 +84,6 @@ export class GamePageComponent {
             next: (questions) => {
                 this.questions = questions.map((question) => ({
                     ...question,
-                    allAnswers: [...question.correctAnswers, ...question.incorrectAnswers],
                 }));
                 if (this.questions.length === 0) {
                     this.displayQuestion = false;
@@ -162,8 +162,18 @@ export class GamePageComponent {
     }
 
     checkAnswers() {
-        const { correctAnswers, allAnswers, pointValue } = this.questions[this.currentQuestionIndex];
-        const selectedAnswers = this.selectedAnswerBoxes.map((box) => allAnswers[box - 1]);
+        const { points } = this.questions[this.currentQuestionIndex];
+        const correctAnswers: Choice[] = [];
+        const incorrectAnswers: Choice[] = [];
+
+        this.questions[this.currentQuestionIndex].choices.forEach((choice) => {
+            if (choice.isCorrect) {
+                correctAnswers.push(choice);
+            } else {
+                incorrectAnswers.push(choice);
+            }
+        });
+        const selectedAnswers = this.selectedAnswerBoxes.map((box) => this.questions[this.currentQuestionIndex].choices[box - 1]);
         let correct = false;
         if (selectedAnswers.length !== 0) {
             correct =
@@ -173,7 +183,7 @@ export class GamePageComponent {
 
         if (correct) {
             this.addBoxValidationHighlight('right');
-            this.points += pointValue;
+            this.score += points;
             this.feedbackMessage = 'Bonne réponse! :)';
             this.feedbackMessageClass = 'correct-answer';
         } else {

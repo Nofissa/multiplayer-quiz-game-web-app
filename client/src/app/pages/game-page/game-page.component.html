@@ -6,25 +6,25 @@
     <div *ngIf="displayQuestion">
         <img class="logo" src='/assets/img/logo.png' alt="Logo Projet" />
             <div class="question-box font-color">
-                {{questions[currentQuestionIndex].question}}
+                {{questions[currentQuestionIndex].text}}
             </div>
             <div class="answer-boxes font-color">
                 <div class="answer-box1" [class.highlight-selected]="isSelected(1)" (click)="toggleAnswerBox(1)">
-                    1. {{questions[currentQuestionIndex].allAnswers[0]}}
+                    1. {{questions[currentQuestionIndex].choices[0].text}}
                 </div>
                 <div class="answer-box2" [class.highlight-selected]="isSelected(2)" (click)="toggleAnswerBox(2)">
-                    2. {{questions[currentQuestionIndex].allAnswers[1]}}
+                    2. {{questions[currentQuestionIndex].choices[1].text}}
                 </div>
                 <div class="boxes-below"></div>
-                <div *ngIf="questions[currentQuestionIndex].allAnswers.length > 2" class="answer-box3" [class.highlight-selected]="isSelected(3)" (click)="toggleAnswerBox(3)">
-                    3. {{questions[currentQuestionIndex].allAnswers[2]}}
+                <div *ngIf="questions[currentQuestionIndex].choices.length > 2" class="answer-box3" [class.highlight-selected]="isSelected(3)" (click)="toggleAnswerBox(3)">
+                    3. {{questions[currentQuestionIndex].choices[2].text}}
                 </div>
-                <div *ngIf="questions[currentQuestionIndex].allAnswers.length === 4" class="answer-box4" [class.highlight-selected]="isSelected(4)" (click)="toggleAnswerBox(4)">
-                    4. {{questions[currentQuestionIndex].allAnswers[3]}}
+                <div *ngIf="questions[currentQuestionIndex].choices.length === 4" class="answer-box4" [class.highlight-selected]="isSelected(4)" (click)="toggleAnswerBox(4)">
+                    4. {{questions[currentQuestionIndex].choices[3].text}}
                 </div>
             </div>
             <div class="value-circle font-color">
-                <div class="centered-text">{{questions[currentQuestionIndex].pointValue}}</div>
+                <div class="centered-text">{{questions[currentQuestionIndex].points}}</div>
             </div>
             <div>
                 <button class="button" (click)="validateChoices()">Valider les choix  <i class="fas fa-check-circle" style="color: green;"></i></button>
@@ -45,10 +45,10 @@
                 <div class="centered-text">Il reste {{secondsLeft}} seconde(s)</div>
             </span>
             <div class="score-circle font-color">
-                <div class="centered-text">{{points}} points</div>
+                <div class="centered-text">{{score}} points</div>
             </div>
         </div>
-        <div *ngIf="!displayQuestion" [@scale]>LE QUIZ EST TERMINÉ. VOUS AVEZ OBTENU {{points}} POINTS</div>
+        <div *ngIf="!displayQuestion" [@scale]>LE QUIZ EST TERMINÉ. VOUS AVEZ OBTENU {{score}} POINTS</div>
     <!-- <section id="server-message" class="justified">
         <div class="justified">
         </div>
