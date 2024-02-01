@@ -1,8 +1,8 @@
 import { Question } from '@app/model/database/question';
 import { Quiz } from '@app/model/database/quiz';
-import { UpsertQuizDto } from '@app/model/dto/quiz/upsert-quiz.dto';
+import { QuizDto } from '@app/model/dto/quiz/quiz.dto';
 import { QuizService } from '@app/services/quiz/quiz.service';
-import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Put, Res } from '@nestjs/common';
 import { ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 
@@ -36,7 +36,7 @@ export class QuizController {
         description: 'Return NOT_FOUND http status when request fails',
     })
     @Post('/')
-    async addQuiz(@Body() dto: UpsertQuizDto, @Res() response: Response) {
+    async addQuiz(@Body() dto: QuizDto, @Res() response: Response) {
         try {
             await this.quizService.addQuiz(dto);
             response.status(HttpStatus.CREATED).send();
@@ -53,7 +53,7 @@ export class QuizController {
         description: 'Return NOT_FOUND http status when request fails',
     })
     @Put('/')
-    async modifyQuiz(@Body() dto: UpsertQuizDto, @Res() response: Response) {
+    async modifyQuiz(@Body() dto: QuizDto, @Res() response: Response) {
         try {
             const quiz: Quiz = await this.quizService.modifyQuiz(dto);
             response.status(HttpStatus.OK).json(quiz);
@@ -80,6 +80,23 @@ export class QuizController {
     }
 
     @ApiOkResponse({
+        description: 'Toggle the hidden state of quiz',
+        type: Quiz,
+    })
+    @ApiNotFoundResponse({
+        description: 'Return NOT_FOUND http status when request fails',
+    })
+    @Patch('/hide/:id')
+    async hideQuestionById(@Param('id') id: string, @Res() response: Response) {
+        try {
+            const quiz: Quiz = await this.quizService.hideQuizById(id);
+            response.status(HttpStatus.OK).json(quiz);
+        } catch (error) {
+            response.status(HttpStatus.NOT_FOUND).send(error.message);
+        }
+    }
+
+    @ApiOkResponse({
         description: 'Delete a question in a quiz ',
         type: Quiz,
     })
@@ -89,8 +106,8 @@ export class QuizController {
     @Delete('/:id/questions/:questionId')
     async deleteQuestionInQuiz(@Param('id') quizId: string, @Param('questionId') questionId: string, @Res() response: Response) {
         try {
-            const question: Question = await this.quizService.deleteQuestionInQuizbyId(quizId, questionId);
-            response.status(HttpStatus.OK).json(question);
+            await this.quizService.deleteQuestionInQuizbyId(quizId, questionId);
+            response.status(HttpStatus.OK).send();
         } catch (error) {
             response.status(HttpStatus.NOT_FOUND).send(error.message);
         }
@@ -105,8 +122,8 @@ export class QuizController {
     @Delete('/:id')
     async deleteQuizById(@Param('id') id: string, @Res() response: Response) {
         try {
-            const quiz: Quiz = await this.quizService.deleteQuizById(id);
-            response.status(HttpStatus.OK).json(quiz);
+            await this.quizService.deleteQuizById(id);
+            response.status(HttpStatus.OK).send();
         } catch (error) {
             response.status(HttpStatus.INTERNAL_SERVER_ERROR).send(error.message);
         }
