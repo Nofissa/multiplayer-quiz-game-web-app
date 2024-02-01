@@ -1,22 +1,8 @@
-// eslint-disable-next-line max-classes-per-file
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { Document } from 'mongoose';
 
 export type QuestionDocument = Question & Document;
-
-export class Answer {
-    @ApiProperty()
-    _id?: string;
-
-    @ApiProperty()
-    @Prop({ required: true })
-    answer: string;
-
-    @ApiProperty()
-    @Prop({ required: true })
-    isCorrect: boolean;
-}
 
 @Schema()
 export class Question {
@@ -28,7 +14,8 @@ export class Question {
     question: string;
 
     @ApiProperty()
-    answers: Answer[];
+    @Prop({ type: [{ _id: false, answer: String, isCorrect: Boolean }], required: true })
+    answers: { answer: string; isCorrect: boolean }[];
 
     @ApiProperty()
     @Prop({ required: true })
