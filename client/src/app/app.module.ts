@@ -13,17 +13,24 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from '@app/modules/app-routing.module';
 import { AppComponent } from '@app/pages/app/app.component';
-// import { ConfirmationDialogComponent } from './components/dialogs/confirmation-dialog/confirmation-dialog.component';
 import { UpsertQuestionDialogComponent } from './components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
-// import { QuestionBankComponent } from './components/question-bank/question-bank.component';
 import { QuestionListComponent } from './components/question-list/question-list.component';
 import { QuizListComponent } from './components/quiz-list/quiz-list.component';
 import { QuizComponent } from './components/quiz/quiz.component';
-// import { ShareTestComponent } from './components/share-test/share-test.component';
 import { AdminPageComponent } from './pages/admin-page/admin-page.component';
 import { CreateGamePageComponent } from './pages/create-game-page/create-game-page.component';
 import { GamePageComponent } from './pages/game-page/game-page.component';
 import { MainPageComponent } from './pages/main-page/main-page.component';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MainPageComponent } from './pages/main-page/main-page.component';
+import { QuestionListComponent } from './components/question-list/question-list.component';
+import { UpsertQuestionDialogComponent } from './components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
+import { LoginDialogComponent } from './components/dialogs/login-dialog/login-dialog.component';
 
 /**
  * Main module that is used in main.ts.
@@ -39,12 +46,11 @@ import { MainPageComponent } from './pages/main-page/main-page.component';
         GamePageComponent,
         MainPageComponent,
         UpsertQuestionDialogComponent,
-        // QuestionBankComponent,
         QuestionListComponent,
-        // ConfirmationDialogComponent,
-        // ShareTestComponent,
         QuizListComponent,
         QuizComponent,
+        LoginDialogComponent,
+        QuestionListComponent,
     ],
     imports: [
         AppRoutingModule,
@@ -62,6 +68,7 @@ import { MainPageComponent } from './pages/main-page/main-page.component';
         MatFormFieldModule,
         MatIconModule,
         MatInputModule,
+        MatSnackBarModule,
         ReactiveFormsModule,
     ],
     providers: [],
