@@ -9,11 +9,11 @@
             <mat-label>Description du Quiz</mat-label>
             <textarea matInput id="description" class="text-edit" placeholder="Votre description ici" formControlName="descritpion" required></textarea>
         </mat-form-field>
-        <div id="questions-container" formArrayName="questions" class="flex-column">
+        <div id="questions-container" class="flex-column">
             <app-question-list id="question-list" [questions]="questionsContainer" [interactionService]="questionInteractionService" [options]="{share: true, create: true, edit: true, delete: true}"></app-question-list>
             <mat-icon aria-hidden="false" aria-label="Ajouter une question" (click)="addQuestion()" font-icon="add"></mat-icon>
         </div>
-        <input type="submit"/>
+        <input type="submit" (click)="submitQuiz()"/>
     </form>
     <app-question-bank [options]="{share: true}"></app-question-bank>
 </div>

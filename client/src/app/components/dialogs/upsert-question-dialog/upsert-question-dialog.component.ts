@@ -87,6 +87,7 @@ export class UpsertQuestionDialogComponent {
     submit() {
         if (this.formGroup.valid) {
             const question: Question = this.formGroup.value;
+            question.lastModified = new Date();
             this.dialogRef.close(question);
         } else {
             window.alert("l'un des paramètres est erroné, veuillez réessayer");

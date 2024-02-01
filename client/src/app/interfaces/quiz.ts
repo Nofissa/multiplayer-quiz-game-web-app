@@ -6,4 +6,5 @@ export interface Quiz {
     description: string;
     questions: Question[];
     lastModified: Date;
+    isHidden: boolean;
 }

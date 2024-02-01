@@ -1,25 +1,29 @@
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
+import { ActivatedRoute } from '@angular/router';
 import { UpsertQuestionDialogComponent } from '@app/components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
 import { Answer } from '@app/interfaces/answer';
 import { Question } from '@app/interfaces/question';
+import { Quiz } from '@app/interfaces/quiz';
 import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog-data';
 import { QuestionInteractionService } from '@app/services/question-interaction.service';
 import { QuestionSharingService } from '@app/services/question-sharing.service';
+import { QuizHttpService } from '@app/services/quiz-http.service';
 // import { Quiz } from '@app/interfaces/quiz';
 
 @Component({
     selector: 'app-qcmcreation-page',
     templateUrl: './qcmcreation-page.component.html',
     styleUrls: ['./qcmcreation-page.component.scss'],
-    providers: [QuestionInteractionService],
+    providers: [QuestionInteractionService, QuizHttpService],
 })
 export class QCMCreationPageComponent implements OnInit {
     title = 'hi';
     formGroup: FormGroup;
-    questionsArray: FormArray;
     questionsContainer: Question[] = [];
+    quizId: string;
+    quiz: Quiz;
 
     emptyAnswer1: Answer = {
         answer: '',
@@ -47,6 +51,8 @@ export class QCMCreationPageComponent implements OnInit {
         private dialog: MatDialog,
         public questionInteractionService: QuestionInteractionService,
         private questionSharingService: QuestionSharingService,
+        private quizHttpServices: QuizHttpService,
+        private route: ActivatedRoute,
     ) {}
 
     get questions(): FormArray {
@@ -54,11 +60,32 @@ export class QCMCreationPageComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.formGroup = this.formBuilder.group({
-            title: ['', Validators.required],
-            descritpion: ['', Validators.required],
-            questions: this.formBuilder.array(this.questionsContainer),
+        this.route.params.subscribe((params) => {
+            this.quizId = params['id'];
         });
+
+        this.quizHttpServices.getQuizById(this.quizId).subscribe({
+            next: (x: Quiz) => {
+                this.quiz = x;
+            },
+            error: () => {
+                return;
+            },
+        });
+
+        if (this.quiz) {
+            this.formGroup = this.formBuilder.group({
+                title: [this.quiz.title, Validators.required],
+                descritpion: [this.quiz.description, Validators.required],
+            });
+
+            this.questionsContainer = this.quiz.questions;
+        } else {
+            this.formGroup = this.formBuilder.group({
+                title: ['', Validators.required],
+                descritpion: ['', Validators.required],
+            });
+        }
 
         this.questionInteractionService.registerOnAddQuestion(() => {
             this.addQuestion();
@@ -92,7 +119,7 @@ export class QCMCreationPageComponent implements OnInit {
         this.questionSharingService.subscribe((question: Question) => {
             if (!this.questionsContainer.find((x) => x._id === question._id)) {
                 this.questionsContainer.push(question);
-            } // ajoute la question dans le formArray et la vue
+            }
         });
     }
 
@@ -116,7 +143,49 @@ export class QCMCreationPageComponent implements OnInit {
     }
 
     submitQuiz() {
-        window.console.log('Form submitted:', this.formGroup.value);
+        // validations de nom unique dans le back end
+        if (this.questionsContainer.length !== 0) {
+            const quiz: Quiz = {
+                _id: this.quizId,
+                title: this.formGroup.value.title,
+                description: this.formGroup.value.description,
+                questions: this.questionsContainer,
+                lastModified: new Date(),
+                isHidden: true,
+            };
+
+            try {
+                if (this.quiz) {
+                    this.quizHttpServices.updateQuiz(quiz).subscribe({
+                        next: (x: Quiz) => {
+                            this.quiz = x;
+                            window.alert('Le quiz est enregistré avec succès');
+                        },
+                        error: (e) => {
+                            window.console.log('une erreur est survenue', e);
+                            window.alert('La création du Quiz na pas pu être faite');
+                        },
+                    });
+                } else {
+                    this.quizHttpServices.createQuiz(quiz).subscribe({
+                        next: (x: Quiz) => {
+                            this.quiz = x;
+                            window.alert('Le quiz est enregistré avec succès');
+                        },
+                        error: (e) => {
+                            window.console.log('une erreur est survenue', e);
+                            window.alert('La création du Quiz na pas pu être faite');
+                        },
+                    });
+                }
+            } catch (e) {
+                window.alert('Un problème est survenu');
+                window.console.log('Server Error:', e);
+            }
+        } else {
+            window.alert('Un paramètre du Quiz est erroné, veuillez y remédier');
+        }
+
         // send info to where it needs to go
     }
 }
