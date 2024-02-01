@@ -11,9 +11,10 @@
         </mat-form-field>
         <div id="questions-container" class="flex-column">
             <app-question-list id="question-list" [questions]="questionsContainer" [interactionService]="questionInteractionService" [options]="{share: true, create: true, edit: true, delete: true, drag:true, numberOrder: true}"></app-question-list>
-            <button (click)="addQuestion()" class="add-icon">+</button>
+            <!-- <button id="add-question" (click)="addQuestion()" class="add-icon">+</button> -->
+            <input type="button" (click)="addQuestion()" class="add-icon" value="+"/>
         </div>
-        <input type="submit" (click)="submitQuiz()"/>
+        <input id="submit-quiz" type="submit" (click)="submitQuiz()"/>
     </form>
     <app-question-bank [options]="{share: true}"></app-question-bank>
 </div>

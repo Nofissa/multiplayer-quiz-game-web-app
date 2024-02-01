@@ -12,7 +12,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppComponent } from '@app/pages/app/app.component';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
-import { CreateQuestionModalComponent } from './components/create-question-modal/create-question-modal.component';
 import { UpsertQuestionDialogComponent } from './components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
 import { ConfirmationDialogComponent } from './components/dialogs/confirmation-dialog/confirmation-dialog.component';
 import { QuestionBankComponent } from './components/question-bank/question-bank.component';
@@ -39,7 +38,6 @@ import { MatSliderModule } from '@angular/material/slider';
         QCMCreationPageComponent,
         UpsertQuestionDialogComponent,
         QuestionListComponent,
-        CreateQuestionModalComponent,
         ConfirmationDialogComponent,
         QuestionBankComponent,
     ],

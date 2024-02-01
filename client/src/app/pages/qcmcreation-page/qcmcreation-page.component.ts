@@ -10,7 +10,6 @@ import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog
 import { QuestionInteractionService } from '@app/services/question-interaction.service';
 import { QuestionSharingService } from '@app/services/question-sharing.service';
 import { QuizHttpService } from '@app/services/quiz-http.service';
-// import { Quiz } from '@app/interfaces/quiz';
 
 @Component({
     selector: 'app-qcmcreation-page',
@@ -46,6 +45,7 @@ export class QCMCreationPageComponent implements OnInit {
         question: this.emptyQuestion,
     };
 
+    // eslint-disable-next-line max-params
     constructor(
         private formBuilder: FormBuilder,
         private dialog: MatDialog,
@@ -117,6 +117,7 @@ export class QCMCreationPageComponent implements OnInit {
         });
 
         this.questionSharingService.subscribe((question: Question) => {
+            // eslint-disable-next-line no-underscore-dangle
             if (!this.questionsContainer.find((x) => x._id === question._id)) {
                 this.questionsContainer.push(question);
             }
