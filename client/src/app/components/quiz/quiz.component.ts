@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { Quiz } from '@app/interfaces/quiz';
 import { QuizHttpService } from '@app/services/quiz-http.service';
 import { saveAs } from 'file-saver';
+
 @Component({
     selector: 'app-quiz',
     templateUrl: './quiz.component.html',
