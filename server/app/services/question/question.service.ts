@@ -3,7 +3,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Question, QuestionDocument } from '@app/model/database/question';
-import { UpsertQuestionDto } from '@app/model/dto/question/upsert-question.dto';
+import { QuestionDto } from '@app/model/dto/question/question.dto';
 
 @Injectable()
 export class QuestionService {
@@ -22,30 +22,30 @@ export class QuestionService {
     }
 
     async populateDB(): Promise<void> {
-        const questions: UpsertQuestionDto[] = [
+        const questions: QuestionDto[] = [
             {
-                question: 'Quelle est la valeur de la constante R dans la formule pV = nRT',
-                answers: [
-                    { answer: '3.14 V/m^2', isCorrect: false },
-                    { answer: '2.72 C/s', isCorrect: false },
-                    { answer: '6.022x10^23 mol/N', isCorrect: false },
-                    { answer: '8.31 J/mol/K', isCorrect: true },
+                text: 'Quelle est la valeur de la constante R dans la formule pV = nRT',
+                type: 'QCM',
+                choices: [
+                    { text: '3.14 V/m^2', isCorrect: false },
+                    { text: '2.72 C/s', isCorrect: false },
+                    { text: '6.022x10^23 mol/N', isCorrect: false },
+                    { text: '8.31 J/mol/K', isCorrect: true },
                 ],
-                pointValue: 100,
-                timeInSeconds: 10,
-                lastModified: new Date(),
+                points: 100,
+                lastModification: new Date(),
             },
             {
-                question: "En quelle année la compagnie d'automobile Volkswagen a-t-elle été fondée?",
-                answers: [
-                    { answer: '1928', isCorrect: false },
-                    { answer: '1987', isCorrect: false },
-                    { answer: '1947', isCorrect: false },
-                    { answer: '1937', isCorrect: true },
+                text: "En quelle année la compagnie d'automobile Volkswagen a-t-elle été fondée?",
+                type: 'QCM',
+                choices: [
+                    { text: '1928', isCorrect: false },
+                    { text: '1987', isCorrect: false },
+                    { text: '1947', isCorrect: false },
+                    { text: '1937', isCorrect: true },
                 ],
-                pointValue: 30,
-                timeInSeconds: 30,
-                lastModified: new Date('2024-01-20 18:43:27'),
+                points: 30,
+                lastModification: new Date('2024-01-20 18:43:27'),
             },
         ];
 
@@ -57,12 +57,12 @@ export class QuestionService {
         return await this.model.find({}).sort({ lastModified: -1 });
     }
 
-    async addQuestion(dto: UpsertQuestionDto): Promise<Question> {
+    async addQuestion(dto: QuestionDto): Promise<Question> {
         if (!(await this.validateQuestion(dto))) {
             return Promise.reject('Invalid question');
         }
 
-        dto.lastModified = new Date();
+        dto.lastModification = new Date();
 
         try {
             return await this.model.create(dto);
@@ -71,12 +71,12 @@ export class QuestionService {
         }
     }
 
-    async updateQuestion(dto: UpsertQuestionDto): Promise<Question> {
+    async updateQuestion(dto: QuestionDto): Promise<Question> {
         if (!(await this.validateQuestion(dto))) {
             return Promise.reject('Invalid question');
         }
 
-        dto.lastModified = new Date();
+        dto.lastModification = new Date();
 
         try {
             return await this.model.findOneAndReplace({ _id: dto._id }, dto, { new: true });
@@ -93,8 +93,8 @@ export class QuestionService {
         }
     }
 
-    async validateQuestion(dto: UpsertQuestionDto): Promise<boolean> {
-        const regex = new RegExp(`^${dto.question}$`, 'i'); // for case unsensitive search
+    async validateQuestion(dto: QuestionDto): Promise<boolean> {
+        const regex = new RegExp(`^${dto.text}$`, 'i'); // for case unsensitive search
         const question = await this.model.findOne({ _id: { $ne: dto._id }, question: { $regex: regex } });
 
         return question === null;
