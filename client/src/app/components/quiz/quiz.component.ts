@@ -44,6 +44,7 @@ export class QuizComponent {
 
     onToggleChange() {
         this.quiz.isHidden = !this.quiz.isHidden;
+        // eslint-disable-next-line no-underscore-dangle
         this.quizHttpService.hideQuizById(this.quiz._id).subscribe((quiz) => {
             this.quiz = quiz;
         });
