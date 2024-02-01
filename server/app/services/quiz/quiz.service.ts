@@ -100,7 +100,7 @@ export class QuizService {
         }
     }
 
-    async hideQuiz(id: string): Promise<Quiz> {
+    async hideQuizById(id: string): Promise<Quiz> {
         try {
             const existingQuiz = await this.model.findOne({ _id: id });
 

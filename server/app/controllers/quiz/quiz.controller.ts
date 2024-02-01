@@ -89,7 +89,7 @@ export class QuizController {
     @Patch('/hide/:id')
     async hideQuestionById(@Param('id') id: string, @Res() response: Response) {
         try {
-            const quiz: Quiz = await this.quizService.hideQuiz(id);
+            const quiz: Quiz = await this.quizService.hideQuizById(id);
             response.status(HttpStatus.OK).json(quiz);
         } catch (error) {
             response.status(HttpStatus.NOT_FOUND).send(error.message);
