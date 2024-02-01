@@ -24,6 +24,10 @@ export class Quiz {
 
     @ApiProperty()
     @Prop({ required: true })
+    duration: number;
+
+    @ApiProperty()
+    @Prop({ required: true })
     lastModification: Date;
 
     @ApiProperty()

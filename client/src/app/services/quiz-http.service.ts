@@ -41,11 +41,8 @@ export class QuizHttpService {
         );
     }
 
-    deleteQuizById(id: string): Observable<Quiz> {
-        return this.http.delete<Quiz>(`${this.baseUrl}/${id}`).pipe(
-            map((deletedQuiz: Quiz) => this.convertLastModifiedToDate(deletedQuiz)),
-            catchError(this.handleError<Quiz>('Error deleting quiz')),
-        );
+    deleteQuizById(id: string): Observable<void> {
+        return this.http.delete<void>(`${this.baseUrl}/${id}`).pipe(catchError(this.handleError<void>('Error deleting quiz')));
     }
 
     hideQuizById(id: string): Observable<Quiz> {
