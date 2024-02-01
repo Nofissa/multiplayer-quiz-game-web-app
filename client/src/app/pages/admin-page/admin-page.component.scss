@@ -1,0 +1,9 @@
+.tabs {
+    height: 80%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    width: 100%;
+}
+::ng-deep .mat-tab-label {
+    color: aliceblue !important;
+}
