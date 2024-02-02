@@ -1,5 +1,5 @@
 import { Question } from '@app/model/database/question';
-import { UpsertQuestionDto } from '@app/model/dto/question/upsert-question.dto';
+import { QuestionDto } from '@app/model/dto/question/question.dto';
 import { QuestionService } from '@app/services/question/question.service';
 import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Res } from '@nestjs/common';
 import { ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
@@ -32,7 +32,7 @@ export class QuestionController {
         description: 'Add new question',
     })
     @Post('/')
-    async addQuestion(@Body() dto: UpsertQuestionDto, @Res() response: Response) {
+    async addQuestion(@Body() dto: QuestionDto, @Res() response: Response) {
         try {
             const addedQuestion: Question = await this.questionService.addQuestion(dto);
             response.status(HttpStatus.CREATED).json(addedQuestion);
@@ -46,7 +46,7 @@ export class QuestionController {
         type: Question,
     })
     @Put('/')
-    async updateQuestion(@Body() dto: UpsertQuestionDto, @Res() response: Response) {
+    async updateQuestion(@Body() dto: QuestionDto, @Res() response: Response) {
         try {
             const updatedQuestion: Question = await this.questionService.updateQuestion(dto);
             response.status(HttpStatus.OK).json(updatedQuestion);
@@ -61,8 +61,8 @@ export class QuestionController {
     @Delete('/:id')
     async deleteQuestionById(@Param('id') id: string, @Res() response: Response) {
         try {
-            const question: Question = await this.questionService.deleteQuestionById(id);
-            response.status(HttpStatus.OK).json(question);
+            await this.questionService.deleteQuestionById(id);
+            response.status(HttpStatus.OK).send();
         } catch (error) {
             response.status(HttpStatus.INTERNAL_SERVER_ERROR).send(error.message);
         }

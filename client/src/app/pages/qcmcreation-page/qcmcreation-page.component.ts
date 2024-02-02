@@ -3,7 +3,7 @@ import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { UpsertQuestionDialogComponent } from '@app/components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
-import { Answer } from '@app/interfaces/answer';
+import { Choice } from '@app/interfaces/choice';
 import { Question } from '@app/interfaces/question';
 import { Quiz } from '@app/interfaces/quiz';
 import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog-data';
@@ -24,21 +24,21 @@ export class QCMCreationPageComponent implements OnInit {
     quizId: string = '';
     quiz: Quiz;
 
-    emptyAnswer1: Answer = {
-        answer: '',
+    emptyAnswer1: Choice = {
+        text: '',
         isCorrect: false,
     };
-    emptyAnswer2: Answer = {
-        answer: '',
+    emptyAnswer2: Choice = {
+        text: '',
         isCorrect: true,
     };
     emptyQuestion: Question = {
-        question: '',
-        answers: [this.emptyAnswer1, this.emptyAnswer2],
-        lastModified: new Date(),
+        type: 'QCM',
+        text: '',
+        choices: [this.emptyAnswer1, this.emptyAnswer2],
+        lastModification: new Date(),
+        points: 10,
         _id: '',
-        timeInSeconds: 10,
-        pointValue: 10,
     };
     emptyDialogData: UpsertQuestionDialogData = {
         title: 'Créer une Question',
@@ -105,11 +105,10 @@ export class QCMCreationPageComponent implements OnInit {
             dialogRef.afterClosed().subscribe({
                 next: (data: Question) => {
                     if (data) {
-                        question.question = data.question;
-                        question.answers = data.answers;
-                        question.timeInSeconds = data.timeInSeconds;
-                        question.pointValue = data.pointValue;
-                        question.lastModified = data.lastModified;
+                        question.text = data.text;
+                        question.choices = data.choices;
+                        question.points = data.points;
+                        question.lastModification = data.lastModification;
                     }
                 },
             });
@@ -125,7 +124,7 @@ export class QCMCreationPageComponent implements OnInit {
 
     deleteQuestion(question: Question) {
         if (question) {
-            this.questionsContainer = this.questionsContainer.filter((x) => x.question !== question.question);
+            this.questionsContainer = this.questionsContainer.filter((x) => x.text !== question.text);
         }
     }
 
@@ -146,11 +145,13 @@ export class QCMCreationPageComponent implements OnInit {
         // validations de nom unique dans le back end
         if (this.questionsContainer.length !== 0) {
             const quiz: Quiz = {
+                id: 'dwdwdqwdwqd',
                 title: this.formGroup.value.title,
                 description: this.formGroup.value.description,
+                duration: 10,
                 questions: this.questionsContainer,
                 isHidden: true,
-                lastModified: new Date(),
+                lastModification: new Date(),
                 _id: '',
             };
             if (this.quiz) {

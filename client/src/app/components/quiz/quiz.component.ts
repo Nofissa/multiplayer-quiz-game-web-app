@@ -25,10 +25,8 @@ export class QuizComponent {
 
     deleteQuiz() {
         // eslint-disable-next-line no-underscore-dangle
-        this.quizHttpService.deleteQuizById(this.quiz._id).subscribe((quiz: Quiz) => {
-            if (quiz) {
-                this.isDeleted = true;
-            }
+        this.quizHttpService.deleteQuizById(this.quiz._id).subscribe(() => {
+            this.isDeleted = true;
         });
     }
 
@@ -43,8 +41,8 @@ export class QuizComponent {
     }
 
     onToggleChange() {
-        this.quiz.isHidden = !this.quiz.isHidden;
-        this.quizHttpService.updateQuiz(this.quiz).subscribe((quiz) => {
+        // eslint-disable-next-line no-underscore-dangle
+        this.quizHttpService.hideQuizById(this.quiz._id).subscribe((quiz) => {
             this.quiz = quiz;
         });
     }

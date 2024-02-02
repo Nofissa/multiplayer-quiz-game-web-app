@@ -4,22 +4,22 @@
         <div class="form-wrapper">
             <mat-form-field appearance="outline">
                 <mat-label>Question</mat-label>
-                <textarea matInput formControlName="question" value="{{ data.question.question }}" placeholder="Votre question ici">
+                <textarea matInput formControlName="text" value="{{ data.question.text }}" placeholder="Votre question ici">
                 </textarea>
             </mat-form-field>
 
             <div cdkDropListGroup>
-                <div cdkDropList [cdkDropListData]="answers.controls" (cdkDropListDropped)="drop($event)">
-                    <div *ngFor="let answerGroup of answers.controls; let i = index" cdkDrag class="answers-wrapper">
+                <div cdkDropList [cdkDropListData]="choices.controls" (cdkDropListDropped)="drop($event)">
+                    <div *ngFor="let answerGroup of choices.controls; let i = index" cdkDrag class="answers-wrapper">
                         <mat-form-field appearance="outline" class="answer">
                             <mat-label>Bonne Réponse {{ i + 1 }}</mat-label>
                             <div class="flex-row" [formGroup]="answerGroup">
-                                <input matInput type="text" formControlName="answer" placeholder="Votre réponse ici">
+                                <input matInput type="text" formControlName="text" placeholder="Votre réponse ici">
                                 <input type="checkbox" formControlName="isCorrect">
                             </div>
                         </mat-form-field>
                         <div class="row-actions-wrapper">
-                            <mat-icon *ngIf="answersControls.length > 2" aria-hidden="false" class="action action-remove"
+                            <mat-icon *ngIf="choicesControls.length > 2" aria-hidden="false" class="action action-remove"
                                 aria-label="Retirer" fontIcon="remove" (click)="removeAnswerAt(i)"></mat-icon>
                         </div>
                     </div>
@@ -28,15 +28,10 @@
                 <mat-icon aria-hidden="false"
                 class="action"
                 aria-label="Ajouter" fontIcon="add" (click)="addAnswer()"></mat-icon>
-                <mat-form-field appearance="outline" class="answer flex-row">
-                    <mat-slider id="timeRange" min="{{getMinTime}}" max="{{getMaxTime}}" discrete>
-                        <input matInput matSliderThumb formControlName="timeInSeconds" value="{{ data.question.timeInSeconds }}">
-                    </mat-slider>
-                </mat-form-field>
             <mat-form-field appearance="outline">
                 <mat-label>Nombre de points</mat-label>
-                <input matInput type="number" min="10" max="100" step="10" formControlName="pointValue"
-                    value="{{ data.question.pointValue }}">
+                <input matInput type="number" min="10" max="100" step="10" formControlName="points"
+                    value="{{ data.question.points }}">
             </mat-form-field>
         </div>
     </mat-dialog-content>

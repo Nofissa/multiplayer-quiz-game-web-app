@@ -2,13 +2,11 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Component, Inject } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { Answer } from '@app/interfaces/answer';
+import { Choice } from '@app/interfaces/choice';
 import { Question } from '@app/interfaces/question';
 import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog-data';
 
 const MAX_CHOICE_COUNT = 4;
-const MIN_TIME = 10;
-const MAX_TIME = 60;
 const POINT_VALUE_BASE_MULTIPLE = 10;
 
 @Component({
@@ -19,19 +17,17 @@ const POINT_VALUE_BASE_MULTIPLE = 10;
 export class UpsertQuestionDialogComponent {
     maxChoiceCount = MAX_CHOICE_COUNT;
     formGroup: FormGroup;
-    answersArray: FormArray;
-    private minTime: number = MIN_TIME;
-    private maxTime: number = MAX_TIME;
+    choicesArray: FormArray;
 
     constructor(
         private formBuilder: FormBuilder,
         public dialogRef: MatDialogRef<UpsertQuestionDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: UpsertQuestionDialogData,
     ) {
-        this.answersArray = this.formBuilder.array(
-            this.data.question.answers.map((answer) => {
+        this.choicesArray = this.formBuilder.array(
+            this.data.question.choices.map((answer) => {
                 return this.formBuilder.group({
-                    answer: [answer.answer, Validators.required],
+                    text: [answer.text, Validators.required],
                     isCorrect: [answer.isCorrect, Validators.required],
                 });
             }),
@@ -39,27 +35,18 @@ export class UpsertQuestionDialogComponent {
         ) as FormArray<FormGroup>;
 
         this.formGroup = this.formBuilder.group({
-            question: [this.data.question.question, Validators.required],
-            answers: this.answersArray,
-            timeInSeconds: [this.data.question.timeInSeconds, [Validators.required, this.timeValidator()]],
-            pointValue: [this.data.question.pointValue, [Validators.required, this.multipleOfTenValidator()]],
+            text: [this.data.question.text, Validators.required],
+            choices: this.choicesArray,
+            points: [this.data.question.points, [Validators.required, this.multipleOfTenValidator()]],
         });
     }
 
-    get answersControls() {
-        return this.answersArray.controls;
+    get choicesControls() {
+        return this.choicesArray.controls;
     }
 
-    get answers() {
-        return this.formGroup.controls['answers'] as FormArray<FormGroup>;
-    }
-
-    get getMaxTime() {
-        return this.maxTime;
-    }
-
-    get getMinTime() {
-        return this.minTime;
+    get choices() {
+        return this.formGroup.controls['choices'] as FormArray<FormGroup>;
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -68,16 +55,16 @@ export class UpsertQuestionDialogComponent {
     }
 
     addAnswer() {
-        this.answersArray.push(
+        this.choicesArray.push(
             this.formBuilder.group({
-                answer: ['', Validators.required],
+                text: ['', Validators.required],
                 isCorrect: [false],
             }),
         );
     }
 
     removeAnswerAt(index: number) {
-        this.answersArray.removeAt(index);
+        this.choicesArray.removeAt(index);
     }
 
     cancel() {
@@ -86,8 +73,15 @@ export class UpsertQuestionDialogComponent {
 
     submit() {
         if (this.formGroup.valid) {
-            const question: Question = this.formGroup.value;
-            question.lastModified = new Date();
+            const question: Question = {
+                type: 'QCM',
+                text: this.formGroup.value.text,
+                points: this.formGroup.value.points,
+                choices: this.formGroup.value.choices,
+                lastModification: new Date(),
+                _id: '',
+            };
+
             this.dialogRef.close(question);
         } else {
             window.alert("l'un des paramètres est erroné, veuillez réessayer");
@@ -96,7 +90,7 @@ export class UpsertQuestionDialogComponent {
 
     private oneTrueValidator(): ValidatorFn {
         return (control: AbstractControl): ValidationErrors | null => {
-            const answerArray: Answer[] = control.value;
+            const answerArray: Choice[] = control.value;
             for (const answer of answerArray) {
                 if (answer.isCorrect) {
                     return null;
@@ -108,7 +102,7 @@ export class UpsertQuestionDialogComponent {
 
     private oneFalseValidator(): ValidatorFn {
         return (control: AbstractControl): ValidationErrors | null => {
-            const answerArray: Answer[] = control.value;
+            const answerArray: Choice[] = control.value;
             for (const answer of answerArray) {
                 if (!answer.isCorrect) {
                     return null;
@@ -123,14 +117,6 @@ export class UpsertQuestionDialogComponent {
             const value = control.value;
 
             return value % POINT_VALUE_BASE_MULTIPLE === 0 ? null : { notMultipleOfTen: true };
-        };
-    }
-
-    private timeValidator(): ValidatorFn {
-        return (control: AbstractControl): ValidationErrors | null => {
-            const value = control.value;
-
-            return value >= this.minTime && value <= this.maxTime ? null : { notValidTime: true };
         };
     }
 }

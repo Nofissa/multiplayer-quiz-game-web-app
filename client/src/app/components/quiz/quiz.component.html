@@ -4,7 +4,7 @@
             {{ quiz.title }}
         </mat-panel-title>
         <mat-panel-description>
-            {{ quiz.lastModified.toLocaleString('fr-CA', { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' }) }}
+            {{ quiz.lastModification.toLocaleString('fr-CA', { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' }) }}
         </mat-panel-description>
         <mat-slide-toggle [checked]="!quiz.isHidden" (change)="onToggleChange()">Visible</mat-slide-toggle>
     </mat-expansion-panel-header>

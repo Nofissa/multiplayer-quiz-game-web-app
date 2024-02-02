@@ -8,6 +8,13 @@ export type QuizDocument = Quiz & Document;
 @Schema()
 export class Quiz {
     @ApiProperty()
+    _id?: string;
+
+    @ApiProperty()
+    @Prop({ required: true })
+    id: string;
+
+    @ApiProperty()
     @Prop({ required: true })
     title: string;
 
@@ -17,7 +24,11 @@ export class Quiz {
 
     @ApiProperty()
     @Prop({ required: true })
-    lastModified: Date;
+    duration: number;
+
+    @ApiProperty()
+    @Prop({ required: true })
+    lastModification: Date;
 
     @ApiProperty()
     @Prop({ required: true })
@@ -26,9 +37,6 @@ export class Quiz {
     @ApiProperty()
     @Prop({ required: true })
     questions: Question[];
-
-    @ApiProperty()
-    _id?: string;
 }
 
 export const quizSchema = SchemaFactory.createForClass(Quiz);
