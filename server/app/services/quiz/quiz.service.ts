@@ -79,6 +79,10 @@ export class QuizService {
         return await this.model.find({}).sort({ lastModified: 1 });
     }
 
+    async getQuizById(id: string): Promise<Quiz> {
+        return await this.model.findOne({ _id: id });
+    }
+
     async addQuiz(dto: QuizDto): Promise<Quiz> {
         dto.lastModification = new Date();
         dto.isHidden = true;
