@@ -142,7 +142,6 @@ export class QCMCreationPageComponent implements OnInit {
     }
 
     submitQuiz() {
-        // validations de nom unique dans le back end
         if (this.questionsContainer.length !== 0) {
             const quiz: Quiz = {
                 id: 'dwdwdqwdwqd',
@@ -180,7 +179,5 @@ export class QCMCreationPageComponent implements OnInit {
         } else {
             window.alert('Un paramètre du Quiz est erroné, veuillez y remédier');
         }
-
-        // send info to where it needs to go
     }
 }
