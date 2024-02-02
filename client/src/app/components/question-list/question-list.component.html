@@ -1,6 +1,4 @@
 <div *ngIf="options.drag" CDKDropListGroup class="drag-container"> 
-    <!-- <app-question *ngFor="let question of questions" [question]="question" [options]="options"
-     [interactionService]="interactionService"></app-question>  -->
     <div cdkDropList [cdkDropListData]="questions" (cdkDropListDropped)="drop($event)" class="list scrollable column"> 
         <div *ngFor="let question of questions; let i = index" class="question-container" cdkDrag>
             <div class="question-body column">
@@ -46,8 +44,6 @@
 
 
 <div *ngIf="!options.drag"  class="list scrollable column">
-    <!-- <app-question *ngFor="let question of questions" [question]="question" [options]="options"
-     [interactionService]="interactionService"></app-question>  -->
     <div *ngFor="let question of questions" class="question-container">
         <div class="question-body column">
             <div *ngIf="options.edit || options.delete || options.share" class="overlay">
@@ -85,9 +81,3 @@
         </div>
     </div>
 </div>
-
-<!-- <div *ngIf="options.create" class="list-footer">
-    <div class="action-wrapper" (click)="invokeOnAddQuestion()">
-        <mat-icon aria-hidden="false" class="action action-add" aria-label="Ajouter" fontIcon="add_circle"></mat-icon>
-    </div>
-</div> -->

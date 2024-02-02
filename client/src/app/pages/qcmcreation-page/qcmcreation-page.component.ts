@@ -3,13 +3,13 @@ import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { UpsertQuestionDialogComponent } from '@app/components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
-import { Choice } from '@app/interfaces/choice';
 import { Question } from '@app/interfaces/question';
 import { Quiz } from '@app/interfaces/quiz';
-import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog-data';
 import { QuestionInteractionService } from '@app/services/question-interaction.service';
 import { QuestionSharingService } from '@app/services/question-sharing.service';
 import { QuizHttpService } from '@app/services/quiz-http.service';
+
+const ID_LENGTH = 10;
 
 @Component({
     selector: 'app-qcmcreation-page',
@@ -18,32 +18,10 @@ import { QuizHttpService } from '@app/services/quiz-http.service';
     providers: [QuestionInteractionService, QuizHttpService],
 })
 export class QCMCreationPageComponent implements OnInit {
-    title = 'hi';
     formGroup: FormGroup;
     questionsContainer: Question[] = [];
     quizId: string = '';
     quiz: Quiz;
-
-    emptyAnswer1: Choice = {
-        text: '',
-        isCorrect: false,
-    };
-    emptyAnswer2: Choice = {
-        text: '',
-        isCorrect: true,
-    };
-    emptyQuestion: Question = {
-        type: 'QCM',
-        text: '',
-        choices: [this.emptyAnswer1, this.emptyAnswer2],
-        lastModification: new Date(),
-        points: 10,
-        _id: '',
-    };
-    emptyDialogData: UpsertQuestionDialogData = {
-        title: 'Créer une Question',
-        question: this.emptyQuestion,
-    };
 
     // eslint-disable-next-line max-params
     constructor(
@@ -130,7 +108,27 @@ export class QCMCreationPageComponent implements OnInit {
 
     addQuestion() {
         const dialogRef = this.dialog.open(UpsertQuestionDialogComponent, {
-            data: this.emptyDialogData,
+            data: {
+                title: 'Créer une Question',
+                question: {
+                    type: 'QCM',
+                    text: '',
+                    choices: [
+                        {
+                            text: '',
+                            isCorrect: true,
+                        },
+                        {
+                            text: '',
+                            isCorrect: false,
+                        }
+                    ],
+                    lastModification: new Date(),
+                    points: 10,
+                    _id: '', 
+                },
+
+            },
         });
         dialogRef.afterClosed().subscribe({
             next: (data: Question) => {
@@ -141,10 +139,22 @@ export class QCMCreationPageComponent implements OnInit {
         });
     }
 
+    generateRandomString(length: number = ID_LENGTH): string {
+        const lettersAndDigits: string = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let randomString: string = '';
+      
+        for (let i = 0; i < length; i++) {
+          const randomIndex: number = Math.floor(Math.random() * lettersAndDigits.length);
+          randomString += lettersAndDigits.charAt(randomIndex);
+        }
+      
+        return randomString;
+      }
+
     submitQuiz() {
         if (this.questionsContainer.length !== 0) {
             const quiz: Quiz = {
-                id: 'dwdwdqwdwqd',
+                id: this.generateRandomString(),
                 title: this.formGroup.value.title,
                 description: this.formGroup.value.description,
                 duration: 10,
@@ -157,22 +167,22 @@ export class QCMCreationPageComponent implements OnInit {
                 this.quizHttpServices.updateQuiz(quiz).subscribe({
                     next: (x: Quiz) => {
                         this.quiz = x;
-                        window.alert('Le quiz est enregistré avec succès');
+                        window.alert('Le quiz a été enregistré avec succès');
                     },
                     error: (e) => {
-                        window.alert('Le quiz na pas pu être modifié');
-                        window.console.log('lerreur est : ', e);
+                        window.alert("Le quiz n'a pas pu être modifié");
+                        window.console.log("l'erreur est : ", e);
                     },
                 });
             } else {
                 this.quizHttpServices.createQuiz(quiz).subscribe({
                     next: (x: Quiz) => {
                         this.quiz = x;
-                        window.alert('Le quiz est enregistré avec succès');
+                        window.alert('Le quiz a été enregistré avec succès');
                     },
                     error: (e) => {
-                        window.alert('Le quiz na pas pu être créer');
-                        window.console.log('lerreur est : ', e);
+                        window.alert("Le quiz n'a pas pu être créer");
+                        window.console.log("l'erreur est : ", e);
                     },
                 });
             }

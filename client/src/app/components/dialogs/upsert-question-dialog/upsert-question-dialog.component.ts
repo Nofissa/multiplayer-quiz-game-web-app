@@ -91,24 +91,16 @@ export class UpsertQuestionDialogComponent {
     private oneTrueValidator(): ValidatorFn {
         return (control: AbstractControl): ValidationErrors | null => {
             const answerArray: Choice[] = control.value;
-            for (const answer of answerArray) {
-                if (answer.isCorrect) {
-                    return null;
-                }
-            }
-            return { noTrueAnswer: true };
+            const hasTrueAnswer = answerArray.some(answer => answer.isCorrect);
+            return hasTrueAnswer ? { noTrueAnswer: true } : null;
         };
     }
 
     private oneFalseValidator(): ValidatorFn {
         return (control: AbstractControl): ValidationErrors | null => {
             const answerArray: Choice[] = control.value;
-            for (const answer of answerArray) {
-                if (!answer.isCorrect) {
-                    return null;
-                }
-            }
-            return { noFalseAnswer: true };
+            const hasFalseAnswer = answerArray.some(answer => !answer.isCorrect);
+            return hasFalseAnswer ? { noFalseAnswer: true } : null;
         };
     }
 
