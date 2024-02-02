@@ -48,7 +48,12 @@
                 <div class="centered-text">{{score}} points</div>
             </div>
     </div>
-    <div *ngIf="!displayQuestion" [@scale] class="end-game-container">LE QUIZ EST TERMINÉ. VOUS AVEZ OBTENU {{score}} POINTS</div>
+    <div *ngIf="!displayQuestion">
+        <div [@scale] class="end-game-container">LE QUIZ EST TERMINÉ. VOUS AVEZ OBTENU {{score}} POINTS</div>
+        <div class="centered-text" style="margin-top: 8%;">
+            <button class="button" (click)="openConfirmationDialog()" >Quitter</button> <!--redirige vers home si pas en mode test, sinon creation-->
+        </div>
+    </div>
     <!-- <section id="server-message" class="justified">
         <div class="justified">
         </div>
