@@ -82,6 +82,8 @@ export class QuizService {
     async addQuiz(dto: QuizDto): Promise<Quiz> {
         dto.lastModification = new Date();
         dto.isHidden = true;
+        // eslint-disable-next-line no-underscore-dangle
+        delete dto._id;
 
         try {
             return await this.model.create(dto);

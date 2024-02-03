@@ -75,7 +75,7 @@
 .server-message {
     justify-content: center;
     width: 20%;
-    min-width: min-content;
+    min-height: min-content;
 }
 
 ::ng-deep .login-failure-snackbar * {

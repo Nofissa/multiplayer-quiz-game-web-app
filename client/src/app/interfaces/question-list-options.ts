@@ -3,5 +3,7 @@ export interface QuestionListOptions {
     edit?: boolean;
     delete?: boolean;
     share?: boolean;
+    drag?: boolean;
+    numberOrder?: boolean;
     displayLastModified?: boolean;
 }
