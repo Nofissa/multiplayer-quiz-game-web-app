@@ -76,6 +76,7 @@ import { QCMCreationPageComponent } from './pages/qcmcreation-page/qcmcreation-p
         CdkDrag,
         CdkDropList,
         MatSliderModule,
+        MatSnackBarModule,
     ],
 
     providers: [],

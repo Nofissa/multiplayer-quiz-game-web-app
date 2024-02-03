@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute } from '@angular/router';
 import { UpsertQuestionDialogComponent } from '@app/components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
 import { Question } from '@app/interfaces/question';
@@ -31,6 +32,7 @@ export class QCMCreationPageComponent implements OnInit {
         private questionSharingService: QuestionSharingService,
         private quizHttpServices: QuizHttpService,
         private route: ActivatedRoute,
+        private snackBar: MatSnackBar,
     ) {}
 
     get questions(): FormArray {
@@ -167,27 +169,27 @@ export class QCMCreationPageComponent implements OnInit {
                 this.quizHttpServices.updateQuiz(quiz).subscribe({
                     next: (x: Quiz) => {
                         this.quiz = x;
-                        window.alert('Le quiz a été enregistré avec succès');
+                        this.snackBar.open('Le quiz a été enregistré avec succès', '', {duration : 2000});
                     },
                     error: (e) => {
-                        window.alert("Le quiz n'a pas pu être modifié");
-                        window.console.log("l'erreur est : ", e);
+                        this.snackBar.open("Le quiz n'a pas pu être modifié", '', {duration : 2000});
+                        window.console.log("L'erreur est : ", e);
                     },
                 });
             } else {
                 this.quizHttpServices.createQuiz(quiz).subscribe({
                     next: (x: Quiz) => {
                         this.quiz = x;
-                        window.alert('Le quiz a été enregistré avec succès');
+                        this.snackBar.open('Le quiz a été enregistré avec succès', '', {duration : 2000});
                     },
                     error: (e) => {
-                        window.alert("Le quiz n'a pas pu être créer");
-                        window.console.log("l'erreur est : ", e);
+                        this.snackBar.open("Le quiz n'a pas pu être créer", '', {duration : 2000});
+                        window.console.log("L'erreur est : ", e);
                     },
                 });
             }
         } else {
-            window.alert('Un paramètre du Quiz est erroné, veuillez y remédier');
+            this.snackBar.open("L'un des paramètres est erroné, veuillez réessayer", '', {duration : 3000});
         }
     }
 }

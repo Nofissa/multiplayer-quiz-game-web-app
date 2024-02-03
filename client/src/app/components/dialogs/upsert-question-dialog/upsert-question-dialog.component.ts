@@ -2,6 +2,7 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Component, Inject } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Choice } from '@app/interfaces/choice';
 import { Question } from '@app/interfaces/question';
 import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog-data';
@@ -21,6 +22,7 @@ export class UpsertQuestionDialogComponent {
 
     constructor(
         private formBuilder: FormBuilder,
+        private snackBar: MatSnackBar,
         public dialogRef: MatDialogRef<UpsertQuestionDialogComponent>,
         @Inject(MAT_DIALOG_DATA) public data: UpsertQuestionDialogData,
     ) {
@@ -72,6 +74,7 @@ export class UpsertQuestionDialogComponent {
     }
 
     submit() {
+        console.log(this.formGroup.valid);
         if (this.formGroup.valid) {
             const question: Question = {
                 type: 'QCM',
@@ -84,30 +87,29 @@ export class UpsertQuestionDialogComponent {
 
             this.dialogRef.close(question);
         } else {
-            window.alert("l'un des paramètres est erroné, veuillez réessayer");
+            this.snackBar.open("L'un des paramètres est erroné, veuillez réessayer", '', {duration : 2000});
         }
     }
 
     private oneTrueValidator(): ValidatorFn {
         return (control: AbstractControl): ValidationErrors | null => {
             const answerArray: Choice[] = control.value;
-            const hasTrueAnswer = answerArray.some(answer => answer.isCorrect);
-            return hasTrueAnswer ? { noTrueAnswer: true } : null;
+            const hasTrueAnswer = answerArray.some((answer) => answer.isCorrect);
+            return hasTrueAnswer ? null : { noTrueAnswer: true };
         };
     }
 
     private oneFalseValidator(): ValidatorFn {
         return (control: AbstractControl): ValidationErrors | null => {
             const answerArray: Choice[] = control.value;
-            const hasFalseAnswer = answerArray.some(answer => !answer.isCorrect);
-            return hasFalseAnswer ? { noFalseAnswer: true } : null;
+            const hasFalseAnswer = answerArray.some((answer) => !answer.isCorrect);
+            return hasFalseAnswer ?  null : { noFalseAnswer: true };
         };
     }
 
     private multipleOfTenValidator(): ValidatorFn {
         return (control: AbstractControl): ValidationErrors | null => {
             const value = control.value;
-
             return value % POINT_VALUE_BASE_MULTIPLE === 0 ? null : { notMultipleOfTen: true };
         };
     }
