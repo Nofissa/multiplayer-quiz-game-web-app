@@ -1,7 +1,6 @@
-import { QuestionDto } from '@app/model/dto/question/question.dto';
-import { IsArray, IsBoolean, IsDate, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
-import { Type } from 'class-transformer';
 import { QuizQuestionDto } from '@app/model/dto/quiz/quiz-question.dto';
+import { Type } from 'class-transformer';
+import { IsArray, IsBoolean, IsDate, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 export class QuizDto {
     @IsString()
