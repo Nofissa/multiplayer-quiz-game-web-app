@@ -23,14 +23,24 @@ export class MainPageComponent {
         private readonly router: Router,
     ) {}
 
-    promptAdminLogin() {
+    validateAdmin() {
         const token = this.sessionService.getSession();
 
         if (token) {
-            this.router.navigate(['/admin']);
-            return;
+            this.authService.verify({ token: token ? token : '' }).subscribe({
+                next: () => {
+                    this.router.navigate(['/admin']);
+                },
+                error: () => {
+                    this.promptAdminLogin();
+                },
+            });
+        } else {
+            this.promptAdminLogin();
         }
+    }
 
+    private promptAdminLogin() {
         const dialogRef = this.dialogService.open(LoginDialogComponent, {
             width: '50%',
             data: { password: '' },

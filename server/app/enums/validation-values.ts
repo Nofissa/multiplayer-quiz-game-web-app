@@ -1,9 +1,9 @@
 export enum ValidationValues {
-    MinPointValue = 10,
-    MaxPointValue = 100,
-    MinTimeInSeconds = 10,
-    MaxTimeInSeconds = 60,
-    MinSizeAnswerArray = 2,
-    MaxSizeAnswerArray = 4,
-    MultipleOfPointValue = 10,
+    MinPoints = 10,
+    MaxPoints = 100,
+    MultipleOfPoints = 10,
+    MinDuration = 10,
+    MaxDuration = 60,
+    MinAnswersSize = 2,
+    MaxAnswersSize = 4,
 }

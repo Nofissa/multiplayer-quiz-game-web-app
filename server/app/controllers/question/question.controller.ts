@@ -1,7 +1,7 @@
 import { Question } from '@app/model/database/question';
 import { QuestionDto } from '@app/model/dto/question/question.dto';
 import { QuestionService } from '@app/services/question/question.service';
-import { Body, Controller, Get, HttpStatus, Put, Post, Res, Delete, Param } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Param, Post, Put, Res } from '@nestjs/common';
 import { ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 

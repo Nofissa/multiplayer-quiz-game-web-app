@@ -4,6 +4,7 @@ import { Question } from '@app/interfaces/question';
 import { QuestionListOptions } from '@app/interfaces/question-list-options';
 import { QuestionInteractionService } from '@app/services/question-interaction.service';
 import { QuestionSharingService } from '@app/services/question-sharing.service';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 @Component({
     selector: 'app-question-list',
@@ -21,6 +22,11 @@ export class QuestionListComponent {
     sharedQuestions: Question[] = [];
 
     constructor(private readonly questionSharingService: QuestionSharingService) {}
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    drop(event: CdkDragDrop<any[]>): void {
+        moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+    }
 
     invokeOnAddQuestion() {
         this.interactionService.invokeOnAddQuestion();

@@ -86,6 +86,8 @@ export class QuizService {
     async addQuiz(dto: QuizDto): Promise<Quiz> {
         dto.lastModification = new Date();
         dto.isHidden = true;
+        // eslint-disable-next-line no-underscore-dangle
+        delete dto._id;
 
         try {
             return await this.model.create(dto);
@@ -121,9 +123,9 @@ export class QuizService {
         }
     }
 
-    async deleteQuizById(id: string): Promise<Quiz> {
+    async deleteQuizById(id: string): Promise<void> {
         try {
-            return await this.model.findByIdAndDelete(id, { new: true });
+            await this.model.findByIdAndDelete(id);
         } catch (error) {
             return Promise.reject(`Failed to delete quiz: ${error}`);
         }
@@ -137,9 +139,9 @@ export class QuizService {
         }
     }
 
-    async deleteQuestionInQuizbyId(id: string, questionId: string): Promise<Question> {
+    async deleteQuestionInQuizbyId(id: string, questionId: string): Promise<void> {
         try {
-            return await this.model.findOneAndUpdate({ _id: id }, { $pull: { questions: { _id: questionId } } }, { new: true });
+            await this.model.findOneAndUpdate({ _id: id }, { $pull: { questions: { _id: questionId } } });
         } catch (error) {
             return Promise.reject(`Failed to delete question: ${error}`);
         }
