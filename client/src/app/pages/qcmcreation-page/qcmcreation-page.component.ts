@@ -123,13 +123,12 @@ export class QCMCreationPageComponent implements OnInit {
                         {
                             text: '',
                             isCorrect: false,
-                        }
+                        },
                     ],
                     lastModification: new Date(),
                     points: 10,
-                    _id: '', 
+                    _id: '',
                 },
-
             },
         });
         dialogRef.afterClosed().subscribe({
@@ -142,16 +141,16 @@ export class QCMCreationPageComponent implements OnInit {
     }
 
     generateRandomString(length: number = ID_LENGTH): string {
-        const lettersAndDigits: string = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        let randomString: string = '';
-      
+        const lettersAndDigits = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let randomString = '';
+
         for (let i = 0; i < length; i++) {
-          const randomIndex: number = Math.floor(Math.random() * lettersAndDigits.length);
-          randomString += lettersAndDigits.charAt(randomIndex);
+            const randomIndex: number = Math.floor(Math.random() * lettersAndDigits.length);
+            randomString += lettersAndDigits.charAt(randomIndex);
         }
-      
+
         return randomString;
-      }
+    }
 
     submitQuiz() {
         if (this.questionsContainer.length !== 0) {
@@ -169,10 +168,10 @@ export class QCMCreationPageComponent implements OnInit {
                 this.quizHttpServices.updateQuiz(quiz).subscribe({
                     next: (x: Quiz) => {
                         this.quiz = x;
-                        this.snackBar.open('Le quiz a été enregistré avec succès', '', {duration : 2000});
+                        this.snackBar.open('Le quiz a été enregistré avec succès', '', { duration: 2000 });
                     },
                     error: (e) => {
-                        this.snackBar.open("Le quiz n'a pas pu être modifié", '', {duration : 2000});
+                        this.snackBar.open("Le quiz n'a pas pu être modifié", '', { duration: 2000 });
                         window.console.log("L'erreur est : ", e);
                     },
                 });
@@ -180,16 +179,16 @@ export class QCMCreationPageComponent implements OnInit {
                 this.quizHttpServices.createQuiz(quiz).subscribe({
                     next: (x: Quiz) => {
                         this.quiz = x;
-                        this.snackBar.open('Le quiz a été enregistré avec succès', '', {duration : 2000});
+                        this.snackBar.open('Le quiz a été enregistré avec succès', '', { duration: 2000 });
                     },
                     error: (e) => {
-                        this.snackBar.open("Le quiz n'a pas pu être créer", '', {duration : 2000});
+                        this.snackBar.open("Le quiz n'a pas pu être créer", '', { duration: 2000 });
                         window.console.log("L'erreur est : ", e);
                     },
                 });
             }
         } else {
-            this.snackBar.open("L'un des paramètres est erroné, veuillez réessayer", '', {duration : 3000});
+            this.snackBar.open("L'un des paramètres est erroné, veuillez réessayer", '', { duration: 3000 });
         }
     }
 }

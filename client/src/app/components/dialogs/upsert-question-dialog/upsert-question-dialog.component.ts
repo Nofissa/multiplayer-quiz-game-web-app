@@ -20,6 +20,7 @@ export class UpsertQuestionDialogComponent {
     formGroup: FormGroup;
     choicesArray: FormArray;
 
+    // eslint-disable-next-line max-params
     constructor(
         private formBuilder: FormBuilder,
         private snackBar: MatSnackBar,
@@ -74,7 +75,6 @@ export class UpsertQuestionDialogComponent {
     }
 
     submit() {
-        console.log(this.formGroup.valid);
         if (this.formGroup.valid) {
             const question: Question = {
                 type: 'QCM',
@@ -87,7 +87,7 @@ export class UpsertQuestionDialogComponent {
 
             this.dialogRef.close(question);
         } else {
-            this.snackBar.open("L'un des paramètres est erroné, veuillez réessayer", '', {duration : 2000});
+            this.snackBar.open("L'un des paramètres est erroné, veuillez réessayer", '', { duration: 2000 });
         }
     }
 
@@ -103,7 +103,7 @@ export class UpsertQuestionDialogComponent {
         return (control: AbstractControl): ValidationErrors | null => {
             const answerArray: Choice[] = control.value;
             const hasFalseAnswer = answerArray.some((answer) => !answer.isCorrect);
-            return hasFalseAnswer ?  null : { noFalseAnswer: true };
+            return hasFalseAnswer ? null : { noFalseAnswer: true };
         };
     }
 
