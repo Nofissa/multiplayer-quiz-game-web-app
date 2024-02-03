@@ -119,9 +119,9 @@ export class QuizService {
         }
     }
 
-    async deleteQuizById(id: string): Promise<Quiz> {
+    async deleteQuizById(id: string): Promise<void> {
         try {
-            return await this.model.findByIdAndDelete(id, { new: true });
+            await this.model.findByIdAndDelete(id);
         } catch (error) {
             return Promise.reject(`Failed to delete quiz: ${error}`);
         }
@@ -135,9 +135,9 @@ export class QuizService {
         }
     }
 
-    async deleteQuestionInQuizbyId(id: string, questionId: string): Promise<Question> {
+    async deleteQuestionInQuizbyId(id: string, questionId: string): Promise<void> {
         try {
-            return await this.model.findOneAndUpdate({ _id: id }, { $pull: { questions: { _id: questionId } } }, { new: true });
+            await this.model.findOneAndUpdate({ _id: id }, { $pull: { questions: { _id: questionId } } });
         } catch (error) {
             return Promise.reject(`Failed to delete question: ${error}`);
         }

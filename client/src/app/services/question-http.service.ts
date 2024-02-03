@@ -34,11 +34,8 @@ export class QuestionHttpService {
         );
     }
 
-    deleteQuestionById(id: string): Observable<Question> {
-        return this.http.delete<Question>(`${this.baseUrl}/${id}`).pipe(
-            map((deletedQuestion) => this.convertLastModifiedToDate(deletedQuestion)),
-            catchError(this.handleError<Question>()),
-        );
+    deleteQuestionById(id: string): Observable<void> {
+        return this.http.delete<void>(`${this.baseUrl}/${id}`).pipe(catchError(this.handleError<void>()));
     }
 
     private convertLastModifiedToDate(question: Question): Question {

@@ -1,12 +1,14 @@
 import { ValidationValues } from '@app/enums/validation-values';
 import { ChoiceDto } from '@app/model/dto/choice/choice.dto';
 import { IsMultipleOf } from '@app/validators/is-multiple-of.validator';
+import { IsQuestionType } from '@app/validators/is-question-type.validator';
 import { QuestionType } from '@common/question-type';
-import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import { ArrayMaxSize, ArrayMinSize, IsArray, IsDate, IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min, ValidateNested } from 'class-validator';
 
 export class QuizQuestionDto {
     @IsString()
+    @IsQuestionType()
     @IsNotEmpty()
     type: QuestionType;
 
@@ -14,22 +16,20 @@ export class QuizQuestionDto {
     @IsNotEmpty()
     text: string;
 
-    @ApiProperty()
     @IsNumber()
-    @Min(ValidationValues.MinPointValue, { message: `points must be greater or equal to ${ValidationValues.MinPointValue}` })
-    @Max(ValidationValues.MaxPointValue, { message: `points must be lesser or equal to ${ValidationValues.MaxPointValue}` })
-    @IsMultipleOf(ValidationValues.MultipleOfPointValue)
+    @Min(ValidationValues.MinPoints, { message: `points must be greater or equal to ${ValidationValues.MinPoints}` })
+    @Max(ValidationValues.MaxPoints, { message: `points must be lesser or equal to ${ValidationValues.MaxPoints}` })
+    @IsMultipleOf(ValidationValues.MultipleOfPoints)
     points: number;
 
-    @ApiProperty()
     @IsArray()
-    @ArrayMinSize(ValidationValues.MinSizeAnswerArray, { message: `choices size must be greater or equal to ${ValidationValues.MinSizeAnswerArray}` })
-    @ArrayMaxSize(ValidationValues.MaxSizeAnswerArray, { message: `choices size must be lesser or equal to ${ValidationValues.MaxSizeAnswerArray}` })
+    @ArrayMinSize(ValidationValues.MinAnswersSize, { message: `choices size must be greater or equal to ${ValidationValues.MinAnswersSize}` })
+    @ArrayMaxSize(ValidationValues.MaxAnswersSize, { message: `choices size must be lesser or equal to ${ValidationValues.MaxAnswersSize}` })
     @ValidateNested({ each: true })
     choices: ChoiceDto[];
 
-    @ApiProperty()
     @IsOptional()
     @IsDate()
+    @Type(() => Date)
     lastModification?: Date;
 }
