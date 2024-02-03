@@ -145,8 +145,8 @@ export class QuestionBankComponent implements OnInit {
     }
 
     private deleteQuestion(question: Question) {
-        this.questionHttpService.deleteQuestionById(question._id).subscribe((response: Question) => {
-            const deletedIndex = this.questions.findIndex((x) => x._id === response._id);
+        this.questionHttpService.deleteQuestionById(question._id).subscribe(() => {
+            const deletedIndex = this.questions.findIndex((x) => x._id === question._id);
 
             if (deletedIndex !== NOT_FOUND_INDEX) {
                 this.questions.splice(deletedIndex, 1);
