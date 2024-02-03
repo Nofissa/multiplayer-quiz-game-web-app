@@ -85,9 +85,9 @@ export class QuestionService {
         }
     }
 
-    async deleteQuestionById(id: string): Promise<Question> {
+    async deleteQuestionById(id: string): Promise<void> {
         try {
-            return await this.model.findByIdAndDelete(id, { new: true });
+            await this.model.findByIdAndDelete(id);
         } catch (error) {
             return Promise.reject(`Failed to delete question: ${error}`);
         }
