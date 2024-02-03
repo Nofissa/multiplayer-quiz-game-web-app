@@ -1,8 +1,10 @@
-import { QuizQuestionDto } from '@app/model/dto/quiz/quiz-question.dto';
+import { QuestionDto } from '@app/model/dto/question/question.dto';
+import { IsArray, IsBoolean, IsDate, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
-import { IsBoolean, IsDate, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { QuizQuestionDto } from '@app/model/dto/quiz/quiz-question.dto';
 
 export class QuizDto {
+    @IsString()
     @IsOptional()
     _id?: string;
 
@@ -26,6 +28,7 @@ export class QuizDto {
     @Type(() => Date)
     lastModification?: Date;
 
+    @IsArray()
     @ValidateNested({ each: true })
     questions: QuizQuestionDto[];
 
