@@ -1,0 +1,44 @@
+<h2 mat-dialog-title>{{ data.title }}</h2>
+<form [formGroup]="formGroup">
+    <mat-dialog-content>
+        <div class="form-wrapper">
+            <mat-form-field appearance="outline">
+                <mat-label>Question</mat-label>
+                <textarea matInput formControlName="text" value="{{ data.question.text }}" placeholder="Votre question ici">
+                </textarea>
+            </mat-form-field>
+
+            <div cdkDropListGroup>
+                <div cdkDropList [cdkDropListData]="choices.controls" (cdkDropListDropped)="drop($event)">
+                    <div *ngFor="let answerGroup of choices.controls; let i = index" cdkDrag class="answers-wrapper">
+                        <mat-form-field appearance="outline" class="answer">
+                            <mat-label>Bonne Réponse {{ i + 1 }}</mat-label>
+                            <div class="flex-row" [formGroup]="answerGroup">
+                                <input matInput type="text" formControlName="text" placeholder="Votre réponse ici">
+                                <input type="checkbox" formControlName="isCorrect">
+                            </div>
+                        </mat-form-field>
+                        <div class="row-actions-wrapper">
+                            <mat-icon *ngIf="choicesControls.length > 2" aria-hidden="false" class="action action-remove"
+                                aria-label="Retirer" fontIcon="remove" (click)="removeAnswerAt(i)"></mat-icon>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                <mat-icon aria-hidden="false"
+                class="action"
+                aria-label="Ajouter" fontIcon="add" (click)="addAnswer()"></mat-icon>
+            <mat-form-field appearance="outline">
+                <mat-label>Nombre de points</mat-label>
+                <input matInput type="number" min="10" max="100" step="10" formControlName="points"
+                    value="{{ data.question.points }}">
+            </mat-form-field>
+        </div>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+        <div class="actions-wrapper">
+            <button mat-raised-button (click)="cancel()">Annuler</button>
+            <button mat-raised-button (click)="submit()">Confirmer</button>
+        </div>
+    </mat-dialog-actions>
+</form>

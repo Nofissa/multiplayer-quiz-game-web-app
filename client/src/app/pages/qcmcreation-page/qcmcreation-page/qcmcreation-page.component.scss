@@ -1,0 +1,49 @@
+#editable-textfields-containers {
+    justify-content: space-evenly;
+}
+
+.flex-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.flex-row {
+    display: flex;
+    flex-direction: row;
+}
+
+::ng-deep .add-icon {
+    align-self: center;
+    color: black;
+    margin: 20px;
+}
+
+#questions-container {
+    width : 100%;
+}
+
+#description {
+    overflow-y: scroll;
+    resize: none;
+}
+
+
+#quiz-creation-page {
+    justify-content: space-evenly;
+    display: flex;
+    flex-direction: row;
+}
+
+form {
+    width: 50%;
+    align-items: center;
+}
+
+#text-editables {
+    width: 100%;
+    justify-content : space-evenly;
+}
+
+.hidden {
+    visibility: hidden;
+}

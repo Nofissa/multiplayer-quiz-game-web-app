@@ -1,0 +1,24 @@
+.container {
+    height: auto;
+    max-height: 66vh;
+    width: 50vw;
+    max-width: 500px;
+    background-color: white;
+    border-radius: 15px;
+    border: 2px black solid;
+    overflow: hidden;
+}
+
+.text-centered {
+    display: block;
+    text-align: center;
+}
+
+.title-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 5vh;
+    max-height: 50px;
+    color: var(--secondary-fg-color);
+}

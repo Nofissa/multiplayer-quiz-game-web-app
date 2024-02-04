@@ -1,0 +1,73 @@
+.form-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+mat-dialog-actions {
+    justify-content: center;
+    width: 100%;
+    padding: 0px 24px 20px 24px;
+}
+
+.actions-wrapper {
+    display: flex;
+    justify-content: space-around;
+    width: 33%;
+}
+
+.mat-mdc-dialog-title {
+    text-align: center;
+}
+
+mat-dialog-content mat-form-field {
+    margin: 2% 0px;
+}
+
+mat-form-field {
+    flex: 0 0 88%;
+}
+
+::ng-deep {
+    .answers-wrapper mat-form-field {
+    }
+
+    .mat-mdc-form-field-subscript-wrapper {
+        height: 0px !important;
+    }
+}
+
+.hidden {
+    visibility: hidden;
+}
+
+.answers-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.row-actions-wrapper {
+    flex: 1;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.action {
+    height: fit-content;
+    width: fit-content;
+    color: black;
+    font-size: 2rem;
+    transition: color 0.3s;
+}
+
+.action:hover {
+    cursor: pointer;
+}
+
+.action-add:hover {
+    color: var(--answer-color-green);
+}
+
+.action-remove:hover {
+    color: var(--answer-color-red);
+}
