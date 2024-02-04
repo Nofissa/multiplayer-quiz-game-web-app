@@ -26,7 +26,7 @@ export class GamePageComponent {
     thirdBoxHotkey: string = '3';
     fourthBoxHotkey: string = '4';
     questions: Question[];
-    displayQuestion: boolean = false;
+    displayQuestion: boolean = true;
     currentQuestionIndex: number = 0;
     timerStarted: boolean = false;
     score: number = 0;
