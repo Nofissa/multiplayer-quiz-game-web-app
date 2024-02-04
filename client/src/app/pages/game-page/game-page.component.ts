@@ -16,7 +16,6 @@ import { oneSecond } from './game-page.constants';
     animations: [trigger('scale', [transition(':enter', [style({ transform: 'scale(0)' }), animate('1s', style({ transform: 'scale(1)' }))])])],
 })
 export class GamePageComponent {
-    // message: BehaviorSubject<string> = new BehaviorSubject<string>('');
     secondsLeft: number;
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     timerDuration: number;
