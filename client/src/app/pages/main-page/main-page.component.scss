@@ -1,23 +1,7 @@
-:root {
-    --back-color : #121212;
-    --objet-color : aliceblue;
-}
-
 .logo {
-    width: 500px;
-    height: 500px;
-}
+    width: 30rem;
+    height: 30rem;
 
-.container {
-    min-height: 100vh;
-    height: auto;
-}
-
-.justified {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
 }
 
 .admin-container {
@@ -28,14 +12,6 @@
 .button {
     width: 550px;
     height: 120px;
-    padding: 8px 22px;
-    border-radius: 6px;
-    background-color: aliceblue;
-    transition: all 0.2s ease;
-    margin-top: 10px;
-    text-align: center;
-    font-size: 24px;
-    font-weight: bold;
 }
 
 
@@ -58,6 +34,7 @@
 
 
 .footer-item {
+
     display: flex;
     flex-direction: row;
     width: 100%;
@@ -73,6 +50,7 @@
 }
 
 .server-message {
+
     justify-content: center;
     width: 20%;
     min-height: min-content;
