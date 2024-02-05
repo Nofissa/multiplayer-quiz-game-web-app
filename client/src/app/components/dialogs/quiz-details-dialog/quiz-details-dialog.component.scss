@@ -1,0 +1,147 @@
+$primary-color: #4bb4de;
+$hover-color: darken($primary-color, 10%);
+$background-color: rgba($primary-color, 0.9);
+$text-color: black;
+$icon-size: 30px;
+$dialog-size: 600px;
+$font-title: 'Arial', sans-serif;
+$font-body: 'Verdana', sans-serif;
+
+.body {
+    color: $primary-color;
+}
+.quiz-details-dialog {
+    background-color: $background-color;
+    color: $text-color;
+    border-radius: 15px;
+    padding: 40px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+    width: 495px;
+    height: 495px;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    overflow-wrap: break-word;
+
+    .close-button {
+        position: absolute;
+        top: 5px;
+        right: 15px;
+        border: none;
+        background: none;
+        cursor: pointer;
+        padding: 10px;
+
+        transition: all 0.2s ease;
+        text-align: center;
+        border-radius: 20px;
+    }
+
+    .title {
+        text-align: center;
+        font-family: $font-title;
+        font-size: 32px;
+        margin-bottom: 5px;
+        margin-top: -5px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: bold;
+    }
+
+    .estimated-time {
+        text-align: center;
+        font-family: $font-body;
+        font-size: 20px;
+        margin-bottom: 15px;
+    }
+
+    .description {
+        text-align: center;
+        font-size: 15px;
+    }
+
+    .questions-box {
+        width: 100%;
+        min-height: 30%;
+        color: black;
+        background-color: aliceblue;
+        border: 2px solid darken($background-color, 15%);
+        border-radius: 10px;
+        padding: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        max-height: 150px;
+        overflow-y: auto;
+        font-family: 'Arial', sans-serif;
+
+        .question-text-container {
+            border-bottom: 1px solid black;
+            padding-bottom: 10px;
+            margin-left: 10px;
+        }
+
+        .questions-title {
+            text-align: center;
+            font-size: 0, 5em;
+            margin-bottom: 10px;
+            margin-top: -5px;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+
+            .question-item {
+                display: flex;
+                align-items: flex-start;
+            }
+
+            li {
+                margin-bottom: 15px;
+                font-size: 1.1em;
+                &:hover {
+                    background-color: rgb(199, 199, 199);
+                }
+
+                .question-number {
+                    flex-shrink: 0;
+                    margin-right: 10px;
+                }
+
+                .question-text {
+                    flex-grow: 1;
+                }
+            }
+        }
+    }
+
+    .time-icon {
+        display: inline-block;
+        width: $icon-size;
+        height: $icon-size;
+        background: url('https://static.vecteezy.com/system/resources/previews/012/067/332/original/hand-holding-a-stopwatch-timer-png.png') no-repeat
+            center center;
+        background-size: contain;
+        vertical-align: middle;
+        margin-left: 10px;
+    }
+
+    button {
+        cursor: pointer;
+        padding: 15px 30px;
+        border-radius: 20px;
+        background-color: aliceblue;
+        transition: all 0.2s ease;
+        margin-top: 10px;
+        text-align: center;
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 3px;
+
+        &:hover {
+            background-color: $hover-color;
+        }
+    }
+}
