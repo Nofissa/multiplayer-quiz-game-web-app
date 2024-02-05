@@ -1,0 +1,31 @@
+import { Component, Inject } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { Router } from '@angular/router';
+import { Quiz } from '@app/interfaces/quiz';
+
+@Component({
+    selector: 'app-quiz-details-dialog',
+    templateUrl: './quiz-details-dialog.component.html',
+    styleUrls: ['./quiz-details-dialog.component.scss'],
+})
+export class QuizDetailsDialogComponent {
+    constructor(
+        @Inject(MAT_DIALOG_DATA) public data: Quiz,
+        private dialogRef: MatDialogRef<QuizDetailsDialogComponent>,
+        private router: Router,
+    ) {}
+
+    startGame() {
+        this.dialogRef.close();
+        this.router.navigate(['/game']);
+    }
+
+    testGame() {
+        this.dialogRef.close();
+        this.router.navigate(['/game']);
+    }
+
+    closeDialog() {
+        this.dialogRef.close();
+    }
+}
