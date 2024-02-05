@@ -27,7 +27,7 @@
                 <div class="centered-text">{{questions[currentQuestionIndex].points}}</div>
             </div>
             <div>
-                <button class="button" (click)="validateChoices()">Valider les choix  <i class="fas fa-check-circle" style="color: green;"></i></button>
+                <button id="validateButton" class="button" (click)="validateChoices()">Valider les choix  <i class="fas fa-check-circle" style="color: green;"></i></button>
             </div>
             <div class="feedback" [class]="[feedbackMessageClass]">{{feedbackMessage}}</div>
             <div class="chat-box">
@@ -51,7 +51,7 @@
     <div *ngIf="!displayQuestion">
         <div [@scale] class="end-game-container">LE QUIZ EST TERMINÉ. VOUS AVEZ OBTENU {{score}} POINTS</div>
         <div class="centered-text" style="margin-top: 8%;">
-            <button class="button" (click)="openConfirmationDialog()" >Quitter</button> <!--redirige vers home si pas en mode test, sinon creation-->
+            <button id="quitEndGame" class="button" (click)="openConfirmationDialog()" >Quitter</button> <!--redirige vers home si pas en mode test, sinon creation-->
         </div>
     </div>
 </div>
