@@ -1,5 +1,5 @@
 import { animate, style, transition, trigger } from '@angular/animations';
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
 import { Choice } from '@app/interfaces/choice';
@@ -15,7 +15,7 @@ import { oneSecond } from './game-page.constants';
     // animation from ChatGPT
     animations: [trigger('scale', [transition(':enter', [style({ transform: 'scale(0)' }), animate('1s', style({ transform: 'scale(1)' }))])])],
 })
-export class GamePageComponent {
+export class GamePageComponent implements OnInit, OnDestroy {
     secondsLeft: number;
     // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     timerDuration: number;
@@ -79,7 +79,6 @@ export class GamePageComponent {
         }
     }
 
-    // eslint-disable-next-line @angular-eslint/use-lifecycle-interface
     ngOnInit() {
         this.loadQuizQuestions();
     }
@@ -231,7 +230,6 @@ export class GamePageComponent {
         });
     }
 
-    // eslint-disable-next-line @angular-eslint/use-lifecycle-interface
     ngOnDestroy() {
         this.stopTimer();
     }
