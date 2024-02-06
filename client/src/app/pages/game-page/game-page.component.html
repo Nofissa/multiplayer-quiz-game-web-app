@@ -1,57 +1,16 @@
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
-</head>
-<div>
-    <div *ngIf="displayQuestion">
-        <img class="logo" src='/assets/img/logo.png' alt="Logo Projet" />
-            <div class="question-box font-color">
-                {{questions[currentQuestionIndex].text}}
-            </div>
-            <div class="answer-boxes font-color">
-                <div class="answer-box1" [class.highlight-selected]="isSelected(1)" (click)="toggleAnswerBox(1)">
-                    1. {{questions[currentQuestionIndex].choices[0].text}}
-                </div>
-                <div class="answer-box2" [class.highlight-selected]="isSelected(2)" (click)="toggleAnswerBox(2)">
-                    2. {{questions[currentQuestionIndex].choices[1].text}}
-                </div>
-                <div class="boxes-below"></div>
-                <div *ngIf="questions[currentQuestionIndex].choices.length > 2" class="answer-box3" [class.highlight-selected]="isSelected(3)" (click)="toggleAnswerBox(3)">
-                    3. {{questions[currentQuestionIndex].choices[2].text}}
-                </div>
-                <div *ngIf="questions[currentQuestionIndex].choices.length === 4" class="answer-box4" [class.highlight-selected]="isSelected(4)" (click)="toggleAnswerBox(4)">
-                    4. {{questions[currentQuestionIndex].choices[3].text}}
-                </div>
-            </div>
-            <div class="value-circle font-color">
-                <div class="centered-text">{{questions[currentQuestionIndex].points}}</div>
-            </div>
-            <div>
-                <button class="button" (click)="validateChoices()">Valider les choix  <i class="fas fa-check-circle" style="color: green;"></i></button>
-            </div>
-            <div class="feedback" [class]="[feedbackMessageClass]">{{feedbackMessage}}</div>
-            <div class="chat-box">
-                <div class="messages font-color" style="color: black;">
-                    Messages envoyés
-                </div>
-                <textarea id="chat-input" class="write-message" placeholder="Envoyer un message"></textarea>
-            </div>
-            <span class="ff-circle">
-                <div class="centered-text">
-                    <button type="button" style="background-color: red;" class="button" (click)="openConfirmationDialog()" >Abandonner</button> <!--redirige vers home si pas en mode test, sinon creation-->
-                </div>
-            </span>
-            <span class="timer-circle">
-                <div class="centered-text">Il reste {{secondsLeft}} seconde(s)</div>
-            </span>
-            <div class="score-circle font-color">
-                <div class="centered-text">{{score}} points</div>
-            </div>
-    </div>
-    <div *ngIf="!displayQuestion">
-        <div [@scale] class="end-game-container">LE QUIZ EST TERMINÉ. VOUS AVEZ OBTENU {{score}} POINTS</div>
-        <div class="centered-text" style="margin-top: 8%;">
-            <button class="button" (click)="openConfirmationDialog()" >Quitter</button> <!--redirige vers home si pas en mode test, sinon creation-->
+<div class="container justified">
+    <h1 class="header-item">Vue de jeu du joueur</h1>
+    <img src="https://bit.ly/3QofL1J" alt="Logo Projet" />
+    <section id="server-message" class="justified">
+        <div class="justified">
         </div>
-    </div>
+    </section>
+
+    <footer class="footer-item">
+        <h4 class="team-name">Équipe 206</h4>
+        <p>
+            <span>Loris Ponderand</span>, <span>Imed-Eddine Bennour</span>, <span>Nofissa Khaif</span>,
+            <span>Romaine Brand</span>, <span>Dimitri Mansour</span>, <span>Jérémie Bolduc</span>
+        </p>
+    </footer>
 </div>

@@ -17,8 +17,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppComponent } from '@app/pages/app/app.component';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
+import { SwiperModule } from 'swiper/angular';
 import { ConfirmationDialogComponent } from './components/dialogs/confirmation-dialog/confirmation-dialog.component';
 import { LoginDialogComponent } from './components/dialogs/login-dialog/login-dialog.component';
+import { QuizDetailsDialogComponent } from './components/dialogs/quiz-details-dialog/quiz-details-dialog.component';
 import { UpsertQuestionDialogComponent } from './components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
 import { QuestionBankComponent } from './components/question-bank/question-bank.component';
 import { QuestionListComponent } from './components/question-list/question-list.component';
@@ -42,6 +44,7 @@ import { QCMCreationPageComponent } from './pages/qcmcreation-page/qcmcreation-p
         CreateGamePageComponent,
         GamePageComponent,
         MainPageComponent,
+        QuizDetailsDialogComponent,
         QCMCreationPageComponent,
         UpsertQuestionDialogComponent,
         QuestionListComponent,
@@ -60,6 +63,8 @@ import { QCMCreationPageComponent } from './pages/qcmcreation-page/qcmcreation-p
         BrowserModule,
         FormsModule,
         HttpClientModule,
+        SwiperModule,
+        MatDialogModule,
         MatExpansionModule,
         MatButtonModule,
         MatIconModule,

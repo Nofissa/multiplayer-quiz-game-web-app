@@ -29,24 +29,6 @@ export class QuizController {
         }
     }
 
-    @ApiOkResponse({
-        description: 'Returns quiz',
-        type: Quiz,
-        isArray: false,
-    })
-    @ApiNotFoundResponse({
-        description: 'Return NOT_FOUND http status when request fails',
-    })
-    @Get('/:id')
-    async getQuizById(@Param('id') id: string, @Res() response: Response) {
-        try {
-            const quiz = await this.quizService.getQuizById(id);
-            response.status(HttpStatus.OK).json(quiz);
-        } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send(error.message);
-        }
-    }
-
     @ApiCreatedResponse({
         description: 'Add new question',
     })
