@@ -1,8 +1,53 @@
-<div class="container justified">
-    <h1 class="header-item">Vue de jeu du joueur</h1>
-    <img src="https://bit.ly/3QofL1J" alt="Logo Projet" />
-    <section id="server-message" class="justified">
-        <div class="justified">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+</head>
+<div>
+    <div *ngIf="currentQuestionIndex >= 0">
+        <img class="logo" src='/assets/img/logo.png' alt="Logo Projet" />
+        <div class="question-box font-color">
+            {{ questions[currentQuestionIndex].text }}
+        </div>
+        <div class="answer-boxes font-color">
+            <div *ngFor="let choice of questions[currentQuestionIndex].choices; index as i"
+                [ngClass]="'answer-box' + (i + 1)" [class.highlight-selected]="isSelected(i)"
+                (click)="toggleAnswerBox(1)">
+                1. {{ choice.text }}
+            </div>
+        </div>
+        <div class="value-circle font-color">
+            <div class="centered-text">{{ questions[currentQuestionIndex].points }}</div>
+        </div>
+        <div>
+            <button class="button" (click)="validateChoices()">Valider les choix <i class="fas fa-check-circle"
+                    style="color: green;"></i></button>
+        </div>
+        <div class="feedback" [class]="[feedbackMessageClass]">{{ feedbackMessage }}</div>
+        <div class="chat-box">
+            <div class="messages font-color" style="color: black;">
+                Messages envoyés
+            </div>
+            <textarea id="chat-input" class="write-message" placeholder="Envoyer un message"></textarea>
+        </div>
+        <span class="ff-circle">
+            <div class="centered-text">
+                <button type="button" style="background-color: red;" class="button"
+                    (click)="openConfirmationDialog()">Abandonner</button>
+                <!--redirige vers home si pas en mode test, sinon creation-->
+            </div>
+        </span>
+        <span class="timer-circle">
+            <div class="centered-text">Il reste {{ secondsLeft }} seconde(s)</div>
+        </span>
+        <div class="score-circle font-color">
+            <div class="centered-text">{{ score }} points</div>
+        </div>
+    </div>
+    <div *ngIf="secondsLeft === 0">
+        <div [@scale] class="end-game-container">LE QUIZ EST TERMINÉ. VOUS AVEZ OBTENU {{ score }} POINTS</div>
+        <div class="centered-text" style="margin-top: 8%;">
+            <button class="button" (click)="openConfirmationDialog()">Quitter</button>
+            <!--redirige vers home si pas en mode test, sinon creation-->
         </div>
     </section>
 
