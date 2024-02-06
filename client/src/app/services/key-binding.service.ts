@@ -10,11 +10,7 @@ export class KeyBindingService {
         this.keyBindings[hotkey] = callback;
     }
 
-    execute(hotkey: string) {
-        const callback = this.keyBindings[hotkey];
-
-        if (callback) {
-            callback();
-        }
+    getExecutor(hotkey: string): () => void | undefined {
+        return this.keyBindings[hotkey];
     }
 }

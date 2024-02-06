@@ -17,12 +17,16 @@ export class TimerService {
         );
 
         this.subscription = countdown.subscribe((secondsLeft: number) => {
+            if (secondsLeft === 0) {
+                this.stopTimer();
+            }
+
             countdownCallback(secondsLeft);
         });
     }
 
     stopTimer() {
-        if (this.subscription?.closed) {
+        if (!this.subscription?.closed) {
             this.subscription.unsubscribe();
         }
     }
