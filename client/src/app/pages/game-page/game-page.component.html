@@ -1,61 +1,50 @@
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
 </head>
-<div>
-    <div *ngIf="currentQuestionIndex >= 0">
-        <img class="logo" src='/assets/img/logo.png' alt="Logo Projet" />
+<img class="logo" src='/assets/img/logo.png' alt="Logo Projet" />
+<div class="container">
+    <div class="game-area" *ngIf="currentQuestionIndex >= 0">
         <div class="question-box font-color">
-            {{ questions[currentQuestionIndex].text }}
+            <span class="text-centered">{{ questions[currentQuestionIndex].text }}</span>
+            <span class="text-centered"><strong>{{ questions[currentQuestionIndex].points }} points</strong></span>
         </div>
-        <div class="answer-boxes font-color">
-            <div *ngFor="let choice of questions[currentQuestionIndex].choices; index as i"
-                [ngClass]="'answer-box' + (i + 1)" [class.highlight-selected]="isSelected(i)"
-                (click)="toggleAnswerBox(1)">
-                1. {{ choice.text }}
+        <div class="answers-grid font-color">
+            <div *ngFor="let choice of questions[currentQuestionIndex].choices; index as i" [ngClass]="{
+                'highlight-selected': isSelected(choice),
+                'answer-box': true,
+                'answer-box1': (i + 1) % 4 === 1,
+                'answer-box2': (i + 1) % 4 === 2,
+                'answer-box3': (i + 1) % 4 === 3,
+                'answer-box4': (i + 1) % 4 === 0
+                }" (click)="toggleChoiceSelection(choice)">
+                {{ i + 1 }}. {{ choice.text }}
+            </div>
+            <div class="circle">
+                <span>{{ secondsLeft }}s</span>
             </div>
         </div>
-        <div class="value-circle font-color">
-            <div class="centered-text">{{ questions[currentQuestionIndex].points }}</div>
+        <div class="validate-button-wrapper">
+            <button mat-flat-button class="game-button" (click)="validateChoices()">Valider <i
+                    class="fas fa-check-circle"></i></button>
+            <button button mat-flat-button color="warn" class="game-button"
+                (click)="openConfirmationDialog()">Abandonner</button>
         </div>
-        <div>
-            <button class="button" (click)="validateChoices()">Valider les choix <i class="fas fa-check-circle"
-                    style="color: green;"></i></button>
-        </div>
-        <div class="feedback" [class]="[feedbackMessageClass]">{{ feedbackMessage }}</div>
-        <div class="chat-box">
-            <div class="messages font-color" style="color: black;">
-                Messages envoyés
-            </div>
-            <textarea id="chat-input" class="write-message" placeholder="Envoyer un message"></textarea>
-        </div>
-        <span class="ff-circle">
-            <div class="centered-text">
-                <button type="button" style="background-color: red;" class="button"
-                    (click)="openConfirmationDialog()">Abandonner</button>
-                <!--redirige vers home si pas en mode test, sinon creation-->
-            </div>
-        </span>
-        <span class="timer-circle">
-            <div class="centered-text">Il reste {{ secondsLeft }} seconde(s)</div>
-        </span>
-        <div class="score-circle font-color">
-            <div class="centered-text">{{ score }} points</div>
+        <div class="feedback" [ngClass]="[feedbackMessageClass]">{{ feedbackMessage }}</div>
+        <div *ngIf="secondsLeft === 0 && currentQuestionIndex === questions.length - 1">
+            <div [@scale] class="end-game-container">LE QUIZ EST TERMINÉ. VOUS AVEZ OBTENU {{ score }} POINTS</div>
         </div>
     </div>
-    <div *ngIf="secondsLeft === 0">
-        <div [@scale] class="end-game-container">LE QUIZ EST TERMINÉ. VOUS AVEZ OBTENU {{ score }} POINTS</div>
-        <div class="centered-text" style="margin-top: 8%;">
-            <button class="button" (click)="openConfirmationDialog()">Quitter</button>
-            <!--redirige vers home si pas en mode test, sinon creation-->
+    <div class="right-panel">
+        <div class="chat-room">
+            <div class="messages-zone font-color text-centered">
+                <h3>Salon de clavardage</h3>
+            </div>
+            <mat-form-field appearance="outline">
+                <mat-label>Message</mat-label>
+                <textarea matInput class="write-message" placeholder="Envoyer un message">
+                </textarea>
+            </mat-form-field>
         </div>
+        <div class="text-centered">Votre score: {{ score }}</div>
     </div>
-
-    <footer class="footer-item">
-        <h4 class="team-name">Équipe 206</h4>
-        <p>
-            <span>Loris Ponderand</span>, <span>Imed-Eddine Bennour</span>, <span>Nofissa Khaif</span>,
-            <span>Romaine Brand</span>, <span>Dimitri Mansour</span>, <span>Jérémie Bolduc</span>
-        </p>
-    </footer>
 </div>

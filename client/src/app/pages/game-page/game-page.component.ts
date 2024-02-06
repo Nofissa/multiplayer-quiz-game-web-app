@@ -1,8 +1,9 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
+import { Choice } from '@app/interfaces/choice';
 import { Question } from '@app/interfaces/question';
 import { Quiz } from '@app/interfaces/quiz';
 import { KeyBindingService } from '@app/services/key-binding.service';
@@ -22,15 +23,12 @@ const ONE_SECOND_IN_MS = 1000;
 export class GamePageComponent implements OnInit, OnDestroy {
     secondsLeft: number;
     timerDuration: number;
-    selectedAnswerBoxes: number[] = [];
-    validatedAnswerBoxes: number[] = [];
+    selectedChoices: Choice[] = [];
     questions: Question[];
     currentQuestionIndex: number = QUESTIONS_NOT_READY_INDEX;
-    timerStarted: boolean = false;
     score: number = 0;
     feedbackMessage: string;
     feedbackMessageClass: string = 'feedback-message';
-    quizID: string = '65bd135dacb6e994665ca0b7';
 
     constructor(
         private readonly keyBindingService: KeyBindingService,
@@ -38,6 +36,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
         private readonly quizHttpService: QuizHttpService,
         private readonly dialog: MatDialog,
         private readonly router: Router,
+        private readonly activatedRoute: ActivatedRoute,
     ) {}
 
     @HostListener('window:keydown', ['$event'])
@@ -48,36 +47,45 @@ export class GamePageComponent implements OnInit, OnDestroy {
             return;
         }
 
-        event.preventDefault();
-        this.keyBindingService.execute(event.key);
+        const executor = this.keyBindingService.getExecutor(event.key);
+
+        if (executor) {
+            event.preventDefault();
+            executor();
+        }
     }
 
     ngOnInit() {
-        ['1', '2', '3', '4'].forEach((x) => {
-            this.keyBindingService.registerKeyBinding(x, () => {
-                this.toggleAnswerBox(parseInt(x, 10));
-            });
-        });
-
-        this.keyBindingService.registerKeyBinding('Enter', () => {
-            this.validateChoices();
-        });
-
-        this.loadQuizQuestions();
-        this.startTimer();
+        this.setupKeyBindings();
+        this.loadQuiz();
     }
 
     ngOnDestroy() {
         this.timerService.stopTimer();
     }
 
-    loadQuizQuestions() {
-        this.quizHttpService.getQuizById(this.quizID).subscribe({
-            next: (quiz: Quiz) => {
-                this.questions = quiz.questions;
-                this.timerDuration = quiz.duration;
-                this.currentQuestionIndex = 0;
-            },
+    setupKeyBindings() {
+        ['1', '2', '3', '4'].forEach((x) => {
+            this.keyBindingService.registerKeyBinding(x, () => {
+                const choiceIndex = parseInt(x, 10) - 1;
+
+                this.toggleChoiceSelection(this.questions[this.currentQuestionIndex].choices[choiceIndex]);
+            });
+        });
+
+        this.keyBindingService.registerKeyBinding('Enter', () => {
+            this.validateChoices();
+        });
+    }
+
+    loadQuiz() {
+        const quizId = this.activatedRoute.snapshot.queryParams['quizId'];
+
+        this.quizHttpService.getQuizById(quizId).subscribe((quiz: Quiz) => {
+            this.questions = quiz.questions;
+            this.timerDuration = 200;
+            this.currentQuestionIndex = 0;
+            this.startTimer();
         });
     }
 
@@ -86,99 +94,56 @@ export class GamePageComponent implements OnInit, OnDestroy {
             this.secondsLeft = secondsLeft;
 
             if (this.secondsLeft === 0) {
-                this.timerService.stopTimer();
                 this.validateChoices();
 
                 setTimeout(() => {
                     this.feedbackMessage = '';
-
-                    if (this.currentQuestionIndex <= this.questions.length) {
-                        this.removeBoxValidationHighlight();
-                        this.currentQuestionIndex++;
-                        this.startTimer();
-                    }
+                    this.nextQuestion();
                 }, ONE_SECOND_IN_MS);
             }
-
-            this.timerStarted = true;
         });
     }
 
-    isSelected(answerBoxNumber: number): boolean {
-        return this.selectedAnswerBoxes.includes(answerBoxNumber);
+    isSelected(choice: Choice): boolean {
+        return this.selectedChoices.some((x): boolean => x === choice);
     }
 
-    toggleAnswerBox(answerBoxNumber: number) {
-        if (this.isSelected(answerBoxNumber)) {
-            this.selectedAnswerBoxes = this.selectedAnswerBoxes.filter((box) => box !== answerBoxNumber);
-        } else {
-            this.selectedAnswerBoxes.push(answerBoxNumber);
+    toggleChoiceSelection(choice: Choice) {
+        if (this.isSelected(choice)) {
+            this.selectedChoices = this.selectedChoices.filter((x) => x !== choice);
+            return;
         }
+
+        this.selectedChoices.push(choice);
     }
 
     validateChoices() {
-        for (const box of this.selectedAnswerBoxes) {
-            this.validatedAnswerBoxes.push(box);
-        }
-
-        if (this.validatedAnswerBoxes.length !== 0) {
-            this.timerService.stopTimer();
-        }
-
-        if (this.areAnswersCorrect()) {
-            this.addBoxValidationHighlight('right');
+        if (this.areChoicesCorrect()) {
             this.score += this.questions[this.currentQuestionIndex].points;
             this.feedbackMessage = 'Bonne réponse! :)';
             this.feedbackMessageClass = 'correct-answer';
         } else {
-            this.addBoxValidationHighlight('wrong');
             this.feedbackMessage = 'Mauvaise réponse :(';
             this.feedbackMessageClass = 'incorrect-answer';
         }
+    }
 
-        if (this.secondsLeft !== 0) {
-            setTimeout(() => {
-                this.feedbackMessage = '';
-                if (this.currentQuestionIndex < this.questions.length - 1) {
-                    this.removeBoxValidationHighlight();
-                    this.currentQuestionIndex++;
-                    this.startTimer();
-                }
-            }, ONE_SECOND_IN_MS);
+    nextQuestion() {
+        if (this.currentQuestionIndex < this.questions.length - 1) {
+            this.currentQuestionIndex++;
+            this.selectedChoices = [];
+            this.startTimer();
+
+            return;
         }
+
+        // this.router.navigateByUrl('/home');
     }
 
-    areAnswersCorrect(): boolean {
-        const correctAnswers = this.questions[this.currentQuestionIndex].choices.filter((choice) => choice.isCorrect);
-        const selectedAnswers = this.selectedAnswerBoxes.map((box) => this.questions[this.currentQuestionIndex].choices[box - 1]);
+    areChoicesCorrect(): boolean {
+        const allCorrect = this.selectedChoices.every((x) => x.isCorrect);
 
-        return (
-            selectedAnswers.length !== 0 &&
-            selectedAnswers.length === correctAnswers.length &&
-            selectedAnswers.every((selectedAnswer) => correctAnswers.includes(selectedAnswer))
-        );
-    }
-
-    addBoxValidationHighlight(state: string) {
-        this.selectedAnswerBoxes.forEach((box) => {
-            const selectedBox = document.getElementsByClassName('answer-box' + box);
-
-            selectedBox[0].classList.remove('highlight-selected');
-            selectedBox[0].classList.add('highlight-validated-' + state);
-        });
-    }
-
-    removeBoxValidationHighlight() {
-        this.validatedAnswerBoxes.forEach((box) => {
-            const validatedBox = document.getElementsByClassName('answer-box' + box);
-
-            if (validatedBox[0].classList.contains('highlight-validated-right')) {
-                validatedBox[0].classList.remove('highlight-validated-right');
-            } else if (validatedBox[0].classList.contains('highlight-validated-wrong')) {
-                validatedBox[0].classList.remove('highlight-validated-wrong');
-            }
-        });
-        this.selectedAnswerBoxes.length = 0;
+        return this.selectedChoices.length !== 0 && allCorrect;
     }
 
     openConfirmationDialog() {
