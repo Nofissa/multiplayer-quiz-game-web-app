@@ -3,7 +3,6 @@ import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
-import { Choice } from '@app/interfaces/choice';
 import { Question } from '@app/interfaces/question';
 import { Quiz } from '@app/interfaces/quiz';
 import { KeyBindingService } from '@app/services/key-binding.service';
@@ -17,6 +16,8 @@ const ONE_SECOND_IN_MS = 1000;
     selector: 'app-game-page',
     templateUrl: './game-page.component.html',
     styleUrls: ['./game-page.component.scss'],
+    // animation from ChatGPT
+    animations: [trigger('scale', [transition(':enter', [style({ transform: 'scale(0)' }), animate('1s', style({ transform: 'scale(1)' }))])])],
 })
 export class GamePageComponent implements OnInit, OnDestroy {
     secondsLeft: number;
@@ -151,9 +152,11 @@ export class GamePageComponent implements OnInit, OnDestroy {
         const correctAnswers = this.questions[this.currentQuestionIndex].choices.filter((choice) => choice.isCorrect);
         const selectedAnswers = this.selectedAnswerBoxes.map((box) => this.questions[this.currentQuestionIndex].choices[box - 1]);
 
-        return selectedAnswers.length !== 0 &&
+        return (
+            selectedAnswers.length !== 0 &&
             selectedAnswers.length === correctAnswers.length &&
-            selectedAnswers.every((selectedAnswer) => correctAnswers.includes(selectedAnswer));
+            selectedAnswers.every((selectedAnswer) => correctAnswers.includes(selectedAnswer))
+        );
     }
 
     addBoxValidationHighlight(state: string) {
