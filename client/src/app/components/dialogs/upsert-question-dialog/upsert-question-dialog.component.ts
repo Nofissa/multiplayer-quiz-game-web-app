@@ -58,16 +58,20 @@ export class UpsertQuestionDialogComponent {
     }
 
     addAnswer() {
-        this.choicesArray.push(
-            this.formBuilder.group({
-                text: ['', Validators.required],
-                isCorrect: [false],
-            }),
-        );
+        if (this.choicesArray.length < 4) {
+            this.choicesArray.push(
+                this.formBuilder.group({
+                    text: ['', Validators.required],
+                    isCorrect: [false],
+                }),
+            );
+        }
     }
 
     removeAnswerAt(index: number) {
-        this.choicesArray.removeAt(index);
+        if (this.choicesArray.length > 2) {
+            this.choicesArray.removeAt(index);
+        }
     }
 
     cancel() {
