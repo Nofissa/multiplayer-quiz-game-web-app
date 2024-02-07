@@ -13,7 +13,7 @@ describe('gamePage', () => {
         await TestBed.configureTestingModule({
             declarations: [GamePageComponent],
             imports: [RouterTestingModule],
-        }).compileComponents(); // compiles the modules (html + css)
+        }).compileComponents();
     });
 
     beforeEach(() => {

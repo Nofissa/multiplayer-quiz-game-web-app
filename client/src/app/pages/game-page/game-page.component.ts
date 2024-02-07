@@ -17,7 +17,6 @@ import { oneSecond } from './game-page.constants';
 })
 export class GamePageComponent implements OnInit, OnDestroy {
     secondsLeft: number;
-    // eslint-disable-next-line @typescript-eslint/no-magic-numbers
     timerDuration: number;
     selectedAnswerBoxes: number[] = [];
     validatedAnswerBoxes: number[] = [];
