@@ -28,6 +28,7 @@ export class GameComponent implements OnInit, OnChanges, OnDestroy {
     score: number = 0;
     feedbackMessage: string;
     feedbackMessageClass: string = 'feedback-message';
+    questionValidated: boolean = false;
 
     constructor(
         private readonly gameDependenciesProviderService: GameDependenciesProviderService,
@@ -85,10 +86,12 @@ export class GameComponent implements OnInit, OnChanges, OnDestroy {
 
             if (this.secondsLeft === 0) {
                 this.validateChoices();
-
-                this.nextQuestion();
             }
         });
+    }
+
+    stopTimer() {
+        this.gameDependenciesProviderService.timerService.stopTimer();
     }
 
     isSelected(choice: Choice): boolean {
@@ -105,6 +108,8 @@ export class GameComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     validateChoices() {
+        this.questionValidated = true;
+        this.stopTimer();
         if (this.areChoicesCorrect()) {
             this.score += this.quiz.questions[this.currentQuestionIndex].points;
             this.feedbackMessage = 'Bonne réponse! :)';
@@ -113,6 +118,7 @@ export class GameComponent implements OnInit, OnChanges, OnDestroy {
             this.feedbackMessage = 'Mauvaise réponse :(';
             this.feedbackMessageClass = 'incorrect-answer';
         }
+        this.nextQuestion();
     }
 
     nextQuestion() {
@@ -120,13 +126,14 @@ export class GameComponent implements OnInit, OnChanges, OnDestroy {
             if (this.currentQuestionIndex < this.quiz.questions.length - 1) {
                 this.feedbackMessage = '';
                 this.currentQuestionIndex++;
+                this.questionValidated = false;
                 this.selectedChoices = [];
                 this.startTimer();
 
                 return;
             }
-
-            this.router.navigateByUrl('/home');
+            const redirect = this.isTest ? '/create-game' : '/home';
+            this.router.navigateByUrl(redirect);
         }, THREE_SECOND_IN_MS);
     }
 
@@ -144,7 +151,8 @@ export class GameComponent implements OnInit, OnChanges, OnDestroy {
 
         dialogRef.afterClosed().subscribe((result) => {
             if (result) {
-                this.router.navigateByUrl('/home');
+                const redirect = this.isTest ? '/create-game' : '/home';
+                this.router.navigateByUrl(redirect);
             }
         });
     }
