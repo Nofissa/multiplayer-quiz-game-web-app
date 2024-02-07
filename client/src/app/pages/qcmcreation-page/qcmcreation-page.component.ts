@@ -21,7 +21,6 @@ const ID_LENGTH = 10;
 export class QCMCreationPageComponent implements OnInit {
     formGroup: FormGroup;
     questionsContainer: Question[] = [];
-    quizId: string = '';
     quiz: Quiz;
 
     // eslint-disable-next-line max-params
@@ -31,7 +30,7 @@ export class QCMCreationPageComponent implements OnInit {
         public questionInteractionService: QuestionInteractionService,
         private questionSharingService: QuestionSharingService,
         private quizHttpServices: QuizHttpService,
-        private route: ActivatedRoute,
+        private activatedRoute: ActivatedRoute,
         private snackBar: MatSnackBar,
     ) {}
 
@@ -40,29 +39,17 @@ export class QCMCreationPageComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.route.params.subscribe((params) => {
-            this.quizId = params['quizId'];
-        });
+        const quizId = this.activatedRoute.snapshot.queryParams['quizId'];
 
-        this.quizHttpServices.getQuizById(this.quizId).subscribe({
-            next: (x: Quiz) => {
-                if (x) {
-                    this.quiz = x;
+        this.setupForm();
+
+        if (quizId) {
+            this.quizHttpServices.getQuizById(quizId).subscribe((quiz: Quiz) => {
+                if (quiz) {
+                    this.quiz = quiz;
+                    this.questionsContainer = this.quiz.questions;
+                    this.setupForm(this.quiz);
                 }
-            },
-        });
-
-        if (this.quiz) {
-            this.formGroup = this.formBuilder.group({
-                title: [this.quiz.title, Validators.required],
-                descritpion: [this.quiz.description, Validators.required],
-            });
-
-            this.questionsContainer = this.quiz.questions;
-        } else {
-            this.formGroup = this.formBuilder.group({
-                title: ['', Validators.required],
-                description: ['', Validators.required],
             });
         }
 
@@ -164,31 +151,40 @@ export class QCMCreationPageComponent implements OnInit {
                 lastModification: new Date(),
                 _id: '',
             };
+
             if (this.quiz) {
                 this.quizHttpServices.updateQuiz(quiz).subscribe({
-                    next: (x: Quiz) => {
-                        this.quiz = x;
+                    next: (updatedQuiz: Quiz) => {
+                        this.quiz = updatedQuiz;
                         this.snackBar.open('Le quiz a été enregistré avec succès', '', { duration: 2000 });
                     },
-                    error: (e) => {
+                    error: () => {
                         this.snackBar.open("Le quiz n'a pas pu être modifié", '', { duration: 2000 });
-                        window.console.log("L'erreur est : ", e);
                     },
                 });
             } else {
                 this.quizHttpServices.createQuiz(quiz).subscribe({
-                    next: (x: Quiz) => {
-                        this.quiz = x;
+                    next: (createdQuiz: Quiz) => {
+                        this.quiz = createdQuiz;
                         this.snackBar.open('Le quiz a été enregistré avec succès', '', { duration: 2000 });
                     },
-                    error: (e) => {
+                    error: () => {
                         this.snackBar.open("Le quiz n'a pas pu être créer", '', { duration: 2000 });
-                        window.console.log("L'erreur est : ", e);
                     },
                 });
             }
         } else {
             this.snackBar.open("L'un des paramètres est erroné, veuillez réessayer", '', { duration: 3000 });
         }
+    }
+
+    private setupForm(quiz?: Quiz) {
+        const title = quiz?.title ? quiz.title : '';
+        const description = quiz?.description ? quiz.description : '';
+
+        this.formGroup = this.formBuilder.group({
+            title: [title, Validators.required],
+            description: [description, Validators.required],
+        });
     }
 }

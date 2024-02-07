@@ -32,7 +32,7 @@ export class QuizComponent {
 
     editQuiz() {
         // eslint-disable-next-line no-underscore-dangle
-        this.router.navigate([`/qcm-creation?quizId=${this.quiz._id}`]);
+        this.router.navigate(['/qcm-creation'], { queryParams: { quizId: this.quiz._id } });
     }
 
     exportQuiz() {

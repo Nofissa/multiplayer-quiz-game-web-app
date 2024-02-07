@@ -95,8 +95,8 @@ export class QuestionService {
 
     async validateQuestion(dto: QuestionDto): Promise<boolean> {
         const regex = new RegExp(`^${dto.text}$`, 'i'); // for case unsensitive search
-        const question = await this.model.findOne({ _id: { $ne: dto._id }, question: { $regex: regex } });
+        const question = await this.model.findOne({ text: { $regex: regex } });
 
-        return question === null;
+        return question._id !== dto._id && question === null;
     }
 }
