@@ -30,6 +30,7 @@ import { AppRoutingModule } from './modules/app-routing.module';
 import { AdminPageComponent } from './pages/admin-page/admin-page.component';
 import { CreateGamePageComponent } from './pages/create-game-page/create-game-page.component';
 import { QCMCreationPageComponent } from './pages/qcmcreation-page/qcmcreation-page.component';
+import { GameComponent } from './components/game/game.component';
 
 /**
  * Main module that is used in main.ts.
@@ -56,6 +57,7 @@ import { QCMCreationPageComponent } from './pages/qcmcreation-page/qcmcreation-p
         ConfirmationDialogComponent,
         QuestionBankComponent,
         QuestionBankComponent,
+        GameComponent,
     ],
     imports: [
         AppRoutingModule,

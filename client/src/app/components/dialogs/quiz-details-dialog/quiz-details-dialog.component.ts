@@ -23,7 +23,8 @@ export class QuizDetailsDialogComponent {
 
     testGame() {
         this.dialogRef.close();
-        this.router.navigate(['/game']);
+        // eslint-disable-next-line no-underscore-dangle
+        this.router.navigate(['/game'], { queryParams: { quizId: this.data._id, isTest: true } });
     }
 
     closeDialog() {
