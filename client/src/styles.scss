@@ -66,3 +66,18 @@ body {
   visibility: hidden;
 }
 
+.base-snackbar * {
+    background-color: aliceblue !important;
+}
+
+.base-snackbar button {
+    color: var(--answer-color-blue) !important;
+}
+
+.base-snackbar .mat-mdc-snack-bar-label {
+    color: #000000 !important;
+}
+
+.base-snackbar .mat-mdc-button-touch-target {
+    height: auto !important;
+}
