@@ -29,7 +29,8 @@ export class QuestionController {
     }
 
     @ApiCreatedResponse({
-        description: 'Add new question',
+        description: 'Adds a new question',
+        type: Question,
     })
     @Post('/')
     async addQuestion(@Body() dto: QuestionDto, @Res() response: Response) {
@@ -42,7 +43,7 @@ export class QuestionController {
     }
 
     @ApiOkResponse({
-        description: 'Update a question',
+        description: 'Updates a question',
         type: Question,
     })
     @Put('/')
@@ -56,7 +57,7 @@ export class QuestionController {
     }
 
     @ApiOkResponse({
-        description: 'Delete a question',
+        description: 'Deletes a question',
     })
     @Delete('/:id')
     async deleteQuestionById(@Param('id') id: string, @Res() response: Response) {
