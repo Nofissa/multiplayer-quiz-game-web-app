@@ -1,0 +1,95 @@
+@import 'swiper/scss';
+@import 'swiper/scss/navigation';
+@import 'swiper/scss/pagination';
+@import 'swiper/css/effect-coverflow';
+
+.container {
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+}
+
+.slider-effectCoverFlow {
+    width: 50%;
+    height: 10 px;
+    margin: 40px auto;
+
+    .swiper {
+        width: 100%;
+        padding-top: 250px;
+        padding-bottom: 250px;
+    }
+
+    .swiper-slide,
+    .game-slide {
+        background-color: #4bb4de;
+        background-size: cover;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+
+        width: 300px;
+        height: 300px;
+        transition:
+            transform 0.3s ease,
+            box-shadow 0.3s ease,
+            background-color 0.3s ease;
+
+        &:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            background-color: lighten($color: #4bb4de, $amount: 10%);
+        }
+    }
+
+    .swiper-slide img {
+        display: block;
+        width: 100%;
+    }
+
+    .quiz-title {
+        color: black;
+        font-size: 1.7em;
+        margin-bottom: 10px;
+        max-width: 90%;
+        max-height: 90%;
+        word-wrap: break-word;
+        text-align: center;
+    }
+
+    .quiz-subtitle {
+        color: black;
+        font-size: 1.5em;
+        margin-bottom: 10px;
+        max-width: 80%;
+        word-wrap: break-word;
+        text-align: center;
+    }
+    .swiper-button-next,
+    .swiper-button-prev {
+        color: white;
+        background-color: grey;
+        width: 40px;
+        height: 40px;
+        border-radius: 100%;
+        opacity: 50%;
+    }
+
+    .swiper-pagination-bullet-active {
+        background-color: white;
+    }
+
+    .swiper-pagination-bullet {
+        background-color: #4bb4de;
+        width: 10px;
+        height: 10px;
+    }
+
+    .swiper-button-next:after,
+    .swiper-button-prev::after {
+        font-size: 15px;
+        font-weight: bold;
+    }
+}
