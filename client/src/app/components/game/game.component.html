@@ -1,0 +1,32 @@
+<div class="container" *ngIf="quiz">
+    <div class="question-box font-color">
+        <span class="text-centered">{{ quiz.questions[currentQuestionIndex].text }}</span>
+        <span class="text-centered"><strong>{{ quiz.questions[currentQuestionIndex].points }} points</strong></span>
+    </div>
+    <div class="answers-grid font-color">
+        <div *ngFor="let choice of quiz.questions[currentQuestionIndex].choices; index as i" [ngClass]="{
+                'highlight-selected': isSelected(choice),
+                'answer-box': true,
+                'answer-box1': (i + 1) % 4 === 1,
+                'answer-box2': (i + 1) % 4 === 2,
+                'answer-box3': (i + 1) % 4 === 3,
+                'answer-box4': (i + 1) % 4 === 0
+                }" (click)="toggleChoiceSelection(choice)">
+            {{ i + 1 }}. {{ choice.text }}
+        </div>
+        <div class="timer">
+            <span>{{ secondsLeft }} sec.</span>
+        </div>
+    </div>
+    <div class="buttons-wrapper">
+        <button mat-flat-button class="game-button" (click)="validateChoices()">Valider <i
+                class="fas fa-check-circle"></i></button>
+        <button button mat-flat-button color="warn" class="game-button"
+            (click)="openConfirmationDialog()">Abandonner</button>
+    </div>
+    <div class="text-centered">Votre score: {{ score }}</div>
+    <div class="feedback" [ngClass]="[feedbackMessageClass]">{{ feedbackMessage }}</div>
+    <div *ngIf="secondsLeft === 0 && currentQuestionIndex === quiz.questions.length - 1">
+        <div [@scale] class="end-game-container">LE QUIZ EST TERMINÉ. VOUS AVEZ OBTENU {{ score }} POINTS</div>
+    </div>
+</div>
