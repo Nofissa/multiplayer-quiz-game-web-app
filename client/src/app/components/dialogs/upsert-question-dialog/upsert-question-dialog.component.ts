@@ -91,7 +91,18 @@ export class UpsertQuestionDialogComponent {
 
             this.dialogRef.close(question);
         } else {
-            this.snackBar.open("L'un des paramètres est erroné, veuillez réessayer", '', { duration: 2000 });
+
+            let snackString: string = 'Une erreur est présente dans les champs :';
+            if (!this.formGroup.controls.text.valid) {
+                snackString += ' question,';
+            } 
+            if (!this.formGroup.controls.choices.valid) {
+                snackString += ' réponses,';
+            } 
+            if (!this.formGroup.controls.points.valid) {
+                snackString += ' points,';
+            }
+            this.snackBar.open(snackString + ' veuillez réessayer', '', { duration: 2000 });
         }
     }
 
@@ -110,6 +121,8 @@ export class UpsertQuestionDialogComponent {
             return hasFalseAnswer ? null : { noFalseAnswer: true };
         };
     }
+
+    
 
     private multipleOfTenValidator(): ValidatorFn {
         return (control: AbstractControl): ValidationErrors | null => {
