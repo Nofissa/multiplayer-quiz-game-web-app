@@ -3,35 +3,35 @@ import { Type } from 'class-transformer';
 import { IsArray, IsBoolean, IsDate, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 export class QuizDto {
-    @IsString({ message: "l'id devrait être une chaîne de caractères" })
+    @IsString({ message: "le champ '_id' de quiz devrait être une chaîne de caractères" })
     @IsOptional()
     _id?: string;
 
-    @IsString({ message: 'le titre devrait être une chaîne de caractères' })
+    @IsString({ message: "le champ 'id' de quiz devrait être une chaîne de caractères" })
     @IsOptional()
     id?: string;
 
-    @IsString({ message: 'le titre devrait être une chaîne de caractères' })
-    @IsNotEmpty({ message: 'le titre ne devrait pas être vide' })
+    @IsString({ message: "le champ 'title' de quiz devrait être une chaîne de caractères" })
+    @IsNotEmpty({ message: "le champ 'title' de quiz ne devrait pas être vide" })
     title: string;
 
-    @IsString({ message: 'la description devrait être une chaîne de caractères' })
-    @IsNotEmpty({ message: 'la description ne devrait pas être vide' })
+    @IsString({ message: "le champ 'description' de quiz devrait être une chaîne de caractères" })
+    @IsNotEmpty({ message: "le champ 'description' de quiz ne devrait pas être vide" })
     description: string;
 
-    @IsNumber({}, { message: 'la durée devrait être un nombre' })
+    @IsNumber({}, { message: "le champ 'durée' de quiz devrait être un nombre" })
     duration: number;
 
-    @IsDate()
+    @IsDate({ message: "le champ 'lastModification' de quiz devrait être une date" })
     @IsOptional()
     @Type(() => Date)
     lastModification?: Date;
 
-    @IsArray({ message: 'la date de dernière modification devrait être une date' })
+    @IsArray({ message: "le champ 'questions' de quiz devrait être un tableau" })
     @ValidateNested({ each: true })
     questions: QuizQuestionDto[];
 
-    @IsBoolean()
+    @IsBoolean({ message: "le champ 'isHidden' de quiz devrait être un booléen" })
     @IsOptional()
     isHidden?: boolean;
 }

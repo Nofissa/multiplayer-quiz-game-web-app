@@ -11,28 +11,32 @@ export class QuestionDto {
     @IsOptional()
     _id?: string;
 
-    @IsString({ message: 'le titre devrait être une chaîne de caractères' })
-    @IsQuestionType({ message: 'le type devrait être une valeur valide' })
-    @IsNotEmpty({ message: 'le type ne devrait pas être vide' })
+    @IsString({ message: "le champ 'type' de question devrait être une chaîne de caractères" })
+    @IsNotEmpty({ message: "le champ 'type' de question ne devrait pas être vide" })
+    @IsQuestionType({ message: "le champ 'type' de question devrait avoir la valeur 'QCM' ou 'QRL'" })
     type: QuestionType;
 
-    @IsString({ message: 'le texte devrait être une chaîne de caractères' })
-    @IsNotEmpty({ message: 'le texte ne devrait pas être vide' })
+    @IsString({ message: "le champ 'text' de question devrait être une chaîne de caractères" })
+    @IsNotEmpty({ message: "le champ 'text' de question ne devrait pas être vide" })
     text: string;
 
-    @IsNumber({}, { message: 'les points devraient être un nombre' })
-    @Min(ValidationValues.MinPoints, { message: `les points devraient être plus grand ou égal ${ValidationValues.MinPoints}` })
-    @Max(ValidationValues.MaxPoints, { message: `les points devraient être plus petit ou égal ${ValidationValues.MaxPoints}` })
+    @IsNumber({}, { message: "le champ 'points' de question devrait être un nombre" })
+    @Min(ValidationValues.MinPoints, { message: `le champ 'points' de question devrait être plus grand ou égal à ${ValidationValues.MinPoints}` })
+    @Max(ValidationValues.MaxPoints, { message: `le champ 'points' de question devrait être plus petit ou égal à ${ValidationValues.MaxPoints}` })
     @IsMultipleOf(ValidationValues.MultipleOfPoints)
     points: number;
 
-    @IsArray({ message: 'les choix devraient être un tableau' })
-    @ArrayMinSize(ValidationValues.MinAnswersSize, { message: `les choix devraient être plus grand ou égal ${ValidationValues.MinAnswersSize}` })
-    @ArrayMaxSize(ValidationValues.MaxAnswersSize, { message: `les choix devraient être plus petit ou égal ${ValidationValues.MaxAnswersSize}` })
+    @IsArray({ message: "le champ 'choices' de question devrait être un tableau" })
+    @ArrayMinSize(ValidationValues.MinAnswersSize, {
+        message: `le champ 'choices' de question devrait être de taille plus grande ou égale à ${ValidationValues.MinAnswersSize}`,
+    })
+    @ArrayMaxSize(ValidationValues.MaxAnswersSize, {
+        message: `le champ 'choices' de question devrait être de taille plus petite ou égale ${ValidationValues.MaxAnswersSize}`,
+    })
     @ValidateNested({ each: true })
     choices: ChoiceDto[];
 
-    @IsDate()
+    @IsDate({ message: "le champ 'lastModification' de question devrait être une date" })
     @IsOptional()
     @Type(() => Date)
     lastModification?: Date;
