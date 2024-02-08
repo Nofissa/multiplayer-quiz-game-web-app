@@ -1,22 +1,26 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
+import { SecurityServicesProvider } from '@app/providers/security-services.provider';
 import { AuthService } from '@app/services/auth.service';
 import { SessionService } from '@app/services/session.service';
-import { BehaviorSubject } from 'rxjs';
 
 @Component({
     selector: 'app-admin-page',
     templateUrl: './admin-page.component.html',
     styleUrls: ['./admin-page.component.scss'],
+    encapsulation: ViewEncapsulation.None,
 })
 export class AdminPageComponent implements OnInit {
-    message: BehaviorSubject<string> = new BehaviorSubject<string>('');
+    private readonly authService: AuthService;
+    private readonly sessionService: SessionService;
 
     constructor(
-        private readonly authService: AuthService,
-        private readonly sessionService: SessionService,
+        securityServicesProvider: SecurityServicesProvider,
         private readonly router: Router,
-    ) {}
+    ) {
+        this.authService = securityServicesProvider.authService;
+        this.sessionService = securityServicesProvider.sessionService;
+    }
 
     ngOnInit() {
         const token = this.sessionService.getSession();

@@ -17,15 +17,14 @@ const POINT_VALUE_BASE_MULTIPLE = 10;
 })
 export class UpsertQuestionDialogComponent {
     maxChoiceCount = MAX_CHOICE_COUNT;
+    formBuilder: FormBuilder = new FormBuilder();
     formGroup: FormGroup;
     choicesArray: FormArray;
 
-    // eslint-disable-next-line max-params
     constructor(
-        private formBuilder: FormBuilder,
-        private snackBar: MatSnackBar,
-        public dialogRef: MatDialogRef<UpsertQuestionDialogComponent>,
-        @Inject(MAT_DIALOG_DATA) public data: UpsertQuestionDialogData,
+        @Inject(MAT_DIALOG_DATA) readonly data: UpsertQuestionDialogData,
+        private readonly snackBar: MatSnackBar,
+        private readonly dialogRef: MatDialogRef<UpsertQuestionDialogComponent>,
     ) {
         this.choicesArray = this.formBuilder.array(
             this.data.question.choices.map((answer) => {
