@@ -54,7 +54,7 @@ export class QuestionService {
     }
 
     async getAllQuestions(): Promise<Question[]> {
-        return await this.model.find({}).sort({ lastModified: -1 });
+        return await this.model.find({}).sort({ lastModification: -1 });
     }
 
     async addQuestion(dto: QuestionDto): Promise<Question> {

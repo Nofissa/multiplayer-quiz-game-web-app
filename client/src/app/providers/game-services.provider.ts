@@ -1,12 +1,12 @@
 /* eslint-disable no-underscore-dangle */
 import { Injectable } from '@angular/core';
-import { KeyBindingService } from './key-binding.service';
-import { TimerService } from './timer-service';
+import { KeyBindingService } from '@app/services/key-binding.service';
+import { TimerService } from '@app/services/timer-service';
 
 @Injectable({
     providedIn: 'root',
 })
-export class GameDependenciesProviderService {
+export class GameServicesProvider {
     constructor(
         private readonly _timerService: TimerService,
         private readonly _keyBindingService: KeyBindingService,
