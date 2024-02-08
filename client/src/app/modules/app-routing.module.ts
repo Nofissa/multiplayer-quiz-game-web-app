@@ -5,6 +5,7 @@ import { CreateGamePageComponent } from '@app/pages/create-game-page/create-game
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { QCMCreationPageComponent } from '@app/pages/qcmcreation-page/qcmcreation-page.component';
+import { WaitingRoomPageComponent } from '@app/pages/waiting-room-page/waiting-room-page/waiting-room-page.component';
 
 const routes: Routes = [
     { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -13,6 +14,7 @@ const routes: Routes = [
     { path: 'create-game', component: CreateGamePageComponent },
     { path: 'game', component: GamePageComponent },
     { path: 'qcm-creation', component: QCMCreationPageComponent },
+    { path: 'waiting-room', component: WaitingRoomPageComponent },
     { path: '**', redirectTo: '/home' },
 ];
 

@@ -7,8 +7,6 @@ import { QuizHttpService } from '@app/services/quiz-http.service';
     selector: 'app-game-page',
     templateUrl: './game-page.component.html',
     styleUrls: ['./game-page.component.scss'],
-    // animation from ChatGPT
-    animations: [trigger('scale', [transition(':enter', [style({ transform: 'scale(0)' }), animate('1s', style({ transform: 'scale(1)' }))])])],
 })
 export class GamePageComponent implements OnInit {
     quiz: Quiz;
