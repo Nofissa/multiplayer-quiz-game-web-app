@@ -5,5 +5,5 @@ export class ChoiceDto {
     text: string;
 
     @IsBoolean()
-    isCorrect?: boolean;
+    isCorrect: boolean;
 }

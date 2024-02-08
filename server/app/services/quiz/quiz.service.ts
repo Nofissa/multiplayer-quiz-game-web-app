@@ -1,4 +1,3 @@
-import { Question } from '@app/model/database/question';
 import { Quiz, QuizDocument } from '@app/model/database/quiz';
 import { QuizQuestionDto } from '@app/model/dto/quiz/quiz-question.dto';
 import { QuizDto } from '@app/model/dto/quiz/quiz.dto';
@@ -128,22 +127,6 @@ export class QuizService {
             await this.model.findByIdAndDelete(id);
         } catch (error) {
             return Promise.reject(`Failed to delete quiz: ${error}`);
-        }
-    }
-
-    async modifyQuestionInQuiz(id: string, questionId: string): Promise<Question> {
-        try {
-            return await this.model.findOneAndUpdate({ _id: id }, { $set: { questions: { _id: questionId } } }, { new: true });
-        } catch (error) {
-            return Promise.reject(`Failed to modify question: ${error}`);
-        }
-    }
-
-    async deleteQuestionInQuizbyId(id: string, questionId: string): Promise<void> {
-        try {
-            await this.model.findOneAndUpdate({ _id: id }, { $pull: { questions: { _id: questionId } } });
-        } catch (error) {
-            return Promise.reject(`Failed to delete question: ${error}`);
         }
     }
 }
