@@ -1,14 +1,12 @@
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Component, Inject } from '@angular/core';
-import { AbstractControl, FormArray, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators} from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Choice } from '@app/interfaces/choice';
 import { Question } from '@app/interfaces/question';
 import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog-data';
-
-const MAX_CHOICE_COUNT = 4;
-const POINT_VALUE_BASE_MULTIPLE = 10;
+import { MAX_CHOICE_COUNT, MIN_CHOICE_COUNT, SNACK_MESSAGE_DURATION, POINT_VALUE_BASE_MULTIPLE } from '@app/constants';
 
 @Component({
     selector: 'app-upsert-question-dialog',
@@ -39,7 +37,7 @@ export class UpsertQuestionDialogComponent {
         ) as FormArray<FormGroup>;
 
         this.toggle = this.data.question.type === 'QCM' ? false : true;
-        
+
         this.formGroup = this.formBuilder.group({
             text: [this.data.question.text, Validators.required],
             choices: this.choicesArray,
@@ -65,7 +63,7 @@ export class UpsertQuestionDialogComponent {
     }
 
     addAnswer() {
-        if (this.choicesArray.length < 4) {
+        if (this.choicesArray.length < MAX_CHOICE_COUNT) {
             this.choicesArray.push(
                 this.formBuilder.group({
                     text: ['', Validators.required],
@@ -77,11 +75,10 @@ export class UpsertQuestionDialogComponent {
 
     doToggle() {
         this.toggle = !this.toggle;
-        console.log(this.toggle);
     }
 
     removeAnswerAt(index: number) {
-        if (this.choicesArray.length > 2) {
+        if (this.choicesArray.length > MIN_CHOICE_COUNT) {
             this.choicesArray.removeAt(index);
         }
     }
@@ -103,23 +100,22 @@ export class UpsertQuestionDialogComponent {
 
             this.dialogRef.close(question);
         } else {
+            let snackString = 'Une erreur est présente dans les champs :';
 
-            let snackString: string = 'Une erreur est présente dans les champs :';
-            
             if (this.toggle) {
                 snackString += " QRL n'est pas implémenté,";
             } else {
                 if (!this.formGroup.controls.text.valid) {
                     snackString += ' question,';
-                } 
+                }
                 if (!this.formGroup.controls.choices.valid) {
                     snackString += ' réponses,';
-                } 
+                }
                 if (!this.formGroup.controls.points.valid) {
-                    snackString += ' points,'; 
+                    snackString += ' points,';
                 }
             }
-            this.snackBar.open(snackString + ' veuillez réessayer', '', { duration: 2000 });
+            this.snackBar.open(snackString + ' veuillez réessayer', '', { duration: SNACK_MESSAGE_DURATION });
         }
     }
 
@@ -137,7 +133,7 @@ export class UpsertQuestionDialogComponent {
             const hasFalseAnswer = answerArray.some((answer) => !answer.isCorrect);
             return hasFalseAnswer ? null : { noFalseAnswer: true };
         };
-    }    
+    }
 
     private multipleOfTenValidator(): ValidatorFn {
         return (control: AbstractControl): ValidationErrors | null => {
@@ -145,5 +141,4 @@ export class UpsertQuestionDialogComponent {
             return value % POINT_VALUE_BASE_MULTIPLE === 0 ? null : { notMultipleOfTen: true };
         };
     }
-
 }

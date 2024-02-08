@@ -12,6 +12,7 @@
             </mat-form-field>
             <div *ngIf="!qcmToggled">
                 <div cdkDropListGroup>
+                    <p>Veuillez cocher les bonnes réponses</p>
                     <div cdkDropList [cdkDropListData]="choices.controls" (cdkDropListDropped)="drop($event)">
                         <div *ngFor="let answerGroup of choices.controls; let i = index" cdkDrag class="answers-wrapper">
                             <mat-form-field appearance="outline" class="answer">
@@ -28,7 +29,7 @@
                         </div>
                     </div>
                 </div>
-                <mat-icon aria-hidden="false"
+                <mat-icon aria-hidden="false" *ngIf="choicesControls.length < 4"
                 class="action"
                 aria-label="Ajouter" fontIcon="add" (click)="addAnswer()"></mat-icon>
             </div>
