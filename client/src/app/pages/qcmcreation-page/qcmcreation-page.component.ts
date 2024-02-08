@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, ParamMap } from '@angular/router';
 import { UpsertQuestionDialogComponent } from '@app/components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
 import { Question } from '@app/interfaces/question';
 import { Quiz } from '@app/interfaces/quiz';
@@ -36,8 +36,8 @@ export class QCMCreationPageComponent implements OnInit {
         readonly questionInteractionService: QuestionInteractionService,
         materialServicesProvider: MaterialServicesProvider,
     ) {
-        this.dialogService = materialServicesProvider.dialogService;
-        this.snackBarService = materialServicesProvider.snackBarService;
+        this.dialogService = materialServicesProvider.dialog;
+        this.snackBarService = materialServicesProvider.snackBar;
     }
 
     get questions(): FormArray {
@@ -45,53 +45,55 @@ export class QCMCreationPageComponent implements OnInit {
     }
 
     ngOnInit() {
-        const quizId = this.activatedRoute.snapshot.queryParams['quizId'];
+        this.activatedRoute.queryParamMap.subscribe((paramMap: ParamMap) => {
+            const quizId = paramMap.get('quizId');
 
-        this.setupForm();
+            this.setupForm();
 
-        if (quizId) {
-            this.quizHttpService.getQuizById(quizId).subscribe((quiz: Quiz) => {
-                if (quiz) {
-                    this.quiz = quiz;
-                    this.questionsContainer = this.quiz.questions;
-                    this.setupForm(this.quiz);
+            if (quizId) {
+                this.quizHttpService.getVisibleQuizById(quizId).subscribe((quiz: Quiz) => {
+                    if (quiz) {
+                        this.quiz = quiz;
+                        this.questionsContainer = this.quiz.questions;
+                        this.setupForm(this.quiz);
+                    }
+                });
+            }
+
+            this.questionInteractionService.registerOnAddQuestion(() => {
+                this.addQuestion();
+            });
+
+            this.questionInteractionService.registerOnShareQuestion((question: Question) => {
+                this.questionSharingService.share(question);
+            });
+
+            this.questionInteractionService.registerOnDeleteQuestion((question: Question) => {
+                this.deleteQuestion(question);
+            });
+
+            this.questionInteractionService.registerOnEditQuestion((question: Question) => {
+                const dialogRef = this.dialogService.open(UpsertQuestionDialogComponent, {
+                    data: { title: 'Moddifier une question', question },
+                });
+                dialogRef.afterClosed().subscribe({
+                    next: (data: Question) => {
+                        if (data) {
+                            question.text = data.text;
+                            question.choices = data.choices;
+                            question.points = data.points;
+                            question.lastModification = data.lastModification;
+                        }
+                    },
+                });
+            });
+
+            this.questionSharingService.subscribe((question: Question) => {
+                // eslint-disable-next-line no-underscore-dangle
+                if (!this.questionsContainer.find((x) => x._id === question._id)) {
+                    this.questionsContainer.push(question);
                 }
             });
-        }
-
-        this.questionInteractionService.registerOnAddQuestion(() => {
-            this.addQuestion();
-        });
-
-        this.questionInteractionService.registerOnShareQuestion((question: Question) => {
-            this.questionSharingService.share(question);
-        });
-
-        this.questionInteractionService.registerOnDeleteQuestion((question: Question) => {
-            this.deleteQuestion(question);
-        });
-
-        this.questionInteractionService.registerOnEditQuestion((question: Question) => {
-            const dialogRef = this.dialogService.open(UpsertQuestionDialogComponent, {
-                data: { title: 'Moddifier une question', question },
-            });
-            dialogRef.afterClosed().subscribe({
-                next: (data: Question) => {
-                    if (data) {
-                        question.text = data.text;
-                        question.choices = data.choices;
-                        question.points = data.points;
-                        question.lastModification = data.lastModification;
-                    }
-                },
-            });
-        });
-
-        this.questionSharingService.subscribe((question: Question) => {
-            // eslint-disable-next-line no-underscore-dangle
-            if (!this.questionsContainer.find((x) => x._id === question._id)) {
-                this.questionsContainer.push(question);
-            }
         });
     }
 

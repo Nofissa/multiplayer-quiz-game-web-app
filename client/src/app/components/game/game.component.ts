@@ -39,8 +39,8 @@ export class GameComponent implements OnInit, OnChanges, OnDestroy {
         private readonly dialog: MatDialog,
         private readonly router: Router,
     ) {
-        this.timerService = gameServicesProvider.timerService;
-        this.keyBindingService = gameServicesProvider.keyBindingService;
+        this.timerService = gameServicesProvider.timer;
+        this.keyBindingService = gameServicesProvider.keyBinding;
     }
 
     @HostListener('window:keydown', ['$event'])
