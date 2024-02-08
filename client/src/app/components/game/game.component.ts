@@ -6,6 +6,7 @@ import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmatio
 import { Choice } from '@app/interfaces/choice';
 import { Quiz } from '@app/interfaces/quiz';
 import { GameServicesProvider } from '@app/providers/game-services.provider';
+import { GameService } from '@app/services/game-service';
 import { KeyBindingService } from '@app/services/key-binding.service';
 import { TimerService } from '@app/services/timer-service';
 
@@ -34,11 +35,13 @@ export class GameComponent implements OnInit, OnChanges, OnDestroy {
 
     private readonly timerService: TimerService;
     private readonly keyBindingService: KeyBindingService;
+    private readonly gameService: GameService;
 
     constructor(
         gameServicesProvider: GameServicesProvider,
         private readonly dialog: MatDialog,
         private readonly router: Router,
+        gameService: GameService,
     ) {
         this.timerService = gameServicesProvider.timerService;
         this.keyBindingService = gameServicesProvider.keyBindingService;
@@ -113,6 +116,17 @@ export class GameComponent implements OnInit, OnChanges, OnDestroy {
         }
 
         this.selectedChoices.push(choice);
+    }
+
+    validateThroughServer(selectedChoices: Choice[], quizID: string, questionIndex: number) {
+        this.gameService.validateAnswers(selectedChoices, questionIndex, quizID).subscribe({
+            next: (response) => {
+                console.log('Response from the server:', response);
+            },
+            error: (error) => {
+                console.error('Error:', error);
+            },
+        });
     }
 
     validateChoices() {
