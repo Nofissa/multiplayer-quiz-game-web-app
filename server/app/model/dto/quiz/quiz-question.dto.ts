@@ -7,24 +7,28 @@ import { Type } from 'class-transformer';
 import { ArrayMaxSize, ArrayMinSize, IsArray, IsDate, IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min, ValidateNested } from 'class-validator';
 
 export class QuizQuestionDto {
-    @IsString()
-    @IsQuestionType()
-    @IsNotEmpty()
+    @IsString({ message: 'le type devrait être une chaîne de caractères' })
+    @IsQuestionType({ message: 'le type devrait être une valeur valide' })
+    @IsNotEmpty({ message: 'le type ne devrait pas être vide' })
     type: QuestionType;
 
-    @IsString()
-    @IsNotEmpty()
+    @IsString({ message: 'le texte devrait être une chaîne de caractères' })
+    @IsNotEmpty({ message: 'le texte ne devrait pas être vide' })
     text: string;
 
-    @IsNumber()
-    @Min(ValidationValues.MinPoints, { message: `points must be greater or equal to ${ValidationValues.MinPoints}` })
-    @Max(ValidationValues.MaxPoints, { message: `points must be lesser or equal to ${ValidationValues.MaxPoints}` })
+    @IsNumber({}, { message: 'les points devraient être un nombre' })
+    @Min(ValidationValues.MinPoints, { message: `les points devraient être plus grand ou égal ${ValidationValues.MinPoints}` })
+    @Max(ValidationValues.MaxPoints, { message: `les points devraient être plus petit ou égal ${ValidationValues.MaxPoints}` })
     @IsMultipleOf(ValidationValues.MultipleOfPoints)
     points: number;
 
-    @IsArray()
-    @ArrayMinSize(ValidationValues.MinAnswersSize, { message: `choices size must be greater or equal to ${ValidationValues.MinAnswersSize}` })
-    @ArrayMaxSize(ValidationValues.MaxAnswersSize, { message: `choices size must be lesser or equal to ${ValidationValues.MaxAnswersSize}` })
+    @IsArray({ message: 'les choix devraient être un tableau' })
+    @ArrayMinSize(ValidationValues.MinAnswersSize, {
+        message: `la taille des choix devraient être plus grand ou égal ${ValidationValues.MinAnswersSize}`,
+    })
+    @ArrayMaxSize(ValidationValues.MaxAnswersSize, {
+        message: `la taille des choix devraient être plus petit ou égal ${ValidationValues.MaxAnswersSize}`,
+    })
     @ValidateNested({ each: true })
     choices: ChoiceDto[];
 

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '@app/services/auth.service';
 import { SessionService } from '@app/services/session.service';
@@ -8,6 +8,7 @@ import { BehaviorSubject } from 'rxjs';
     selector: 'app-admin-page',
     templateUrl: './admin-page.component.html',
     styleUrls: ['./admin-page.component.scss'],
+    encapsulation: ViewEncapsulation.None,
 })
 export class AdminPageComponent implements OnInit {
     message: BehaviorSubject<string> = new BehaviorSubject<string>('');
