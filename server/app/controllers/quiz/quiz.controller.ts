@@ -12,7 +12,7 @@ export class QuizController {
     constructor(private readonly quizService: QuizService) {}
 
     @ApiOkResponse({
-        description: 'Returns quizzes',
+        description: 'Returns all quizzes',
         type: Quiz,
         isArray: true,
     })
@@ -30,12 +30,11 @@ export class QuizController {
     }
 
     @ApiOkResponse({
-        description: 'Returns quiz',
+        description: 'Returns a quiz',
         type: Quiz,
-        isArray: false,
     })
     @ApiNotFoundResponse({
-        description: 'Return NOT_FOUND http status when request fails',
+        description: 'Returns NOT_FOUND http status when request fails',
     })
     @Get('/:id')
     async getQuizById(@Param('id') id: string, @Res() response: Response) {

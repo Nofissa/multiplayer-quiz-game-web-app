@@ -5,7 +5,9 @@ import { Router } from '@angular/router';
 import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
 import { Choice } from '@app/interfaces/choice';
 import { Quiz } from '@app/interfaces/quiz';
-import { GameDependenciesProviderService } from '@app/services/game-dependencies-provider.service';
+import { GameServicesProvider } from '@app/providers/game-services.provider';
+import { KeyBindingService } from '@app/services/key-binding.service';
+import { TimerService } from '@app/services/timer-service';
 
 const THREE_SECOND_IN_MS = 3000;
 
@@ -30,11 +32,17 @@ export class GameComponent implements OnInit, OnChanges, OnDestroy {
     feedbackMessageClass: string = 'feedback-message';
     questionValidated: boolean = false;
 
+    private readonly timerService: TimerService;
+    private readonly keyBindingService: KeyBindingService;
+
     constructor(
-        private readonly gameDependenciesProviderService: GameDependenciesProviderService,
+        gameServicesProvider: GameServicesProvider,
         private readonly dialog: MatDialog,
         private readonly router: Router,
-    ) {}
+    ) {
+        this.timerService = gameServicesProvider.timerService;
+        this.keyBindingService = gameServicesProvider.keyBindingService;
+    }
 
     @HostListener('window:keydown', ['$event'])
     handleKeyboardEvent(event: KeyboardEvent): void {
@@ -44,7 +52,7 @@ export class GameComponent implements OnInit, OnChanges, OnDestroy {
             return;
         }
 
-        const executor = this.gameDependenciesProviderService.keyBindingService.getExecutor(event.key);
+        const executor = this.keyBindingService.getExecutor(event.key);
 
         if (executor) {
             event.preventDefault();
@@ -63,25 +71,25 @@ export class GameComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     ngOnDestroy() {
-        this.gameDependenciesProviderService.timerService.stopTimer();
+        this.timerService.stopTimer();
     }
 
     setupKeyBindings() {
         ['1', '2', '3', '4'].forEach((x) => {
-            this.gameDependenciesProviderService.keyBindingService.registerKeyBinding(x, () => {
+            this.keyBindingService.registerKeyBinding(x, () => {
                 const choiceIndex = parseInt(x, 10) - 1;
 
                 this.toggleChoiceSelection(this.quiz.questions[this.currentQuestionIndex].choices[choiceIndex]);
             });
         });
 
-        this.gameDependenciesProviderService.keyBindingService.registerKeyBinding('Enter', () => {
+        this.keyBindingService.registerKeyBinding('Enter', () => {
             this.validateChoices();
         });
     }
 
     startTimer() {
-        this.gameDependenciesProviderService.timerService.startTimer(this.quiz.duration, (secondsLeft: number) => {
+        this.timerService.startTimer(this.quiz.duration, (secondsLeft: number) => {
             this.secondsLeft = secondsLeft;
 
             if (this.secondsLeft === 0) {

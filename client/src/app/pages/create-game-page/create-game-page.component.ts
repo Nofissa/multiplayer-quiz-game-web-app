@@ -17,7 +17,7 @@ export class CreateGamePageComponent implements OnInit {
     quizzArray: Quiz[];
 
     constructor(
-        private dialog: MatDialog,
+        private dialogService: MatDialog,
         private quizHttpService: QuizHttpService,
     ) {}
 
@@ -34,7 +34,7 @@ export class CreateGamePageComponent implements OnInit {
     }
 
     openQuizDetails(quiz: Quiz): void {
-        this.dialog.open(QuizDetailsDialogComponent, {
+        this.dialogService.open(QuizDetailsDialogComponent, {
             data: quiz,
         });
     }
