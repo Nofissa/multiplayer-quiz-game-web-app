@@ -99,7 +99,7 @@ export class GameComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     stopTimer() {
-        this.gameDependenciesProviderService.timerService.stopTimer();
+        this.timerService.stopTimer();
     }
 
     isSelected(choice: Choice): boolean {
@@ -116,6 +116,7 @@ export class GameComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     validateChoices() {
+        // this.quiz.questions[this.currentQuestionIndex]._id;
         this.questionValidated = true;
         this.stopTimer();
         if (this.areChoicesCorrect()) {

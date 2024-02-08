@@ -5,7 +5,7 @@ import { By } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Quiz } from '@app/interfaces/quiz';
-import { GameDependenciesProviderService } from '@app/services/game-dependencies-provider.service';
+import { GameServicesProvider } from '@app/providers/game-services.provider';
 import { KeyBindingService } from '@app/services/key-binding.service';
 import { TimerService } from '@app/services/timer-service';
 import { GameComponent } from './game.component';
@@ -38,24 +38,24 @@ describe('gameComponent', () => {
     let fixture: ComponentFixture<GameComponent>;
     let timerServiceSpy: jasmine.SpyObj<TimerService>;
     let keyBindingServiceSpy: jasmine.SpyObj<KeyBindingService>;
-    let gameDependenciesProviderServiceSpy: jasmine.SpyObj<GameDependenciesProviderService>;
+    let gameServicesProviderSpy: jasmine.SpyObj<GameServicesProvider>;
     // let router: Router;
 
     beforeEach(async () => {
         timerServiceSpy = jasmine.createSpyObj('TimerService', ['startTimer', 'stopTimer']);
         keyBindingServiceSpy = jasmine.createSpyObj('KeyBindingService', ['registerKeyBinding', 'getExecutor']);
-        gameDependenciesProviderServiceSpy = jasmine.createSpyObj('GameDependenciesProviderService', ['timerService', 'keyBindingService']);
-        (gameDependenciesProviderServiceSpy as any).timerService = timerServiceSpy;
-        (gameDependenciesProviderServiceSpy as any).keyBindingService = keyBindingServiceSpy;
+        gameServicesProviderSpy = jasmine.createSpyObj('GameDependenciesProviderService', ['timerService', 'keyBindingService']);
+        (gameServicesProviderSpy as any).timerService = timerServiceSpy;
+        (gameServicesProviderSpy as any).keyBindingService = keyBindingServiceSpy;
 
         await TestBed.configureTestingModule({
             declarations: [GameComponent],
             imports: [RouterTestingModule],
             providers: [
-                GameDependenciesProviderService,
+                GameServicesProvider,
                 { provide: MatDialog, useValue: { open: jasmine.createSpy() } },
                 { provide: Router, useValue: { navigateByUrl: jasmine.createSpy() } },
-                { provide: GameDependenciesProviderService, useValue: gameDependenciesProviderServiceSpy },
+                { provide: GameServicesProvider, useValue: gameServicesProviderSpy },
             ],
         }).compileComponents();
     });
