@@ -8,7 +8,6 @@ import { Choice } from '@app/interfaces/choice';
 import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-
 describe('UpsertQuestionDialogComponent', () => {
     let component: UpsertQuestionDialogComponent;
     let fixture: ComponentFixture<UpsertQuestionDialogComponent>;
@@ -16,6 +15,7 @@ describe('UpsertQuestionDialogComponent', () => {
     let snackBarSpy: jasmine.SpyObj<MatSnackBar>;
 
     let correctUpsertValues: UpsertQuestionDialogData;
+
     const noTrueChoiceValues: Choice[] = [
                                             {
                                                 text: 'false choice 1',
@@ -215,6 +215,25 @@ describe('UpsertQuestionDialogComponent', () => {
         }
     });
 
+    it ('should toggle() change toogle status', ()=> {
+        expect(component.qcmToggled).toBeFalsy();
+        component.doToggle();
+        fixture.detectChanges();
+        expect(component.qcmToggled).toBeTruthy();
+    });
+
+    it ('should have answers in dialog when QCM is selected', ()=> {
+        const answersArea = (fixture.debugElement.queryAll(By.css('.answers-wrapper'))).length;
+        expect(answersArea).toBe(2);
+    });
+
+    it ('should not have answers in dialog when QRL is selected', ()=> {
+        component.doToggle();
+        fixture.detectChanges();
+        const answersTextArea = (fixture.debugElement.queryAll(By.css('.answers-wrapper'))).length;
+        expect(answersTextArea).toBe(0);
+    });
+
     it('should close the dialog with formGroup value when submit is pressed and form is valid', () => {
         let newQuestion = Object.assign({}, correctUpsertValues.question);
         newQuestion.lastModification = new Date();
@@ -257,12 +276,17 @@ describe('UpsertQuestionDialogComponent', () => {
         expect(dialogRefSpy.close).not.toHaveBeenCalled();
     });
 
+it('should not close the dialog when submit is pressed and qcm toggle is set for QRL', () => {
+        component.doToggle();
+        component.submit();
+        expect(dialogRefSpy.close).not.toHaveBeenCalled();
+    });
+
     it('should spring a snack bar when submit is pressed and form is invalid', () => {
         component.formGroup.setErrors({});
         component.submit();
         expect(snackBarSpy.open).toHaveBeenCalled();
     });
-
 
     it('should close the dialog when cancel is pressed', () => {
         component.cancel();
