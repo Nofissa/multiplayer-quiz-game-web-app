@@ -1,11 +1,20 @@
 .container {
     height: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     max-height: 66vh;
-    width: 50vw;
     max-width: 500px;
     background-color: white;
     border-radius: 5px;
-    border: 2px black solid;
+}
+
+.list-bottom {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--secondary-bg-color);
+    height: 5vh;
 }
 
 .text-centered {
@@ -22,7 +31,6 @@
     background-color: white;
     width: 100%;
     height: 100%;
-    max-height: 50vh;
     display: flex;
     align-items: center;
     flex-grow: 1;
@@ -41,6 +49,7 @@
 
 .scrollable {
     flex-grow: 1;
+    max-height: 100%;
     overflow-y: auto;
 }
 
@@ -62,7 +71,6 @@
     min-height: 80px;
     height: fit-content;
     border-radius: 5px;
-    width: 95%;
 }
 
 .question-body {
@@ -131,6 +139,7 @@
 
 .action-wrapper {
     position: relative;
+    height: 32px;
 }
 
 .action {
@@ -149,6 +158,11 @@
     right: 24px;
     top: 50%;
     transform: translate(-50%, -50%);
+}
+
+.action-add {
+    color: var(--secondary-fg-color);
+    font-size: 2.5rem;
 }
 
 .action:hover {
