@@ -9,8 +9,10 @@ const BONUS = 1.2;
 export class GameService {
     evaluateChoices(dtos: ChoiceDto[], question: Question): EvaluationPayload {
         const correctAnswers: Choice[] = question.choices.filter((x) => x.isCorrect);
+        const correctAnswerTexts: Set<string> = new Set(correctAnswers.map((x) => x.text));
+        const chosenAnswerTexts: Set<string> = new Set(dtos.map((x) => x.text));
 
-        const complement = dtos.filter((x) => correctAnswers.includes(x));
+        const complement = Array.from(chosenAnswerTexts).filter((x) => !correctAnswerTexts.has(x));
 
         if (!complement.length) {
             return { correctAnswers, score: question.points * BONUS };
