@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { PromptDialogComponent } from '@app/components/dialogs/prompt-dialog/prompt-dialog.component';
 import { Quiz } from '@app/interfaces/quiz';
 import { QuizHttpService } from '@app/services/quiz-http.service';
 
@@ -14,6 +16,7 @@ export class QuizListComponent implements OnInit {
     quizzes: Quiz[] = [];
 
     constructor(
+        private readonly dialog: MatDialog,
         private readonly quizHttpService: QuizHttpService,
         private snackbar: MatSnackBar,
     ) {}
@@ -23,6 +26,7 @@ export class QuizListComponent implements OnInit {
     }
 
     importQuiz(event: Event) {
+        this.fetchQuizzes();
         const file = (event.target as HTMLInputElement)?.files?.[0];
         if (file) {
             const reader = new FileReader();
@@ -31,21 +35,51 @@ export class QuizListComponent implements OnInit {
                 if (!quiz) {
                     return;
                 }
-                this.quizHttpService.createQuiz(quiz).subscribe({
-                    next: (createdQuiz: Quiz) => {
-                        this.quizzes.push(createdQuiz);
-                    },
-                    error: (error: Error) => {
-                        if (error.message.length) {
-                            this.handleSnackbarError(error.message);
-                        } else {
-                            this.handleSnackbarError('Erreur lors de la création du quiz');
-                        }
-                    },
-                });
+                if (this.isQuizNameTaken(quiz)) {
+                    this.openPromptDialog(quiz);
+                } else {
+                    this.handleImportSubscription(quiz);
+                }
             };
             reader.readAsText(file);
         }
+    }
+
+    private openPromptDialog(quiz: Quiz) {
+        const dialogRef = this.dialog.open(PromptDialogComponent, {
+            width: '30%',
+            data: {
+                title: 'Nom de quiz existant',
+                message: 'Veuillez entrer un autre nom pour le quiz',
+                placeholder: 'Nom du quiz',
+                value: '',
+                submitText: 'Corriger',
+                cancelText: 'Annuler',
+            },
+        });
+        dialogRef.afterClosed().subscribe((value) => {
+            quiz.title = value.value;
+            if (this.isQuizNameTaken(quiz)) {
+                this.handleSnackbarError('Nom de quiz déjà existant');
+            } else {
+                this.handleImportSubscription(quiz);
+            }
+        });
+    }
+
+    private handleImportSubscription(quiz: Quiz) {
+        this.quizHttpService.createQuiz(quiz).subscribe({
+            next: (createdQuiz: Quiz) => {
+                this.quizzes.push(createdQuiz);
+            },
+            error: (error: Error) => {
+                if (error.message.length) {
+                    this.handleSnackbarError(error.message);
+                } else {
+                    this.handleSnackbarError('Erreur lors de la création du quiz');
+                }
+            },
+        });
     }
 
     private tryParse(e: ProgressEvent<FileReader>): Quiz | null {
@@ -55,6 +89,10 @@ export class QuizListComponent implements OnInit {
             this.handleSnackbarError('Erreur lors de la lecture du fichier');
             return null;
         }
+    }
+
+    private isQuizNameTaken(quiz: Quiz): boolean {
+        return this.quizzes.some((q) => q.title === quiz.title);
     }
 
     private handleSnackbarError(error: string) {
