@@ -75,9 +75,9 @@ export class QuizService {
         await this.model.insertMany(quizzes);
     }
 
-    async getQuizzes(isVisible?: boolean): Promise<Quiz[]> {
-        if (!isVisible) {
-            return await this.model.find({}).sort({ lastModified: 1 });
+    async getQuizzes(visibleOnly?: boolean): Promise<Quiz[]> {
+        if (!visibleOnly) {
+            return await this.model.find({}).sort({ lastModification: 1 });
         }
 
         return await this.model.find({ isHidden: false }).sort({ lastModified: 1 });
