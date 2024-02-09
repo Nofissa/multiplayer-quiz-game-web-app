@@ -4,6 +4,7 @@
     overflow-y: auto;
     width: 100%;
 }
-::ng-deep .mat-tab-label {
-    color: aliceblue !important;
+
+.mdc-tab__text-label {
+    color: white;
 }

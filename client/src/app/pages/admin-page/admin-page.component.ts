@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
 import { SecurityServicesProvider } from '@app/providers/security-services.provider';
 import { AuthService } from '@app/services/auth.service';
@@ -8,6 +8,7 @@ import { SessionService } from '@app/services/session.service';
     selector: 'app-admin-page',
     templateUrl: './admin-page.component.html',
     styleUrls: ['./admin-page.component.scss'],
+    encapsulation: ViewEncapsulation.None,
 })
 export class AdminPageComponent implements OnInit {
     private readonly authService: AuthService;
