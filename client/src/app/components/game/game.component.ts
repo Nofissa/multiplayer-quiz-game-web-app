@@ -133,7 +133,7 @@ export class GameComponent implements OnInit, OnChanges, OnDestroy {
     allocatePoints(points: number) {
         if (points) {
             this.score += points;
-            this.feedbackMessage = 'Bonne réponse! :)';
+            this.feedbackMessage = 'Bonne réponse! :) (+20%)';
             this.feedbackMessageClass = 'correct-answer';
         } else {
             this.feedbackMessage = 'Mauvaise réponse :(';
