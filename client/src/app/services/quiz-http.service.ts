@@ -78,7 +78,6 @@ export class QuizHttpService {
     }
 
     private handleError<T>(): (error: HttpErrorResponse) => Observable<T> {
-        // eslint-disable-next-line no-unused-vars
         return (httpErrorResponse: HttpErrorResponse): Observable<T> => {
             return throwError(() => httpErrorResponse.error);
         };
