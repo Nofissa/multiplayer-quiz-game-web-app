@@ -3,7 +3,7 @@ import { Component, HostListener, Input, OnChanges, OnDestroy, OnInit } from '@a
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
-import { Choice } from '@app/interfaces/choice';
+import { Choice } from '@common/choice';
 import { Quiz } from '@app/interfaces/quiz';
 import { GameServicesProvider } from '@app/providers/game-services.provider';
 import { KeyBindingService } from '@app/services/key-binding.service';

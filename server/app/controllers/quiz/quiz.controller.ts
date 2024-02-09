@@ -1,7 +1,7 @@
 import { Quiz } from '@app/model/database/quiz';
 import { QuizDto } from '@app/model/dto/quiz/quiz.dto';
 import { QuizService } from '@app/services/quiz/quiz.service';
-import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Put, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Put, Res, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 
@@ -51,6 +51,7 @@ export class QuizController {
     @ApiNotFoundResponse({
         description: 'Return NOT_FOUND http status when request fails',
     })
+    @UsePipes(new ValidationPipe({ transform: true }))
     @Post('/')
     async addQuiz(@Body() dto: QuizDto, @Res() response: Response) {
         try {
