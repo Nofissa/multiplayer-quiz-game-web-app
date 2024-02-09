@@ -12,7 +12,7 @@ export class GameService {
         const correctAnswerTexts: Set<string> = new Set(correctAnswers.map((x) => x.text));
         const chosenAnswerTexts: Set<string> = new Set(dtos.map((x) => x.text));
 
-        const complement = Array.from(chosenAnswerTexts).filter((x) => !correctAnswerTexts.has(x));
+        const complement = Array.from(correctAnswerTexts).filter((x) => !chosenAnswerTexts.has(x));
 
         if (!complement.length) {
             return { correctAnswers, score: question.points * BONUS };
