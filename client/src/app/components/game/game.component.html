@@ -21,6 +21,7 @@
             [class.disable-click]="questionValidated"
         >
             {{ i + 1 }}. {{ choice.text }}
+            <span *ngIf="questionValidated && choice.isCorrect && isTest" class="correct-answer-mark">✔</span>
         </div>
         <div class="timer">
             <span id="secondsLeft">{{ secondsLeft }} sec.</span>
@@ -34,7 +35,4 @@
     </div>
     <div id="score" class="text-centered">Votre score: {{ score }} points</div>
     <div class="feedback" [ngClass]="[feedbackMessageClass]">{{ feedbackMessage }}</div>
-    <div *ngIf="secondsLeft === 0 && currentQuestionIndex === quiz.questions.length - 1">
-        <div [@scale] class="end-game-container">LE QUIZ EST TERMINÉ. VOUS AVEZ OBTENU {{ score }} POINTS</div>
-    </div>
 </div>

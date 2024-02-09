@@ -15,6 +15,7 @@ export class GameController {
         private readonly quizService: QuizService,
     ) {}
 
+    // eslint-disable-next-line max-params
     @ApiOkResponse({
         description: 'Returns points for the choices',
     })
