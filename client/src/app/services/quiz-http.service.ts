@@ -35,7 +35,7 @@ export class QuizHttpService {
     }
 
     getVisibleQuizById(id: string): Observable<Quiz> {
-        return this.http.get<Quiz>(`${this.baseUrl}/${id}?isVisible=true`).pipe(
+        return this.http.get<Quiz>(`${this.baseUrl}/${id}?visibleOnly=true`).pipe(
             map((quiz: Quiz) => this.convertLastModifiedToDate(quiz)),
             catchError(this.handleError<Quiz>()),
         );

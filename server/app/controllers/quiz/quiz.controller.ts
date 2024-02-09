@@ -37,9 +37,9 @@ export class QuizController {
         description: 'Returns NOT_FOUND http status when request fails',
     })
     @Get('/:id')
-    async getQuizById(@Param('id') id: string, @Res() response: Response, @Query('isVisible') isVisible?: boolean) {
+    async getQuizById(@Param('id') id: string, @Res() response: Response, @Query('visibleOnly') visibleOnly?: boolean) {
         try {
-            const quiz = await this.quizService.getQuizById(id, isVisible);
+            const quiz = await this.quizService.getQuizById(id, visibleOnly);
 
             if (quiz) {
                 response.status(HttpStatus.OK).json(quiz);
