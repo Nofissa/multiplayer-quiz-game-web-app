@@ -35,13 +35,13 @@ export class GameComponent implements OnInit, OnChanges, OnDestroy {
 
     private readonly timerService: TimerService;
     private readonly keyBindingService: KeyBindingService;
-    private readonly gameService: GameService;
 
+    // eslint-disable-next-line max-params
     constructor(
         gameServicesProvider: GameServicesProvider,
         private readonly dialog: MatDialog,
         private readonly router: Router,
-        gameService: GameService,
+        private readonly gameService: GameService,
     ) {
         this.timerService = gameServicesProvider.timerService;
         this.keyBindingService = gameServicesProvider.keyBindingService;
@@ -118,29 +118,47 @@ export class GameComponent implements OnInit, OnChanges, OnDestroy {
         this.selectedChoices.push(choice);
     }
 
-    validateThroughServer(selectedChoices: Choice[], quizID: string, questionIndex: number) {
-        this.gameService.validateAnswers(selectedChoices, questionIndex, quizID).subscribe({
-            next: (response) => {
-                console.log('Response from the server:', response);
-            },
-            error: (error) => {
-                console.error('Error:', error);
-            },
-        });
-    }
+    // validateThroughServer(selectedChoices: Choice[], quizID: string, questionIndex: number) {
+    //     this.gameService.validateAnswers(selectedChoices, quizID, questionIndex).subscribe({
+    //         next: (response: number) => {
+    //             console.log('Response from the server:', response);
+    //         },
+    //         error: (error) => {
+    //             console.error('Error:', error);
+    //         },
+    //     });
+    // }
 
-    validateChoices() {
-        // this.quiz.questions[this.currentQuestionIndex]._id;
-        this.questionValidated = true;
-        this.stopTimer();
-        if (this.areChoicesCorrect()) {
-            this.score += this.quiz.questions[this.currentQuestionIndex].points;
+    allocatePoints(points: number) {
+        if (points === this.quiz.questions[this.currentQuestionIndex].points) {
+            this.score += points;
             this.feedbackMessage = 'Bonne réponse! :)';
             this.feedbackMessageClass = 'correct-answer';
         } else {
             this.feedbackMessage = 'Mauvaise réponse :(';
             this.feedbackMessageClass = 'incorrect-answer';
         }
+    }
+
+    validateChoices() {
+        this.stopTimer();
+        this.questionValidated = true;
+        // lint disabled on this line because it's a mongodb id
+        // eslint-disable-next-line no-underscore-dangle
+        this.gameService.validateAnswers(this.selectedChoices, this.quiz._id, this.currentQuestionIndex).subscribe({
+            next: (score) => {
+                this.allocatePoints(score);
+                // console.log('Response from the server:', score);
+            },
+        });
+        // if (this.areChoicesCorrect()) {
+        //     this.score += this.quiz.questions[this.currentQuestionIndex].points;
+        //     this.feedbackMessage = 'Bonne réponse! :)';
+        //     this.feedbackMessageClass = 'correct-answer';
+        // } else {
+        //     this.feedbackMessage = 'Mauvaise réponse :(';
+        //     this.feedbackMessageClass = 'incorrect-answer';
+        // }
         this.nextQuestion();
     }
 

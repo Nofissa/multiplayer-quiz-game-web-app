@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { By } from '@angular/platform-browser';
 import { Router } from '@angular/router';
@@ -39,25 +40,27 @@ describe('gameComponent', () => {
     let timerServiceSpy: jasmine.SpyObj<TimerService>;
     let keyBindingServiceSpy: jasmine.SpyObj<KeyBindingService>;
     let gameServicesProviderSpy: jasmine.SpyObj<GameServicesProvider>;
-    // let router: Router;
+    let router: Router;
 
     beforeEach(async () => {
+        const routerSpy = jasmine.createSpyObj('Router', ['navigateByUrl']);
         timerServiceSpy = jasmine.createSpyObj('TimerService', ['startTimer', 'stopTimer']);
         keyBindingServiceSpy = jasmine.createSpyObj('KeyBindingService', ['registerKeyBinding', 'getExecutor']);
-        gameServicesProviderSpy = jasmine.createSpyObj('GameDependenciesProviderService', ['timerService', 'keyBindingService']);
+        gameServicesProviderSpy = jasmine.createSpyObj('GameServicesProvider', ['timerService', 'keyBindingService']);
         (gameServicesProviderSpy as any).timerService = timerServiceSpy;
         (gameServicesProviderSpy as any).keyBindingService = keyBindingServiceSpy;
 
         await TestBed.configureTestingModule({
             declarations: [GameComponent],
-            imports: [RouterTestingModule],
+            imports: [RouterTestingModule, HttpClientTestingModule],
             providers: [
                 GameServicesProvider,
                 { provide: MatDialog, useValue: { open: jasmine.createSpy() } },
-                { provide: Router, useValue: { navigateByUrl: jasmine.createSpy() } },
+                { provide: Router, useValue: routerSpy },
                 { provide: GameServicesProvider, useValue: gameServicesProviderSpy },
             ],
         }).compileComponents();
+        router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
     });
 
     describe('htmlTests', () => {
@@ -211,6 +214,32 @@ describe('gameComponent', () => {
         });
     });
 
-    // describe('tsLogic', () => {
-    // });
+    describe('tsLogic', () => {
+        beforeEach(() => {
+            fixture = TestBed.createComponent(GameComponent);
+            component = fixture.componentInstance;
+            component.quiz = quizStub;
+            fixture.detectChanges();
+        });
+        it('should navigate to correct route when the quiz is finished', fakeAsync(() => {
+            component.isTest = true;
+            component.currentQuestionIndex = component.quiz.questions.length - 1;
+            const THREE_SECOND_IN_MS = 3000;
+
+            component.nextQuestion();
+            tick(THREE_SECOND_IN_MS);
+
+            let redirect = '/create-game';
+            expect(router.navigateByUrl).toHaveBeenCalledWith(redirect);
+
+            component.isTest = false;
+            component.currentQuestionIndex = component.quiz.questions.length - 1;
+
+            component.nextQuestion();
+            tick(THREE_SECOND_IN_MS);
+
+            redirect = '/home';
+            expect(router.navigateByUrl).toHaveBeenCalledWith(redirect);
+        }));
+    });
 });

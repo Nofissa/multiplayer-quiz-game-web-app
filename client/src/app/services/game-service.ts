@@ -8,12 +8,12 @@ import { environment } from 'src/environments/environment';
     providedIn: 'root',
 })
 export class GameService {
-    private apiURL = `${environment.serverUrl}/game/evaluateChoices`;
+    private apiURL = `${environment.serverUrl}/game`;
     constructor(private http: HttpClient) {}
 
-    validateAnswers(selectedChoices: Choice[], questionIndex: number, quizID: string): Observable<unknown> {
-        const url = `${this.apiURL}/${quizID}?questionIndex=${questionIndex}`;
-        return this.http.post(url, selectedChoices);
+    validateAnswers(selectedChoices: Choice[], quizID: string, questionIndex: number): Observable<number> {
+        const url = `${this.apiURL}/evaluateChoices/${quizID}?questionIndex=${questionIndex}`;
+        return this.http.post<number>(url, selectedChoices);
     }
 
     areChoicesCorrect(selectedChoices: Choice[]): boolean {
