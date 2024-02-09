@@ -10,19 +10,21 @@ import { Quiz } from '@app/interfaces/quiz';
 })
 export class QuizDetailsDialogComponent {
     constructor(
-        @Inject(MAT_DIALOG_DATA) public data: Quiz,
-        private dialogRef: MatDialogRef<QuizDetailsDialogComponent>,
-        private router: Router,
+        @Inject(MAT_DIALOG_DATA) readonly data: Quiz,
+        private readonly dialogRef: MatDialogRef<QuizDetailsDialogComponent>,
+        private readonly router: Router,
     ) {}
 
     startGame() {
         this.dialogRef.close();
-        this.router.navigate(['/game']);
+        // eslint-disable-next-line no-underscore-dangle
+        this.router.navigate(['/game'], { queryParams: { quizId: this.data._id } });
     }
 
     testGame() {
         this.dialogRef.close();
-        this.router.navigate(['/game']);
+        // eslint-disable-next-line no-underscore-dangle
+        this.router.navigate(['/game'], { queryParams: { quizId: this.data._id, isTest: true } });
     }
 
     closeDialog() {

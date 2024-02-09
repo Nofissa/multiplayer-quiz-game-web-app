@@ -12,9 +12,9 @@ export class LoginDialogComponent {
     formGroup: FormGroup;
 
     constructor(
-        private formBuilder: FormBuilder,
-        public dialogRef: MatDialogRef<LoginDialogComponent>,
-        @Inject(MAT_DIALOG_DATA) public data: LoginDialogData,
+        @Inject(MAT_DIALOG_DATA) readonly data: LoginDialogData,
+        private readonly formBuilder: FormBuilder,
+        private readonly dialogRef: MatDialogRef<LoginDialogComponent>,
     ) {
         this.formGroup = this.formBuilder.group({
             password: [this.data.password, Validators.required],

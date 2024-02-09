@@ -11,7 +11,7 @@ export class QuizController {
     constructor(private readonly quizService: QuizService) {}
 
     @ApiOkResponse({
-        description: 'Returns quizzes',
+        description: 'Returns all quizzes',
         type: Quiz,
         isArray: true,
     })
@@ -25,6 +25,23 @@ export class QuizController {
             response.status(HttpStatus.OK).json(allQuiz);
         } catch (error) {
             response.status(HttpStatus.NOT_FOUND).send('Quizzes not found');
+        }
+    }
+
+    @ApiOkResponse({
+        description: 'Returns a quiz',
+        type: Quiz,
+    })
+    @ApiNotFoundResponse({
+        description: 'Returns NOT_FOUND http status when request fails',
+    })
+    @Get('/:id')
+    async getQuizById(@Param('id') id: string, @Res() response: Response) {
+        try {
+            const quiz = await this.quizService.getQuizById(id);
+            response.status(HttpStatus.OK).json(quiz);
+        } catch (error) {
+            response.status(HttpStatus.NOT_FOUND).send(error.message);
         }
     }
 

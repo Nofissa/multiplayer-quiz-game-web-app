@@ -1,16 +1,21 @@
-<div class="container justified">
-    <h1 class="header-item">Vue de jeu du joueur</h1>
-    <img src="https://bit.ly/3QofL1J" alt="Logo Projet" />
-    <section id="server-message" class="justified">
-        <div class="justified">
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+</head>
+<img class="logo" src='/assets/img/logo.png' alt="Logo Projet" />
+<div class="container">
+    <div class="game-area">
+        <app-game [quiz]="quiz" [isTest]="isTest"></app-game>
+    </div>
+    <div class="right-panel">
+        <div class="chat-room">
+            <div class="messages-zone font-color text-centered">
+                <h3>Salon de clavardage</h3>
+            </div>
+            <mat-form-field appearance="outline">
+                <mat-label>Message</mat-label>
+                <textarea matInput class="write-message" placeholder="Envoyer un message">
+                </textarea>
+            </mat-form-field>
         </div>
-    </section>
-
-    <footer class="footer-item">
-        <h4 class="team-name">Équipe 206</h4>
-        <p>
-            <span>Loris Ponderand</span>, <span>Imed-Eddine Bennour</span>, <span>Nofissa Khaif</span>,
-            <span>Romaine Brand</span>, <span>Dimitri Mansour</span>, <span>Jérémie Bolduc</span>
-        </p>
-    </footer>
+    </div>
 </div>
