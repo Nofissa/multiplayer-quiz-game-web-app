@@ -64,7 +64,6 @@ export class QuizComponent {
         // eslint-disable-next-line no-underscore-dangle
         this.quizHttpService.hideQuizById(this.quiz._id).subscribe((quiz) => {
             this.quiz = quiz;
-            this.router.navigate(['/admin']);
         });
     }
 }
