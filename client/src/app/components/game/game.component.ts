@@ -1,4 +1,3 @@
-import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, HostListener, Input, OnChanges, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
@@ -17,8 +16,6 @@ const THREE_SECOND_IN_MS = 3000;
     selector: 'app-game',
     templateUrl: './game.component.html',
     styleUrls: ['./game.component.scss'],
-    // animation from ChatGPT
-    animations: [trigger('scale', [transition(':enter', [style({ transform: 'scale(0)' }), animate('1s', style({ transform: 'scale(1)' }))])])],
 })
 export class GameComponent implements OnInit, OnChanges, OnDestroy {
     @Input()
@@ -82,13 +79,16 @@ export class GameComponent implements OnInit, OnChanges, OnDestroy {
         ['1', '2', '3', '4'].forEach((x) => {
             this.keyBindingService.registerKeyBinding(x, () => {
                 const choiceIndex = parseInt(x, 10) - 1;
-
-                this.toggleChoiceSelection(this.quiz.questions[this.currentQuestionIndex].choices[choiceIndex]);
+                if (!this.questionValidated) {
+                    this.toggleChoiceSelection(this.quiz.questions[this.currentQuestionIndex].choices[choiceIndex]);
+                }
             });
         });
 
         this.keyBindingService.registerKeyBinding('Enter', () => {
-            this.validateChoices();
+            if (!this.questionValidated) {
+                this.validateChoices();
+            }
         });
     }
 
@@ -119,17 +119,6 @@ export class GameComponent implements OnInit, OnChanges, OnDestroy {
         this.selectedChoices.push(choice);
     }
 
-    // validateThroughServer(selectedChoices: Choice[], quizID: string, questionIndex: number) {
-    //     this.gameService.validateAnswers(selectedChoices, quizID, questionIndex).subscribe({
-    //         next: (response: number) => {
-    //             console.log('Response from the server:', response);
-    //         },
-    //         error: (error) => {
-    //             console.error('Error:', error);
-    //         },
-    //     });
-    // }
-
     allocatePoints(points: number) {
         if (points) {
             this.score += points;
@@ -149,17 +138,8 @@ export class GameComponent implements OnInit, OnChanges, OnDestroy {
         this.gameService.validateAnswers(this.selectedChoices, this.quiz._id, this.currentQuestionIndex).subscribe({
             next: (response: EvaluationPayload) => {
                 this.allocatePoints(response.score);
-                // console.log('Response from the server:', score);
             },
         });
-        // if (this.areChoicesCorrect()) {
-        //     this.score += this.quiz.questions[this.currentQuestionIndex].points;
-        //     this.feedbackMessage = 'Bonne réponse! :)';
-        //     this.feedbackMessageClass = 'correct-answer';
-        // } else {
-        //     this.feedbackMessage = 'Mauvaise réponse :(';
-        //     this.feedbackMessageClass = 'incorrect-answer';
-        // }
         this.nextQuestion();
     }
 
