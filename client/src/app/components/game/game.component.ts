@@ -3,12 +3,13 @@ import { Component, HostListener, Input, OnChanges, OnDestroy, OnInit } from '@a
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
-import { Choice } from '@common/choice';
 import { Quiz } from '@app/interfaces/quiz';
 import { GameServicesProvider } from '@app/providers/game-services.provider';
 import { GameService } from '@app/services/game-service';
 import { KeyBindingService } from '@app/services/key-binding.service';
 import { TimerService } from '@app/services/timer-service';
+import { Choice } from '@common/choice';
+import { EvaluationPayload } from '@common/evaluation-payload';
 
 const THREE_SECOND_IN_MS = 3000;
 
@@ -146,8 +147,8 @@ export class GameComponent implements OnInit, OnChanges, OnDestroy {
         // lint disabled on this line because it's a mongodb id
         // eslint-disable-next-line no-underscore-dangle
         this.gameService.validateAnswers(this.selectedChoices, this.quiz._id, this.currentQuestionIndex).subscribe({
-            next: (score) => {
-                this.allocatePoints(score);
+            next: (response: EvaluationPayload) => {
+                this.allocatePoints(response.score);
                 // console.log('Response from the server:', score);
             },
         });
