@@ -34,9 +34,9 @@ export class GameController {
             }
 
             const targetedQuestion = questions[questionIndex];
-            const score = this.gameService.evaluateChoices(choices, targetedQuestion);
+            const payload = this.gameService.evaluateChoices(choices, targetedQuestion);
 
-            response.status(HttpStatus.OK).json({ score });
+            response.status(HttpStatus.OK).json(payload);
         } catch (error) {
             response.status(HttpStatus.INTERNAL_SERVER_ERROR).send(error.message);
         }

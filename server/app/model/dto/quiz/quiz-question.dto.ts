@@ -22,11 +22,13 @@ export class QuizQuestionDto {
     @IsMultipleOf(ValidationValues.MultipleOfPoints)
     points: number;
 
+    @IsOptional()
     @IsArray()
     @ArrayMinSize(ValidationValues.MinAnswersSize, { message: `choices size must be greater or equal to ${ValidationValues.MinAnswersSize}` })
     @ArrayMaxSize(ValidationValues.MaxAnswersSize, { message: `choices size must be lesser or equal to ${ValidationValues.MaxAnswersSize}` })
+    @Type(() => ChoiceDto)
     @ValidateNested({ each: true })
-    choices: ChoiceDto[];
+    choices?: ChoiceDto[];
 
     @IsOptional()
     @IsDate()

@@ -28,6 +28,7 @@ export class QuizDto {
     lastModification?: Date;
 
     @IsArray()
+    @Type(() => QuizQuestionDto)
     @ValidateNested({ each: true })
     questions: QuizQuestionDto[];
 
