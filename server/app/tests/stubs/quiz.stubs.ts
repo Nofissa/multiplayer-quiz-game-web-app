@@ -12,7 +12,7 @@ const questionStub: Question[] = [
             { text: '8.31 J/mol/K', isCorrect: true },
         ],
         points: 100,
-        lastModification: new Date(),
+        lastModification: new Date('2024-01-20 18:43:27'),
     },
     {
         text: "En quelle année la compagnie d'automobile Volkswagen a-t-elle été fondée?",
@@ -35,7 +35,7 @@ export const quizStub = (): Quiz => {
         description: 'Quiz 1 description',
         questions: questionStub,
         duration: 40,
-        lastModification: new Date(),
+        lastModification: new Date('2024-01-20 18:43:27'),
         isHidden: true,
     };
 };
