@@ -187,12 +187,19 @@ describe('gameComponent', () => {
         });
 
         it('should display feedback when a question is validated', () => {
-            component.validateChoices();
+            const questionValue = 40;
+            component.allocatePoints(questionValue);
             fixture.detectChanges();
-            const feedbackElement = fixture.debugElement.query(By.css('.feedback')).nativeElement;
+            let feedbackElement = fixture.debugElement.query(By.css('.feedback')).nativeElement;
 
-            expect(feedbackElement.textContent.trim()).toBe('Mauvaise réponse :(' || 'Bonne réponse :)');
-            expect(feedbackElement.classList.contains('correct-answer' || 'incorrect-answer'));
+            expect(feedbackElement.textContent.trim()).toBe('Bonne réponse! :) (+20%)');
+            expect(feedbackElement.classList.contains('correct-answer'));
+            component.allocatePoints(0);
+            fixture.detectChanges();
+            feedbackElement = fixture.debugElement.query(By.css('.feedback')).nativeElement;
+
+            expect(feedbackElement.textContent.trim()).toBe('Mauvaise réponse :(');
+            expect(feedbackElement.classList.contains('incorrect-answer'));
         });
 
         it('should display timer correctly', () => {
@@ -221,6 +228,7 @@ describe('gameComponent', () => {
             component.quiz = quizStub;
             fixture.detectChanges();
         });
+
         it('should navigate to correct route when the quiz is finished', fakeAsync(() => {
             component.isTest = true;
             component.currentQuestionIndex = component.quiz.questions.length - 1;
@@ -240,6 +248,31 @@ describe('gameComponent', () => {
 
             redirect = '/home';
             expect(router.navigateByUrl).toHaveBeenCalledWith(redirect);
+        }));
+
+        it('should call toggleChoiceSelection when a number key is pressed', fakeAsync(() => {
+            component.questionValidated = false;
+            fixture.detectChanges();
+            spyOn(component, 'toggleChoiceSelection');
+            const key = '1';
+            const event = new KeyboardEvent('keydown', { key });
+            document.dispatchEvent(event);
+
+            tick();
+
+            expect(component.toggleChoiceSelection).toHaveBeenCalled();
+        }));
+
+        it('should call validateChoices when Enter key is pressed', fakeAsync(() => {
+            component.questionValidated = false;
+            fixture.detectChanges();
+            spyOn(component, 'validateChoices');
+            const event = new KeyboardEvent('keydown', { key: 'Enter' });
+            document.dispatchEvent(event);
+
+            tick();
+
+            expect(component.validateChoices).toHaveBeenCalled();
         }));
     });
 });
