@@ -21,7 +21,7 @@ export class QuizHttpService {
     }
 
     getVisibleQuizzes(): Observable<Quiz[]> {
-        return this.http.get<Quiz[]>(`${this.baseUrl}?isVisible=true`).pipe(
+        return this.http.get<Quiz[]>(`${this.baseUrl}?visibleOnly=true`).pipe(
             map((quizzes: Quiz[]) => this.convertAllLastModifiedToDate(quizzes)),
             catchError(this.handleError<Quiz[]>()),
         );
@@ -80,7 +80,7 @@ export class QuizHttpService {
     private handleError<T>(): (error: HttpErrorResponse) => Observable<T> {
         // eslint-disable-next-line no-unused-vars
         return (httpErrorResponse: HttpErrorResponse): Observable<T> => {
-            return throwError(() => httpErrorResponse);
+            return throwError(() => httpErrorResponse.error);
         };
     }
 }
