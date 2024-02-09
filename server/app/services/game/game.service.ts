@@ -10,9 +10,9 @@ export class GameService {
     evaluateChoices(dtos: ChoiceDto[], question: Question): EvaluationPayload {
         const correctAnswers: Choice[] = question.choices.filter((x) => x.isCorrect);
 
-        const outterIntersection = dtos.filter((x) => !correctAnswers.includes(x));
+        const complement = dtos.filter((x) => correctAnswers.includes(x));
 
-        if (!outterIntersection) {
+        if (!complement.length) {
             return { correctAnswers, score: question.points * BONUS };
         } else {
             return { correctAnswers, score: 0 };
