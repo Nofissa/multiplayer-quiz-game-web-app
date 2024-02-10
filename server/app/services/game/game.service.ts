@@ -12,9 +12,9 @@ export class GameService {
         const correctAnswerTexts: Set<string> = new Set(correctAnswers.map((x) => x.text));
         const chosenAnswerTexts: Set<string> = new Set(dtos.map((x) => x.text));
 
-        const complement = Array.from(correctAnswerTexts).filter((x) => !chosenAnswerTexts.has(x));
+        const difference = new Set([...chosenAnswerTexts].filter((x) => !correctAnswerTexts.has(x)));
 
-        if (!complement.length) {
+        if (!difference.size) {
             return { correctAnswers, score: question.points * BONUS };
         } else {
             return { correctAnswers, score: 0 };
