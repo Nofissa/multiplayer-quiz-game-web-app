@@ -10,6 +10,8 @@ import { Quiz } from '@app/interfaces/quiz';
 import { Question } from '@app/interfaces/question';
 import { UpsertQuestionDialogComponent } from '@app/components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
 import { QuizHttpService } from '@app/services/quiz-http.service';
+import { QuestionInteractionService } from '@app/services/question-interaction.service';
+import SpyObj = jasmine.SpyObj;
 
 fdescribe('QCMCreationPageComponent', () => {
     let component: QCMCreationPageComponent;
@@ -19,7 +21,7 @@ fdescribe('QCMCreationPageComponent', () => {
     let dialogRefSpy: jasmine.SpyObj<MatDialogRef<UpsertQuestionDialogComponent>>
     let mockQuestionSubject: Subject<Question>;
     let mockQuizSubject: Subject<Quiz>;
-    let quizHttpServiceSpy: jasmine.SpyObj<QuizHttpService>;
+    let quizHttpServiceSpy: SpyObj<QuizHttpService>;
 
     const mockQuestion: Question = 
         {
@@ -54,7 +56,7 @@ fdescribe('QCMCreationPageComponent', () => {
     
 
     describe ('tests with no quizId in url', () => {
-        beforeEach(() => {
+        beforeEach(async () => {
             mockQuestionSubject = new Subject();
             mockQuizSubject = new Subject();
 
@@ -76,7 +78,7 @@ fdescribe('QCMCreationPageComponent', () => {
             };
             const matSnackBarSpy = jasmine.createSpyObj('MatSnackBar', ['open']);
 
-            TestBed.configureTestingModule({
+            await TestBed.configureTestingModule({
                 declarations: [QCMCreationPageComponent],
                 providers: [
                     { provide: MatDialog, useValue: dialogSpy },
@@ -86,7 +88,7 @@ fdescribe('QCMCreationPageComponent', () => {
                     { provide: MatSnackBar, useValue: matSnackBarSpy },
                 ],
                 imports: [HttpClientModule, MatSnackBarModule],
-            });
+            }).compileComponents();
 
             snackBarSpy = TestBed.inject(MatSnackBar) as jasmine.SpyObj<MatSnackBar>;
             fixture = TestBed.createComponent(QCMCreationPageComponent);
@@ -177,6 +179,8 @@ fdescribe('QCMCreationPageComponent', () => {
     //requires a different before each
 
     describe ("tests with a different before each", () => {
+        let quizSpy: jasmine.SpyObj<QuizHttpService>;
+        let questionSharing : jasmine.SpyObj<QuestionInteractionService>;
         beforeEach(() => {
             mockQuestionSubject = new Subject();
             mockQuizSubject = new Subject();
@@ -190,7 +194,10 @@ fdescribe('QCMCreationPageComponent', () => {
             quizHttpServiceSpy = jasmine.createSpyObj('QuizHttpService', ['updateQuiz', 'createQuiz', 'getQuizById']);
             quizHttpServiceSpy.createQuiz.and.callFake((quiz)=>mockQuizSubject);
             quizHttpServiceSpy.updateQuiz.and.callFake((quiz)=>mockQuizSubject);
-            quizHttpServiceSpy.getQuizById.and.callFake((quizId )=>of(mockQuiz));
+            quizHttpServiceSpy.getQuizById.and.callFake((quizId )=>mockQuizSubject);
+
+            questionSharing = jasmine.createSpyObj('QuestionInteractionService', ['registerOnEditQuestion']);
+            questionSharing.registerOnEditQuestion.and.callFake(()=> console.log('AAAAAAAAAAAAAAA'));
     
             const paramMap = jasmine.createSpyObj('ParamMap', ['get']);
             paramMap.get.and.returnValue('mockedQuizId'); 
@@ -207,6 +214,7 @@ fdescribe('QCMCreationPageComponent', () => {
                     { provide: MatDialog, useValue: dialogSpy },
                     { provide: MatDialogRef, useValue: dialogRefSpy },
                     { provide: QuizHttpService, useValue: quizHttpServiceSpy },
+                    { provide: QuestionInteractionService, useValue: questionSharing},
                     { provide: ActivatedRoute, useValue: activatedRouteSpy },
                     { provide: MatSnackBar, useValue: matSnackBarSpy },
                 ],
@@ -214,9 +222,10 @@ fdescribe('QCMCreationPageComponent', () => {
             });
     
             snackBarSpy = TestBed.inject(MatSnackBar) as jasmine.SpyObj<MatSnackBar>;
+            quizSpy = TestBed.inject(QuizHttpService) as jasmine.SpyObj<QuizHttpService>;
             fixture = TestBed.createComponent(QCMCreationPageComponent);
             component = fixture.componentInstance;
-            mockQuizSubject.next(mockQuiz);
+            //mockQuizSubject.next(mockQuiz);
   
 
             fixture.detectChanges();
@@ -226,6 +235,7 @@ fdescribe('QCMCreationPageComponent', () => {
 
             expect(quizHttpServiceSpy.getQuizById).toHaveBeenCalled();
             expect(component.formGroup.value.title).toBe(mockQuiz.title);
+            expect(quizSpy.getQuizById).toHaveBeenCalled();
         });
     });
 
