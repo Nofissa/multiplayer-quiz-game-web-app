@@ -32,6 +32,7 @@ import { AdminPageComponent } from './pages/admin-page/admin-page.component';
 import { CreateGamePageComponent } from './pages/create-game-page/create-game-page.component';
 import { QCMCreationPageComponent } from './pages/qcmcreation-page/qcmcreation-page.component';
 import { WaitingRoomPageComponent } from './pages/waiting-room-page/waiting-room-page.component';
+import { LoaderAnimationComponent } from './components/animations/loader-animation/loader-animation.component';
 
 /**
  * Main module that is used in main.ts.
@@ -60,6 +61,7 @@ import { WaitingRoomPageComponent } from './pages/waiting-room-page/waiting-room
         QuestionBankComponent,
         GameComponent,
         WaitingRoomPageComponent,
+        LoaderAnimationComponent,
     ],
     imports: [
         AppRoutingModule,
