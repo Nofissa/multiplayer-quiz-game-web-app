@@ -1,11 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { QuizService } from '@app/services/quiz/quiz.service';
+import { cleanData, connect, disconnect } from '@app/tests/helpers/mongodb.memory.test.helper';
+import { quizStub } from '@app/tests/stubs/quiz.stubs';
 import { Logger } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Model } from 'mongoose';
-// import { MongoMemoryServer } from 'mongodb-memory-server';
-import { cleanData, connect, disconnect } from '@app/tests/helpers/mongodb.memory.test.helper';
-import { quizStub } from '@app/tests/stubs/quiz.stubs';
 
 import { Quiz, QuizDocument } from '@app/model/database/quiz';
 import { QuizDto } from '@app/model/dto/quiz/quiz.dto';
@@ -16,8 +15,6 @@ describe('quizService', () => {
     let quizModelTest: Model<QuizDocument>;
 
     beforeAll(async () => {
-        // notice that only the functions we call from the model are mocked
-        // we can´t use sinon because mongoose Model is an interface
         quizModelTest = {
             countDocuments: jest.fn(),
             insertMany: jest.fn(),
@@ -26,11 +23,7 @@ describe('quizService', () => {
             findOneAndReplace: jest.fn(),
             findOneAndUpdate: jest.fn(),
             findByIdAndDelete: jest.fn(),
-            // sort: jest.fn(),
             findOne: jest.fn(),
-            // deleteOne: jest.fn(),
-            // update: jest.fn(),
-            // updateOne: jest.fn(),
         } as unknown as Model<QuizDocument>;
 
         const module: TestingModule = await Test.createTestingModule({
@@ -62,7 +55,7 @@ describe('quizService', () => {
 
     describe('getQuizzes()', () => {
         const findSortMock = {
-            sort: jest.fn().mockResolvedValue([quizStub()]), // Mock the sort method
+            sort: jest.fn().mockResolvedValue([quizStub()]),
         };
 
         const onlyVisibleTrue = true;
