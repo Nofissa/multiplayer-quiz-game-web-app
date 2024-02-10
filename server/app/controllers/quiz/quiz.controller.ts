@@ -43,10 +43,10 @@ export class QuizController {
             if (quiz) {
                 response.status(HttpStatus.OK).json(quiz);
             } else {
-                response.status(HttpStatus.NOT_FOUND).send();
+                response.status(HttpStatus.NOT_FOUND).send('cannot find quiz');
             }
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send(error.message);
+            response.status(HttpStatus.NOT_FOUND).send('error while getting the quiz');
         }
     }
 

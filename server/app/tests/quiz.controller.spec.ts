@@ -37,18 +37,47 @@ describe('QuizController', () => {
             send: sinon.stub().returnsThis(),
             json: sinon.stub().returnsThis(),
         };
+        const onlyVisible = true;
         const mockResult = quizStub();
         it('should return all quizzes with 200 OK if they exist', async () => {
-            quizServiceTest.getAllQuizzes.resolves([mockResult]);
-            await quizControllerTest.getAllQuizzes(mockResponse as any);
+            quizServiceTest.getQuizzes.resolves([mockResult]);
+            await quizControllerTest.getQuizzes(mockResponse as any, onlyVisible);
             expect(mockResponse.status.calledWith(HttpStatus.OK)).toBeTruthy();
             expect(mockResponse.json.calledWith([mockResult])).toBeTruthy();
         });
         it('should return 404 Not Found when no content', async () => {
-            quizServiceTest.getAllQuizzes.rejects([mockResult]);
-            await quizControllerTest.getAllQuizzes(mockResponse as any);
+            quizServiceTest.getQuizzes.rejects([mockResult]);
+            await quizControllerTest.getQuizzes(mockResponse as any, onlyVisible);
             expect(mockResponse.status.calledWith(HttpStatus.OK)).toBeTruthy();
             expect(mockResponse.send.calledWith('Quizzes not found')).toBeTruthy();
+        });
+    });
+
+    describe('getQuizById', () => {
+        const mockResponse = {
+            status: sinon.stub().returnsThis(),
+            send: sinon.stub().returnsThis(),
+            json: sinon.stub().returnsThis(),
+        };
+        const onlyVisible = true;
+        const mockResult = quizStub();
+        it('should return quiz with 200 OK if it exists', async () => {
+            quizServiceTest.getQuizById.resolves(mockResult);
+            await quizControllerTest.getQuizById(mockResult.id, mockResponse as any, onlyVisible);
+            expect(mockResponse.status.calledWith(HttpStatus.OK)).toBeTruthy();
+            expect(mockResponse.json.calledWith(mockResult)).toBeTruthy();
+        });
+        it('should return 404 Not Found with "cannot find quiz" if quiz = null', async () => {
+            quizServiceTest.getQuizById.resolves(null);
+            await quizControllerTest.getQuizById(mockResult.id, mockResponse as any, onlyVisible);
+            expect(mockResponse.status.calledWith(HttpStatus.NOT_FOUND)).toBeTruthy();
+            expect(mockResponse.send.calledWith('cannot find quiz')).toBeTruthy();
+        });
+        it('should return 404 not found when an error occurs', async () => {
+            quizServiceTest.getQuizById.rejects(mockResult);
+            await quizControllerTest.getQuizById(mockResult.id, mockResponse as any, onlyVisible);
+            expect(mockResponse.status.calledWith(HttpStatus.NOT_FOUND)).toBeTruthy();
+            expect(mockResponse.send.calledWith('error while getting the quiz')).toBeTruthy();
         });
     });
 

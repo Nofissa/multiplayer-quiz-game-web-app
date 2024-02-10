@@ -26,11 +26,11 @@ describe('quizService', () => {
             findOneAndReplace: jest.fn(),
             findOneAndUpdate: jest.fn(),
             findByIdAndDelete: jest.fn(),
-            sort: jest.fn(),
+            // sort: jest.fn(),
             findOne: jest.fn(),
-            deleteOne: jest.fn(),
-            update: jest.fn(),
-            updateOne: jest.fn(),
+            // deleteOne: jest.fn(),
+            // update: jest.fn(),
+            // updateOne: jest.fn(),
         } as unknown as Model<QuizDocument>;
 
         const module: TestingModule = await Test.createTestingModule({
@@ -49,6 +49,7 @@ describe('quizService', () => {
     });
     beforeEach(async () => {
         await cleanData();
+        jest.clearAllMocks();
     });
 
     afterAll(async () => {
@@ -59,11 +60,52 @@ describe('quizService', () => {
         expect(quizServiceTest).toBeDefined();
     });
 
-    describe('getAllQuizzes()', () => {
-        it('getAllQuizzes() should get all quizzes', async () => {
-            jest.spyOn(quizModelTest, 'find').mockResolvedValue([quizStub()]);
-            const quizzes = await quizServiceTest.getAllQuizzes();
+    describe('getQuizzes()', () => {
+        const findSortMock = {
+            sort: jest.fn().mockResolvedValue([quizStub()]), // Mock the sort method
+        };
+
+        const onlyVisibleTrue = true;
+        const onlyVisibleFalse = false;
+
+        it('getQuizzes() should get all quizzes if visibleOnly = false', async () => {
+            jest.spyOn(quizModelTest, 'find').mockReturnValue(findSortMock as any);
+            const quizzes = await quizServiceTest.getQuizzes(onlyVisibleFalse);
+            expect(findSortMock.sort).toHaveBeenCalledWith({ lastModification: 1 });
             expect(quizzes).toEqual([quizStub()]);
+        });
+        it('getQuizzes() should get all quizzes if not visibleOnly', async () => {
+            jest.spyOn(quizModelTest, 'find').mockReturnValue(findSortMock as any);
+            const quizzes = await quizServiceTest.getQuizzes();
+            expect(findSortMock.sort).toHaveBeenCalledWith({ lastModification: 1 });
+            expect(quizzes).toEqual([quizStub()]);
+        });
+        it('getQuizzes() should get non hidden quizzes if visibleOnly = true', async () => {
+            jest.spyOn(quizModelTest, 'find').mockReturnValue(findSortMock as any);
+            const quizzes = await quizServiceTest.getQuizzes(onlyVisibleTrue);
+            expect(findSortMock.sort).toHaveBeenCalledWith({ lastModified: 1 });
+            expect(quizzes).toEqual([quizStub()]);
+        });
+    });
+
+    describe('getQuizById()', () => {
+        const onlyVisibleTrue = true;
+        const onlyVisibleFalse = false;
+        it('getQuizById() should get all quizzes if visibleOnly = false', async () => {
+            jest.spyOn(quizModelTest, 'findOne').mockResolvedValue(quizStub());
+            const quiz = await quizServiceTest.getQuizById(quizStub().id, onlyVisibleFalse);
+            expect(quiz).toEqual(quizStub());
+        });
+
+        it('getQuizById() should get all quizzes if visibleOnly = undefined', async () => {
+            jest.spyOn(quizModelTest, 'findOne').mockResolvedValue(quizStub());
+            const quiz = await quizServiceTest.getQuizById(quizStub().id);
+            expect(quiz).toEqual(quizStub());
+        });
+        it('getQuizById() should get non hidden quizzes if visibleOnly = true', async () => {
+            jest.spyOn(quizModelTest, 'findOne').mockResolvedValue(quizStub());
+            const quiz = await quizServiceTest.getQuizById(quizStub().id, onlyVisibleTrue);
+            expect(quiz).toEqual(quizStub());
         });
     });
 
