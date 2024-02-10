@@ -254,8 +254,7 @@ describe('gameComponent', () => {
             component.questionValidated = false;
             fixture.detectChanges();
             spyOn(component, 'toggleChoiceSelection');
-            const key = '1';
-            const event = new KeyboardEvent('keydown', { key });
+            const event = new KeyboardEvent('keydown', { key: '1' });
             document.dispatchEvent(event);
 
             tick();
@@ -273,6 +272,60 @@ describe('gameComponent', () => {
             tick();
 
             expect(component.validateChoices).toHaveBeenCalled();
+        }));
+
+        it('should call executor when window keydown event is triggered', () => {
+            const event = new KeyboardEvent('keydown', { key: 'A' });
+            spyOn(event, 'preventDefault');
+
+            // eslint-disable-next-line @typescript-eslint/no-empty-function
+            keyBindingServiceSpy.getExecutor.and.returnValue(() => {});
+
+            window.dispatchEvent(event);
+
+            expect(keyBindingServiceSpy.getExecutor).toHaveBeenCalledWith('A');
+            expect(event.preventDefault).toHaveBeenCalled();
+        });
+
+        it('should not call executor when focused element is a textarea', () => {
+            const event = new KeyboardEvent('keydown', { key: 'A' });
+
+            const textarea: HTMLTextAreaElement = document.createElement('textarea');
+            spyOnProperty(document, 'activeElement').and.returnValue(textarea);
+            component.handleKeyboardEvent(event);
+
+            expect(component.keyBindingService.getExecutor).not.toHaveBeenCalled();
+        });
+
+        it('should call validateChoices when the timer reaches 0', fakeAsync(() => {
+            component.quiz.duration = 10;
+            component.startTimer();
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+            expect(component.secondsLeft).toBe(10);
+            spyOn(component, 'validateChoices');
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+            tick(10000);
+
+            expect(component.secondsLeft).toBe(0);
+            expect(component.validateChoices).toHaveBeenCalled();
+        }));
+
+        it('should update secondsLeft correctly during the countdown', fakeAsync(() => {
+            component.quiz.duration = 5;
+            spyOn(component, 'validateChoices');
+
+            component.startTimer();
+            expect(component.secondsLeft).toBe(3);
+
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+            tick(1000);
+            expect(component.secondsLeft).toBe(2);
+
+            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+            tick(1000);
+            expect(component.secondsLeft).toBe(1);
+
+            expect(component.validateChoices).not.toHaveBeenCalled();
         }));
     });
 });

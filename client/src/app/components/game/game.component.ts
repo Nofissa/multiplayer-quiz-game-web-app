@@ -31,8 +31,8 @@ export class GameComponent implements OnInit, OnChanges, OnDestroy {
     feedbackMessageClass: string = 'feedback-message';
     questionValidated: boolean = false;
 
-    private readonly timerService: TimerService;
-    private readonly keyBindingService: KeyBindingService;
+    readonly keyBindingService: KeyBindingService;
+    readonly timerService: TimerService;
 
     // eslint-disable-next-line max-params
     constructor(
@@ -43,6 +43,9 @@ export class GameComponent implements OnInit, OnChanges, OnDestroy {
     ) {
         this.timerService = gameServicesProvider.timerService;
         this.keyBindingService = gameServicesProvider.keyBindingService;
+    }
+    get time(): number {
+        return this.timerService.time;
     }
 
     @HostListener('window:keydown', ['$event'])
@@ -93,17 +96,16 @@ export class GameComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     startTimer() {
-        this.timerService.startTimer(this.quiz.duration, (secondsLeft: number) => {
-            this.secondsLeft = secondsLeft;
-
-            if (this.secondsLeft === 0) {
+        this.timerService.startTimer(this.quiz.duration);
+        // this.secondsLeft = this.timerService.time;
+        this.timerService.onTick.subscribe(() => {
+            if (this.time === 0) {
                 this.validateChoices();
             }
         });
-    }
-
-    stopTimer() {
-        this.timerService.stopTimer();
+        // if (this.time === 0) {
+        //     this.validateChoices();
+        // }
     }
 
     isSelected(choice: Choice): boolean {
@@ -131,7 +133,7 @@ export class GameComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     validateChoices() {
-        this.stopTimer();
+        this.timerService.stopTimer();
         this.questionValidated = true;
         // lint disabled on this line because it's a mongodb id
         // eslint-disable-next-line no-underscore-dangle
