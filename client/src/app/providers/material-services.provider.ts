@@ -8,15 +8,15 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 })
 export class MaterialServicesProvider {
     constructor(
-        private readonly _dialogService: MatDialog,
-        private readonly _snackBarService: MatSnackBar,
+        private readonly dialogService: MatDialog,
+        private readonly snackBarService: MatSnackBar,
     ) {}
 
-    get dialogService(): MatDialog {
-        return this._dialogService;
+    get dialog(): MatDialog {
+        return this.dialogService;
     }
 
-    get snackBarService(): MatSnackBar {
-        return this._snackBarService;
+    get snackBar(): MatSnackBar {
+        return this.snackBarService;
     }
 }

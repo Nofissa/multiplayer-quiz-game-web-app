@@ -8,15 +8,15 @@ import { QuestionSharingService } from '@app/services/question-sharing.service';
 })
 export class QuestionServicesProvider {
     constructor(
-        private readonly _questionHttpService: QuestionHttpService,
-        private readonly _questionSharingService: QuestionSharingService,
+        private readonly questionHttpService: QuestionHttpService,
+        private readonly questionSharingService: QuestionSharingService,
     ) {}
 
-    get questionHttpService(): QuestionHttpService {
-        return this._questionHttpService;
+    get questionHttp(): QuestionHttpService {
+        return this.questionHttpService;
     }
 
-    get questionSharingService(): QuestionSharingService {
-        return this._questionSharingService;
+    get questionSharing(): QuestionSharingService {
+        return this.questionSharingService;
     }
 }
