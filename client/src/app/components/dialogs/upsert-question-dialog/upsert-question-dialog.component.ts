@@ -8,6 +8,8 @@ import { Question } from '@app/interfaces/question';
 import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog-data';
 import { MAX_CHOICE_COUNT, MIN_CHOICE_COUNT, SNACK_MESSAGE_DURATION, POINT_VALUE_BASE_MULTIPLE } from '@app/constants';
 
+const ID_LENGTH: number = 10;
+
 @Component({
     selector: 'app-upsert-question-dialog',
     templateUrl: './upsert-question-dialog.component.html',
@@ -62,6 +64,18 @@ export class UpsertQuestionDialogComponent {
         moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
     }
 
+    generateRandomString(length: number = ID_LENGTH): string {
+        const lettersAndDigits = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let randomString = '';
+
+        for (let i = 0; i < length; i++) {
+            const randomIndex: number = Math.floor(Math.random() * lettersAndDigits.length);
+            randomString += lettersAndDigits.charAt(randomIndex);
+        }
+
+        return randomString;
+    }
+
     addAnswer() {
         if (this.choicesArray.length < MAX_CHOICE_COUNT) {
             this.choicesArray.push(
@@ -95,7 +109,7 @@ export class UpsertQuestionDialogComponent {
                 points: this.formGroup.value.points,
                 choices: this.formGroup.value.choices,
                 lastModification: new Date(),
-                _id: '',
+                _id: this.data.question._id? this.data.question._id : this.generateRandomString(),
             };
 
             this.dialogRef.close(question);

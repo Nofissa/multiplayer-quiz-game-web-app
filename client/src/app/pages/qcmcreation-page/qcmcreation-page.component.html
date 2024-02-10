@@ -11,7 +11,7 @@
         </mat-form-field>
         <div id="questions-container" class="flex-column">
             <app-question-list id="question-list" [questions]="questionsContainer" [interactionService]="questionInteractionService" [options]="{share: true, create: true, edit: true, delete: true, drag:true, numberOrder: true}"></app-question-list>
-            <input type="button" (click)="addQuestion()" class="add-icon" value="+"/>
+            <input type="button" (click)="openQuestionDialog()" class="add-icon" value="+"/>
         </div>
         <input id="submit-quiz" type="submit" (mouseDown)="submitQuiz()"/>
     </form>

@@ -9,6 +9,7 @@ import { Quiz } from '@app/interfaces/quiz';
 import { QuestionInteractionService } from '@app/services/question-interaction.service';
 import { QuestionSharingService } from '@app/services/question-sharing.service';
 import { QuizHttpService } from '@app/services/quiz-http.service';
+import { SNACK_MESSAGE_DURATION } from '@app/constants';
 
 const ID_LENGTH = 10;
 
@@ -40,13 +41,17 @@ export class QCMCreationPageComponent implements OnInit {
     }
 
     ngOnInit() {
+        console.log('ngOnInit called');
         this.activatedRoute.queryParamMap.subscribe((paramMap: ParamMap) => {
             const quizId = paramMap.get('quizId');
-
+            console.log('activated route works too');
             this.setupForm();
 
             if (quizId) {
+                console.log('quizId exists');
+
                 this.quizHttpService.getQuizById(quizId).subscribe((quiz: Quiz) => {
+                    console.log('the sub is working correctly');
                     if (quiz) {
                         this.quiz = quiz;
                         this.questionsContainer = this.quiz.questions;
@@ -56,7 +61,7 @@ export class QCMCreationPageComponent implements OnInit {
             }
 
             this.questionInteractionService.registerOnAddQuestion(() => {
-                this.addQuestion();
+                this.openQuestionDialog();
             });
 
             this.questionInteractionService.registerOnShareQuestion((question: Question) => {
@@ -68,19 +73,7 @@ export class QCMCreationPageComponent implements OnInit {
             });
 
             this.questionInteractionService.registerOnEditQuestion((question: Question) => {
-                const dialogRef = this.dialogService.open(UpsertQuestionDialogComponent, {
-                    data: { title: 'Moddifier une question', question },
-                });
-                dialogRef.afterClosed().subscribe({
-                    next: (data: Question) => {
-                        if (data) {
-                            question.text = data.text;
-                            question.choices = data.choices;
-                            question.points = data.points;
-                            question.lastModification = data.lastModification;
-                        }
-                    },
-                });
+                this.openQuestionDialog('Modifier une question', question);
             });
 
             this.questionSharingService.subscribe((question: Question) => {
@@ -98,33 +91,45 @@ export class QCMCreationPageComponent implements OnInit {
         }
     }
 
-    addQuestion() {
+    openQuestionDialog(
+        title:string = 'Créer une Question', 
+        question: Question = 
+                                {
+                                    type: 'QCM',
+                                    text: '',
+                                    choices: [
+                                        {
+                                            text: '',
+                                            isCorrect: true,
+                                        },
+                                        {
+                                            text: '',
+                                            isCorrect: false,
+                                        },
+                                    ],
+                                    lastModification: new Date(),
+                                    points: 10,
+                                    _id: '',
+                                } 
+        ) {
         const dialogRef = this.dialogService.open(UpsertQuestionDialogComponent, {
             data: {
-                title: 'Créer une Question',
-                question: {
-                    type: 'QCM',
-                    text: '',
-                    choices: [
-                        {
-                            text: '',
-                            isCorrect: true,
-                        },
-                        {
-                            text: '',
-                            isCorrect: false,
-                        },
-                    ],
-                    lastModification: new Date(),
-                    points: 10,
-                    _id: '',
-                },
+                title: title,
+                question: question,
             },
         });
         dialogRef.afterClosed().subscribe({
             next: (data: Question) => {
                 if (data) {
-                    this.questionsContainer.push(data);
+                    if (question._id != '') {
+                        question.text = data.text;
+                        question.choices = data.choices;
+                        question.points = data.points;
+                        question.lastModification = data.lastModification;
+                    }
+                    else {
+                        this.questionsContainer.push(data);
+                    }
                 }
             },
         });
@@ -143,9 +148,11 @@ export class QCMCreationPageComponent implements OnInit {
     }
 
     submitQuiz() {
-        if (this.questionsContainer.length !== 0) {
+        console.log('submit Quiz is entered');
+        if (this.questionsContainer.length !== 0 && this.formGroup.valid) {
+            console.log('enough questions and title $ description is');
             const quiz: Quiz = {
-                id: this.generateRandomString(),
+                id: this.quiz? this.quiz.id : this.generateRandomString(),
                 title: this.formGroup.value.title,
                 description: this.formGroup.value.description,
                 duration: 10,
@@ -155,13 +162,14 @@ export class QCMCreationPageComponent implements OnInit {
                 _id: '',
             };
             if (this.quiz) {
+                console.log('hi');
                 this.quizHttpService.updateQuiz(quiz).subscribe({
                     next: (x: Quiz) => {
                         this.quiz = x;
-                        this.snackBar.open('Le quiz a été enregistré avec succès', '', { duration: 2000 });
+                        this.snackBar.open('Le quiz a été enregistré avec succès', '', { duration: SNACK_MESSAGE_DURATION });
                     },
                     error: (e) => {
-                        this.snackBar.open("Le quiz n'a pas pu être modifié", '', { duration: 2000 });
+                        this.snackBar.open("Le quiz n'a pas pu être modifié", '', { duration: SNACK_MESSAGE_DURATION });
                         window.console.log("L'erreur est : ", e);
                     },
                 });
@@ -169,16 +177,16 @@ export class QCMCreationPageComponent implements OnInit {
                 this.quizHttpService.createQuiz(quiz).subscribe({
                     next: (x: Quiz) => {
                         this.quiz = x;
-                        this.snackBar.open('Le quiz a été enregistré avec succès', '', { duration: 2000 });
+                        this.snackBar.open('Le quiz a été enregistré avec succès', '', { duration: SNACK_MESSAGE_DURATION });
                     },
                     error: (e) => {
-                        this.snackBar.open("Le quiz n'a pas pu être créer", '', { duration: 2000 });
+                        this.snackBar.open("Le quiz n'a pas pu être créer", '', { duration: SNACK_MESSAGE_DURATION });
                         window.console.log("L'erreur est : ", e);
                     },
                 });
             }
         } else {
-            this.snackBar.open("L'un des paramètres est erroné, veuillez réessayer", '', { duration: 3000 });
+            this.snackBar.open("L'un des paramètres est erroné, veuillez réessayer", '', { duration: SNACK_MESSAGE_DURATION });
         }
     }
 
