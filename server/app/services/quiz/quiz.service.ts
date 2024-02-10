@@ -75,12 +75,20 @@ export class QuizService {
         await this.model.insertMany(quizzes);
     }
 
-    async getAllQuizzes(): Promise<Quiz[]> {
-        return await this.model.find({}).sort({ lastModified: 1 });
+    async getQuizzes(visibleOnly?: boolean): Promise<Quiz[]> {
+        if (!visibleOnly) {
+            return await this.model.find({}).sort({ lastModification: 1 });
+        }
+
+        return await this.model.find({ isHidden: false }).sort({ lastModified: 1 });
     }
 
-    async getQuizById(id: string): Promise<Quiz> {
-        return await this.model.findOne({ _id: id });
+    async getQuizById(id: string, visibleOnly?: boolean): Promise<Quiz> {
+        if (!visibleOnly) {
+            return await this.model.findOne({ _id: id });
+        }
+
+        return await this.model.findOne({ _id: id, isHidden: false });
     }
 
     async addQuiz(dto: QuizDto): Promise<Quiz> {
