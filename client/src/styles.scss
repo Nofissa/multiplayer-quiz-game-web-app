@@ -5,65 +5,70 @@ $client-primary: mat.define-palette(mat.$indigo-palette);
 $client-accent: mat.define-palette(mat.$pink-palette, A200, A100, A400);
 $client-warn: mat.define-palette(mat.$red-palette);
 
-$client-theme: mat.define-light-theme((
-  color: (
-    primary: $client-primary,
-    accent: $client-accent,
-    warn: $client-warn,
-  )
-));
+$client-theme: mat.define-light-theme(
+    (
+        color: (
+            primary: $client-primary,
+            accent: $client-accent,
+            warn: $client-warn,
+        ),
+    )
+);
 
 @include mat.all-component-themes($client-theme);
 
 :root {
     --main-bg-color: #121212;
-    --secondary-bg-color: #FFFFFF;
-    --main-fg-color: #FFFFFF;
+    --secondary-bg-color: #ffffff;
+    --main-fg-color: #ffffff;
     --secondary-fg-color: #121212;
-    --answer-color-red: #DC4D66;
-    --answer-color-blue: #63C5EA;
-    --answer-color-green: #9CD172;
-    --answer-color-yellow: #E69D2E;
+    --answer-color-red: #dc4d66;
+    --answer-color-blue: #63c5ea;
+    --answer-color-green: #9cd172;
+    --answer-color-yellow: #e69d2e;
 }
 
-html, body { height: 100%; }
+html,
+body {
+    height: 100%;
+}
 body {
     margin: 0;
     background-color: var(--main-bg-color);
     color: aliceblue;
-    font-family: Roboto, "Helvetica Neue", sans-serif;
+    font-family: Roboto, 'Helvetica Neue', sans-serif;
 }
 
 .button {
-  padding: 8px 22px;
-  border-radius: 6px;
-  background-color: aliceblue;
-  transition: all 0.2s ease;
-  margin-top: 10px;
-  text-align: center;
-  font-size: 24px;
-  font-weight: bold;
+    padding: 8px 22px;
+    border-radius: 6px;
+    background-color: aliceblue;
+    transition: all 0.2s ease;
+    margin-top: 10px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
 }
 
 .justified {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .flex-row {
-  display: flex;
-  flex-direction: row;
+    display: flex;
+    flex-direction: row;
 }
 
 .flex-column {
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column;
 }
 
 .hidden {
-  visibility: hidden;
+    visibility: hidden;
 }
 
 .base-snackbar * {
