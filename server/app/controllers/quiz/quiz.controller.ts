@@ -1,4 +1,3 @@
-import { Question } from '@app/model/database/question';
 import { Quiz } from '@app/model/database/quiz';
 import { QuizDto } from '@app/model/dto/quiz/quiz.dto';
 import { QuizService } from '@app/services/quiz/quiz.service';
@@ -25,7 +24,7 @@ export class QuizController {
             const quizzes = await this.quizService.getQuizzes(visibleOnly);
             response.status(HttpStatus.OK).json(quizzes);
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send(error.message);
+            response.status(HttpStatus.NOT_FOUND).send('Quizzes not found');
         }
     }
 
@@ -44,10 +43,10 @@ export class QuizController {
             if (quiz) {
                 response.status(HttpStatus.OK).json(quiz);
             } else {
-                response.status(HttpStatus.NOT_FOUND).send();
+                response.status(HttpStatus.NOT_FOUND).send('cannot find quiz');
             }
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send(error.message);
+            response.status(HttpStatus.NOT_FOUND).send('error while getting the quiz');
         }
     }
 
@@ -63,7 +62,7 @@ export class QuizController {
             const createdQuiz = await this.quizService.addQuiz(dto);
             response.status(HttpStatus.CREATED).json(createdQuiz);
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send(error.message);
+            response.status(HttpStatus.BAD_REQUEST).send('Cant add quiz');
         }
     }
 
@@ -80,24 +79,7 @@ export class QuizController {
             const quiz: Quiz = await this.quizService.modifyQuiz(dto);
             response.status(HttpStatus.OK).json(quiz);
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send(error.message);
-        }
-    }
-
-    @ApiOkResponse({
-        description: 'Modify a question in a quiz',
-        type: Quiz,
-    })
-    @ApiNotFoundResponse({
-        description: 'Return NOT_FOUND http status when request fails',
-    })
-    @Put('/:id/questions/:questionId')
-    async modifyQuestionInQuiz(@Param('id') quizId: string, @Param('questionId') questionId: string, @Res() response: Response) {
-        try {
-            const question: Question = await this.quizService.modifyQuestionInQuiz(quizId, questionId);
-            response.status(HttpStatus.OK).json(question);
-        } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send(error.message);
+            response.status(HttpStatus.NOT_FOUND).send('Cant find quiz to modify');
         }
     }
 
@@ -109,29 +91,12 @@ export class QuizController {
         description: 'Return NOT_FOUND http status when request fails',
     })
     @Patch('/hide/:id')
-    async hideQuestionById(@Param('id') id: string, @Res() response: Response) {
+    async hideQuizById(@Param('id') id: string, @Res() response: Response) {
         try {
             const quiz: Quiz = await this.quizService.hideQuizById(id);
             response.status(HttpStatus.OK).json(quiz);
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send(error.message);
-        }
-    }
-
-    @ApiOkResponse({
-        description: 'Delete a question in a quiz ',
-        type: Quiz,
-    })
-    @ApiNotFoundResponse({
-        description: 'Return NOT_FOUND http status when request fails',
-    })
-    @Delete('/:id/questions/:questionId')
-    async deleteQuestionInQuiz(@Param('id') quizId: string, @Param('questionId') questionId: string, @Res() response: Response) {
-        try {
-            await this.quizService.deleteQuestionInQuizbyId(quizId, questionId);
-            response.status(HttpStatus.OK).send();
-        } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send(error.message);
+            response.status(HttpStatus.NOT_FOUND).send('Cant find quiz to hide');
         }
     }
 
@@ -147,7 +112,7 @@ export class QuizController {
             await this.quizService.deleteQuizById(id);
             response.status(HttpStatus.OK).send();
         } catch (error) {
-            response.status(HttpStatus.INTERNAL_SERVER_ERROR).send(error.message);
+            response.status(HttpStatus.NOT_FOUND).send('Cant find quiz to delete');
         }
     }
 }
