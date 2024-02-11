@@ -1,13 +1,17 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
+import { Quiz } from '@app/interfaces/quiz';
+import { QuizHttpService } from '@app/services/quiz-http.service';
+import { of } from 'rxjs';
 import { GamePageComponent } from './game-page.component';
 
 describe('gamePage', () => {
     let component: GamePageComponent;
     let fixture: ComponentFixture<GamePageComponent>;
+    let quizHttpService: jasmine.SpyObj<QuizHttpService>;
 
     const mockActivatedRoute = {
         snapshot: {
@@ -29,6 +33,7 @@ describe('gamePage', () => {
     beforeEach(() => {
         fixture = TestBed.createComponent(GamePageComponent);
         component = fixture.componentInstance;
+        quizHttpService = TestBed.inject(QuizHttpService) as jasmine.SpyObj<QuizHttpService>;
         fixture.detectChanges();
     });
 
@@ -78,4 +83,36 @@ describe('gamePage', () => {
 
         expect(component.isTest).toBe(true);
     });
+
+    it('should load quiz from the server when quizId is present in queryParams', fakeAsync(() => {
+        spyOn(quizHttpService, 'getVisibleQuizById');
+        const mockQuiz: Quiz = {
+            id: 'loool',
+            title: 'testing',
+            description: 'test quiz',
+            duration: 20,
+            lastModification: new Date(),
+            questions: [
+                {
+                    type: 'QCM',
+                    text: 'Sample Question Text',
+                    points: 10,
+                    choices: [
+                        { text: 'Choice 1', isCorrect: true },
+                        { text: 'Choice 2', isCorrect: false },
+                    ],
+                    lastModification: null,
+                    _id: 'dheoh30hd380',
+                },
+            ],
+            isHidden: null,
+            _id: 'loool',
+        };
+        quizHttpService.getVisibleQuizById.and.returnValue(of(mockQuiz));
+        component.loadQuiz();
+        tick();
+
+        expect(quizHttpService.getVisibleQuizById).toHaveBeenCalledWith('loool');
+        expect(component.quiz).toEqual(mockQuiz);
+    }));
 });
