@@ -1,11 +1,13 @@
 import { Component } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { AuthService } from '@app/services/auth.service';
 import { SessionService } from '@app/services/session.service';
 import { AuthPayload } from '@common/auth-payload';
 import { LoginDialogComponent } from '@app/components/dialogs/login-dialog/login-dialog.component';
 import { LoginDialogData } from '@app/interfaces/login-dialog-data';
+import { MaterialServicesProvider } from '@app/providers/material-services.provider';
+import { SecurityServicesProvider } from '@app/providers/security-services.provider';
+import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
@@ -14,14 +16,21 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     styleUrls: ['./main-page.component.scss'],
 })
 export class MainPageComponent {
-    // eslint-disable-next-line max-params
+    private readonly authService: AuthService;
+    private readonly sessionService: SessionService;
+    private readonly dialogService: MatDialog;
+    private readonly snackBarService: MatSnackBar;
+
     constructor(
-        private readonly dialogService: MatDialog,
-        private readonly snackBarService: MatSnackBar,
-        private readonly authService: AuthService,
-        private readonly sessionService: SessionService,
+        securityServicesProvider: SecurityServicesProvider,
+        materialServicesProvider: MaterialServicesProvider,
         private readonly router: Router,
-    ) {}
+    ) {
+        this.authService = securityServicesProvider.auth;
+        this.sessionService = securityServicesProvider.session;
+        this.dialogService = materialServicesProvider.dialog;
+        this.snackBarService = materialServicesProvider.snackBar;
+    }
 
     validateAdmin() {
         const token = this.sessionService.getSession();
@@ -55,7 +64,7 @@ export class MainPageComponent {
                 error: () => {
                     this.snackBarService.open("Échec de l'authentification", 'OK', {
                         verticalPosition: 'top',
-                        panelClass: ['login-failure-snackbar'],
+                        panelClass: ['base-snackbar'],
                     });
                 },
             });

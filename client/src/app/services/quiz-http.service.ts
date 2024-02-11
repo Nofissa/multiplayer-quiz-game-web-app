@@ -16,7 +16,14 @@ export class QuizHttpService {
     getAllQuizzes(): Observable<Quiz[]> {
         return this.http.get<Quiz[]>(this.baseUrl).pipe(
             map((quizzes: Quiz[]) => this.convertAllLastModifiedToDate(quizzes)),
-            catchError(this.handleError<Quiz[]>('Error getting quizzes')),
+            catchError(this.handleError<Quiz[]>()),
+        );
+    }
+
+    getVisibleQuizzes(): Observable<Quiz[]> {
+        return this.http.get<Quiz[]>(`${this.baseUrl}?visibleOnly=true`).pipe(
+            map((quizzes: Quiz[]) => this.convertAllLastModifiedToDate(quizzes)),
+            catchError(this.handleError<Quiz[]>()),
         );
     }
 
@@ -24,7 +31,14 @@ export class QuizHttpService {
         console.log('urghhhhh');
         return this.http.get<Quiz>(`${this.baseUrl}/${id}`).pipe(
             map((quiz: Quiz) => this.convertLastModifiedToDate(quiz)),
-            catchError(this.handleError<Quiz>('Error getting quiz')),
+            catchError(this.handleError<Quiz>()),
+        );
+    }
+
+    getVisibleQuizById(id: string): Observable<Quiz> {
+        return this.http.get<Quiz>(`${this.baseUrl}/${id}?visibleOnly=true`).pipe(
+            map((quiz: Quiz) => this.convertLastModifiedToDate(quiz)),
+            catchError(this.handleError<Quiz>()),
         );
     }
 
@@ -32,25 +46,25 @@ export class QuizHttpService {
         console.log('i am entered and i dont llike it');
         return this.http.post<Quiz>(this.baseUrl, quiz).pipe(
             map((createdQuiz: Quiz) => this.convertLastModifiedToDate(createdQuiz)),
-            catchError(this.handleError<Quiz>('Error creating quiz')),
+            catchError(this.handleError<Quiz>()),
         );
     }
 
     updateQuiz(quiz: Quiz): Observable<Quiz> {
         return this.http.put<Quiz>(this.baseUrl, quiz).pipe(
             map((updatedQuiz: Quiz) => this.convertLastModifiedToDate(updatedQuiz)),
-            catchError(this.handleError<Quiz>('Error updating quiz')),
+            catchError(this.handleError<Quiz>()),
         );
     }
 
     deleteQuizById(id: string): Observable<void> {
-        return this.http.delete<void>(`${this.baseUrl}/${id}`).pipe(catchError(this.handleError<void>('Error deleting quiz')));
+        return this.http.delete<void>(`${this.baseUrl}/${id}`).pipe(catchError(this.handleError<void>()));
     }
 
     hideQuizById(id: string): Observable<Quiz> {
         return this.http.patch<Quiz>(`${this.baseUrl}/hide/${id}`, {}).pipe(
             map((hiddenQuiz: Quiz) => this.convertLastModifiedToDate(hiddenQuiz)),
-            catchError(this.handleError<Quiz>('Error hiding quiz')),
+            catchError(this.handleError<Quiz>()),
         );
     }
 
@@ -65,10 +79,9 @@ export class QuizHttpService {
         return quizzes.map(this.convertLastModifiedToDate);
     }
 
-    private handleError<T>(errorMessage: string): (error: HttpErrorResponse) => Observable<T> {
-        // eslint-disable-next-line no-unused-vars
-        return (_: HttpErrorResponse): Observable<T> => {
-            return throwError(() => new Error(errorMessage));
+    private handleError<T>(): (error: HttpErrorResponse) => Observable<T> {
+        return (httpErrorResponse: HttpErrorResponse): Observable<T> => {
+            return throwError(() => httpErrorResponse.error);
         };
     }
 }

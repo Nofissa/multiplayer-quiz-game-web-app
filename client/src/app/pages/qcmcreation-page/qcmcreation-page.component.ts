@@ -6,6 +6,7 @@ import { ActivatedRoute, ParamMap } from '@angular/router';
 import { UpsertQuestionDialogComponent } from '@app/components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
 import { Question } from '@app/interfaces/question';
 import { Quiz } from '@app/interfaces/quiz';
+import { MaterialServicesProvider } from '@app/providers/material-services.provider';
 import { QuestionInteractionService } from '@app/services/question-interaction.service';
 import { QuestionSharingService } from '@app/services/question-sharing.service';
 import { QuizHttpService } from '@app/services/quiz-http.service';
@@ -17,41 +18,41 @@ const ID_LENGTH = 10;
     selector: 'app-qcmcreation-page',
     templateUrl: './qcmcreation-page.component.html',
     styleUrls: ['./qcmcreation-page.component.scss'],
-    providers: [QuestionInteractionService, QuizHttpService],
+    providers: [QuestionInteractionService],
 })
 export class QCMCreationPageComponent implements OnInit {
     formGroup: FormGroup;
     questionsContainer: Question[] = [];
-    quizId: string = '';
     quiz: Quiz;
+
+    private readonly dialogService: MatDialog;
+    private readonly snackBarService: MatSnackBar;
 
     // eslint-disable-next-line max-params
     constructor(
-        private formBuilder: FormBuilder,
-        private dialogService: MatDialog,
-        public questionInteractionService: QuestionInteractionService,
-        private questionSharingService: QuestionSharingService,
-        private quizHttpService: QuizHttpService,
-        private activatedRoute: ActivatedRoute,
-        private snackBar: MatSnackBar,
-    ) {}
+        private readonly formBuilder: FormBuilder,
+        private readonly activatedRoute: ActivatedRoute,
+        private readonly quizHttpService: QuizHttpService,
+        private readonly questionSharingService: QuestionSharingService,
+        readonly questionInteractionService: QuestionInteractionService,
+        materialServicesProvider: MaterialServicesProvider,
+    ) {
+        this.dialogService = materialServicesProvider.dialog;
+        this.snackBarService = materialServicesProvider.snackBar;
+    }
 
     get questions(): FormArray {
         return this.formGroup.get('questions') as FormArray;
     }
 
     ngOnInit() {
-        console.log('ngOnInit called');
         this.activatedRoute.queryParamMap.subscribe((paramMap: ParamMap) => {
             const quizId = paramMap.get('quizId');
-            console.log('activated route works too');
+
             this.setupForm();
 
             if (quizId) {
-                console.log('quizId exists');
-
-                this.quizHttpService.getQuizById(quizId).subscribe((quiz: Quiz) => {
-                    console.log('the sub is working correctly');
+                this.quizHttpService.getVisibleQuizById(quizId).subscribe((quiz: Quiz) => {
                     if (quiz) {
                         this.quiz = quiz;
                         this.questionsContainer = this.quiz.questions;
@@ -61,7 +62,7 @@ export class QCMCreationPageComponent implements OnInit {
             }
 
             this.questionInteractionService.registerOnAddQuestion(() => {
-                this.openQuestionDialog();
+                this.addQuestion();
             });
 
             this.questionInteractionService.registerOnShareQuestion((question: Question) => {
@@ -73,7 +74,19 @@ export class QCMCreationPageComponent implements OnInit {
             });
 
             this.questionInteractionService.registerOnEditQuestion((question: Question) => {
-                this.openQuestionDialog('Modifier une question', question);
+                const dialogRef = this.dialogService.open(UpsertQuestionDialogComponent, {
+                    data: { title: 'Moddifier une question', question },
+                });
+                dialogRef.afterClosed().subscribe({
+                    next: (data: Question) => {
+                        if (data) {
+                            question.text = data.text;
+                            question.choices = data.choices;
+                            question.points = data.points;
+                            question.lastModification = data.lastModification;
+                        }
+                    },
+                });
             });
 
             this.questionSharingService.subscribe((question: Question) => {
@@ -91,45 +104,35 @@ export class QCMCreationPageComponent implements OnInit {
         }
     }
 
-    openQuestionDialog(
-        title:string = 'Créer une Question', 
-        question: Question = 
-                                {
-                                    type: 'QCM',
-                                    text: '',
-                                    choices: [
-                                        {
-                                            text: '',
-                                            isCorrect: true,
-                                        },
-                                        {
-                                            text: '',
-                                            isCorrect: false,
-                                        },
-                                    ],
-                                    lastModification: new Date(),
-                                    points: 10,
-                                    _id: '',
-                                } 
-        ) {
+    addQuestion() {
         const dialogRef = this.dialogService.open(UpsertQuestionDialogComponent, {
             data: {
-                title: title,
-                question: question,
+                title: 'Créer une Question',
+                question: {
+                    type: 'QCM',
+                    text: '',
+                    choices: [
+                        {
+                            text: '',
+                            isCorrect: true,
+                        },
+                        {
+                            text: '',
+                            isCorrect: false,
+                        },
+                    ],
+                    lastModification: new Date(),
+                    points: 10,
+                    _id: '',
+                },
             },
         });
         dialogRef.afterClosed().subscribe({
             next: (data: Question) => {
                 if (data) {
-                    if (question._id != '') {
-                        question.text = data.text;
-                        question.choices = data.choices;
-                        question.points = data.points;
-                        question.lastModification = data.lastModification;
-                    }
-                    else {
-                        this.questionsContainer.push(data);
-                    }
+                   
+                    this.questionsContainer.push(data);
+                    
                 }
             },
         });
@@ -161,32 +164,30 @@ export class QCMCreationPageComponent implements OnInit {
                 lastModification: new Date(),
                 _id: '',
             };
+
             if (this.quiz) {
-                console.log('hi');
                 this.quizHttpService.updateQuiz(quiz).subscribe({
-                    next: (x: Quiz) => {
-                        this.quiz = x;
-                        this.snackBar.open('Le quiz a été enregistré avec succès', '', { duration: SNACK_MESSAGE_DURATION });
+                    next: (updatedQuiz: Quiz) => {
+                        this.quiz = updatedQuiz;
+                        this.snackBarService.open('Le quiz a été enregistré avec succès', '', { duration: 2000 });
                     },
-                    error: (e) => {
-                        this.snackBar.open("Le quiz n'a pas pu être modifié", '', { duration: SNACK_MESSAGE_DURATION });
-                        window.console.log("L'erreur est : ", e);
+                    error: () => {
+                        this.snackBarService.open("Le quiz n'a pas pu être modifié", '', { duration: 2000 });
                     },
                 });
             } else {
                 this.quizHttpService.createQuiz(quiz).subscribe({
-                    next: (x: Quiz) => {
-                        this.quiz = x;
-                        this.snackBar.open('Le quiz a été enregistré avec succès', '', { duration: SNACK_MESSAGE_DURATION });
+                    next: (createdQuiz: Quiz) => {
+                        this.quiz = createdQuiz;
+                        this.snackBarService.open('Le quiz a été enregistré avec succès', '', { duration: 2000 });
                     },
-                    error: (e) => {
-                        this.snackBar.open("Le quiz n'a pas pu être créer", '', { duration: SNACK_MESSAGE_DURATION });
-                        window.console.log("L'erreur est : ", e);
+                    error: () => {
+                        this.snackBarService.open("Le quiz n'a pas pu être créer", '', { duration: 2000 });
                     },
                 });
             }
         } else {
-            this.snackBar.open("L'un des paramètres est erroné, veuillez réessayer", '', { duration: SNACK_MESSAGE_DURATION });
+            this.snackBarService.open("L'un des paramètres est erroné, veuillez réessayer", '', { duration: 3000 });
         }
     }
 
@@ -199,4 +200,5 @@ export class QCMCreationPageComponent implements OnInit {
             description: [description, Validators.required],
         });
     }
+
 }
