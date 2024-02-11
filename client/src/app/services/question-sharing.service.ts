@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Injectable } from '@angular/core';
 import { Question } from '@app/interfaces/question';
 
@@ -6,7 +5,7 @@ import { Question } from '@app/interfaces/question';
     providedIn: 'root',
 })
 export class QuestionSharingService {
-    private callbacks: ((data: Question) => any)[] = [];
+    private callbacks: ((data: Question) => void)[] = [];
 
     share(data: Question): void {
         this.callbacks.forEach((callback) => {
@@ -14,7 +13,7 @@ export class QuestionSharingService {
         });
     }
 
-    subscribe(callback: (data: Question) => any): void {
+    subscribe(callback: (data: Question) => void): void {
         this.callbacks.push(callback);
     }
 }

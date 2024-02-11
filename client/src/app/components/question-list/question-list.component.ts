@@ -48,6 +48,6 @@ export class QuestionListComponent {
     }
 
     isShared(question: Question) {
-        return this.sharedQuestions.some((x) => x._id === question._id);
+        return this.sharedQuestions.includes(question);
     }
 }

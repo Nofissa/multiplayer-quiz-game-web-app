@@ -3,7 +3,7 @@ import { Component, Inject } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Choice } from '@app/interfaces/choice';
+import { Choice } from '@common/choice';
 import { Question } from '@app/interfaces/question';
 import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog-data';
 import { MAX_CHOICE_COUNT, MIN_CHOICE_COUNT, SNACK_MESSAGE_DURATION, POINT_VALUE_BASE_MULTIPLE } from '@app/constants';
@@ -15,16 +15,15 @@ import { MAX_CHOICE_COUNT, MIN_CHOICE_COUNT, SNACK_MESSAGE_DURATION, POINT_VALUE
 })
 export class UpsertQuestionDialogComponent {
     maxChoiceCount = MAX_CHOICE_COUNT;
+    formBuilder: FormBuilder = new FormBuilder();
     formGroup: FormGroup;
     choicesArray: FormArray;
     toggle: boolean;
 
-    // eslint-disable-next-line max-params
     constructor(
-        private formBuilder: FormBuilder,
-        private snackBar: MatSnackBar,
-        public dialogRef: MatDialogRef<UpsertQuestionDialogComponent>,
-        @Inject(MAT_DIALOG_DATA) public data: UpsertQuestionDialogData,
+        @Inject(MAT_DIALOG_DATA) readonly data: UpsertQuestionDialogData,
+        private readonly snackBar: MatSnackBar,
+        private readonly dialogRef: MatDialogRef<UpsertQuestionDialogComponent>,
     ) {
         this.choicesArray = this.formBuilder.array(
             this.data.question.choices.map((answer) => {

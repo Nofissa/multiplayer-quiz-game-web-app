@@ -1,16 +1,20 @@
 /* eslint-disable no-underscore-dangle */
 import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
 import { UpsertQuestionDialogComponent } from '@app/components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
 import { Question } from '@app/interfaces/question';
 import { QuestionListOptions } from '@app/interfaces/question-list-options';
 import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog-data';
+import { MaterialServicesProvider } from '@app/providers/material-services.provider';
+import { QuestionServicesProvider } from '@app/providers/question-services.provider';
 import { QuestionHttpService } from '@app/services/question-http.service';
 import { QuestionInteractionService } from '@app/services/question-interaction.service';
 import { QuestionSharingService } from '@app/services/question-sharing.service';
 
 const NOT_FOUND_INDEX = -1;
+const SNACK_BAR_DURATION_MS = 3000;
 
 @Component({
     selector: 'app-question-bank',
@@ -24,13 +28,21 @@ export class QuestionBankComponent implements OnInit {
 
     questions: Question[] = [];
 
-    // eslint-disable-next-line max-params
+    private readonly dialogService: MatDialog;
+    private readonly snackBarService: MatSnackBar;
+    private readonly questionSharingService: QuestionSharingService;
+    private readonly questionHttpService: QuestionHttpService;
+
     constructor(
-        readonly interactionService: QuestionInteractionService,
-        private readonly questionHttpService: QuestionHttpService,
-        private readonly questionSharingService: QuestionSharingService,
-        private readonly dialogService: MatDialog,
-    ) {}
+        materialServicesProvider: MaterialServicesProvider,
+        questionServicesProvider: QuestionServicesProvider,
+        readonly questionInteractionService: QuestionInteractionService,
+    ) {
+        this.dialogService = materialServicesProvider.dialog;
+        this.snackBarService = materialServicesProvider.snackBar;
+        this.questionHttpService = questionServicesProvider.questionHttp;
+        this.questionSharingService = questionServicesProvider.questionSharing;
+    }
 
     ngOnInit() {
         this.loadQuestions();
@@ -41,16 +53,16 @@ export class QuestionBankComponent implements OnInit {
             }
         });
 
-        this.interactionService.registerOnAddQuestion(() => {
+        this.questionInteractionService.registerOnAddQuestion(() => {
             this.openAddQuestionDialog();
         });
-        this.interactionService.registerOnEditQuestion((question: Question) => {
+        this.questionInteractionService.registerOnEditQuestion((question: Question) => {
             this.openEditQuestionDialog(question);
         });
-        this.interactionService.registerOnDeleteQuestion((question: Question) => {
+        this.questionInteractionService.registerOnDeleteQuestion((question: Question) => {
             this.openDeleteQuestionDialog(question);
         });
-        this.interactionService.registerOnShareQuestion((question: Question) => {
+        this.questionInteractionService.registerOnShareQuestion((question: Question) => {
             this.shareQuestion(question);
         });
     }
@@ -129,8 +141,17 @@ export class QuestionBankComponent implements OnInit {
     }
 
     private addQuestion(question: Question) {
-        this.questionHttpService.createQuestion(question).subscribe((response: Question) => {
-            this.questions = [response, ...this.questions];
+        this.questionHttpService.createQuestion(question).subscribe({
+            next: (response: Question) => {
+                this.questions = [response, ...this.questions];
+            },
+            error: () => {
+                this.snackBarService.open("Échec de l'ajout de la question à la Banque de Questions", 'OK', {
+                    verticalPosition: 'top',
+                    panelClass: ['base-snackbar'],
+                    duration: SNACK_BAR_DURATION_MS,
+                });
+            },
         });
     }
 

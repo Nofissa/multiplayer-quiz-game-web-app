@@ -1,5 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
 import { Quiz } from '@app/interfaces/quiz';
 import { QuizHttpService } from '@app/services/quiz-http.service';
 import { saveAs } from 'file-saver';
@@ -19,9 +21,27 @@ export class QuizComponent {
     isDeleted: boolean = false;
 
     constructor(
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        private readonly dialog: MatDialog,
         private readonly quizHttpService: QuizHttpService,
         private readonly router: Router,
     ) {}
+
+    openDeleteQuizDialog() {
+        const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+            width: '30%',
+            data: {
+                title: 'Supprimer le quiz',
+                prompt: 'Êtes vous certains de vouloir supprimer le quiz?',
+            },
+        });
+
+        dialogRef.afterClosed().subscribe((isSubmited: boolean) => {
+            if (isSubmited) {
+                this.deleteQuiz();
+            }
+        });
+    }
 
     deleteQuiz() {
         // eslint-disable-next-line no-underscore-dangle
@@ -32,7 +52,7 @@ export class QuizComponent {
 
     editQuiz() {
         // eslint-disable-next-line no-underscore-dangle
-        this.router.navigate([`/qcm-creation?quizId=${this.quiz._id}`]);
+        this.router.navigate(['/qcm-creation'], { queryParams: { quizId: this.quiz._id } });
     }
 
     exportQuiz() {

@@ -1,16 +1,30 @@
-<div class="container justified">
-    <h1 class="header-item">Vue de création d'une partie</h1>
-    <img src="https://bit.ly/3QofL1J" alt="Logo Projet" />
-    <section id="server-message" class="justified">
-        <div class="justified">
-        </div>
-    </section>
+<div class="container">
+    <div class="slider-effectCoverFlow">
+        <swiper
+            [effect]="'coverflow'"
+            [grabCursor]="true"
+            [centeredSlides]="true"
+            [slideToClickedSlide]="true"
+            [slidesPerView]="'auto'"
+            [coverflowEffect]="{
+                rotate: 50,
+                stretch: 0,
+                depth: 100,
+                modifier: 1,
+                slideShadows: true
+            }"
+            [pagination]="true"
+            [navigation]="true"
+            class="mySwiper"
+        >
+            <ng-template swiperSlide *ngFor="let quiz of quizzArray; let i = index">
+                <div class="game-slide" (click)="openQuizDetails(quiz)">
+                    <h2 class="quiz-title">Quiz {{ i + 1 }}</h2>
+                    <p class="quiz-subtitle">{{ quiz.title }}</p>
+                </div>
+            </ng-template>
 
-    <footer class="footer-item">
-        <h4 class="team-name">Équipe 206</h4>
-        <p>
-            <span>Loris Ponderand</span>, <span>Imed-Eddine Bennour</span>, <span>Nofissa Khaif</span>,
-            <span>Romaine Brand</span>, <span>Dimitri Mansour</span>, <span>Jérémie Bolduc</span>
-        </p>
-    </footer>
+            ></swiper
+        >
+    </div>
 </div>
