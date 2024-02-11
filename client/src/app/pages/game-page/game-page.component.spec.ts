@@ -1,22 +1,28 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { ActivatedRoute } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
-// import { QuizHttpService } from '@app/services/quiz-http.service';
 import { GamePageComponent } from './game-page.component';
 
 describe('gamePage', () => {
     let component: GamePageComponent;
     let fixture: ComponentFixture<GamePageComponent>;
 
+    const mockActivatedRoute = {
+        snapshot: {
+            queryParams: {
+                isTest: 'true',
+            },
+        },
+    };
+
     beforeEach(async () => {
-        // const quizHttpServiceStub = jasmine.createSpyObj('QuizHttpService', ['getQuizById']);
         await TestBed.configureTestingModule({
             declarations: [GamePageComponent],
             imports: [RouterTestingModule, HttpClientTestingModule],
-            // providers: [{ provide: QuizHttpService, useValue: quizHttpServiceStub }],
+            providers: [{ provide: ActivatedRoute, useValue: mockActivatedRoute }],
         }).compileComponents();
-        // quizHttpService = TestBed.inject(QuizHttpService) as jasmine.SpyObj<QuizHttpService>;
     });
 
     beforeEach(() => {
@@ -62,5 +68,13 @@ describe('gamePage', () => {
         expect(logo).toBeTruthy();
         const srcAttribute = logo.nativeElement.getAttribute('src');
         expect(srcAttribute).toBe('/assets/img/logo.png');
+    });
+
+    it('should go in test mode when queryParams isTest is true', () => {
+        fixture = TestBed.createComponent(GamePageComponent);
+        component = fixture.componentInstance;
+        component.loadMode();
+
+        expect(component.isTest).toBe(true);
     });
 });
