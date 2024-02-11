@@ -20,10 +20,4 @@ export class GameService {
         const url = `${this.apiURL}/evaluateChoices/${quizID}?questionIndex=${questionIndex}`;
         return this.http.post<EvaluationPayload>(url, selectedChoices);
     }
-
-    areChoicesCorrect(selectedChoices: Choice[]): boolean {
-        const allCorrect = selectedChoices.every((x) => x.isCorrect);
-
-        return selectedChoices.length !== 0 && allCorrect;
-    }
 }

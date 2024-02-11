@@ -43,18 +43,4 @@ describe('GameService', () => {
         expect(request.request.method).toEqual('POST');
         request.flush(expectedPayload);
     });
-
-    it('should check if choices are correct', () => {
-        const correctChoices: Choice[] = [
-            { text: 'Choice 1', isCorrect: true },
-            { text: 'Choice 2', isCorrect: true },
-        ];
-        const incorrectChoices: Choice[] = [
-            { text: 'Choice 3', isCorrect: false },
-            { text: 'Choice 4', isCorrect: false },
-        ];
-
-        expect(service.areChoicesCorrect(correctChoices)).toBe(true);
-        expect(service.areChoicesCorrect(incorrectChoices)).toBe(false);
-    });
 });
