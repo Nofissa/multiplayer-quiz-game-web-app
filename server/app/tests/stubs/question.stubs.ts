@@ -4,6 +4,7 @@ import { firstChoiceStub, secondChoiceStub } from './choices.stubs';
 export const questionStub = (): Question[] => {
     return [
         {
+            _id: '123456789',
             text: 'Quelle est la valeur de la constante R dans la formule pV = nRT',
             type: 'QCM',
             choices: firstChoiceStub(),
@@ -11,6 +12,7 @@ export const questionStub = (): Question[] => {
             lastModification: new Date('2024-01-20 18:43:27'),
         },
         {
+            _id: '987654321',
             text: "En quelle année la compagnie d'automobile Volkswagen a-t-elle été fondée?",
             type: 'QCM',
             choices: secondChoiceStub(),

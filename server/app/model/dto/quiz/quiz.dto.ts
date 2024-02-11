@@ -1,4 +1,5 @@
-import { QuizQuestionDto } from '@app/model/dto/quiz/quiz-question.dto';
+// import { QuizQuestionDto } from '@app/model/dto/quiz/quiz-question.dto';
+import { QuestionDto } from '@app/model/dto/question/question.dto';
 import { Type } from 'class-transformer';
 import { IsArray, IsBoolean, IsDate, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
 
@@ -29,7 +30,7 @@ export class QuizDto {
 
     @IsArray({ message: "le champ 'questions' de quiz devrait être un tableau" })
     @ValidateNested({ each: true })
-    questions: QuizQuestionDto[];
+    questions: QuestionDto[];
 
     @IsBoolean({ message: "le champ 'isHidden' de quiz devrait être un booléen" })
     @IsOptional()

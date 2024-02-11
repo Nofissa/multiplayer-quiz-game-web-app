@@ -47,7 +47,7 @@ export class QuestionService {
         try {
             await this.model.findByIdAndDelete(id);
         } catch (error) {
-            return Promise.reject(`Failed to delete question: ${error}`);
+            return Promise.reject('Failed to delete question');
         }
     }
 

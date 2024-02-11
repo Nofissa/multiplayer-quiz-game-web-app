@@ -95,13 +95,13 @@ describe('QuestionService', () => {
 
     describe('updateQuestion', () => {
         const updateQuestionDto: QuestionDto = {
+            _id: questionStub()[0]._id,
             type: questionStub()[0].type,
             text: questionStub()[0].text,
             points: questionStub()[0].points,
             choices: questionStub()[0].choices,
             lastModification: questionStub()[0].lastModification,
         };
-        updateQuestionDto._id = '123456789';
 
         it('updateQuestion() should modify a question if the modified question is correct', async () => {
             jest.spyOn(questionModelTest, 'findOneAndReplace').mockResolvedValue(updateQuestionDto);
@@ -124,48 +124,42 @@ describe('QuestionService', () => {
         });
     });
 
-    // describe('hideQuizById', () => {
-    //     const addQuizDto: QuestionDto = {
-    //         id: questionStub().id,
-    //         title: questionStub().title,
-    //         description: questionStub().description,
-    //         questions: questionStub().questions,
-    //         duration: questionStub().duration,
-    //         lastModification: questionStub().lastModification,
-    //         isHidden: false,
-    //     };
+    describe('deleteQuestionById', () => {
+        it('deleteQuestionById should delete question', async () => {
+            const quiz = await questionServiceTest.deleteQuestionById(questionStub()[0]._id);
+            expect(quiz).toEqual(undefined);
+        });
+        it('deleteQuestionById should not delete question when an error occurs', async () => {
+            jest.spyOn(questionModelTest, 'findByIdAndDelete').mockRejectedValue(questionStub()[0]);
+            await expect(questionServiceTest.deleteQuestionById(questionStub()[0]._id)).rejects.toMatch('Failed to delete question');
+        });
+    });
 
-    //     it('hideQuizById() should modify a quiz', async () => {
-    //         jest.spyOn(questionModelTest, 'findOne').mockResolvedValue(addQuizDto);
-    //         const quiz = await questionModelTest.findOne({ _id: addQuizDto.id });
-    //         quiz.isHidden = true;
-    //         quiz.lastModification = new Date();
-    //         jest.spyOn(questionModelTest, 'findOneAndUpdate').mockResolvedValue(quiz);
-    //         const quizUpdated = await questionServiceTest.hideQuizById(addQuizDto.id);
-    //         addQuizDto.lastModification = quizUpdated.lastModification;
-    //         addQuizDto.isHidden = true;
-    //         expect(quizUpdated).toEqual(addQuizDto);
-    //     });
+    describe('validateQuestion', () => {
+        const validateQuestionDto: QuestionDto = {
+            _id: questionStub()[0]._id,
+            type: questionStub()[0].type,
+            text: questionStub()[0].text,
+            points: questionStub()[0].points,
+            choices: questionStub()[0].choices,
+            lastModification: questionStub()[0].lastModification,
+        };
+        const validateQuestionDtoCopy = { ...validateQuestionDto, _id: '341941409194710' };
+        it('validateQuestion should return true if the question doesnt exist in the bd', async () => {
+            jest.spyOn(questionModelTest, 'findOne').mockResolvedValue(null);
+            const bool = await questionServiceTest.validateQuestion(validateQuestionDto);
+            expect(bool).toEqual(true);
+        });
 
-    //     it('hideQuizById() should not modify a quiz when findOne returns null', async () => {
-    //         jest.spyOn(questionModelTest, 'findOne').mockReturnValue(null);
-    //         await expect(questionServiceTest.hideQuizById(addQuizDto.id)).rejects.toMatch(`Can't find quiz with ID ${addQuizDto.id}`);
-    //     });
-
-    //     it('hideQuizById() should not modify a quiz when an error occurs', async () => {
-    //         jest.spyOn(questionModelTest, 'findOne').mockRejectedValue(addQuizDto);
-    //         await expect(questionServiceTest.hideQuizById(addQuizDto.id)).rejects.toMatch('Failed to toggle quiz hidden state');
-    //     });
-    // });
-
-    // describe('deleQuizById', () => {
-    //     it('deleteQuizById should delete quiz', async () => {
-    //         const quiz = await questionServiceTest.deleteQuizById(questionStub().id);
-    //         expect(quiz).toEqual(undefined);
-    //     });
-    //     it('deleteQuizById should not delete quiz when an error occurs', async () => {
-    //         jest.spyOn(questionModelTest, 'findByIdAndDelete').mockRejectedValue(questionStub());
-    //         await expect(questionServiceTest.deleteQuizById(questionStub().id)).rejects.toMatch('Failed to delete quiz');
-    //     });
-    // });
+        it('validateQuestion should return true if question._id !== dto._id the in the bd', async () => {
+            jest.spyOn(questionModelTest, 'findOne').mockResolvedValue(validateQuestionDtoCopy);
+            const bool = await questionServiceTest.validateQuestion(validateQuestionDto);
+            expect(bool).toEqual(true);
+        });
+        it('validateQuestion should return false if question._id === dto._id the in the bd', async () => {
+            jest.spyOn(questionModelTest, 'findOne').mockResolvedValue(validateQuestionDto);
+            const bool = await questionServiceTest.validateQuestion(validateQuestionDto);
+            expect(bool).toEqual(false);
+        });
+    });
 });
