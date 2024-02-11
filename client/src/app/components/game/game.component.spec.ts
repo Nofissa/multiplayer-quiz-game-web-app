@@ -340,7 +340,6 @@ describe('gameComponent', () => {
             spyOn(component, 'validateChoices');
 
             component.startTimer();
-            tick();
             tick(QUESTION_DURATION_MS);
 
             expect(component.time).toBe(0);
