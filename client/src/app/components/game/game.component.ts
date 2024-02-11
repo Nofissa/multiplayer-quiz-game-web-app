@@ -97,15 +97,14 @@ export class GameComponent implements OnInit, OnChanges, OnDestroy {
 
     startTimer() {
         this.timerService.startTimer(this.quiz.duration);
-        // this.secondsLeft = this.timerService.time;
-        this.timerService.onTick.subscribe(() => {
-            if (this.time === 0) {
-                this.validateChoices();
-            }
-        });
-        // if (this.time === 0) {
-        //     this.validateChoices();
-        // }
+        if (this.timerService.onTick) {
+            this.timerService.onTick.subscribe(() => {
+                // this.secondsLeft = this.time;
+                if (this.time === 0) {
+                    this.validateChoices();
+                }
+            });
+        }
     }
 
     isSelected(choice: Choice): boolean {
@@ -149,6 +148,7 @@ export class GameComponent implements OnInit, OnChanges, OnDestroy {
         setTimeout(() => {
             if (this.currentQuestionIndex < this.quiz.questions.length - 1) {
                 this.feedbackMessage = '';
+                this.feedbackMessageClass = '';
                 this.currentQuestionIndex++;
                 this.questionValidated = false;
                 this.selectedChoices = [];
@@ -159,12 +159,6 @@ export class GameComponent implements OnInit, OnChanges, OnDestroy {
             const redirect = this.isTest ? '/create-game' : '/home';
             this.router.navigateByUrl(redirect);
         }, THREE_SECOND_IN_MS);
-    }
-
-    areChoicesCorrect(): boolean {
-        const allCorrect = this.selectedChoices.every((x) => x.isCorrect);
-
-        return this.selectedChoices.length !== 0 && allCorrect;
     }
 
     openConfirmationDialog() {

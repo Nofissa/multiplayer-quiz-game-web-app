@@ -1,5 +1,7 @@
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { ActivatedRoute } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { GamePageComponent } from './game-page.component';
 
@@ -7,10 +9,20 @@ describe('gamePage', () => {
     let component: GamePageComponent;
     let fixture: ComponentFixture<GamePageComponent>;
 
+    const mockActivatedRoute = {
+        snapshot: {
+            queryParams: {
+                quizId: 'loool',
+                isTest: 'true',
+            },
+        },
+    };
+
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             declarations: [GamePageComponent],
-            imports: [RouterTestingModule],
+            imports: [RouterTestingModule, HttpClientTestingModule],
+            providers: [{ provide: ActivatedRoute, useValue: mockActivatedRoute }],
         }).compileComponents();
     });
 
@@ -36,7 +48,7 @@ describe('gamePage', () => {
     });
 
     it('should contain chat box during the game', () => {
-        const chatBox = fixture.debugElement.query(By.css('.messages-zone font-color text-centered'));
+        const chatBox = fixture.debugElement.query(By.css('.chat-room'));
         expect(chatBox).toBeTruthy();
     });
 
@@ -57,5 +69,13 @@ describe('gamePage', () => {
         expect(logo).toBeTruthy();
         const srcAttribute = logo.nativeElement.getAttribute('src');
         expect(srcAttribute).toBe('/assets/img/logo.png');
+    });
+
+    it('should go in test mode when queryParams isTest is true', () => {
+        fixture = TestBed.createComponent(GamePageComponent);
+        component = fixture.componentInstance;
+        component.loadMode();
+
+        expect(component.isTest).toBe(true);
     });
 });

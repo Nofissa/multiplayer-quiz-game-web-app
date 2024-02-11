@@ -150,9 +150,13 @@
 }
 
 .feedback {
-    font-size: 44px;
+    font-size: 24px;
     font-family: 'Roboto', 'Helvetica Neue', sans-serif;
     font-weight: bold;
+    text-align: center;
+    margin-top: 20px;
+    padding: 10px;
+    border-radius: 10px;
 }
 
 .logo {
@@ -173,11 +177,13 @@
 }
 
 .correct-answer {
-    color: rgb(14, 182, 14);
+    background-color: #4caf50;
+    color: white;
 }
 
 .incorrect-answer {
-    color: red;
+    background-color: #f44336;
+    color: white;
 }
 
 #score {
