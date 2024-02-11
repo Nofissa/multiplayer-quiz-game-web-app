@@ -1,7 +1,7 @@
 import { Quiz } from '@app/model/database/quiz';
 import { QuizDto } from '@app/model/dto/quiz/quiz.dto';
 import { QuizService } from '@app/services/quiz/quiz.service';
-import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Put, Query, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Put, Query, Res, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 

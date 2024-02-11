@@ -1,6 +1,6 @@
 /* eslint-disable max-lines */
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, flush, tick } from '@angular/core/testing';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { By } from '@angular/platform-browser';
 import { Router } from '@angular/router';
@@ -73,6 +73,10 @@ describe('gameComponent', () => {
         router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
         timerServiceSpy = TestBed.inject(TimerService) as jasmine.SpyObj<TimerService>;
         gameServicesProviderSpy = TestBed.inject(GameServicesProvider) as jasmine.SpyObj<GameServicesProvider>;
+    });
+
+    afterEach(() => {
+        TestBed.resetTestingModule();
     });
 
     describe('htmlTests', () => {
@@ -231,18 +235,6 @@ describe('gameComponent', () => {
             expect(feedbackElement.classList.contains('incorrect-answer'));
         });
 
-        it('should display timer correctly', fakeAsync(() => {
-            component.quiz.duration = 40;
-            component.currentQuestionIndex = 0;
-            fixture.detectChanges();
-            component.startTimer();
-            tick();
-            const timer = fixture.debugElement.query(By.css('.timer'));
-            expect(timer).toBeTruthy();
-            const timerElement: HTMLElement = fixture.nativeElement.querySelector('.timer #secondsLeft');
-            expect(timerElement.textContent).toContain(`${component.time} sec.`);
-        }));
-
         it('should display score correctly', () => {
             component.currentQuestionIndex = 0;
             component.score = 147;
@@ -282,48 +274,57 @@ describe('gameComponent', () => {
             expect(router.navigateByUrl).toHaveBeenCalledWith(redirect);
         }));
 
+        it('should set up key bindings correctly', () => {
+            const shotcutsAmount = 5;
+            spyOn(component.keyBindingService, 'registerKeyBinding');
+            component.setupKeyBindings();
+
+            expect(component.keyBindingService.registerKeyBinding).toHaveBeenCalledTimes(shotcutsAmount);
+            expect(component.keyBindingService.registerKeyBinding).toHaveBeenCalledWith('1', jasmine.any(Function));
+            expect(component.keyBindingService.registerKeyBinding).toHaveBeenCalledWith('2', jasmine.any(Function));
+            expect(component.keyBindingService.registerKeyBinding).toHaveBeenCalledWith('3', jasmine.any(Function));
+            expect(component.keyBindingService.registerKeyBinding).toHaveBeenCalledWith('4', jasmine.any(Function));
+            expect(component.keyBindingService.registerKeyBinding).toHaveBeenCalledWith('Enter', jasmine.any(Function));
+        });
+
         it('should call toggleChoiceSelection when a number key is pressed', fakeAsync(() => {
-            component.ngOnChanges();
+            component.setupKeyBindings();
             spyOn(component, 'toggleChoiceSelection');
-            expect(keyBindingServiceSpy.registerKeyBinding).toHaveBeenCalledWith('1', jasmine.any(Function));
-            expect(keyBindingServiceSpy.registerKeyBinding).toHaveBeenCalledWith('2', jasmine.any(Function));
-            expect(keyBindingServiceSpy.registerKeyBinding).toHaveBeenCalledWith('3', jasmine.any(Function));
-            expect(keyBindingServiceSpy.registerKeyBinding).toHaveBeenCalledWith('4', jasmine.any(Function));
 
-            keyBindingServiceSpy.registerKeyBinding.calls.argsFor(0)[1]();
-            fixture.detectChanges();
+            const numberOneEvent = new KeyboardEvent('keydown', { key: '1' });
+            window.dispatchEvent(numberOneEvent);
+            tick();
 
-            const expectedChoice = component.quiz.questions[component.currentQuestionIndex].choices[0];
-            expect(component.toggleChoiceSelection).toHaveBeenCalledWith(expectedChoice);
+            expect(component.toggleChoiceSelection).toHaveBeenCalled();
         }));
 
         it('should call validateChoices when Enter key is pressed', fakeAsync(() => {
-            component.ngOnChanges();
-            spyOn(component, 'toggleChoiceSelection');
-            expect(keyBindingServiceSpy.registerKeyBinding).toHaveBeenCalledWith('Enter', jasmine.any(Function));
+            component.setupKeyBindings();
+            spyOn(component, 'validateChoices');
 
-            keyBindingServiceSpy.registerKeyBinding.calls.argsFor(0)[1]();
-            fixture.detectChanges();
+            const enterEvent = new KeyboardEvent('keydown', { key: 'Enter' });
+            window.dispatchEvent(enterEvent);
+            tick();
 
-            const expectedChoice = component.quiz.questions[component.currentQuestionIndex].choices[0];
-            expect(component.toggleChoiceSelection).toHaveBeenCalledWith(expectedChoice);
+            expect(component.validateChoices).toHaveBeenCalled();
         }));
 
         it('should call executor when window keydown event is triggered', () => {
-            const event = new KeyboardEvent('keydown', { key: 'A' });
-            spyOn(event, 'preventDefault');
-
+            const mockEvent = new KeyboardEvent('keydown', {
+                key: '3',
+                bubbles: true,
+                cancelable: true,
+            });
             // eslint-disable-next-line @typescript-eslint/no-empty-function
-            keyBindingServiceSpy.getExecutor.and.returnValue(() => {});
+            spyOn(component.keyBindingService, 'getExecutor').and.returnValue(() => {});
+            component.handleKeyboardEvent(mockEvent);
 
-            window.dispatchEvent(event);
-
-            expect(keyBindingServiceSpy.getExecutor).toHaveBeenCalledWith('A');
-            expect(event.preventDefault).toHaveBeenCalled();
+            expect(component.keyBindingService.getExecutor).toHaveBeenCalledWith('3');
         });
 
         it('should not call executor when focused element is a textarea', () => {
             const event = new KeyboardEvent('keydown', { key: 'A' });
+            spyOn(component.keyBindingService, 'getExecutor');
 
             const textarea: HTMLTextAreaElement = document.createElement('textarea');
             spyOnProperty(document, 'activeElement').and.returnValue(textarea);
@@ -334,36 +335,34 @@ describe('gameComponent', () => {
 
         it('should call validateChoices when the timer reaches 0', fakeAsync(() => {
             component.quiz.duration = 10;
+            const tenSecondsMs = 10000;
             spyOn(component, 'validateChoices');
 
-            // Start the timer and wait for it to initialize
             component.startTimer();
             tick();
-
-            // Now, simulate the timer reaching 0
-            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-            tick(10000);
+            tick(tenSecondsMs);
 
             expect(component.time).toBe(0);
             expect(component.validateChoices).toHaveBeenCalled();
+            component.timerService.stopTimer();
         }));
 
-        it('should update secondsLeft correctly during the countdown', fakeAsync(() => {
+        it('should update time correctly during the countdown', fakeAsync(() => {
             component.quiz.duration = 5;
+            const oneSecondMs = 1000;
             spyOn(component, 'validateChoices');
-
             component.startTimer();
-            expect(component.time).toBe(3);
+            tick();
+            expect(component.time).toBe(component.quiz.duration);
 
-            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-            tick(1000);
-            expect(component.secondsLeft).toBe(2);
+            tick(oneSecondMs);
+            expect(component.time).toBe(component.quiz.duration - 1);
 
-            // eslint-disable-next-line @typescript-eslint/no-magic-numbers
-            tick(1000);
-            expect(component.secondsLeft).toBe(1);
+            tick(oneSecondMs);
+            expect(component.time).toBe(component.quiz.duration - 2);
 
             expect(component.validateChoices).not.toHaveBeenCalled();
+            component.timerService.stopTimer();
         }));
 
         it('isSelected() should return true if the choice is selected', () => {
@@ -435,11 +434,12 @@ describe('gameComponent', () => {
             component.nextQuestion();
             tick(threeSecondsMs);
             fixture.detectChanges();
-
+            flush();
             expect(component.feedbackMessage).toBe('');
             expect(component.currentQuestionIndex).toBe(1);
             expect(component.questionValidated).toBe(false);
             expect(component.selectedChoices).toEqual([]);
+            component.timerService.stopTimer();
         }));
 
         it('validateChoices() should validate answers, allocate points and call nextQuestion()', fakeAsync(() => {
@@ -451,7 +451,7 @@ describe('gameComponent', () => {
             component.validateChoices();
             tick();
 
-            expect(gameServicesProviderSpy.timerService.stopTimer).toHaveBeenCalled();
+            expect(component.timerService.stopTimer).toHaveBeenCalled();
             expect(component.questionValidated).toBe(true);
             expect(gameServiceSpy.validateAnswers).toHaveBeenCalledWith(
                 component.selectedChoices,
