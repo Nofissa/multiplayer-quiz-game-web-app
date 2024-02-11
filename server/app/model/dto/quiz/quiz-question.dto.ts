@@ -30,7 +30,7 @@ export class QuizQuestionDto {
         message: `le champ 'choices' de question devrait être de taille plus petite ou égale ${ValidationValues.MaxAnswersSize}`,
     })
     @ValidateNested({ each: true })
-    choices: ChoiceDto[];
+    choices?: ChoiceDto[];
 
     @IsDate({ message: "le champ 'lastModification' de question devrait être une date" })
     @IsOptional()

@@ -1,13 +1,14 @@
-import { animate, style, transition, trigger } from '@angular/animations';
 import { Component, HostListener, Input, OnChanges, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
-import { Choice } from '@app/interfaces/choice';
 import { Quiz } from '@app/interfaces/quiz';
 import { GameServicesProvider } from '@app/providers/game-services.provider';
+import { GameService } from '@app/services/game-service';
 import { KeyBindingService } from '@app/services/key-binding.service';
 import { TimerService } from '@app/services/timer-service';
+import { Choice } from '@common/choice';
+import { EvaluationPayload } from '@common/evaluation-payload';
 
 const THREE_SECOND_IN_MS = 3000;
 
@@ -15,8 +16,7 @@ const THREE_SECOND_IN_MS = 3000;
     selector: 'app-game',
     templateUrl: './game.component.html',
     styleUrls: ['./game.component.scss'],
-    // animation from ChatGPT
-    animations: [trigger('scale', [transition(':enter', [style({ transform: 'scale(0)' }), animate('1s', style({ transform: 'scale(1)' }))])])],
+    providers: [GameServicesProvider],
 })
 export class GameComponent implements OnInit, OnChanges, OnDestroy {
     @Input()
@@ -30,17 +30,23 @@ export class GameComponent implements OnInit, OnChanges, OnDestroy {
     score: number = 0;
     feedbackMessage: string;
     feedbackMessageClass: string = 'feedback-message';
+    questionValidated: boolean = false;
 
-    private readonly timerService: TimerService;
-    private readonly keyBindingService: KeyBindingService;
+    readonly keyBindingService: KeyBindingService;
+    readonly timerService: TimerService;
 
+    // eslint-disable-next-line max-params
     constructor(
         gameServicesProvider: GameServicesProvider,
         private readonly dialog: MatDialog,
         private readonly router: Router,
+        private readonly gameService: GameService,
     ) {
         this.timerService = gameServicesProvider.timer;
         this.keyBindingService = gameServicesProvider.keyBinding;
+    }
+    get time(): number {
+        return this.timerService.time;
     }
 
     @HostListener('window:keydown', ['$event'])
@@ -77,26 +83,29 @@ export class GameComponent implements OnInit, OnChanges, OnDestroy {
         ['1', '2', '3', '4'].forEach((x) => {
             this.keyBindingService.registerKeyBinding(x, () => {
                 const choiceIndex = parseInt(x, 10) - 1;
-
-                this.toggleChoiceSelection(this.quiz.questions[this.currentQuestionIndex].choices[choiceIndex]);
+                if (!this.questionValidated) {
+                    this.toggleChoiceSelection(this.quiz.questions[this.currentQuestionIndex].choices[choiceIndex]);
+                }
             });
         });
 
         this.keyBindingService.registerKeyBinding('Enter', () => {
-            this.validateChoices();
+            if (!this.questionValidated) {
+                this.validateChoices();
+            }
         });
     }
 
     startTimer() {
-        this.timerService.startTimer(this.quiz.duration, (secondsLeft: number) => {
-            this.secondsLeft = secondsLeft;
-
-            if (this.secondsLeft === 0) {
-                this.validateChoices();
-
-                this.nextQuestion();
-            }
-        });
+        this.timerService.startTimer(this.quiz.duration);
+        if (this.timerService.onTick) {
+            this.timerService.onTick.subscribe(() => {
+                // this.secondsLeft = this.time;
+                if (this.time === 0) {
+                    this.validateChoices();
+                }
+            });
+        }
     }
 
     isSelected(choice: Choice): boolean {
@@ -112,10 +121,10 @@ export class GameComponent implements OnInit, OnChanges, OnDestroy {
         this.selectedChoices.push(choice);
     }
 
-    validateChoices() {
-        if (this.areChoicesCorrect()) {
-            this.score += this.quiz.questions[this.currentQuestionIndex].points;
-            this.feedbackMessage = 'Bonne réponse! :)';
+    allocatePoints(points: number) {
+        if (points) {
+            this.score += points;
+            this.feedbackMessage = 'Bonne réponse! :) (+20%)';
             this.feedbackMessageClass = 'correct-answer';
         } else {
             this.feedbackMessage = 'Mauvaise réponse :(';
@@ -123,25 +132,34 @@ export class GameComponent implements OnInit, OnChanges, OnDestroy {
         }
     }
 
+    validateChoices() {
+        this.timerService.stopTimer();
+        this.questionValidated = true;
+        // lint disabled on this line because it's a mongodb id
+        // eslint-disable-next-line no-underscore-dangle
+        this.gameService.validateAnswers(this.selectedChoices, this.quiz._id, this.currentQuestionIndex).subscribe({
+            next: (response: EvaluationPayload) => {
+                this.allocatePoints(response.score);
+            },
+        });
+        this.nextQuestion();
+    }
+
     nextQuestion() {
         setTimeout(() => {
             if (this.currentQuestionIndex < this.quiz.questions.length - 1) {
                 this.feedbackMessage = '';
+                this.feedbackMessageClass = '';
                 this.currentQuestionIndex++;
+                this.questionValidated = false;
                 this.selectedChoices = [];
                 this.startTimer();
 
                 return;
             }
-
-            this.router.navigateByUrl('/home');
+            const redirect = this.isTest ? '/create-game' : '/home';
+            this.router.navigateByUrl(redirect);
         }, THREE_SECOND_IN_MS);
-    }
-
-    areChoicesCorrect(): boolean {
-        const allCorrect = this.selectedChoices.every((x) => x.isCorrect);
-
-        return this.selectedChoices.length !== 0 && allCorrect;
     }
 
     openConfirmationDialog() {
@@ -152,7 +170,8 @@ export class GameComponent implements OnInit, OnChanges, OnDestroy {
 
         dialogRef.afterClosed().subscribe((result) => {
             if (result) {
-                this.router.navigateByUrl('/home');
+                const redirect = this.isTest ? '/create-game' : '/home';
+                this.router.navigateByUrl(redirect);
             }
         });
     }
