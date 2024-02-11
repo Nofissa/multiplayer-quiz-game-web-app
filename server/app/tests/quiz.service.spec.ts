@@ -16,8 +16,6 @@ describe('quizService', () => {
 
     beforeAll(async () => {
         quizModelTest = {
-            countDocuments: jest.fn(),
-            insertMany: jest.fn(),
             create: jest.fn(),
             find: jest.fn(),
             findOneAndReplace: jest.fn(),

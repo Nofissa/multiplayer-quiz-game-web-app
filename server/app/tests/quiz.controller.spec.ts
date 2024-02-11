@@ -31,7 +31,7 @@ describe('QuizController', () => {
         expect(quizControllerTest).toBeDefined();
     });
 
-    describe('getAllQuiz', () => {
+    describe('getQuizzes', () => {
         const mockResponse = {
             status: sinon.stub().returnsThis(),
             send: sinon.stub().returnsThis(),
@@ -48,7 +48,7 @@ describe('QuizController', () => {
         it('should return 404 Not Found when no content', async () => {
             quizServiceTest.getQuizzes.rejects([mockResult]);
             await quizControllerTest.getQuizzes(mockResponse as any, onlyVisible);
-            expect(mockResponse.status.calledWith(HttpStatus.OK)).toBeTruthy();
+            expect(mockResponse.status.calledWith(HttpStatus.NOT_FOUND)).toBeTruthy();
             expect(mockResponse.send.calledWith('Quizzes not found')).toBeTruthy();
         });
     });
