@@ -18,10 +18,13 @@ import { AppComponent } from '@app/pages/app/app.component';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { SwiperModule } from 'swiper/angular';
+import { LoaderAnimationComponent } from './components/animations/loader-animation/loader-animation.component';
 import { ConfirmationDialogComponent } from './components/dialogs/confirmation-dialog/confirmation-dialog.component';
 import { LoginDialogComponent } from './components/dialogs/login-dialog/login-dialog.component';
+import { PromptDialogComponent } from './components/dialogs/prompt-dialog/prompt-dialog.component';
 import { QuizDetailsDialogComponent } from './components/dialogs/quiz-details-dialog/quiz-details-dialog.component';
 import { UpsertQuestionDialogComponent } from './components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
+import { GameComponent } from './components/game/game.component';
 import { QuestionBankComponent } from './components/question-bank/question-bank.component';
 import { QuestionListComponent } from './components/question-list/question-list.component';
 import { QuizListComponent } from './components/quiz-list/quiz-list.component';
@@ -30,8 +33,7 @@ import { AppRoutingModule } from './modules/app-routing.module';
 import { AdminPageComponent } from './pages/admin-page/admin-page.component';
 import { CreateGamePageComponent } from './pages/create-game-page/create-game-page.component';
 import { QCMCreationPageComponent } from './pages/qcmcreation-page/qcmcreation-page.component';
-import { GameComponent } from './components/game/game.component';
-import { PromptDialogComponent } from './components/dialogs/prompt-dialog/prompt-dialog.component';
+import { WaitingRoomPageComponent } from './pages/waiting-room-page/waiting-room-page.component';
 
 /**
  * Main module that is used in main.ts.
@@ -59,6 +61,8 @@ import { PromptDialogComponent } from './components/dialogs/prompt-dialog/prompt
         QuestionBankComponent,
         QuestionBankComponent,
         GameComponent,
+        WaitingRoomPageComponent,
+        LoaderAnimationComponent,
         PromptDialogComponent,
     ],
     imports: [
