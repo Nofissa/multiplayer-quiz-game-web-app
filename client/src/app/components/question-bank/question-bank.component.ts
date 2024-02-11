@@ -38,7 +38,6 @@ export class QuestionBankComponent implements OnInit {
         questionServicesProvider: QuestionServicesProvider,
         readonly questionInteractionService: QuestionInteractionService,
     ) {
-        console.log(questionInteractionService);
         this.dialogService = materialServicesProvider.dialog;
         this.snackBarService = materialServicesProvider.snackBar;
         this.questionHttpService = questionServicesProvider.questionHttp;
@@ -53,7 +52,6 @@ export class QuestionBankComponent implements OnInit {
                 this.addQuestion(question);
             }
         });
-        console.log(this.questionInteractionService);
         this.questionInteractionService.registerOnAddQuestion(() => {
             this.openAddQuestionDialog();
         });
