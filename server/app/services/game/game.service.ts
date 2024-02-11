@@ -7,14 +7,14 @@ const BONUS = 1.2;
 
 @Injectable()
 export class GameService {
-    evaluateChoices(dtos: ChoiceDto[], question: Question): EvaluationPayload {
+    evaluateChoices(chosenAnswers: ChoiceDto[], question: Question): EvaluationPayload {
         const correctAnswers: Choice[] = question.choices.filter((x) => x.isCorrect);
         const correctAnswerTexts: Set<string> = new Set(correctAnswers.map((x) => x.text));
-        const chosenAnswerTexts: Set<string> = new Set(dtos.map((x) => x.text));
+        const chosenAnswerTexts: Set<string> = new Set(chosenAnswers.map((x) => x.text));
 
-        const difference = new Set([...chosenAnswerTexts].filter((x) => !correctAnswerTexts.has(x)));
+        const areEqualSets = correctAnswerTexts.size === chosenAnswerTexts.size && [...correctAnswerTexts].every((x) => chosenAnswerTexts.has(x));
 
-        if (!difference.size) {
+        if (areEqualSets) {
             return { correctAnswers, score: question.points * BONUS };
         } else {
             return { correctAnswers, score: 0 };
