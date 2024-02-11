@@ -101,7 +101,6 @@ describe('QuestionBankComponent', () => {
                 { provide: MaterialServicesProvider, useValue: materialServicesProviderSpy },
                 { provide: QuestionServicesProvider, useValue: questionServicesProviderSpy },
                 QuestionInteractionService,
-
             ],
         }).compileComponents();
     });
@@ -130,7 +129,7 @@ describe('QuestionBankComponent', () => {
     it('should openAddQuestionDialog not add a question to questions[] when an error is thrown', () => {
         component.questions = [];
         dialogRefSpy.afterClosed.and.callFake(() => of(mockQuestion));
-        questionHttpServiceSpy.createQuestion.and.returnValue(throwError('Simulated Error'));
+        questionHttpServiceSpy.createQuestion.and.returnValue(throwError(() => new Error('test')));
         component.openAddQuestionDialog();
         mockQuestionSubject.error(undefined);
         expect(questionHttpServiceSpy.createQuestion).toHaveBeenCalled();
@@ -149,6 +148,7 @@ describe('QuestionBankComponent', () => {
 
     it('should openDeleteQuestionDialog not delete a question from questions[] when is submitted = true and question not in questions[', () => {
         const mockQuestionDifferentId = editedMockQuestion;
+        // eslint-disable-next-line no-underscore-dangle
         mockQuestionDifferentId._id = 'Some id 2';
         component.questions = [mockQuestionDifferentId];
         dialogRefSpy.afterClosed.and.callFake(() => booleanSubject);
