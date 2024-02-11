@@ -59,6 +59,5 @@ export class QuestionService {
         } else {
             return question._id !== dto._id;
         }
-        // return question._id !== dto._id || question === null;
     }
 }
