@@ -69,6 +69,7 @@ describe('QuestionBankComponent', () => {
         mockQuestionSubject = new Subject();
         mockQuestionEditedSubject = new Subject();
         booleanSubject = new Subject();
+
         questionHttpServiceSpy = jasmine.createSpyObj('QuestionHttpService', [
             'getAllQuestions',
             'updateQuestion',
@@ -99,9 +100,8 @@ describe('QuestionBankComponent', () => {
             providers: [
                 { provide: MaterialServicesProvider, useValue: materialServicesProviderSpy },
                 { provide: QuestionServicesProvider, useValue: questionServicesProviderSpy },
-                {
-                    provide: QuestionInteractionService,
-                },
+                QuestionInteractionService,
+
             ],
         }).compileComponents();
     });
