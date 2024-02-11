@@ -350,16 +350,16 @@ describe('gameComponent', () => {
 
         it('should update time correctly during the countdown', fakeAsync(() => {
             component.quiz.duration = 5;
-            const ONE_SECOND_MS = 1000;
+            const TIMER_MOCK_COUNTDOWN = 1000;
             spyOn(component, 'validateChoices');
             component.startTimer();
             tick();
             expect(component.time).toBe(component.quiz.duration);
 
-            tick(ONE_SECOND_MS);
+            tick(TIMER_MOCK_COUNTDOWN);
             expect(component.time).toBe(component.quiz.duration - 1);
 
-            tick(ONE_SECOND_MS);
+            tick(TIMER_MOCK_COUNTDOWN);
             expect(component.time).toBe(component.quiz.duration - 2);
 
             expect(component.validateChoices).not.toHaveBeenCalled();
