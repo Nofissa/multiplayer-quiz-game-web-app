@@ -12,6 +12,7 @@ describe('gamePage', () => {
     const mockActivatedRoute = {
         snapshot: {
             queryParams: {
+                quizId: 'loool',
                 isTest: 'true',
             },
         },
