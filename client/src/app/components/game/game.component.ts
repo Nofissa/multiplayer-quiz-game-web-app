@@ -16,6 +16,7 @@ const THREE_SECOND_IN_MS = 3000;
     selector: 'app-game',
     templateUrl: './game.component.html',
     styleUrls: ['./game.component.scss'],
+    providers: [GameServicesProvider],
 })
 export class GameComponent implements OnInit, OnChanges, OnDestroy {
     @Input()

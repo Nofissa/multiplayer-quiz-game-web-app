@@ -434,6 +434,7 @@ describe('gameComponent', () => {
 
             component.nextQuestion();
             tick(threeSecondsMs);
+            fixture.detectChanges();
 
             expect(component.feedbackMessage).toBe('');
             expect(component.currentQuestionIndex).toBe(1);
