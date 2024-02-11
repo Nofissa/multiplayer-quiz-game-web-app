@@ -25,7 +25,7 @@ export class GamePageComponent implements OnInit {
     loadQuiz() {
         const quizId = this.activatedRoute.snapshot.queryParams['quizId'];
 
-        this.quizHttpService.getQuizById(quizId).subscribe((quiz: Quiz) => {
+        this.quizHttpService.getVisibleQuizById(quizId).subscribe((quiz: Quiz) => {
             this.quiz = quiz;
         });
     }

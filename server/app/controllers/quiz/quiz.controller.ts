@@ -1,7 +1,7 @@
 import { Quiz } from '@app/model/database/quiz';
 import { QuizDto } from '@app/model/dto/quiz/quiz.dto';
 import { QuizService } from '@app/services/quiz/quiz.service';
-import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Put, Res, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Param, Patch, Post, Put, Query, Res } from '@nestjs/common';
 import { ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 
@@ -19,12 +19,12 @@ export class QuizController {
         description: 'Return NOT_FOUND http status when request fails',
     })
     @Get('/')
-    async getAllQuizzes(@Res() response: Response) {
+    async getQuizzes(@Res() response: Response, @Query('visibleOnly') visibleOnly?: boolean) {
         try {
-            const allQuiz = await this.quizService.getAllQuizzes();
-            response.status(HttpStatus.OK).json(allQuiz);
+            const quizzes = await this.quizService.getQuizzes(visibleOnly);
+            response.status(HttpStatus.OK).json(quizzes);
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send(error.message);
+            response.status(HttpStatus.NOT_FOUND).send('Quizzes not found');
         }
     }
 
@@ -36,12 +36,17 @@ export class QuizController {
         description: 'Returns NOT_FOUND http status when request fails',
     })
     @Get('/:id')
-    async getQuizById(@Param('id') id: string, @Res() response: Response) {
+    async getQuizById(@Param('id') id: string, @Res() response: Response, @Query('visibleOnly') visibleOnly?: boolean) {
         try {
-            const quiz = await this.quizService.getQuizById(id);
-            response.status(HttpStatus.OK).json(quiz);
+            const quiz = await this.quizService.getQuizById(id, visibleOnly);
+
+            if (quiz) {
+                response.status(HttpStatus.OK).json(quiz);
+            } else {
+                response.status(HttpStatus.NOT_FOUND).send('cannot find quiz');
+            }
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send(error.message);
+            response.status(HttpStatus.NOT_FOUND).send('error while getting the quiz');
         }
     }
 
@@ -58,7 +63,7 @@ export class QuizController {
             const createdQuiz = await this.quizService.addQuiz(dto);
             response.status(HttpStatus.CREATED).json(createdQuiz);
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send(error.message);
+            response.status(HttpStatus.BAD_REQUEST).send('Cant add quiz');
         }
     }
 
@@ -75,7 +80,7 @@ export class QuizController {
             const quiz: Quiz = await this.quizService.modifyQuiz(dto);
             response.status(HttpStatus.OK).json(quiz);
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send(error.message);
+            response.status(HttpStatus.NOT_FOUND).send('Cant find quiz to modify');
         }
     }
 
@@ -87,12 +92,12 @@ export class QuizController {
         description: 'Return NOT_FOUND http status when request fails',
     })
     @Patch('/hide/:id')
-    async hideQuestionById(@Param('id') id: string, @Res() response: Response) {
+    async hideQuizById(@Param('id') id: string, @Res() response: Response) {
         try {
             const quiz: Quiz = await this.quizService.hideQuizById(id);
             response.status(HttpStatus.OK).json(quiz);
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send(error.message);
+            response.status(HttpStatus.NOT_FOUND).send('Cant find quiz to hide');
         }
     }
 
@@ -108,7 +113,7 @@ export class QuizController {
             await this.quizService.deleteQuizById(id);
             response.status(HttpStatus.OK).send();
         } catch (error) {
-            response.status(HttpStatus.INTERNAL_SERVER_ERROR).send(error.message);
+            response.status(HttpStatus.NOT_FOUND).send('Cant find quiz to delete');
         }
     }
 }

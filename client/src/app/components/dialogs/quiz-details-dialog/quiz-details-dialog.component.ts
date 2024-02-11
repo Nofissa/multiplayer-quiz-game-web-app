@@ -1,7 +1,9 @@
+/* eslint-disable no-underscore-dangle */
+import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { Router } from '@angular/router';
 import { Quiz } from '@app/interfaces/quiz';
+import { QuizHttpService } from '@app/services/quiz-http.service';
 
 @Component({
     selector: 'app-quiz-details-dialog',
@@ -10,21 +12,36 @@ import { Quiz } from '@app/interfaces/quiz';
 })
 export class QuizDetailsDialogComponent {
     constructor(
-        @Inject(MAT_DIALOG_DATA) readonly data: Quiz,
+        @Inject(MAT_DIALOG_DATA)
+        readonly data: { quiz: Quiz; onStartGame: (quiz: Quiz) => void; onTestGame: (quiz: Quiz) => void; onNotFound: () => void },
         private readonly dialogRef: MatDialogRef<QuizDetailsDialogComponent>,
-        private readonly router: Router,
+        private readonly quizHttpService: QuizHttpService,
     ) {}
 
     startGame() {
-        this.dialogRef.close();
-        // eslint-disable-next-line no-underscore-dangle
-        this.router.navigate(['/game'], { queryParams: { quizId: this.data._id } });
+        this.quizHttpService.getVisibleQuizById(this.data.quiz._id).subscribe({
+            next: (quiz: Quiz) => {
+                this.data.onStartGame(quiz);
+            },
+            error: (error: HttpErrorResponse) => {
+                if (error.status === HttpStatusCode.NotFound) {
+                    this.data.onNotFound();
+                }
+            },
+        });
     }
 
     testGame() {
-        this.dialogRef.close();
-        // eslint-disable-next-line no-underscore-dangle
-        this.router.navigate(['/game'], { queryParams: { quizId: this.data._id, isTest: true } });
+        this.quizHttpService.getVisibleQuizById(this.data.quiz._id).subscribe({
+            next: (quiz: Quiz) => {
+                this.data.onTestGame(quiz);
+            },
+            error: (error: HttpErrorResponse) => {
+                if (error.status === HttpStatusCode.NotFound) {
+                    this.data.onNotFound();
+                }
+            },
+        });
     }
 
     closeDialog() {

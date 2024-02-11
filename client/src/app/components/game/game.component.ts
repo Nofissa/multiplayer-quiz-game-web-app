@@ -41,8 +41,8 @@ export class GameComponent implements OnInit, OnChanges, OnDestroy {
         private readonly router: Router,
         private readonly gameService: GameService,
     ) {
-        this.timerService = gameServicesProvider.timerService;
-        this.keyBindingService = gameServicesProvider.keyBindingService;
+        this.timerService = gameServicesProvider.timer;
+        this.keyBindingService = gameServicesProvider.keyBinding;
     }
     get time(): number {
         return this.timerService.time;

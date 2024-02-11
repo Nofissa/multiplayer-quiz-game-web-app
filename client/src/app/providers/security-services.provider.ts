@@ -8,15 +8,15 @@ import { SessionService } from '@app/services/session.service';
 })
 export class SecurityServicesProvider {
     constructor(
-        private readonly _authService: AuthService,
-        private readonly _sessionService: SessionService,
+        private readonly authService: AuthService,
+        private readonly sessionService: SessionService,
     ) {}
 
-    get authService(): AuthService {
-        return this._authService;
+    get auth(): AuthService {
+        return this.authService;
     }
 
-    get sessionService(): SessionService {
-        return this._sessionService;
+    get session(): SessionService {
+        return this.sessionService;
     }
 }

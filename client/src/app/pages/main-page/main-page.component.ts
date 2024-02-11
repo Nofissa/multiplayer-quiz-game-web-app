@@ -26,10 +26,10 @@ export class MainPageComponent {
         materialServicesProvider: MaterialServicesProvider,
         private readonly router: Router,
     ) {
-        this.authService = securityServicesProvider.authService;
-        this.sessionService = securityServicesProvider.sessionService;
-        this.dialogService = materialServicesProvider.dialogService;
-        this.snackBarService = materialServicesProvider.snackBarService;
+        this.authService = securityServicesProvider.auth;
+        this.sessionService = securityServicesProvider.session;
+        this.dialogService = materialServicesProvider.dialog;
+        this.snackBarService = materialServicesProvider.snackBar;
     }
 
     validateAdmin() {
