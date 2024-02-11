@@ -256,10 +256,10 @@ describe('gameComponent', () => {
         it('should navigate to correct route when the quiz is finished', fakeAsync(() => {
             component.isTest = true;
             component.currentQuestionIndex = component.quiz.questions.length - 1;
-            const THREE_SECOND_IN_MS = 3000;
+            const NEXT_QUESTION_DELAY_MS = 3000;
 
             component.nextQuestion();
-            tick(THREE_SECOND_IN_MS);
+            tick(NEXT_QUESTION_DELAY_MS);
 
             let redirect = '/create-game';
             expect(router.navigateByUrl).toHaveBeenCalledWith(redirect);
@@ -268,7 +268,7 @@ describe('gameComponent', () => {
             component.currentQuestionIndex = component.quiz.questions.length - 1;
 
             component.nextQuestion();
-            tick(THREE_SECOND_IN_MS);
+            tick(NEXT_QUESTION_DELAY_MS);
 
             redirect = '/home';
             expect(router.navigateByUrl).toHaveBeenCalledWith(redirect);
@@ -310,8 +310,9 @@ describe('gameComponent', () => {
         }));
 
         it('should call executor when window keydown event is triggered', () => {
+            const numberThreeKey = '3';
             const mockEvent = new KeyboardEvent('keydown', {
-                key: '3',
+                key: numberThreeKey,
                 bubbles: true,
                 cancelable: true,
             });
@@ -319,7 +320,7 @@ describe('gameComponent', () => {
             spyOn(component.keyBindingService, 'getExecutor').and.returnValue(() => {});
             component.handleKeyboardEvent(mockEvent);
 
-            expect(component.keyBindingService.getExecutor).toHaveBeenCalledWith('3');
+            expect(component.keyBindingService.getExecutor).toHaveBeenCalledWith(numberThreeKey);
         });
 
         it('should not call executor when focused element is a textarea', () => {
@@ -335,12 +336,12 @@ describe('gameComponent', () => {
 
         it('should call validateChoices when the timer reaches 0', fakeAsync(() => {
             component.quiz.duration = 10;
-            const tenSecondsMs = 10000;
+            const QUESTION_DURATION_MS = 10000;
             spyOn(component, 'validateChoices');
 
             component.startTimer();
             tick();
-            tick(tenSecondsMs);
+            tick(QUESTION_DURATION_MS);
 
             expect(component.time).toBe(0);
             expect(component.validateChoices).toHaveBeenCalled();
@@ -349,16 +350,16 @@ describe('gameComponent', () => {
 
         it('should update time correctly during the countdown', fakeAsync(() => {
             component.quiz.duration = 5;
-            const oneSecondMs = 1000;
+            const ONE_SECOND_MS = 1000;
             spyOn(component, 'validateChoices');
             component.startTimer();
             tick();
             expect(component.time).toBe(component.quiz.duration);
 
-            tick(oneSecondMs);
+            tick(ONE_SECOND_MS);
             expect(component.time).toBe(component.quiz.duration - 1);
 
-            tick(oneSecondMs);
+            tick(ONE_SECOND_MS);
             expect(component.time).toBe(component.quiz.duration - 2);
 
             expect(component.validateChoices).not.toHaveBeenCalled();
@@ -417,7 +418,7 @@ describe('gameComponent', () => {
         });
 
         it('should go to the next question for non-last questions', fakeAsync(() => {
-            const threeSecondsMs = 3000;
+            const NEXT_QUESTION_DELAY_MS = 3000;
             component.quiz.questions.push({
                 type: 'QCM',
                 text: 'Sample Question Text 2',
@@ -432,7 +433,7 @@ describe('gameComponent', () => {
             component.currentQuestionIndex = 0;
 
             component.nextQuestion();
-            tick(threeSecondsMs);
+            tick(NEXT_QUESTION_DELAY_MS);
             fixture.detectChanges();
             flush();
             expect(component.feedbackMessage).toBe('');

@@ -16,7 +16,7 @@ describe('gamePage', () => {
     const mockActivatedRoute = {
         snapshot: {
             queryParams: {
-                quizId: 'loool',
+                quizId: 'a1b2c3',
                 isTest: 'true',
             },
         },
@@ -87,7 +87,7 @@ describe('gamePage', () => {
     it('should load quiz from the server when quizId is present in queryParams', fakeAsync(() => {
         spyOn(quizHttpService, 'getVisibleQuizById');
         const mockQuiz: Quiz = {
-            id: 'loool',
+            id: 'a1b2c3',
             title: 'testing',
             description: 'test quiz',
             duration: 20,
@@ -106,13 +106,13 @@ describe('gamePage', () => {
                 },
             ],
             isHidden: null,
-            _id: 'loool',
+            _id: 'a1b2c3',
         };
         quizHttpService.getVisibleQuizById.and.returnValue(of(mockQuiz));
         component.loadQuiz();
         tick();
 
-        expect(quizHttpService.getVisibleQuizById).toHaveBeenCalledWith('loool');
+        expect(quizHttpService.getVisibleQuizById).toHaveBeenCalledWith('a1b2c3');
         expect(component.quiz).toEqual(mockQuiz);
     }));
 });

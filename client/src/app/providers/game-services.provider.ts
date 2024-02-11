@@ -8,8 +8,8 @@ import { TimerService } from '@app/services/timer-service';
 })
 export class GameServicesProvider {
     constructor(
-        readonly timerService: TimerService,
-        readonly keyBindingService: KeyBindingService,
+        private readonly timerService: TimerService,
+        private readonly keyBindingService: KeyBindingService,
     ) {}
 
     get timer(): TimerService {
