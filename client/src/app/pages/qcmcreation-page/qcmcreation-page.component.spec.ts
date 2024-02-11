@@ -11,10 +11,8 @@ describe('QCMCreationPageComponent', () => {
     let component: QCMCreationPageComponent;
     let fixture: ComponentFixture<QCMCreationPageComponent>;
     let snackBarSpy: jasmine.SpyObj<MatSnackBar>;
-    // let dialogSpy: jasmine.SpyObj<MatDialog>;
 
     beforeEach(() => {
-        // const matDialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
         const questionHttpClientSpy = jasmine.createSpyObj('QuestionHttpService', ['close']);
         const paramMap = jasmine.createSpyObj('ParamMap', ['get']);
         paramMap.get.and.returnValue('mockedQuizId'); // Set the value as needed

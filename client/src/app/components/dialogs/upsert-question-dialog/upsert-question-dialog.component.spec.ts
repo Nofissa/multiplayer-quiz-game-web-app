@@ -49,11 +49,6 @@ describe('UpsertQuestionDialogComponent', () => {
     ];
     const wrongPoints = 11;
 
-    // function dispatchDragEvent(element: Element, eventType: string, eventData: any = null): void {
-    //     const event = new DragEvent(eventType, eventData);
-    //     element.dispatchEvent(event);
-    // }
-
     beforeEach(() => {
         const matDialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['close']);
         const matSnackBarSpy = jasmine.createSpyObj('MatSnackBar', ['open']);
@@ -214,25 +209,6 @@ describe('UpsertQuestionDialogComponent', () => {
             expect(componentChoicesArray.value).toEqual(formGroupValue);
         }
     });
-
-    // it('should reorder choices on drag and drop', () => {
-    //     fixture.detectChanges();
-
-    //     const choicesWrapper = fixture.debugElement.query(By.css('[cdkDropList]')).nativeElement;
-    //     const initialChoices = component.choicesArray.value;
-
-    //     // Simulate a drag and drop event to reorder choices
-    //     dispatchDragEvent(choicesWrapper, 'dragstart', { dataTransfer: new DataTransfer() });
-    //     dispatchDragEvent(choicesWrapper, 'dragenter');
-    //     dispatchDragEvent(choicesWrapper, 'drop');
-    //     dispatchDragEvent(choicesWrapper, 'dragend');
-
-    //     fixture.detectChanges();
-
-    //     const reorderedChoices = component.choicesArray.value;
-
-    //     expect(initialChoices).not.toEqual(reorderedChoices);
-    // });
 
     it('should toggle() change toogle status', () => {
         expect(component.qcmToggled).toBeFalsy();
