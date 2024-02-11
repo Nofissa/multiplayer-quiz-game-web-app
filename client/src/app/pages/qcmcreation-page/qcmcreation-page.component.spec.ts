@@ -13,7 +13,7 @@ import { QuizHttpService } from '@app/services/quiz-http.service';
 import { QuestionInteractionService } from '@app/services/question-interaction.service';
 import SpyObj = jasmine.SpyObj;
 
-fdescribe('QCMCreationPageComponent', () => {
+describe('QCMCreationPageComponent', () => {
     let component: QCMCreationPageComponent;
     let fixture: ComponentFixture<QCMCreationPageComponent>;
     let snackBarSpy: jasmine.SpyObj<MatSnackBar>;
