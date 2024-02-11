@@ -1,15 +1,12 @@
 import { Injectable } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
-// import { Subscription, map, take, timer } from 'rxjs';
 
-// const ONE_SECOND_IN_MS = 1000;
-
-// timer inspired from ChatGPT and https://www.codeproject.com/Questions/5349203/How-to-make-5-minute-countdown-timer-with-rxjs-and
 @Injectable({
     providedIn: 'root',
 })
 export class TimerService {
     private onTickSubject = new Subject<number>();
+    // disabled lint here because if I place it on the first line, onTickSubject would be used before its declaration
     // eslint-disable-next-line @typescript-eslint/member-ordering
     onTick: Observable<number> = this.onTickSubject.asObservable();
     private interval: number | undefined;

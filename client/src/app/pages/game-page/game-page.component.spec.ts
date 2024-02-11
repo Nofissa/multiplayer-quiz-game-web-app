@@ -1,6 +1,8 @@
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { RouterTestingModule } from '@angular/router/testing';
+// import { QuizHttpService } from '@app/services/quiz-http.service';
 import { GamePageComponent } from './game-page.component';
 
 describe('gamePage', () => {
@@ -8,10 +10,13 @@ describe('gamePage', () => {
     let fixture: ComponentFixture<GamePageComponent>;
 
     beforeEach(async () => {
+        // const quizHttpServiceStub = jasmine.createSpyObj('QuizHttpService', ['getQuizById']);
         await TestBed.configureTestingModule({
             declarations: [GamePageComponent],
-            imports: [RouterTestingModule],
+            imports: [RouterTestingModule, HttpClientTestingModule],
+            // providers: [{ provide: QuizHttpService, useValue: quizHttpServiceStub }],
         }).compileComponents();
+        // quizHttpService = TestBed.inject(QuizHttpService) as jasmine.SpyObj<QuizHttpService>;
     });
 
     beforeEach(() => {
@@ -36,7 +41,7 @@ describe('gamePage', () => {
     });
 
     it('should contain chat box during the game', () => {
-        const chatBox = fixture.debugElement.query(By.css('.messages-zone font-color text-centered'));
+        const chatBox = fixture.debugElement.query(By.css('.chat-room'));
         expect(chatBox).toBeTruthy();
     });
 
