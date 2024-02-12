@@ -117,7 +117,7 @@ describe('QuestionBankComponent', () => {
         expect(questionSharingServiceSpy.subscribe).toHaveBeenCalled();
     });
 
-    it('should openAddQuestionDialog add a question to questions[] when a question is submitted', () => {
+    it('should add a question to questions[] when a question is submitted', () => {
         component.questions = [];
         dialogRefSpy.afterClosed.and.callFake(() => of(mockQuestion));
         component.openAddQuestionDialog();
@@ -126,7 +126,7 @@ describe('QuestionBankComponent', () => {
         expect(component.questions).toEqual([mockQuestion]);
     });
 
-    it('should openAddQuestionDialog not add a question to questions[] when an error is thrown', () => {
+    it('should not add a question to questions[] when an error is thrown', () => {
         component.questions = [];
         dialogRefSpy.afterClosed.and.callFake(() => of(mockQuestion));
         questionHttpServiceSpy.createQuestion.and.returnValue(throwError(() => new Error('test')));
@@ -137,7 +137,7 @@ describe('QuestionBankComponent', () => {
         expect(component.questions).toEqual([]);
     });
 
-    it('should openDeleteQuestionDialog delete a question from questions[] when is submitted = true', () => {
+    it('should delete a question from questions[] when is submitted = true', () => {
         component.questions = [mockQuestion];
         dialogRefSpy.afterClosed.and.callFake(() => booleanSubject);
         component.openDeleteQuestionDialog(mockQuestion);
@@ -146,7 +146,7 @@ describe('QuestionBankComponent', () => {
         expect(component.questions).toEqual([]);
     });
 
-    it('should openDeleteQuestionDialog not delete a question from questions[] when is submitted = true and question not in questions[', () => {
+    it('should not delete a question from questions[] when is submitted = true and question not in questions[]', () => {
         const mockQuestionDifferentId = editedMockQuestion;
         // eslint-disable-next-line no-underscore-dangle
         mockQuestionDifferentId._id = 'Some id 2';
@@ -158,7 +158,7 @@ describe('QuestionBankComponent', () => {
         expect(component.questions).toEqual([mockQuestionDifferentId]);
     });
 
-    it('should openDeleteQuestionDialog not delete a question from questions[] when is submitted = false', () => {
+    it('should not delete a question from questions[] when is submitted = false', () => {
         component.questions = [mockQuestion];
         dialogRefSpy.afterClosed.and.callFake(() => booleanSubject);
         component.openDeleteQuestionDialog(mockQuestion);
@@ -167,7 +167,7 @@ describe('QuestionBankComponent', () => {
         expect(component.questions).toEqual([mockQuestion]);
     });
 
-    it('should openEditQuestionDialog edit an existing question when question is submitted', () => {
+    it('should edit an existing question when question is submitted', () => {
         component.questions = [mockQuestion];
         dialogRefSpy.afterClosed.and.callFake(() => of(editedMockQuestion));
         component.openEditQuestionDialog(mockQuestion);
@@ -176,7 +176,7 @@ describe('QuestionBankComponent', () => {
         expect(component.questions).toEqual([editedMockQuestion]);
     });
 
-    it('should openEditQuestionDialog not edit an existing question when question is submitted and question not in questions[]', () => {
+    it('should not edit an existing question when question is submitted and question not in questions[]', () => {
         component.questions = [];
         dialogRefSpy.afterClosed.and.callFake(() => of(editedMockQuestion));
         component.openEditQuestionDialog(mockQuestion);
@@ -185,7 +185,7 @@ describe('QuestionBankComponent', () => {
         expect(component.questions).toEqual([]);
     });
 
-    it('should invokeOnAddQuestion call openAddQuestionDialog QuestionIteractionService', () => {
+    it('should invokeOnAddQuestion use openAddQuestionDialog logic and add question to questions[]', () => {
         component.questions = [];
         dialogRefSpy.afterClosed.and.callFake(() => of(mockQuestion));
         component.questionInteractionService.invokeOnAddQuestion();
@@ -194,7 +194,7 @@ describe('QuestionBankComponent', () => {
         expect(questionHttpServiceSpy.createQuestion).toHaveBeenCalled();
     });
 
-    it('should invokeOnEditQuestion call openEditQuestionDialog QuestionIteractionService', () => {
+    it('should invokeOnEditQuestion use openEditQuestionDialog logic and edit targetted question', () => {
         component.questions = [mockQuestion];
         dialogRefSpy.afterClosed.and.callFake(() => of(editedMockQuestion));
         component.questionInteractionService.invokeOnEditQuestion(mockQuestion);
@@ -203,7 +203,7 @@ describe('QuestionBankComponent', () => {
         expect(component.questions).toEqual([editedMockQuestion]);
     });
 
-    it('should invokeOnDelete call openDeleteQuestionDialog QuestionIteractionService', () => {
+    it('should invokeOnDelete use openDeleteQuestionDialog logic and delete targetted question', () => {
         component.questions = [mockQuestion];
         dialogRefSpy.afterClosed.and.callFake(() => booleanSubject);
         component.questionInteractionService.invokeOnDeleteQuestion(mockQuestion);
@@ -212,7 +212,7 @@ describe('QuestionBankComponent', () => {
         expect(component.questions).toEqual([]);
     });
 
-    it('should invokeOnShare call shareQuestion QuestionIteractionService', () => {
+    it('should invokeOnShare use shareQuestion logic and share targetted question', () => {
         component.questions = [mockQuestion];
         component.questionInteractionService.invokeOnShareQuestion(mockQuestion);
         expect(questionSharingServiceSpy.share).toHaveBeenCalled();
