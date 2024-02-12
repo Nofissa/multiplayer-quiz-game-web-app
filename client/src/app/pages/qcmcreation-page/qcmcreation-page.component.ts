@@ -52,7 +52,7 @@ export class QCMCreationPageComponent implements OnInit {
             this.setupForm();
 
             if (quizId) {
-                this.quizHttpService.getVisibleQuizById(quizId).subscribe((quiz: Quiz) => {
+                this.quizHttpService.getQuizById(quizId).subscribe((quiz: Quiz) => {
                     if (quiz) {
                         this.quiz = quiz;
                         this.questionsContainer = this.quiz.questions;
@@ -75,7 +75,7 @@ export class QCMCreationPageComponent implements OnInit {
 
             this.questionInteractionService.registerOnEditQuestion((question: Question) => {
                 const dialogRef = this.dialogService.open(UpsertQuestionDialogComponent, {
-                    data: { title: 'Moddifier une question', question },
+                    data: { title: 'Modifier une question', question },
                 });
                 dialogRef.afterClosed().subscribe({
                     next: (data: Question) => {
@@ -129,8 +129,7 @@ export class QCMCreationPageComponent implements OnInit {
         });
         dialogRef.afterClosed().subscribe({
             next: (data: Question) => {
-                if (data) {
-                   
+                if (data) {                   
                     this.questionsContainer.push(data);
                     
                 }
@@ -138,7 +137,7 @@ export class QCMCreationPageComponent implements OnInit {
         });
     }
 
-    generateRandomString(length: number = ID_LENGTH): string {
+    private generateRandomString(length: number = ID_LENGTH): string {
         const lettersAndDigits = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         let randomString = '';
 
@@ -151,9 +150,7 @@ export class QCMCreationPageComponent implements OnInit {
     }
 
     submitQuiz() {
-        console.log('submit Quiz is entered');
         if (this.questionsContainer.length !== 0 && this.formGroup.valid) {
-            console.log('enough questions and title $ description is');
             const quiz: Quiz = {
                 id: this.quiz? this.quiz.id : this.generateRandomString(),
                 title: this.formGroup.value.title,
@@ -169,25 +166,25 @@ export class QCMCreationPageComponent implements OnInit {
                 this.quizHttpService.updateQuiz(quiz).subscribe({
                     next: (updatedQuiz: Quiz) => {
                         this.quiz = updatedQuiz;
-                        this.snackBarService.open('Le quiz a été enregistré avec succès', '', { duration: 2000 });
+                        this.snackBarService.open('Le quiz a été enregistré avec succès', '', { duration: SNACK_MESSAGE_DURATION });
                     },
                     error: () => {
-                        this.snackBarService.open("Le quiz n'a pas pu être modifié", '', { duration: 2000 });
+                        this.snackBarService.open("Le quiz n'a pas pu être modifié", '', { duration: SNACK_MESSAGE_DURATION });
                     },
                 });
             } else {
                 this.quizHttpService.createQuiz(quiz).subscribe({
                     next: (createdQuiz: Quiz) => {
                         this.quiz = createdQuiz;
-                        this.snackBarService.open('Le quiz a été enregistré avec succès', '', { duration: 2000 });
+                        this.snackBarService.open('Le quiz a été enregistré avec succès', '', { duration: SNACK_MESSAGE_DURATION });
                     },
                     error: () => {
-                        this.snackBarService.open("Le quiz n'a pas pu être créer", '', { duration: 2000 });
+                        this.snackBarService.open("Le quiz n'a pas pu être créer", '', { duration: SNACK_MESSAGE_DURATION });
                     },
                 });
             }
         } else {
-            this.snackBarService.open("L'un des paramètres est erroné, veuillez réessayer", '', { duration: 3000 });
+            this.snackBarService.open("L'un des paramètres est erroné, veuillez réessayer", '', { duration: SNACK_MESSAGE_DURATION });
         }
     }
 
