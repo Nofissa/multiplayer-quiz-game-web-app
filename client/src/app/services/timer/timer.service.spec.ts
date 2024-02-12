@@ -1,5 +1,5 @@
 import { TestBed, discardPeriodicTasks, fakeAsync, tick } from '@angular/core/testing';
-import { TimerService } from './timer-service';
+import { TimerService } from './timer.service';
 
 describe('TimerService', () => {
     let service: TimerService;

@@ -9,15 +9,15 @@ import { environment } from 'src/environments/environment';
     providedIn: 'root',
 })
 export class GameService {
-    private apiURL = `${environment.serverUrl}/game`;
+    private readonly baseUrl = `${environment.serverUrl}/game`;
     constructor(private http: HttpClient) {}
 
-    get apiURl() {
-        return this.apiURL;
+    get apiUrl() {
+        return this.baseUrl;
     }
 
     validateAnswers(selectedChoices: Choice[], quizID: string, questionIndex: number): Observable<EvaluationPayload> {
-        const url = `${this.apiURL}/evaluateChoices/${quizID}?questionIndex=${questionIndex}`;
+        const url = `${this.baseUrl}/evaluateChoices/${quizID}?questionIndex=${questionIndex}`;
         return this.http.post<EvaluationPayload>(url, selectedChoices);
     }
 }

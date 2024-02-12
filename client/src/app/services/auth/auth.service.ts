@@ -14,6 +14,10 @@ export class AuthService {
 
     constructor(private readonly http: HttpClient) {}
 
+    get apiUrl() {
+        return this.baseUrl;
+    }
+
     login(userCredentialSet: UserCredentialSet): Observable<AuthPayload> {
         return this.http.post<AuthPayload>(`${this.baseUrl}/login`, userCredentialSet).pipe(catchError(this.handleError<AuthPayload>()));
     }
