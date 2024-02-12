@@ -9,7 +9,6 @@ const usersFilePath = 'assets/users.json';
 @Injectable()
 export class AuthService {
     async authenticate(userCredentialSet: UserCredentialSet): Promise<AuthPayload> {
-        // try {
         const userCredentialSets: UserCredentialSet[] = JSON.parse(readFileSync(usersFilePath).toString());
         const matchingCredentialSet: UserCredentialSet = userCredentialSets.find((x) => {
             return x.username === userCredentialSet.username && x.password === userCredentialSet.password;
@@ -22,9 +21,6 @@ export class AuthService {
         return {
             token: sign({}, process.env.PRIVATE_RSA_KEY, { algorithm: 'RS256' }),
         };
-        // } catch (error) {
-        //     return Promise.reject(`Failed to authenticate: ${error}`);
-        // }
     }
 
     async verifyAuth(payload: AuthPayload): Promise<void> {
