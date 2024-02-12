@@ -42,22 +42,14 @@ describe('AuthService', () => {
             token: null,
         };
 
-        const errorPayloadMock: AuthPayload = {
-            token: undefined,
-        };
-
         it('verify should be called with the right token if payload validated', async () => {
             jest.spyOn(jsonwebtoken, 'verify');
             await authServiceTest.verifyAuth(goodPayloadMock);
             expect(jsonwebtoken.verify).toHaveBeenCalledWith(goodPayloadMock.token, process.env.PUBLIC_RSA_KEY);
         });
 
-        it('verify should reject if token == null', async () => {
+        it('verify should reject if no token', async () => {
             await expect(authServiceTest.verifyAuth(badPayloadMock)).rejects.toMatch('No token in payload');
-        });
-
-        it('verify should catch error if token == undefined', async () => {
-            await expect(authServiceTest.verifyAuth(errorPayloadMock)).rejects.toMatch('Failed to verify token');
         });
     });
 });

@@ -24,15 +24,11 @@ export class AuthService {
     }
 
     async verifyAuth(payload: AuthPayload): Promise<void> {
-        try {
-            const token = payload.token;
-            if (token === null) {
-                return Promise.reject('No token in payload');
-            }
-
-            verify(token, process.env.PUBLIC_RSA_KEY);
-        } catch (error) {
-            return Promise.reject('Failed to verify token');
+        const token = payload.token;
+        if (!token) {
+            return Promise.reject('No token in payload');
         }
+
+        verify(token, process.env.PUBLIC_RSA_KEY);
     }
 }
