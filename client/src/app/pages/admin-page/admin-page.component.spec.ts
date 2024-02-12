@@ -1,13 +1,13 @@
 /* eslint-disable max-classes-per-file */
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { SecurityServicesProvider } from '@app/providers/security-services.provider';
 import { AuthService } from '@app/services/auth.service';
 import { SessionService } from '@app/services/session.service';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { AdminPageComponent } from './admin-page.component';
 
 class MockSessionService {
@@ -46,7 +46,7 @@ describe('adminPage', () => {
         fixture.detectChanges();
     });
 
-    it('Should create component', () => {
+    it('should create component', () => {
         expect(component).toBeTruthy();
     });
 
@@ -71,27 +71,45 @@ describe('adminPage', () => {
 
     it('should display app-question-bank correctly', () => {
         const questionBankElement = fixture.debugElement.query(By.css('app-question-bank'));
-
         expect(questionBankElement).toBeTruthy();
     });
 
     it('should display app-quiz-list correctly', () => {
         const questionBankElement = fixture.debugElement.query(By.css('app-quiz-list'));
-
         expect(questionBankElement).toBeTruthy();
     });
 
     it('should display page title correctly', () => {
         const h1Element = fixture.debugElement.query(By.css('h1'));
-
         expect(h1Element).toBeTruthy();
         expect(h1Element.nativeElement.textContent).toEqual("Vue de création d'une partie");
     });
 
-    it('should redirect to home page when session is not present', () => {
-        spyOn(component.sessionService, 'getSession').and.returnValue(null);
-        component.ngOnInit();
+    it('should display mattab correctly', () => {
+        const matTabElement = fixture.debugElement.query(By.css('mat-tab-group'));
+        expect(matTabElement).toBeTruthy();
+    });
 
+    it('should return session service', () => {
+        expect(component.getSession()).toBeInstanceOf(MockSessionService);
+    });
+
+    it('should redirect to home page when session is not present', () => {
+        spyOn(component.getSession(), 'getSession').and.returnValue(null);
+        component.ngOnInit();
         expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('/');
     });
+
+    it('should redirect to home page on verification error', () => {
+        component['authService'].verify = jasmine.createSpy().and.returnValue(throwError(() => new Error('Verification error')));
+        component.ngOnInit();
+        expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('/');
+    });
+
+    it('should not redirect on successful verification', fakeAsync(() => {
+        spyOn(component.getSession(), 'getSession').and.returnValue('token');
+        component.ngOnInit();
+        tick();
+        expect(mockRouter.navigateByUrl).not.toHaveBeenCalled();
+    }));
 });

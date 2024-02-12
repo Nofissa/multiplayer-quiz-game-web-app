@@ -35,4 +35,8 @@ export class AdminPageComponent implements OnInit {
             this.router.navigateByUrl('/');
         }
     }
+
+    getSession() {
+        return this.sessionService;
+    }
 }
