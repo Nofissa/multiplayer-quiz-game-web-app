@@ -4,7 +4,7 @@ import { By } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Quiz } from '@app/interfaces/quiz';
-import { QuizHttpService } from '@app/services/quiz-http.service';
+import { QuizHttpService } from '@app/services/quiz-http/quiz-http.service';
 import { of } from 'rxjs';
 import { GamePageComponent } from './game-page.component';
 
@@ -101,7 +101,7 @@ describe('gamePage', () => {
                         { text: 'Choice 1', isCorrect: true },
                         { text: 'Choice 2', isCorrect: false },
                     ],
-                    lastModification: null,
+                    lastModification: new Date(),
                     _id: 'dheoh30hd380',
                 },
             ],
