@@ -18,8 +18,8 @@ export class AdminPageComponent implements OnInit {
         securityServicesProvider: SecurityServicesProvider,
         private readonly router: Router,
     ) {
-        this.authService = securityServicesProvider.authService;
-        this.sessionService = securityServicesProvider.sessionService;
+        this.authService = securityServicesProvider.auth;
+        this.sessionService = securityServicesProvider.session;
     }
 
     ngOnInit() {

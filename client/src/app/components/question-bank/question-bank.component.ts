@@ -38,10 +38,10 @@ export class QuestionBankComponent implements OnInit {
         questionServicesProvider: QuestionServicesProvider,
         readonly questionInteractionService: QuestionInteractionService,
     ) {
-        this.dialogService = materialServicesProvider.dialogService;
-        this.snackBarService = materialServicesProvider.snackBarService;
-        this.questionHttpService = questionServicesProvider.questionHttpService;
-        this.questionSharingService = questionServicesProvider.questionSharingService;
+        this.dialogService = materialServicesProvider.dialog;
+        this.snackBarService = materialServicesProvider.snackBar;
+        this.questionHttpService = questionServicesProvider.questionHttp;
+        this.questionSharingService = questionServicesProvider.questionSharing;
     }
 
     ngOnInit() {
