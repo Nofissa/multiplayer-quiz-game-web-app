@@ -28,7 +28,6 @@ export class QuizHttpService {
     }
 
     getQuizById(id: string): Observable<Quiz> {
-        console.log('urghhhhh');
         return this.http.get<Quiz>(`${this.baseUrl}/${id}`).pipe(
             map((quiz: Quiz) => this.convertLastModifiedToDate(quiz)),
             catchError(this.handleError<Quiz>()),
@@ -43,7 +42,6 @@ export class QuizHttpService {
     }
 
     createQuiz(quiz: Quiz): Observable<Quiz> {
-        console.log('i am entered and i dont llike it');
         return this.http.post<Quiz>(this.baseUrl, quiz).pipe(
             map((createdQuiz: Quiz) => this.convertLastModifiedToDate(createdQuiz)),
             catchError(this.handleError<Quiz>()),

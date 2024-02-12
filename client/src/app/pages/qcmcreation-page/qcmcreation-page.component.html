@@ -1,11 +1,21 @@
 <div id="quiz-creation-page">
-    <form [formGroup]="formGroup" class="flex-column" (ngSubmit)="submitQuiz()">
+    <form [formGroup]="formGroup" class="flex-column quiz-edit-form" (ngSubmit)="submitQuiz()">
         <h1 class="header-item">Création de Quiz</h1>
-        <mat-form-field id="text-editables" class="flex-column">
+        <mat-form-field id="text-editables" class="flex-column" >
             <mat-label>Titre du Quiz</mat-label>
             <input matInput id="title" type="text" class="text-edit" placeholder="Votre titre ici"
                 formControlName="title" required />
         </mat-form-field>
+        <div class="flex-column slider-container">
+            <label>Durée du Quiz</label>
+            <div class="flex-row">
+                <label>10</label>
+                <mat-slider matInput id="duration" min="10" max="60" step="1" discrete required>
+                <input matSliderThumb formControlName="duration">                
+            </mat-slider>
+            <label>60</label>
+        </div>
+        </div>
         <mat-form-field id="text-editables" class="flex-column">
             <mat-label>Description du Quiz</mat-label>
             <textarea matInput id="description" class="text-edit" placeholder="Votre description ici"

@@ -8,7 +8,7 @@ import { Question } from '@app/interfaces/question';
 import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog-data';
 import { MAX_CHOICE_COUNT, MIN_CHOICE_COUNT, SNACK_MESSAGE_DURATION, POINT_VALUE_BASE_MULTIPLE } from '@app/constants';
 
-const ID_LENGTH: number = 10;
+const ID_LENGTH = 10;
 
 @Component({
     selector: 'app-upsert-question-dialog',
@@ -108,7 +108,8 @@ export class UpsertQuestionDialogComponent {
                 points: this.formGroup.value.points,
                 choices: this.formGroup.value.choices,
                 lastModification: new Date(),
-                _id: this.data.question._id? this.data.question._id : this.generateRandomString(),
+                // eslint-disable-next-line no-underscore-dangle
+                _id: this.data.question._id ? this.data.question._id : this.generateRandomString(),
             };
 
             this.dialogRef.close(question);

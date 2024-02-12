@@ -20,6 +20,8 @@
 
 #questions-container {
     width : 100%;
+    justify-content: center;
+    align-items: center;
 }
 
 #description {
@@ -27,6 +29,9 @@
     resize: none;
 }
 
+.quiz-edit-form{
+    align-items: space-evenly;
+}
 
 #quiz-creation-page {
     justify-content: space-evenly;
@@ -39,6 +44,15 @@ form {
     align-items: center;
 }
 
+.slider-container{
+    justify-content: center;
+    align-content: center;
+}
+
+.slider-container label{
+    text-align: center;
+}
+
 #text-editables {
     width: 100%;
     justify-content : space-evenly;
@@ -47,5 +61,4 @@ form {
 .hidden {
     visibility: hidden;
 }
-
 

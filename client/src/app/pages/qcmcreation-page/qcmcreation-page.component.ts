@@ -13,6 +13,7 @@ import { QuizHttpService } from '@app/services/quiz-http.service';
 import { SNACK_MESSAGE_DURATION } from '@app/constants';
 
 const ID_LENGTH = 10;
+const DURATION = 10;
 
 @Component({
     selector: 'app-qcmcreation-page',
@@ -125,37 +126,25 @@ export class QCMCreationPageComponent implements OnInit {
         });
         dialogRef.afterClosed().subscribe({
             next: (data: Question) => {
-                if (data) {                   
+                if (data) {
                     this.questionsContainer.push(data);
-                    
                 }
             },
         });
     }
 
-    private generateRandomString(length: number = ID_LENGTH): string {
-        const lettersAndDigits = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        let randomString = '';
-
-        for (let i = 0; i < length; i++) {
-            const randomIndex: number = Math.floor(Math.random() * lettersAndDigits.length);
-            randomString += lettersAndDigits.charAt(randomIndex);
-        }
-
-        return randomString;
-    }
-
     submitQuiz() {
         if (this.questionsContainer.length !== 0 && this.formGroup.valid) {
             const quiz: Quiz = {
-                id: this.quiz? this.quiz.id : this.generateRandomString(),
+                id: this.quiz ? this.quiz.id : this.generateRandomString(),
                 title: this.formGroup.value.title,
                 description: this.formGroup.value.description,
-                duration: 10,
+                duration: this.formGroup.value.duration,
                 questions: this.questionsContainer,
                 isHidden: true,
                 lastModification: new Date(),
-                _id: '',
+                // eslint-disable-next-line no-underscore-dangle
+                _id: this.quiz ? this.quiz._id : '',
             };
 
             if (this.quiz) {
@@ -184,14 +173,27 @@ export class QCMCreationPageComponent implements OnInit {
         }
     }
 
+    private generateRandomString(length: number = ID_LENGTH): string {
+        const lettersAndDigits = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let randomString = '';
+
+        for (let i = 0; i < length; i++) {
+            const randomIndex: number = Math.floor(Math.random() * lettersAndDigits.length);
+            randomString += lettersAndDigits.charAt(randomIndex);
+        }
+
+        return randomString;
+    }
+
     private setupForm(quiz?: Quiz) {
         const title = quiz?.title ? quiz.title : '';
         const description = quiz?.description ? quiz.description : '';
+        const duration = quiz?.duration ? quiz.duration : DURATION;
 
         this.formGroup = this.formBuilder.group({
             title: [title, Validators.required],
             description: [description, Validators.required],
+            duration: [duration, Validators.required],
         });
     }
-
 }
