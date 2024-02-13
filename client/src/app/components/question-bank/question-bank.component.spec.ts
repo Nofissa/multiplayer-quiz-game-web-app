@@ -20,7 +20,7 @@ describe('QuestionBankComponent', () => {
     let dialogRefSpy: SpyObj<MatDialogRef<Question>>;
     let snackBarSpy: SpyObj<MatSnackBar>;
 
-    let questionServicesProviderSpy: SpyObj<QuestionServicesProvider>;
+    let questionServicesProvider: SpyObj<QuestionServicesProvider>;
     let questionHttpServiceSpy: SpyObj<QuestionHttpService>;
     let questionSharingServiceSpy: SpyObj<QuestionSharingService>;
 
@@ -81,12 +81,18 @@ describe('QuestionBankComponent', () => {
         questionHttpServiceSpy.updateQuestion.and.returnValue(mockQuestionEditedSubject);
         questionHttpServiceSpy.deleteQuestionById.and.returnValue(of(undefined));
 
-        questionSharingServiceSpy = jasmine.createSpyObj('QuestionSharingService', ['share', 'subscribe']);
+        questionSharingServiceSpy = jasmine.createSpyObj(QuestionSharingService, ['share', 'subscribe']);
+        questionSharingServiceSpy['callbacks'] = [];
+        questionSharingServiceSpy.subscribe.and.callFake((callback: (data: Question) => void) => {
+            questionSharingServiceSpy['callbacks'].push(callback);
+        });
+        questionSharingServiceSpy.share.and.callFake((question: Question) => {
+            questionSharingServiceSpy['callbacks'].forEach((callback: (data: Question) => void) => {
+                callback(question);
+            });
+        });
 
-        questionServicesProviderSpy = new QuestionServicesProvider(
-            questionHttpServiceSpy,
-            questionSharingServiceSpy,
-        ) as jasmine.SpyObj<QuestionServicesProvider>;
+        questionServicesProvider = new QuestionServicesProvider(questionHttpServiceSpy, questionSharingServiceSpy);
 
         dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
         dialogServiceSpy = jasmine.createSpyObj('MatDialog', ['open']);
@@ -99,7 +105,7 @@ describe('QuestionBankComponent', () => {
             declarations: [QuestionBankComponent],
             providers: [
                 { provide: MaterialServicesProvider, useValue: materialServicesProviderSpy },
-                { provide: QuestionServicesProvider, useValue: questionServicesProviderSpy },
+                { provide: QuestionServicesProvider, useValue: questionServicesProvider },
                 QuestionInteractionService,
             ],
         }).compileComponents();
@@ -109,12 +115,14 @@ describe('QuestionBankComponent', () => {
         fixture = TestBed.createComponent(QuestionBankComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
+        component.questions = [];
     });
 
     it('should create', () => {
         expect(component).toBeTruthy();
         expect(questionHttpServiceSpy.getAllQuestions).toHaveBeenCalled();
         expect(questionSharingServiceSpy.subscribe).toHaveBeenCalled();
+        questionSharingServiceSpy.share(mockQuestion);
     });
 
     it('should add a question to questions[] when a question is submitted', () => {
@@ -212,9 +220,26 @@ describe('QuestionBankComponent', () => {
         expect(component.questions).toEqual([]);
     });
 
-    it('should invokeOnShare use shareQuestion logic and share targetted question', () => {
-        component.questions = [mockQuestion];
+    it('should invokeOnShare use shareQuestion logic and call addQuestion', () => {
+        // to spy on private method
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const addQuestionSpy = spyOn<any>(component, 'addQuestion').and.callThrough();
+
         component.questionInteractionService.invokeOnShareQuestion(mockQuestion);
+
         expect(questionSharingServiceSpy.share).toHaveBeenCalled();
+        expect(addQuestionSpy).toHaveBeenCalled();
+    });
+
+    it('should invokeOnShare use shareQuestion logic and not call addQuestion', () => {
+        // to spy on private method
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const addQuestionSpy = spyOn<any>(component, 'addQuestion').and.callThrough();
+        component.questions = [mockQuestion];
+
+        component.questionInteractionService.invokeOnShareQuestion(mockQuestion);
+
+        expect(questionSharingServiceSpy.share).toHaveBeenCalled();
+        expect(addQuestionSpy).not.toHaveBeenCalled();
     });
 });

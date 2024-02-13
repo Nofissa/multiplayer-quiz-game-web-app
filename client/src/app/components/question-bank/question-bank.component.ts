@@ -48,7 +48,7 @@ export class QuestionBankComponent implements OnInit {
         this.loadQuestions();
 
         this.questionSharingService.subscribe((question: Question) => {
-            if (!this.questions.find((x) => x._id === question._id)) {
+            if (!this.questions.includes(question)) {
                 this.addQuestion(question);
             }
         });
