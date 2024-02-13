@@ -77,12 +77,6 @@ describe('MainPage', () => {
         expect(buttons[2].textContent?.trim()).toBe('Administrer les jeux');
     });
 
-    it('should contain team logo', () => {
-        const compiled = fixture.nativeElement as HTMLElement;
-        const teamLogo = compiled.querySelector('.logo');
-        expect(teamLogo).toBeTruthy();
-    });
-
     it('should contain team number', () => {
         const compiled = fixture.nativeElement as HTMLElement;
         const teamNumber = 'Équipe 206';

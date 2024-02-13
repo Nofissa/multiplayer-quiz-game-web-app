@@ -55,8 +55,6 @@
     margin-bottom: auto;
 }
 
-
-
 .footer-item {
     display: flex;
     flex-direction: row;
@@ -76,4 +74,9 @@
     justify-content: center;
     width: 20%;
     min-height: min-content;
+}
+
+.header {
+    height: 500px;
+    justify-content: center;
 }
