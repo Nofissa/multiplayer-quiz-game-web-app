@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Quiz } from '@app/interfaces/quiz';
-import { QuizHttpService } from '@app/services/quiz-http.service';
+import { QuizHttpService } from '@app/services/quiz-http/quiz-http.service';
 
 @Component({
     selector: 'app-game-page',

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService } from '@app/services/auth.service';
-import { SessionService } from '@app/services/session.service';
+import { AuthService } from '@app/services/auth/auth.service';
+import { SessionService } from '@app/services/session/session.service';
 import { AuthPayload } from '@common/auth-payload';
 import { LoginDialogComponent } from '@app/components/dialogs/login-dialog/login-dialog.component';
 import { LoginDialogData } from '@app/interfaces/login-dialog-data';
