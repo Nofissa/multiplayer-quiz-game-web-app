@@ -72,7 +72,7 @@ export class CreateGamePageComponent implements OnInit {
     }
 
     private startGame(quiz: Quiz) {
-        this.router.navigate(['/game'], { queryParams: { quizId: quiz._id } });
+        this.router.navigate(['/waiting-room'], { queryParams: { quizId: quiz._id } });
     }
 
     private testGame(quiz: Quiz) {

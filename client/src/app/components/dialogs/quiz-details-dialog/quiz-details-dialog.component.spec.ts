@@ -1,26 +1,38 @@
+import { HttpErrorResponse } from '@angular/common/http';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { quizStub } from '@app/TestStubs/quiz.stubs';
+import { QuizHttpService } from '@app/services/quiz-http.service';
+import { of, throwError } from 'rxjs';
 import { QuizDetailsDialogComponent } from './quiz-details-dialog.component';
-import { Router } from '@angular/router';
 
 describe('QuizDetailsDialogComponent', () => {
     let component: QuizDetailsDialogComponent;
     let fixture: ComponentFixture<QuizDetailsDialogComponent>;
+    let quizHttpServiceMock: jasmine.SpyObj<QuizHttpService>;
     let dialogRefSpy: jasmine.SpyObj<MatDialogRef<QuizDetailsDialogComponent>>;
-    let routerSpy: jasmine.SpyObj<Router>;
+    const mockQuiz = quizStub();
+    const mockData = {
+        quiz: mockQuiz,
+        onStartGame: jasmine.createSpy('onStartGame'),
+        onTestGame: jasmine.createSpy('onTestGame'),
+        onNotFound: jasmine.createSpy('onNotFound'),
+    };
 
     beforeEach(() => {
-        const quizId = 'mockId';
         const matDialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['close']);
-        routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+        quizHttpServiceMock = jasmine.createSpyObj('QuizHttpService', ['getVisibleQuizById']);
         TestBed.configureTestingModule({
+            imports: [HttpClientTestingModule],
             declarations: [QuizDetailsDialogComponent],
             providers: [
                 { provide: MatDialogRef, useValue: matDialogRefSpy },
-                { provide: MAT_DIALOG_DATA, useValue: { quizId } },
-                { provide: Router, useValue: routerSpy },
+                { provide: MAT_DIALOG_DATA, useValue: mockData },
+                { provide: QuizHttpService, useValue: quizHttpServiceMock },
             ],
-        });
+        }).compileComponents();
+
         fixture = TestBed.createComponent(QuizDetailsDialogComponent);
         component = fixture.componentInstance;
         dialogRefSpy = TestBed.inject(MatDialogRef) as jasmine.SpyObj<MatDialogRef<QuizDetailsDialogComponent>>;
@@ -36,9 +48,32 @@ describe('QuizDetailsDialogComponent', () => {
         expect(dialogRefSpy.close).toHaveBeenCalled();
     });
 
-    it('should close the dialog and navigate to the waiting room page on startGame', () => {
+    it('should call onStartGame with the quiz when startGame is successful', () => {
+        quizHttpServiceMock.getVisibleQuizById.and.returnValue(of(mockQuiz));
         component.startGame();
-        expect(dialogRefSpy.close).toHaveBeenCalledWith();
-        expect(routerSpy.navigate).toHaveBeenCalledWith(['/waiting-room'], { queryParams: { quizId: 'mockId' } });
+        expect(quizHttpServiceMock.getVisibleQuizById).toHaveBeenCalledWith('testId');
+        expect(mockData.onStartGame).toHaveBeenCalledWith(mockQuiz);
+    });
+
+    it('should call onNotFound when startGame quiz is not found', () => {
+        const errorResponse = new HttpErrorResponse({ status: 404, statusText: 'Not Found' });
+        quizHttpServiceMock.getVisibleQuizById.and.returnValue(throwError(() => errorResponse));
+        component.startGame();
+        expect(quizHttpServiceMock.getVisibleQuizById).toHaveBeenCalledWith('testId');
+        expect(mockData.onNotFound).toHaveBeenCalled();
+    });
+
+    it('should call ontestGame with the quiz when testGame is successful', () => {
+        quizHttpServiceMock.getVisibleQuizById.and.returnValue(of(mockQuiz));
+        component.testGame();
+        expect(quizHttpServiceMock.getVisibleQuizById).toHaveBeenCalledWith('testId');
+        expect(mockData.onTestGame).toHaveBeenCalledWith(mockQuiz);
+    });
+    it('should call onNotFound when testGame quiz is not found', () => {
+        const errorResponse = new HttpErrorResponse({ status: 404, statusText: 'Not Found' });
+        quizHttpServiceMock.getVisibleQuizById.and.returnValue(throwError(() => errorResponse));
+        component.testGame();
+        expect(quizHttpServiceMock.getVisibleQuizById).toHaveBeenCalledWith('testId');
+        expect(mockData.onNotFound).toHaveBeenCalled();
     });
 });

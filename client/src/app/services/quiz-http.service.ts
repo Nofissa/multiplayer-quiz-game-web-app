@@ -79,7 +79,7 @@ export class QuizHttpService {
 
     private handleError<T>(): (error: HttpErrorResponse) => Observable<T> {
         return (httpErrorResponse: HttpErrorResponse): Observable<T> => {
-            return throwError(() => httpErrorResponse.error);
+            return throwError(() => httpErrorResponse);
         };
     }
 }
