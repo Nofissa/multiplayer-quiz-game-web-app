@@ -11,7 +11,7 @@ import { QuestionInteractionService } from '@app/services/question-interaction.s
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
-fdescribe('QuestionBankComponent', () => {
+describe('QuestionBankComponent', () => {
     let component: QuestionBankComponent;
     let fixture: ComponentFixture<QuestionBankComponent>;
 
