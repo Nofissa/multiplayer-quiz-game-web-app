@@ -117,6 +117,15 @@ describe('QCMCreationPageComponent', () => {
         mockQuizSubject = new Subject<Quiz>();
     };
 
+    const reset = (): void => {
+        component.formGroup.controls.title.patchValue('');
+        component.formGroup.controls.description.patchValue('');
+        dialogSpy.open.calls.reset();
+        quizHttpServiceSpy.createQuiz.calls.reset();
+        quizHttpServiceSpy.updateQuiz.calls.reset();
+        component.quiz = undefined as unknown as Quiz;
+    };
+
     describe('tests with no quizId in url', () => {
         beforeEach(async () => {
             basicBeforeAll();
@@ -154,117 +163,9 @@ describe('QCMCreationPageComponent', () => {
             expect(questionSharingServiceSpy.subscribe).toHaveBeenCalled();
         });
 
-        it('should invokeOnAddQuestion call addQuestion QuestionInteractionService', () => {
-            component.questionsContainer = [];
-            component.questionInteractionService.invokeOnAddQuestion();
-            mockQuestionSubject.next(mockQuestion);
-            fixture.detectChanges();
-            expect(component.questionsContainer).toEqual([mockQuestion]);
-        });
-
         it('should call questionService share with invokeOnShareQuestion', () => {
             component.questionInteractionService.invokeOnShareQuestion(mockQuestion);
-
             expect(questionSharingServiceSpy.share).toHaveBeenCalled();
-        });
-
-        it('should add question to questionsContainer if empty on invokeOnShareQuestion', () => {
-            component.questionsContainer = [];
-            component.questionInteractionService.invokeOnShareQuestion(mockQuestion);
-
-            expect(component.questionsContainer).toContain(mockQuestion);
-        });
-
-        it('should not add question to questionsContainer if already contained on invokeOnShareQuestion', () => {
-            component.questionsContainer = [mockQuestion];
-            component.questionInteractionService.invokeOnShareQuestion(mockQuestion);
-
-            expect(component.questionsContainer).toContain(mockQuestion);
-        });
-
-        it('should invokeOnEditQuestion open edit upsert dialog QuestionInteractionService', () => {
-            component.questionsContainer = [{ ...mockQuestion }];
-            component.questionInteractionService.invokeOnEditQuestion(component.questionsContainer[0]);
-            mockQuestionSubject.next(mockEditedQuestion);
-            fixture.detectChanges();
-            expect(dialogSpy.open).toHaveBeenCalled();
-            expect(component.questionsContainer).toEqual([mockEditedQuestion]);
-        });
-
-        it('should invokeOnEditQuestion open edit upsert dialog QuestionInteractionService but not edit question when data is not valid', () => {
-            component.questionsContainer = [{ ...mockQuestion }];
-            component.questionInteractionService.invokeOnEditQuestion(undefined as unknown as Question);
-            fixture.detectChanges();
-            expect(dialogSpy.open).toHaveBeenCalled();
-            expect(component.questionsContainer).toEqual([mockQuestion]);
-        });
-
-        it('should invokeOnDeleteQuestion call deleteQuestion QuestionInteractionService', () => {
-            component.questionsContainer = [mockQuestion];
-            component.questionInteractionService.invokeOnDeleteQuestion(mockQuestion);
-            fixture.detectChanges();
-            expect(component.questionsContainer).toEqual([]);
-        });
-
-        it('should deleteQuestion not delete any question if question not present in questions[]', () => {
-            component.questionsContainer = [mockEditedQuestion];
-            component.deleteQuestion(mockQuestion);
-            fixture.detectChanges();
-            expect(component.questionsContainer).toEqual([mockEditedQuestion]);
-        });
-
-        it('should deleteQuestion not delete any question if data is not valid', () => {
-            component.questionsContainer = [mockEditedQuestion];
-            expect(component.questionsContainer).toEqual([mockEditedQuestion]);
-            component.deleteQuestion(undefined as unknown as Question);
-            fixture.detectChanges();
-            expect(component.questionsContainer).toEqual([mockEditedQuestion]);
-        });
-
-        it('should addQuestion add question to array if data is valid', () => {
-            component.questionsContainer = [];
-            component.addQuestion();
-            mockQuestionSubject.next(mockQuestion);
-            fixture.detectChanges();
-            expect(component.questionsContainer).toEqual([mockQuestion]);
-        });
-
-        it('should addQuestion not add question to array if data is not valid', () => {
-            component.questionsContainer = [];
-            component.addQuestion();
-            mockQuestionSubject.next(undefined as unknown as Question);
-            fixture.detectChanges();
-            expect(component.questionsContainer).toEqual([]);
-        });
-
-        it('should addQuestion open question creation dialog', () => {
-            component.questionsContainer = [];
-            component.addQuestion();
-            fixture.detectChanges();
-            expect(dialogSpy.open).toHaveBeenCalled();
-        });
-
-        it('should submitQuiz create quiz if all fileds are valid and quiz does not exist', () => {
-            component.questionsContainer = [mockQuestion];
-            component.formGroup.controls.title.patchValue(mockQuiz.title);
-            component.formGroup.controls.description.patchValue(mockQuiz.description);
-            component.submitQuiz();
-            mockQuizSubject.next(mockQuiz);
-            fixture.detectChanges();
-            expect(quizHttpServiceSpy.updateQuiz).not.toHaveBeenCalled();
-            expect(quizHttpServiceSpy.createQuiz).toHaveBeenCalled();
-        });
-
-        it('should submitQuiz not create quiz if all fileds are valid and quiz does not exist but error is thrown', () => {
-            component.questionsContainer = [mockQuestion];
-            component.formGroup.controls.title.patchValue(mockQuiz.title);
-            component.formGroup.controls.description.patchValue(mockQuiz.description);
-            component.submitQuiz();
-            mockQuizSubject.error(throwError(() => new Error('This is an error')));
-            fixture.detectChanges();
-            expect(quizHttpServiceSpy.updateQuiz).not.toHaveBeenCalled();
-            expect(quizHttpServiceSpy.createQuiz).toHaveBeenCalled();
-            expect(snackBarSpy.open).toHaveBeenCalled();
         });
 
         it('should submitQuiz update quiz if all fileds are valid and quiz exists', () => {
@@ -300,26 +201,6 @@ describe('QCMCreationPageComponent', () => {
             expect(snackBarSpy.open).toHaveBeenCalled();
         });
 
-        it('should SubmitQuiz not be able to submit a quiz when quiz title is empty', () => {
-            component.questionsContainer = [mockQuestion];
-            component.formGroup.controls.description.patchValue(mockQuiz.description);
-            component.submitQuiz();
-            fixture.detectChanges();
-            expect(quizHttpServiceSpy.createQuiz).not.toHaveBeenCalled();
-            expect(quizHttpServiceSpy.updateQuiz).not.toHaveBeenCalled();
-            expect(snackBarSpy.open).toHaveBeenCalled();
-        });
-
-        it('should SubmitQuiz not be able to submit a quiz when quiz description is empty', () => {
-            component.questionsContainer = [mockQuestion];
-            component.formGroup.controls.title.patchValue(mockQuiz.title);
-            component.submitQuiz();
-            fixture.detectChanges();
-            expect(quizHttpServiceSpy.createQuiz).not.toHaveBeenCalled();
-            expect(quizHttpServiceSpy.updateQuiz).not.toHaveBeenCalled();
-            expect(snackBarSpy.open).toHaveBeenCalled();
-        });
-
         it('should SubmitQuiz not be able to submit a quiz when there are no questions', () => {
             component.formGroup.controls.title.patchValue(mockQuiz.title);
             component.formGroup.controls.description.patchValue(mockQuiz.description);
@@ -328,6 +209,129 @@ describe('QCMCreationPageComponent', () => {
             expect(quizHttpServiceSpy.createQuiz).not.toHaveBeenCalled();
             expect(quizHttpServiceSpy.updateQuiz).not.toHaveBeenCalled();
             expect(snackBarSpy.open).toHaveBeenCalled();
+        });
+
+        describe('Tests with empty questionContainer', () => {
+            beforeEach(() => {
+                component.questionsContainer = [];
+                reset();
+            });
+
+            it('should invokeOnAddQuestion call addQuestion QuestionInteractionService', () => {
+                component.questionInteractionService.invokeOnAddQuestion();
+                mockQuestionSubject.next(mockQuestion);
+                fixture.detectChanges();
+                expect(component.questionsContainer).toEqual([mockQuestion]);
+            });
+
+            it('should add question to questionsContainer if empty on invokeOnShareQuestion', () => {
+                component.questionInteractionService.invokeOnShareQuestion(mockQuestion);
+                expect(component.questionsContainer).toContain(mockQuestion);
+            });
+
+            it('should addQuestion add question to array if data is valid', () => {
+                component.addQuestion();
+                mockQuestionSubject.next(mockQuestion);
+                fixture.detectChanges();
+                expect(component.questionsContainer).toEqual([mockQuestion]);
+            });
+
+            it('should addQuestion not add question to array if data is not valid', () => {
+                component.addQuestion();
+                mockQuestionSubject.next(undefined as unknown as Question);
+                fixture.detectChanges();
+                expect(component.questionsContainer).toEqual([]);
+            });
+
+            it('should addQuestion open question creation dialog', () => {
+                component.addQuestion();
+                fixture.detectChanges();
+                expect(dialogSpy.open).toHaveBeenCalled();
+            });
+        });
+
+        describe('Tests with non-empty questionContainer', () => {
+            beforeEach(() => {
+                component.questionsContainer = [{ ...mockQuestion }];
+                reset();
+            });
+
+            it('should not add question to questionsContainer if already contained on invokeOnShareQuestion', () => {
+                component.questionInteractionService.invokeOnShareQuestion(mockQuestion);
+                expect(component.questionsContainer).toContain(mockQuestion);
+            });
+
+            it('should invokeOnEditQuestion open edit upsert dialog QuestionInteractionService', () => {
+                component.questionInteractionService.invokeOnEditQuestion(component.questionsContainer[0]);
+                mockQuestionSubject.next(mockEditedQuestion);
+                fixture.detectChanges();
+                expect(dialogSpy.open).toHaveBeenCalled();
+                expect(component.questionsContainer).toEqual([mockEditedQuestion]);
+            });
+
+            it('should invokeOnEditQuestion open edit upsert dialog QuestionInteractionService but not edit question when data is not valid', () => {
+                component.questionInteractionService.invokeOnEditQuestion(undefined as unknown as Question);
+                fixture.detectChanges();
+                expect(dialogSpy.open).toHaveBeenCalled();
+                expect(component.questionsContainer).toEqual([mockQuestion]);
+            });
+
+            it('should invokeOnDeleteQuestion call deleteQuestion QuestionInteractionService', () => {
+                component.questionInteractionService.invokeOnDeleteQuestion(mockQuestion);
+                fixture.detectChanges();
+                expect(component.questionsContainer).toEqual([]);
+            });
+
+            it('should deleteQuestion not delete any question if question not present in questions[]', () => {
+                component.deleteQuestion(mockEditedQuestion);
+                fixture.detectChanges();
+                expect(component.questionsContainer).toEqual([mockQuestion]);
+            });
+
+            it('should deleteQuestion not delete any question if data is not valid', () => {
+                component.deleteQuestion(undefined as unknown as Question);
+                fixture.detectChanges();
+                expect(component.questionsContainer).toEqual([mockQuestion]);
+            });
+
+            it('should submitQuiz create quiz if all fileds are valid and quiz does not exist', () => {
+                component.formGroup.controls.title.patchValue(mockQuiz.title);
+                component.formGroup.controls.description.patchValue(mockQuiz.description);
+                component.submitQuiz();
+                mockQuizSubject.next(mockQuiz);
+                fixture.detectChanges();
+                expect(quizHttpServiceSpy.updateQuiz).not.toHaveBeenCalled();
+                expect(quizHttpServiceSpy.createQuiz).toHaveBeenCalled();
+            });
+
+            it('should submitQuiz not create quiz if all fileds are valid and quiz does not exist but error is thrown', () => {
+                component.formGroup.controls.title.patchValue(mockQuiz.title);
+                component.formGroup.controls.description.patchValue(mockQuiz.description);
+                component.submitQuiz();
+                mockQuizSubject.error(throwError(() => new Error('This is an error')));
+                fixture.detectChanges();
+                expect(quizHttpServiceSpy.updateQuiz).not.toHaveBeenCalled();
+                expect(quizHttpServiceSpy.createQuiz).toHaveBeenCalled();
+                expect(snackBarSpy.open).toHaveBeenCalled();
+            });
+
+            it('should SubmitQuiz not be able to submit a quiz when quiz title is empty', () => {
+                component.formGroup.controls.description.patchValue(mockQuiz.description);
+                component.submitQuiz();
+                fixture.detectChanges();
+                expect(quizHttpServiceSpy.createQuiz).not.toHaveBeenCalled();
+                expect(quizHttpServiceSpy.updateQuiz).not.toHaveBeenCalled();
+                expect(snackBarSpy.open).toHaveBeenCalled();
+            });
+
+            it('should SubmitQuiz not be able to submit a quiz when quiz description is empty', () => {
+                component.formGroup.controls.title.patchValue(mockQuiz.title);
+                component.submitQuiz();
+                fixture.detectChanges();
+                expect(quizHttpServiceSpy.createQuiz).not.toHaveBeenCalled();
+                expect(quizHttpServiceSpy.updateQuiz).not.toHaveBeenCalled();
+                expect(snackBarSpy.open).toHaveBeenCalled();
+            });
         });
     });
 
