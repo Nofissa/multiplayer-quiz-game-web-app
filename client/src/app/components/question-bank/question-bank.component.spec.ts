@@ -11,7 +11,7 @@ import { QuestionInteractionService } from '@app/services/question-interaction.s
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
-describe('QuestionBankComponent', () => {
+fdescribe('QuestionBankComponent', () => {
     let component: QuestionBankComponent;
     let fixture: ComponentFixture<QuestionBankComponent>;
 
@@ -20,7 +20,7 @@ describe('QuestionBankComponent', () => {
     let dialogRefSpy: SpyObj<MatDialogRef<Question>>;
     let snackBarSpy: SpyObj<MatSnackBar>;
 
-    let questionServicesProviderSpy: SpyObj<QuestionServicesProvider>;
+    let questionServicesProvider: SpyObj<QuestionServicesProvider>;
     let questionHttpServiceSpy: SpyObj<QuestionHttpService>;
     let questionSharingServiceSpy: SpyObj<QuestionSharingService>;
 
@@ -81,12 +81,18 @@ describe('QuestionBankComponent', () => {
         questionHttpServiceSpy.updateQuestion.and.returnValue(mockQuestionEditedSubject);
         questionHttpServiceSpy.deleteQuestionById.and.returnValue(of(undefined));
 
-        questionSharingServiceSpy = jasmine.createSpyObj('QuestionSharingService', ['share', 'subscribe']);
+        questionSharingServiceSpy = jasmine.createSpyObj(QuestionSharingService, ['share', 'subscribe']);
+        questionSharingServiceSpy['callbacks'] = [];
+        questionSharingServiceSpy.subscribe.and.callFake((callback: (data: Question) => void) => {
+            questionSharingServiceSpy['callbacks'].push(callback);
+        });
+        questionSharingServiceSpy.share.and.callFake((question: Question) => {
+            questionSharingServiceSpy['callbacks'].forEach((callback: (data: Question) => void) => {
+                callback(question);
+            });
+        });
 
-        questionServicesProviderSpy = new QuestionServicesProvider(
-            questionHttpServiceSpy,
-            questionSharingServiceSpy,
-        ) as jasmine.SpyObj<QuestionServicesProvider>;
+        questionServicesProvider = new QuestionServicesProvider(questionHttpServiceSpy, questionSharingServiceSpy);
 
         dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);
         dialogServiceSpy = jasmine.createSpyObj('MatDialog', ['open']);
@@ -99,7 +105,7 @@ describe('QuestionBankComponent', () => {
             declarations: [QuestionBankComponent],
             providers: [
                 { provide: MaterialServicesProvider, useValue: materialServicesProviderSpy },
-                { provide: QuestionServicesProvider, useValue: questionServicesProviderSpy },
+                { provide: QuestionServicesProvider, useValue: questionServicesProvider },
                 QuestionInteractionService,
             ],
         }).compileComponents();
@@ -109,12 +115,26 @@ describe('QuestionBankComponent', () => {
         fixture = TestBed.createComponent(QuestionBankComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
+        component.questions = [];
     });
 
     it('should create', () => {
         expect(component).toBeTruthy();
         expect(questionHttpServiceSpy.getAllQuestions).toHaveBeenCalled();
         expect(questionSharingServiceSpy.subscribe).toHaveBeenCalled();
+        questionSharingServiceSpy.share(mockQuestion);
+    });
+
+    it('should not delete a question from questions[] when is submitted = true and question not in questions[]', () => {
+        const mockQuestionDifferentId = { ...editedMockQuestion };
+        // eslint-disable-next-line no-underscore-dangle
+        mockQuestionDifferentId._id = 'Some id 2';
+        component.questions = [{ ...mockQuestionDifferentId }];
+        dialogRefSpy.afterClosed.and.callFake(() => booleanSubject);
+        component.openDeleteQuestionDialog({ ...mockQuestion });
+        booleanSubject.next(true);
+        expect(questionHttpServiceSpy.deleteQuestionById).toHaveBeenCalled();
+        expect(component.questions).toEqual([mockQuestionDifferentId]);
     });
 
     describe('Tests where component.questions is empty in the begining', () => {
@@ -127,6 +147,18 @@ describe('QuestionBankComponent', () => {
             dialogServiceSpy.open.calls.reset();
             dialogRefSpy.afterClosed.and.stub();
         });
+
+        it('should invokeOnShare use shareQuestion logic and call addQuestion', () => {
+            // to spy on private method
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const addQuestionSpy = spyOn<any>(component, 'addQuestion').and.callThrough();
+
+            component.questionInteractionService.invokeOnShareQuestion(mockQuestion);
+
+            expect(questionSharingServiceSpy.share).toHaveBeenCalled();
+            expect(addQuestionSpy).toHaveBeenCalled();
+        });
+
         it('should add a question to questions[] when a question is submitted', () => {
             dialogRefSpy.afterClosed.and.callFake(() => of({ ...mockQuestion }));
             component.openAddQuestionDialog();
@@ -164,13 +196,24 @@ describe('QuestionBankComponent', () => {
 
     describe('Tests where component.questions is not empty in the begining', () => {
         beforeEach(() => {
-            component.questions = [{ ...mockQuestion }];
+            component.questions = [mockQuestion];
             questionHttpServiceSpy.createQuestion.calls.reset();
             questionHttpServiceSpy.updateQuestion.calls.reset();
             questionHttpServiceSpy.deleteQuestionById.calls.reset();
             questionHttpServiceSpy.getAllQuestions.calls.reset();
             dialogServiceSpy.open.calls.reset();
             dialogRefSpy.afterClosed.and.stub();
+        });
+
+        it('should invokeOnShare use shareQuestion logic and not call addQuestion', () => {
+            // to spy on private method
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const addQuestionSpy = spyOn<any>(component, 'addQuestion').and.callThrough();
+
+            component.questionInteractionService.invokeOnShareQuestion(mockQuestion);
+
+            expect(questionSharingServiceSpy.share).toHaveBeenCalled();
+            expect(addQuestionSpy).not.toHaveBeenCalled();
         });
 
         it('should delete a question from questions[] when is submitted = true', () => {
@@ -211,23 +254,6 @@ describe('QuestionBankComponent', () => {
             booleanSubject.next(true);
             expect(questionHttpServiceSpy.deleteQuestionById).toHaveBeenCalled();
             expect(component.questions).toEqual([]);
-        });
-
-        it('should invokeOnShare use shareQuestion logic and share targetted question', () => {
-            component.questionInteractionService.invokeOnShareQuestion({ ...mockQuestion });
-            expect(questionSharingServiceSpy.share).toHaveBeenCalled();
-        });
-
-        it('should not delete a question from questions[] when is submitted = true and question not in questions[]', () => {
-            const mockQuestionDifferentId = { ...editedMockQuestion };
-            // eslint-disable-next-line no-underscore-dangle
-            mockQuestionDifferentId._id = 'Some id 2';
-            component.questions = [{ ...mockQuestionDifferentId }];
-            dialogRefSpy.afterClosed.and.callFake(() => booleanSubject);
-            component.openDeleteQuestionDialog({ ...mockQuestion });
-            booleanSubject.next(true);
-            expect(questionHttpServiceSpy.deleteQuestionById).toHaveBeenCalled();
-            expect(component.questions).toEqual([mockQuestionDifferentId]);
         });
     });
 });
