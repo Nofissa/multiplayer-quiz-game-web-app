@@ -1,7 +1,7 @@
 import { ValidationArguments, ValidationOptions, ValidatorConstraint, ValidatorConstraintInterface, registerDecorator } from 'class-validator';
 
 @ValidatorConstraint({ name: 'arrayNotContainEmpty', async: false })
-class ArrayNoEmptyValuesConstraint implements ValidatorConstraintInterface {
+export class ArrayNoEmptyValuesConstraint implements ValidatorConstraintInterface {
     // eslint-disable-next-line no-unused-vars
     validate(value: unknown[], _: ValidationArguments) {
         return (

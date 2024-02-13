@@ -1,3 +1,5 @@
+// for mongodb's _id fields
+/* eslint-disable no-underscore-dangle */
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
@@ -87,7 +89,6 @@ export class QCMCreationPageComponent implements OnInit {
             });
 
             this.questionSharingService.subscribe((question: Question) => {
-                // eslint-disable-next-line no-underscore-dangle
                 if (!this.questionsContainer.find((x) => x._id === question._id)) {
                     this.questionsContainer.push(question);
                 }
