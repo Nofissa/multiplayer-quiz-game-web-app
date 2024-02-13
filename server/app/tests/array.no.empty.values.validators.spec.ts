@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import { ArrayNoEmptyValues } from '@app/validators/array-no-empty-values.validator';
 import { validate } from 'class-validator';
 

@@ -1,5 +1,5 @@
 /* eslint-disable max-classes-per-file */
-import { IsMultipleOf } from '@app/validators/is-multiple-of.validator'; // Update the path accordingly
+import { IsMultipleOf } from '@app/validators/is-multiple-of.validator';
 import { validate } from 'class-validator';
 
 describe('IsMultipleOfConstraint', () => {
@@ -30,7 +30,7 @@ describe('IsMultipleOfConstraint', () => {
     it('should handle non-number values', async () => {
         class TestClass {
             @IsMultipleOf(MULTIPLE_OF_TEN)
-            value: string; // Non-number type
+            value: string;
 
             constructor(value: string) {
                 this.value = value;
