@@ -11,14 +11,32 @@ describe('QuestionListComponent', () => {
     let fixture: ComponentFixture<QuestionListComponent>;
     let interactionService: QuestionInteractionService;
     let sharingService: QuestionSharingService;
-    const questionMock: Question = {
-        _id: '1',
-        text: 'Sample question',
-        type: 'QCM',
-        points: 10,
-        choices: [],
-        lastModification: new Date(),
-    };
+    const questionMocks: Question[] = [
+        {
+            _id: '1',
+            text: 'Sample question 1',
+            type: 'QCM',
+            points: 10,
+            choices: [],
+            lastModification: new Date(),
+        },
+        {
+            _id: '2',
+            text: 'Sample question 2',
+            type: 'QCM',
+            points: 10,
+            choices: [],
+            lastModification: new Date(),
+        },
+        {
+            _id: '3',
+            text: 'Sample question 3',
+            type: 'QCM',
+            points: 10,
+            choices: [],
+            lastModification: new Date(),
+        },
+    ];
 
     beforeEach(async () => {
         const interactionServiceMock = {
@@ -61,54 +79,28 @@ describe('QuestionListComponent', () => {
     });
 
     it('should invoke interaction service on edit question', () => {
-        const question: Question = {
-            _id: '1',
-            text: 'Sample question',
-            type: 'QCM',
-            points: 10,
-            choices: [],
-            lastModification: new Date(),
-        };
+        const question = questionMocks[0];
         component.invokeOnEditQuestion(question);
         expect(interactionService.invokeOnEditQuestion).toHaveBeenCalledWith(question);
     });
 
     it('should invoke interaction service on delete question', () => {
-        const question: Question = {
-            _id: '1',
-            text: 'Sample question',
-            type: 'QCM',
-            points: 10,
-            choices: [],
-            lastModification: new Date(),
-        };
+        const question = questionMocks[0];
         component.invokeOnDeleteQuestion(question);
         expect(interactionService.invokeOnDeleteQuestion).toHaveBeenCalledWith(question);
     });
 
     it('should share a question', () => {
-        component.share(questionMock);
-        expect(sharingService.share).toHaveBeenCalledWith(questionMock);
-        expect(component.sharedQuestions).toContain(questionMock);
+        const question = questionMocks[0];
+        component.share(question);
+        expect(sharingService.share).toHaveBeenCalledWith(question);
+        expect(component.sharedQuestions).toContain(question);
     });
 
     it('should correctly mark question as shared if is shared', () => {
-        const sharedQuestion: Question = {
-            _id: '1',
-            text: 'Sample question 1',
-            type: 'QCM',
-            points: 10,
-            choices: [],
-            lastModification: new Date(),
-        };
-        const notSharedQuestion: Question = {
-            _id: '2',
-            text: 'Sample question 2',
-            type: 'QCM',
-            points: 10,
-            choices: [],
-            lastModification: new Date(),
-        };
+        const sharedQuestion = questionMocks[0];
+        const notSharedQuestion = questionMocks[1];
+
         component.sharedQuestions = [sharedQuestion];
 
         expect(component.isShared(sharedQuestion)).toBeTrue();
@@ -116,34 +108,13 @@ describe('QuestionListComponent', () => {
     });
 
     it('should move item in array on drop', () => {
-        const firstQuestion: Question = {
-            _id: '1',
-            text: 'Sample question 1',
-            type: 'QCM',
-            points: 10,
-            choices: [],
-            lastModification: new Date(),
-        };
-        const secondQuestion: Question = {
-            _id: '2',
-            text: 'Sample question 2',
-            type: 'QCM',
-            points: 10,
-            choices: [],
-            lastModification: new Date(),
-        };
-        const thirdQuestion: Question = {
-            _id: '3',
-            text: 'Sample question 3',
-            type: 'QCM',
-            points: 10,
-            choices: [],
-            lastModification: new Date(),
-        };
-        const questionsMock = [firstQuestion, secondQuestion, thirdQuestion];
-        component.questions = questionsMock;
+        const firstQuestion = questionMocks[0];
+        const secondQuestion = questionMocks[1];
+        const thirdQuestion = questionMocks[2];
 
-        const dropList = { data: questionsMock } as CdkDropList;
+        component.questions = questionMocks;
+
+        const dropList = { data: questionMocks } as CdkDropList;
         const drag = { data: firstQuestion } as CdkDrag;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const dropEvent: CdkDragDrop<any[]> = {
@@ -163,8 +134,8 @@ describe('QuestionListComponent', () => {
         component.drop(dropEvent);
 
         expect(component.drop).toHaveBeenCalledWith(dropEvent);
-        expect(questionsMock[0].text).toBe(secondQuestion.text);
-        expect(questionsMock[1].text).toBe(firstQuestion.text);
-        expect(questionsMock[2].text).toBe(thirdQuestion.text);
+        expect(questionMocks[0].text).toBe(secondQuestion.text);
+        expect(questionMocks[1].text).toBe(firstQuestion.text);
+        expect(questionMocks[2].text).toBe(thirdQuestion.text);
     });
 });
