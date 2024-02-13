@@ -20,6 +20,7 @@ export class QuestionService {
             return Promise.reject('Invalid question');
         }
 
+        delete dto._id;
         dto.lastModification = new Date();
 
         try {
@@ -52,12 +53,13 @@ export class QuestionService {
     }
 
     async validateQuestion(dto: QuestionDto): Promise<boolean> {
-        const regex = new RegExp(`^${dto.text}$`, 'i'); // for case unsensitive search
+        const regex = new RegExp(`${dto.text}`, 'i'); // for case unsensitive search
         const question = await this.model.findOne({ text: { $regex: regex } });
+
         if (question === null) {
             return true;
         } else {
-            return question._id !== dto._id;
+            return question._id === dto._id;
         }
     }
 }
