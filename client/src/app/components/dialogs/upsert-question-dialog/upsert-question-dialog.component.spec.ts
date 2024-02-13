@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { DragDropModule } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { UpsertQuestionDialogComponent } from './upsert-question-dialog.component';
@@ -50,8 +50,8 @@ describe('UpsertQuestionDialogComponent', () => {
     const wrongPoints = 11;
 
     beforeEach(() => {
-        const matDialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['close']);
-        const matSnackBarSpy = jasmine.createSpyObj('MatSnackBar', ['open']);
+        dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['close']);
+        snackBarSpy = jasmine.createSpyObj('MatSnackBar', ['open']);
         correctUpsertValues = {
             title: 'some title',
             question: {
@@ -77,8 +77,8 @@ describe('UpsertQuestionDialogComponent', () => {
             imports: [ReactiveFormsModule, MatSnackBarModule, BrowserAnimationsModule, DragDropModule],
             providers: [
                 FormBuilder,
-                { provide: MatDialogRef, useValue: matDialogRefSpy },
-                { provide: MatSnackBar, useValue: matSnackBarSpy },
+                { provide: MatDialogRef, useValue: dialogRefSpy },
+                { provide: MatSnackBar, useValue: snackBarSpy },
                 {
                     provide: MAT_DIALOG_DATA,
                     useValue: correctUpsertValues,
@@ -87,22 +87,14 @@ describe('UpsertQuestionDialogComponent', () => {
         });
         fixture = TestBed.createComponent(UpsertQuestionDialogComponent);
         component = fixture.componentInstance;
-        dialogRefSpy = TestBed.inject(MatDialogRef) as jasmine.SpyObj<MatDialogRef<UpsertQuestionDialogComponent>>;
-        snackBarSpy = TestBed.inject(MatSnackBar) as jasmine.SpyObj<MatSnackBar>;
         fixture.detectChanges();
     });
-
-    afterEach(() => {
-        fixture.destroy();
-    });
-
-    // FORM CREATION TESTING
 
     it('should create', () => {
         expect(component).toBeDefined();
     });
 
-    it('should initialize the form with inputted data', () => {
+    it('should initialize the form with input data', () => {
         expect(component.formGroup.value).toEqual({
             text: correctUpsertValues.question.text,
             choices: correctUpsertValues.question.choices,
@@ -122,7 +114,7 @@ describe('UpsertQuestionDialogComponent', () => {
         expect(choiceArray).toBe(MIN_CHOICE_COUNT);
     });
 
-    it('should choicesArray contain all initially inputted choices', () => {
+    it('should choicesArray contain all initially input choices', () => {
         const formGroupValue = correctUpsertValues.question.choices;
         const componentChoicesArray = component.formGroup.get('choices');
 
@@ -156,7 +148,7 @@ describe('UpsertQuestionDialogComponent', () => {
         expect(choiceArray).toBe(MAX_CHOICE_COUNT);
     });
 
-    it('should choicesArray contain all inputted choices when choice is added', () => {
+    it('should choicesArray contain all input choices when choice is added', () => {
         const formGroupValue: Choice[] = [];
         correctUpsertValues.question.choices.forEach((choice) => {
             formGroupValue.push(choice);
@@ -177,7 +169,7 @@ describe('UpsertQuestionDialogComponent', () => {
         }
     });
 
-    it('should choicesArray contain all inputted choices when last choice is removed', () => {
+    it('should choicesArray contain all input choices when last choice is removed', () => {
         const formGroupValue = correctUpsertValues.question.choices;
         component.addAnswer();
         component.removeAnswerAt(2);
@@ -189,7 +181,7 @@ describe('UpsertQuestionDialogComponent', () => {
         }
     });
 
-    it('should choicesArray contain all inputted choices when first choice is removed', () => {
+    it('should choicesArray contain all input choices when first choice is removed', () => {
         const formGroupValue: Choice[] = [];
         correctUpsertValues.question.choices.forEach((choice) => {
             formGroupValue.push(choice);
@@ -210,7 +202,7 @@ describe('UpsertQuestionDialogComponent', () => {
         }
     });
 
-    it('should toggle() change toogle status', () => {
+    it('should change toogle status', () => {
         expect(component.qcmToggled).toBeFalsy();
         component.doToggle();
         fixture.detectChanges();
@@ -292,5 +284,28 @@ describe('UpsertQuestionDialogComponent', () => {
     it('should close the dialog when cancel is pressed', () => {
         component.cancel();
         expect(dialogRefSpy.close).toHaveBeenCalledWith();
+    });
+
+    it('should drag and drop move items in array', () => {
+        const initialChoices = [
+            { text: 'Choice 1', isCorrect: true },
+            { text: 'Choice 2', isCorrect: false },
+        ];
+        component.choicesArray.setValue(initialChoices);
+
+        const cdkEvent: CdkDragDrop<unknown[]> = {
+            container: {
+                data: component.choicesArray.value,
+            },
+            previousIndex: 1,
+            currentIndex: 0,
+        } as unknown as CdkDragDrop<unknown[]>;
+
+        component.drop(cdkEvent);
+
+        expect(component.choicesArray.value).toEqual([
+            { text: 'Choice 2', isCorrect: false },
+            { text: 'Choice 1', isCorrect: true },
+        ]);
     });
 });
