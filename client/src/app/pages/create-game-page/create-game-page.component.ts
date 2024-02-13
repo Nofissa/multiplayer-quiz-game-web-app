@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
 import { QuizDetailsDialogComponent } from '@app/components/dialogs/quiz-details-dialog/quiz-details-dialog.component';
 import { Quiz } from '@app/interfaces/quiz';
 import { MaterialServicesProvider } from '@app/providers/material-services.provider';
-import { QuizHttpService } from '@app/services/quiz-http.service';
+import { QuizHttpService } from '@app/services/quiz-http/quiz-http.service';
 import SwiperCore, { EffectCoverflow, Navigation, Pagination } from 'swiper';
 
 SwiperCore.use([Navigation, Pagination, EffectCoverflow]);

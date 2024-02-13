@@ -7,9 +7,9 @@ import { UpsertQuestionDialogComponent } from '@app/components/dialogs/upsert-qu
 import { Question } from '@app/interfaces/question';
 import { Quiz } from '@app/interfaces/quiz';
 import { MaterialServicesProvider } from '@app/providers/material-services.provider';
-import { QuestionInteractionService } from '@app/services/question-interaction.service';
-import { QuestionSharingService } from '@app/services/question-sharing.service';
-import { QuizHttpService } from '@app/services/quiz-http.service';
+import { QuestionInteractionService } from '@app/services/question-interaction/question-interaction.service';
+import { QuestionSharingService } from '@app/services/question-sharing/question-sharing.service';
+import { QuizHttpService } from '@app/services/quiz-http/quiz-http.service';
 import { SNACK_MESSAGE_DURATION } from '@app/constants';
 
 const ID_LENGTH = 10;
