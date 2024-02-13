@@ -13,23 +13,27 @@ export class QuestionHttpService {
 
     constructor(private readonly http: HttpClient) {}
 
+    get apiUrl() {
+        return this.baseUrl;
+    }
+
     getAllQuestions(): Observable<Question[]> {
         return this.http.get<Question[]>(this.baseUrl).pipe(
-            map((questions) => this.convertAllLastModifiedToDate(questions)),
+            map((questions) => this.convertAllLastModificationToDate(questions)),
             catchError(this.handleError<Question[]>()),
         );
     }
 
     createQuestion(question: Question): Observable<Question> {
         return this.http.post<Question>(this.baseUrl, question).pipe(
-            map((createdQuestion) => this.convertLastModifiedToDate(createdQuestion)),
+            map((createdQuestion) => this.convertLastModificationToDate(createdQuestion)),
             catchError(this.handleError<Question>()),
         );
     }
 
     updateQuestion(question: Question): Observable<Question> {
         return this.http.put<Question>(this.baseUrl, question).pipe(
-            map((updatedQuestion) => this.convertLastModifiedToDate(updatedQuestion)),
+            map((updatedQuestion) => this.convertLastModificationToDate(updatedQuestion)),
             catchError(this.handleError<Question>()),
         );
     }
@@ -38,20 +42,20 @@ export class QuestionHttpService {
         return this.http.delete<void>(`${this.baseUrl}/${id}`).pipe(catchError(this.handleError<void>()));
     }
 
-    private convertLastModifiedToDate(question: Question): Question {
+    private convertLastModificationToDate(question: Question): Question {
         return {
             ...question,
-            lastModification: question.lastModification ? new Date(question.lastModification) : null,
+            lastModification: new Date(question.lastModification),
         };
     }
 
-    private convertAllLastModifiedToDate(questions: Question[]): Question[] {
-        return questions.map(this.convertLastModifiedToDate);
+    private convertAllLastModificationToDate(questions: Question[]): Question[] {
+        return questions.map(this.convertLastModificationToDate);
     }
 
     private handleError<T>(): (error: HttpErrorResponse) => Observable<T> {
         return (httpErrorResponse: HttpErrorResponse): Observable<T> => {
-            return throwError(() => new Error(httpErrorResponse.message));
+            return throwError(() => new Error(httpErrorResponse.error));
         };
     }
 }

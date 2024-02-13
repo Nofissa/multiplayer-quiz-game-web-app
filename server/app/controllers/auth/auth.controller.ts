@@ -1,9 +1,9 @@
+import { AuthService } from '@app/services/auth/auth.service';
 import { AuthPayload } from '@common/auth-payload';
 import { UserCredentialSet } from '@common/user-credential-set';
 import { Body, Controller, HttpStatus, Post, Res } from '@nestjs/common';
 import { ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
-import { AuthService } from '@app/services/auth/auth.service';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -22,7 +22,7 @@ export class AuthController {
             const payload = await this.authService.authenticate(userCredentialSet);
             response.status(HttpStatus.OK).json(payload);
         } catch (error) {
-            response.status(HttpStatus.UNAUTHORIZED).send(error.message);
+            response.status(HttpStatus.UNAUTHORIZED).send('Unauthorized acces');
         }
     }
 
@@ -38,7 +38,7 @@ export class AuthController {
             await this.authService.verifyAuth(payload);
             response.status(HttpStatus.NO_CONTENT).send();
         } catch (error) {
-            response.status(HttpStatus.UNAUTHORIZED).send(error.message);
+            response.status(HttpStatus.UNAUTHORIZED).send('verification failed');
         }
     }
 }

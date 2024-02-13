@@ -13,8 +13,4 @@ export class SessionService {
     getSession(): string | null {
         return localStorage.getItem(this.tokenKey);
     }
-
-    clearSession() {
-        localStorage.removeItem(this.tokenKey);
-    }
 }

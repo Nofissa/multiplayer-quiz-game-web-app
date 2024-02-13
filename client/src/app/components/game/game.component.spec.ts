@@ -8,9 +8,9 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
 import { Quiz } from '@app/interfaces/quiz';
 import { GameServicesProvider } from '@app/providers/game-services.provider';
-import { GameService } from '@app/services/game-service';
-import { KeyBindingService } from '@app/services/key-binding.service';
-import { TimerService } from '@app/services/timer-service';
+import { GameService } from '@app/services/game/game.service';
+import { KeyBindingService } from '@app/services/key-binding/key-binding.service';
+import { TimerService } from '@app/services/timer/timer.service';
 import { of } from 'rxjs';
 import { GameComponent } from './game.component';
 
@@ -29,7 +29,7 @@ export const quizStub: Quiz = {
                 { text: 'Choice 1', isCorrect: true },
                 { text: 'Choice 2', isCorrect: false },
             ],
-            lastModification: null,
+            lastModification: new Date(),
             _id: 'dheoh30hd380',
         },
     ],
@@ -37,7 +37,7 @@ export const quizStub: Quiz = {
     _id: 'testsststst',
 };
 
-describe('gameComponent', () => {
+describe('GameComponent', () => {
     let component: GameComponent;
     let fixture: ComponentFixture<GameComponent>;
     let timerServiceSpy: jasmine.SpyObj<TimerService>;
@@ -79,7 +79,7 @@ describe('gameComponent', () => {
         TestBed.resetTestingModule();
     });
 
-    describe('htmlTests', () => {
+    describe('Display', () => {
         beforeEach(() => {
             fixture = TestBed.createComponent(GameComponent);
             component = fixture.componentInstance;
@@ -87,11 +87,11 @@ describe('gameComponent', () => {
             fixture.detectChanges();
         });
 
-        it('Should create component', () => {
+        it('should create', () => {
             expect(component).toBeTruthy();
         });
 
-        describe('validateButton', () => {
+        describe('Validate Button', () => {
             it('should contain validate button during game', () => {
                 component.secondsLeft = 40;
                 component.currentQuestionIndex = 0;
@@ -111,7 +111,7 @@ describe('gameComponent', () => {
             });
         });
 
-        describe('giveUpButton', () => {
+        describe('Give Up Button', () => {
             it('should contain give up button during the game', () => {
                 component.secondsLeft = 40;
                 component.currentQuestionIndex = 0;
@@ -139,7 +139,7 @@ describe('gameComponent', () => {
             expect(questionText).toBe('Sample Question Text');
         });
 
-        describe('answerBoxes', () => {
+        describe('Answer Boxes', () => {
             beforeEach(() => {
                 component.quiz = {
                     id: 'test',
@@ -156,7 +156,7 @@ describe('gameComponent', () => {
                                 { text: 'Choice 1', isCorrect: true },
                                 { text: 'Choice 2', isCorrect: false },
                             ],
-                            lastModification: null,
+                            lastModification: new Date(),
                             _id: 'dheoh30hd380',
                         },
                     ],
@@ -426,7 +426,7 @@ describe('gameComponent', () => {
                     { text: 'Choice 1', isCorrect: true },
                     { text: 'Choice 2', isCorrect: false },
                 ],
-                lastModification: null,
+                lastModification: new Date(),
                 _id: 'jedwi320nsxw',
             });
             component.currentQuestionIndex = 0;

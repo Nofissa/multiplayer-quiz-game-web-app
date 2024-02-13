@@ -36,10 +36,9 @@ export class GameController {
 
             const targetedQuestion = questions[questionIndex];
             const payload = this.gameService.evaluateChoices(choices, targetedQuestion);
-
             response.status(HttpStatus.OK).json(payload);
         } catch (error) {
-            response.status(HttpStatus.INTERNAL_SERVER_ERROR).send(error.message);
+            response.status(HttpStatus.INTERNAL_SERVER_ERROR).send('Une erreur est survenue');
         }
     }
 }
