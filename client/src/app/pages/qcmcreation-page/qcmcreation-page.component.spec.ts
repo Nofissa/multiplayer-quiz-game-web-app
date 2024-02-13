@@ -16,8 +16,9 @@ import { QuestionSharingService } from '@app/services/question-sharing/question-
 import { MaterialServicesProvider } from '@app/providers/material-services.provider';
 import { FormBuilder } from '@angular/forms';
 import { throwError } from 'rxjs/internal/observable/throwError';
+import { questionStub } from '@app/TestStubs/question.stubs';
 
-describe('QCMCreationPageComponent', () => {
+fdescribe('QCMCreationPageComponent', () => {
     let component: QCMCreationPageComponent;
     let fixture: ComponentFixture<QCMCreationPageComponent>;
     let snackBarSpy: SpyObj<MatSnackBar>;
@@ -28,55 +29,19 @@ describe('QCMCreationPageComponent', () => {
     let matServiceProvierSpy: SpyObj<MaterialServicesProvider>;
     let mockQuestionSubject: Subject<Question>;
     let mockQuizSubject: Subject<Quiz>;
-    let mockQuestion: Question;
-    let mockEditedQuestion: Question;
+    let mockQuestions: Question[];
     let mockQuiz: Quiz;
     let mockEditedQuiz: Quiz;
 
     const basicBeforeAll = (): void => {
-        mockQuestion = {
-            type: 'QCM',
-            text: 'some question ?',
-            choices: [
-                {
-                    text: 'some text 1',
-                    isCorrect: true,
-                },
-                {
-                    text: 'some text 2',
-                    isCorrect: false,
-                },
-            ],
-            lastModification: new Date(),
-            points: 10,
-            _id: 'some basic Id',
-        };
-
-        mockEditedQuestion = {
-            type: 'QCM',
-            text: 'some other test string',
-            choices: [
-                {
-                    text: 'some text 1',
-                    isCorrect: true,
-                },
-                {
-                    text: 'some text 2',
-                    isCorrect: false,
-                },
-            ],
-            lastModification: new Date(),
-            points: 50,
-            // eslint-disable-next-line no-underscore-dangle
-            _id: mockQuestion._id,
-        };
+        mockQuestions = questionStub();
 
         mockQuiz = {
             id: 'Some ID',
             title: 'Some Title here',
             description: 'Some description here',
             duration: 10,
-            questions: [mockQuestion],
+            questions: [mockQuestions[0]],
             isHidden: true,
             lastModification: new Date(),
             _id: '',
@@ -87,7 +52,7 @@ describe('QCMCreationPageComponent', () => {
             title: 'Some other Title here',
             description: 'Some other description here',
             duration: 10,
-            questions: [mockEditedQuestion],
+            questions: [mockQuestions[1]],
             isHidden: true,
             lastModification: new Date(),
             _id: '',
@@ -164,7 +129,7 @@ describe('QCMCreationPageComponent', () => {
         });
 
         it('should call questionService share with invokeOnShareQuestion', () => {
-            component.questionInteractionService.invokeOnShareQuestion(mockQuestion);
+            component.questionInteractionService.invokeOnShareQuestion(mockQuestions[0]);
             expect(questionSharingServiceSpy.share).toHaveBeenCalled();
         });
 
@@ -217,23 +182,23 @@ describe('QCMCreationPageComponent', () => {
                 reset();
             });
 
-            it('should invokeOnAddQuestion call addQuestion QuestionInteractionService', () => {
+            it('should invokeOnAddQuestion call addQuestion', () => {
                 component.questionInteractionService.invokeOnAddQuestion();
-                mockQuestionSubject.next(mockQuestion);
+                mockQuestionSubject.next(mockQuestions[0]);
                 fixture.detectChanges();
-                expect(component.questionsContainer).toEqual([mockQuestion]);
+                expect(component.questionsContainer).toEqual([mockQuestions[0]]);
             });
 
             it('should add question to questionsContainer if empty on invokeOnShareQuestion', () => {
-                component.questionInteractionService.invokeOnShareQuestion(mockQuestion);
-                expect(component.questionsContainer).toContain(mockQuestion);
+                component.questionInteractionService.invokeOnShareQuestion(mockQuestions[0]);
+                expect(component.questionsContainer).toContain(mockQuestions[0]);
             });
 
             it('should addQuestion add question to array if data is valid', () => {
                 component.addQuestion();
-                mockQuestionSubject.next(mockQuestion);
+                mockQuestionSubject.next(mockQuestions[0]);
                 fixture.detectChanges();
-                expect(component.questionsContainer).toEqual([mockQuestion]);
+                expect(component.questionsContainer).toEqual([mockQuestions[0]]);
             });
 
             it('should addQuestion not add question to array if data is not valid', () => {
@@ -252,18 +217,20 @@ describe('QCMCreationPageComponent', () => {
 
         describe('Tests with non-empty questionContainer', () => {
             beforeEach(() => {
-                component.questionsContainer = [{ ...mockQuestion }];
+                component.questionsContainer = [{ ...mockQuestions[0] }];
                 reset();
             });
 
             it('should not add question to questionsContainer if already contained on invokeOnShareQuestion', () => {
-                component.questionInteractionService.invokeOnShareQuestion(mockQuestion);
-                expect(component.questionsContainer).toContain(mockQuestion);
+                component.questionInteractionService.invokeOnShareQuestion(mockQuestions[0]);
+                expect(component.questionsContainer).toContain(mockQuestions[0]);
             });
 
             it('should invokeOnEditQuestion open edit upsert dialog QuestionInteractionService', () => {
+                const mockEditedQuestion = { ...mockQuestions[0] };
+                mockEditedQuestion.text = 'hiiii';
                 component.questionInteractionService.invokeOnEditQuestion(component.questionsContainer[0]);
-                mockQuestionSubject.next(mockEditedQuestion);
+                mockQuestionSubject.next({ ...mockEditedQuestion });
                 fixture.detectChanges();
                 expect(dialogSpy.open).toHaveBeenCalled();
                 expect(component.questionsContainer).toEqual([mockEditedQuestion]);
@@ -273,25 +240,25 @@ describe('QCMCreationPageComponent', () => {
                 component.questionInteractionService.invokeOnEditQuestion(undefined as unknown as Question);
                 fixture.detectChanges();
                 expect(dialogSpy.open).toHaveBeenCalled();
-                expect(component.questionsContainer).toEqual([mockQuestion]);
+                expect(component.questionsContainer).toEqual([mockQuestions[0]]);
             });
 
             it('should invokeOnDeleteQuestion call deleteQuestion QuestionInteractionService', () => {
-                component.questionInteractionService.invokeOnDeleteQuestion(mockQuestion);
+                component.questionInteractionService.invokeOnDeleteQuestion(mockQuestions[0]);
                 fixture.detectChanges();
                 expect(component.questionsContainer).toEqual([]);
             });
 
             it('should deleteQuestion not delete any question if question not present in questions[]', () => {
-                component.deleteQuestion(mockEditedQuestion);
+                component.deleteQuestion(mockQuestions[1]);
                 fixture.detectChanges();
-                expect(component.questionsContainer).toEqual([mockQuestion]);
+                expect(component.questionsContainer).toEqual([mockQuestions[0]]);
             });
 
             it('should deleteQuestion not delete any question if data is not valid', () => {
                 component.deleteQuestion(undefined as unknown as Question);
                 fixture.detectChanges();
-                expect(component.questionsContainer).toEqual([mockQuestion]);
+                expect(component.questionsContainer).toEqual([mockQuestions[0]]);
             });
 
             it('should submitQuiz create quiz if all fileds are valid and quiz does not exist', () => {
