@@ -2,8 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CdkDrag, CdkDragDrop, CdkDropList, DragDropModule } from '@angular/cdk/drag-drop';
 import { QuestionListComponent } from './question-list.component';
 import { Question } from '@app/interfaces/question';
-import { QuestionInteractionService } from '@app/services/question-interaction/question-interaction.service';
-import { QuestionSharingService } from '@app/services/question-sharing/question-sharing.service';
+import { QuestionInteractionService } from '@app/services/question-interaction.service';
+import { QuestionSharingService } from '@app/services/question-sharing.service';
 import { of } from 'rxjs';
 
 describe('QuestionListComponent', () => {
