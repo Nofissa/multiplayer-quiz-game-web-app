@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { HttpClientModule } from '@angular/common/http';
@@ -5,7 +6,6 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { QCMCreationPageComponent } from './qcmcreation-page.component';
 import { ActivatedRoute } from '@angular/router';
 import { Subject, of } from 'rxjs';
-// import { By } from '@angular/platform-browser';
 import { Quiz } from '@app/interfaces/quiz';
 import { Question } from '@app/interfaces/question';
 import { UpsertQuestionDialogComponent } from '@app/components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
@@ -103,8 +103,15 @@ describe('QCMCreationPageComponent', () => {
         quizHttpServiceSpy.createQuiz.and.callFake(() => mockQuizSubject);
         quizHttpServiceSpy.updateQuiz.and.callFake(() => mockQuizSubject);
         questionSharingServiceSpy = jasmine.createSpyObj('QuestionSharingService', ['share', 'subscribe']);
-        questionSharingServiceSpy.share.and.stub();
-        questionSharingServiceSpy.subscribe.and.stub();
+        questionSharingServiceSpy['callbacks'] = [];
+        questionSharingServiceSpy.subscribe.and.callFake((callback: (data: Question) => void) => {
+            questionSharingServiceSpy['callbacks'].push(callback);
+        });
+        questionSharingServiceSpy.share.and.callFake((question: Question) => {
+            questionSharingServiceSpy['callbacks'].forEach((callback: (data: Question) => void) => {
+                callback(question);
+            });
+        });
         matServiceProvierSpy = new MaterialServicesProvider(dialogSpy, snackBarSpy) as SpyObj<MaterialServicesProvider>;
         mockQuestionSubject = new Subject<Question>();
         mockQuizSubject = new Subject<Quiz>();
@@ -155,9 +162,24 @@ describe('QCMCreationPageComponent', () => {
             expect(component.questionsContainer).toEqual([mockQuestion]);
         });
 
-        it('should invokeOnShareQuestion call questionService share QuestionInteractionService', () => {
+        it('should call questionService share with invokeOnShareQuestion', () => {
             component.questionInteractionService.invokeOnShareQuestion(mockQuestion);
+
             expect(questionSharingServiceSpy.share).toHaveBeenCalled();
+        });
+
+        it('should add question to questionsContainer if empty on invokeOnShareQuestion', () => {
+            component.questionsContainer = [];
+            component.questionInteractionService.invokeOnShareQuestion(mockQuestion);
+
+            expect(component.questionsContainer).toContain(mockQuestion);
+        });
+
+        it('should not add question to questionsContainer if already contained on invokeOnShareQuestion', () => {
+            component.questionsContainer = [mockQuestion];
+            component.questionInteractionService.invokeOnShareQuestion(mockQuestion);
+
+            expect(component.questionsContainer).toContain(mockQuestion);
         });
 
         it('should invokeOnEditQuestion open edit upsert dialog QuestionInteractionService', () => {
@@ -339,7 +361,7 @@ describe('QCMCreationPageComponent', () => {
             fixture.detectChanges();
         });
 
-        it('should present all fileds from quiz when modifying one', () => {
+        it('should present all fields from quiz when modifying one', () => {
             expect(quizHttpServiceSpy.getQuizById).toHaveBeenCalled();
             expect(component.quiz).toEqual(mockQuiz);
             expect(component.formGroup.value.title).toBe(mockQuiz.title);
