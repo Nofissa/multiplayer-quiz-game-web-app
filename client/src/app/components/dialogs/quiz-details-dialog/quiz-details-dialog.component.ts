@@ -3,7 +3,7 @@ import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Quiz } from '@app/interfaces/quiz';
-import { QuizHttpService } from '@app/services/quiz-http.service';
+import { QuizHttpService } from '@app/services/quiz-http/quiz-http.service';
 
 @Component({
     selector: 'app-quiz-details-dialog',

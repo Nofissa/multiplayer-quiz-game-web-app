@@ -48,6 +48,7 @@
         "@types/webpack-env": "^1.18.4",
         "@typescript-eslint/eslint-plugin": "^6.2.1",
         "@typescript-eslint/parser": "^6.2.1",
+        "dotenv": "^16.4.2",
         "eslint": "^8.46.0",
         "eslint-config-prettier": "^9.0.0",
         "eslint-import-resolver-typescript": "^3.5.5",
@@ -92,6 +93,9 @@
             "!app/index.ts"
         ],
         "coverageDirectory": "./coverage",
+        "setupFiles": [
+            "dotenv/config"
+        ],
         "testEnvironment": "node",
         "moduleNameMapper": {
             "^@app(.*)$": "<rootDir>/app/$1",
