@@ -20,11 +20,13 @@
                         </div>
                     </div>
                 </div>
-                <div *ngIf="options.numberOrder" class="textIndex">
-                    <p>{{i+1}}</p>
-                </div>
-                <div class="question-content">
-                    <span class="text-centered">{{ question.text }}</span>
+                <div class="question-header">
+                    <div *ngIf="options.numberOrder" class="question-index">
+                        {{i+1}}
+                    </div>
+                    <div class="question-content">
+                        <span class="text-centered">{{ question.text }}</span>
+                    </div>
                 </div>
                 <div *ngIf="options.displayLastModified" class="last-modified-wrapper">
                     <span class="text-centered">

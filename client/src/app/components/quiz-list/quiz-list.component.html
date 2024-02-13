@@ -1,12 +1,12 @@
-<div class="bouttons-quiz">
-    <button mat-fab extended color="primary" routerLink="/qcm-creation">
+<div class="quiz-buttons">
+    <button mat-fab extended class="add-button" routerLink="/qcm-creation">
         <mat-icon>add</mat-icon>
-        Ajouter un quiz
+        Ajouter
     </button>
     <input type="file" #fileInput style="display: none" (change)="importQuiz($event)" />
-    <button mat-fab extended color="accent" (click)="fileInput.click()">
+    <button mat-fab extended class="import-button" (click)="fileInput.click()">
         <mat-icon>file_upload</mat-icon>
-        Importer un quiz
+        Importer
     </button>
 </div>
 <div *ngFor="let quiz of quizzes" class="quizzes-container">
