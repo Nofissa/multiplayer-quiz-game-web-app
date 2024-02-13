@@ -1,3 +1,25 @@
+.logo {
+    width: 100px;
+    height: fit-content;
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 1000;
+}
+
+.header-container {
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+h1 {
+    position: relative;
+    align-self: center;
+    justify-self: center;
+    text-align: center;
+}
+
 #editable-textfields-containers {
     justify-content: space-evenly;
 }
@@ -35,8 +57,6 @@
 
 #quiz-creation-page {
     justify-content: space-evenly;
-    display: flex;
-    flex-direction: row;
 }
 
 form {
@@ -64,4 +84,5 @@ form {
 
 app-question-list {
     width: 100%;
+    justify-self: center;
 }
