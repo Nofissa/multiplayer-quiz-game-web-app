@@ -1,15 +1,14 @@
+// for mongodb _id fields
+/* eslint-disable no-underscore-dangle */
 import { Quiz, QuizDocument } from '@app/model/database/quiz';
 import { QuizDto } from '@app/model/dto/quiz/quiz.dto';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
 @Injectable()
 export class QuizService {
-    constructor(
-        @InjectModel(Quiz.name) public model: Model<QuizDocument>,
-        private readonly logger: Logger,
-    ) {}
+    constructor(@InjectModel(Quiz.name) public model: Model<QuizDocument>) {}
 
     async getQuizzes(visibleOnly?: boolean): Promise<Quiz[]> {
         if (!visibleOnly) {
@@ -30,7 +29,6 @@ export class QuizService {
     async addQuiz(dto: QuizDto): Promise<Quiz> {
         dto.lastModification = new Date();
         dto.isHidden = true;
-        // eslint-disable-next-line no-underscore-dangle
         delete dto._id;
 
         try {
@@ -40,11 +38,16 @@ export class QuizService {
         }
     }
 
-    async modifyQuiz(dto: QuizDto): Promise<Quiz> {
+    async upsertQuiz(dto: QuizDto): Promise<Quiz> {
         dto.lastModification = new Date();
 
         try {
-            // eslint-disable-next-line no-underscore-dangle
+            const existingQuiz: Quiz = await this.model.findOne({ _id: dto._id });
+
+            if (!existingQuiz) {
+                return await this.model.create(dto);
+            }
+
             return await this.model.findOneAndReplace({ _id: dto._id }, dto, { new: true });
         } catch (error) {
             return Promise.reject('Failed to modify quiz');

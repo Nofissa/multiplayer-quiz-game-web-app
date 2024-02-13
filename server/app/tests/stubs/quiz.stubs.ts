@@ -3,6 +3,7 @@ import { questionStub } from '@app/tests/stubs/question.stubs';
 
 export const quizStub = (): Quiz => {
     return {
+        _id: '123456789',
         title: 'Quiz 1',
         id: '4d5e6f',
         description: 'Quiz 1 description',
