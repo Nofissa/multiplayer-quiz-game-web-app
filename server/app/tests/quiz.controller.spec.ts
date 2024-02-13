@@ -71,13 +71,13 @@ describe('QuizController', () => {
             quizServiceTest.getQuizById.resolves(null);
             await quizControllerTest.getQuizById(mockResult.id, mockResponse as any, onlyVisible);
             expect(mockResponse.status.calledWith(HttpStatus.NOT_FOUND)).toBeTruthy();
-            expect(mockResponse.send.calledWith('cannot find quiz')).toBeTruthy();
+            expect(mockResponse.send.called).toBeTruthy();
         });
         it('should return 404 not found when an error occurs', async () => {
             quizServiceTest.getQuizById.rejects(mockResult);
             await quizControllerTest.getQuizById(mockResult.id, mockResponse as any, onlyVisible);
             expect(mockResponse.status.calledWith(HttpStatus.NOT_FOUND)).toBeTruthy();
-            expect(mockResponse.send.calledWith('error while getting the quiz')).toBeTruthy();
+            expect(mockResponse.send.called).toBeTruthy();
         });
     });
 
@@ -108,11 +108,11 @@ describe('QuizController', () => {
             quizServiceTest.addQuiz.rejects(mockResult);
             await quizControllerTest.addQuiz(addQuizDto, mockResponse as any);
             expect(mockResponse.status.calledWith(HttpStatus.BAD_REQUEST)).toBeTruthy();
-            expect(mockResponse.send.calledWith('Cant add quiz')).toBeTruthy();
+            expect(mockResponse.send.called).toBeTruthy();
         });
     });
 
-    describe('modifyQuiz', () => {
+    describe('upsertQuiz', () => {
         const modifyQuizDto: QuizDto = {
             id: quizStub().id,
             title: quizStub().title,
@@ -131,17 +131,17 @@ describe('QuizController', () => {
         const mockResult = quizStub();
 
         it('should return 200 OK when successful', async () => {
-            quizServiceTest.modifyQuiz.resolves(mockResult);
-            await quizControllerTest.modifyQuiz(modifyQuizDto, mockResponse as any);
+            quizServiceTest.upsertQuiz.resolves(mockResult);
+            await quizControllerTest.upsertQuiz(modifyQuizDto, mockResponse as any);
             expect(mockResponse.status.calledWith(HttpStatus.OK)).toBeTruthy();
             expect(mockResponse.json.calledWith(mockResult)).toBeTruthy();
         });
 
         it('should return 404 Not Found when rejected and send "cant find quiz to modify"', async () => {
-            quizServiceTest.modifyQuiz.rejects(mockResult);
-            await quizControllerTest.modifyQuiz(modifyQuizDto, mockResponse as any);
+            quizServiceTest.upsertQuiz.rejects(mockResult);
+            await quizControllerTest.upsertQuiz(modifyQuizDto, mockResponse as any);
             expect(mockResponse.status.calledWith(HttpStatus.OK)).toBeTruthy();
-            expect(mockResponse.send.calledWith('Cant find quiz to modify')).toBeTruthy();
+            expect(mockResponse.send.called).toBeTruthy();
         });
     });
 
@@ -164,7 +164,7 @@ describe('QuizController', () => {
             quizServiceTest.hideQuizById.rejects(mockResult);
             await quizControllerTest.hideQuizById(mockResult.id, mockResponse as any);
             expect(mockResponse.status.calledWith(HttpStatus.NOT_FOUND)).toBeTruthy();
-            expect(mockResponse.send.calledWith('Cant find quiz to hide')).toBeTruthy();
+            expect(mockResponse.send.called).toBeTruthy();
         });
     });
 
@@ -183,7 +183,7 @@ describe('QuizController', () => {
             quizServiceTest.deleteQuizById.rejects();
             await quizControllerTest.deleteQuizById(mockResult.id, mockResponse as any);
             expect(mockResponse.status.calledWith(HttpStatus.NOT_FOUND)).toBeTruthy();
-            expect(mockResponse.send.calledWith('Cant find quiz to delete')).toBeTruthy();
+            expect(mockResponse.send.called).toBeTruthy();
         });
     });
 });

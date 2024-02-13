@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { cleanData, connect, disconnect } from '@app/tests/helpers/mongodb.memory.test.helper';
@@ -51,7 +52,7 @@ describe('quizService', () => {
         expect(quizServiceTest).toBeDefined();
     });
 
-    describe('getQuizzes()', () => {
+    describe('getQuizzes', () => {
         const findSortMock = {
             sort: jest.fn().mockResolvedValue([quizStub()]),
         };
@@ -59,19 +60,19 @@ describe('quizService', () => {
         const onlyVisibleTrue = true;
         const onlyVisibleFalse = false;
 
-        it('getQuizzes() should get all quizzes if visibleOnly = false', async () => {
+        it('should get all quizzes if visibleOnly = false', async () => {
             jest.spyOn(quizModelTest, 'find').mockReturnValue(findSortMock as any);
             const quizzes = await quizServiceTest.getQuizzes(onlyVisibleFalse);
             expect(findSortMock.sort).toHaveBeenCalledWith({ lastModification: 1 });
             expect(quizzes).toEqual([quizStub()]);
         });
-        it('getQuizzes() should get all quizzes if not visibleOnly', async () => {
+        it('should get all quizzes if not visibleOnly', async () => {
             jest.spyOn(quizModelTest, 'find').mockReturnValue(findSortMock as any);
             const quizzes = await quizServiceTest.getQuizzes();
             expect(findSortMock.sort).toHaveBeenCalledWith({ lastModification: 1 });
             expect(quizzes).toEqual([quizStub()]);
         });
-        it('getQuizzes() should get non hidden quizzes if visibleOnly = true', async () => {
+        it('should get non hidden quizzes if visibleOnly = true', async () => {
             jest.spyOn(quizModelTest, 'find').mockReturnValue(findSortMock as any);
             const quizzes = await quizServiceTest.getQuizzes(onlyVisibleTrue);
             expect(findSortMock.sort).toHaveBeenCalledWith({ lastModified: 1 });
@@ -79,29 +80,29 @@ describe('quizService', () => {
         });
     });
 
-    describe('getQuizById()', () => {
-        const onlyVisibleTrue = true;
-        const onlyVisibleFalse = false;
-        it('getQuizById() should get all quizzes if visibleOnly = false', async () => {
+    describe('getQuizById', () => {
+        it('should get all quizzes if visibleOnly = false', async () => {
             jest.spyOn(quizModelTest, 'findOne').mockResolvedValue(quizStub());
-            const quiz = await quizServiceTest.getQuizById(quizStub().id, onlyVisibleFalse);
+            const quiz = await quizServiceTest.getQuizById(quizStub()._id, false);
             expect(quiz).toEqual(quizStub());
         });
 
-        it('getQuizById() should get all quizzes if visibleOnly = undefined', async () => {
+        it('should get all quizzes if visibleOnly = undefined', async () => {
             jest.spyOn(quizModelTest, 'findOne').mockResolvedValue(quizStub());
-            const quiz = await quizServiceTest.getQuizById(quizStub().id);
+            const quiz = await quizServiceTest.getQuizById(quizStub()._id);
             expect(quiz).toEqual(quizStub());
         });
-        it('getQuizById() should get non hidden quizzes if visibleOnly = true', async () => {
+
+        it('should get non hidden quizzes if visibleOnly = true', async () => {
             jest.spyOn(quizModelTest, 'findOne').mockResolvedValue(quizStub());
-            const quiz = await quizServiceTest.getQuizById(quizStub().id, onlyVisibleTrue);
+            const quiz = await quizServiceTest.getQuizById(quizStub()._id, true);
             expect(quiz).toEqual(quizStub());
         });
     });
 
-    describe('addQuiz()', () => {
+    describe('addQuiz', () => {
         const addQuizDto: QuizDto = {
+            _id: quizStub()._id,
             id: quizStub().id,
             title: quizStub().title,
             description: quizStub().description,
@@ -110,11 +111,13 @@ describe('quizService', () => {
             lastModification: quizStub().lastModification,
             isHidden: quizStub().isHidden,
         };
-        it('addQuiz() should add a quiz', async () => {
-            jest.spyOn(quizModelTest, 'create').mockResolvedValue(addQuizDto as any);
+
+        it('should add a quiz with a new lastModification', async () => {
+            jest.spyOn(quizModelTest, 'create').mockResolvedValue({ ...addQuizDto } as any);
             const quiz = await quizServiceTest.addQuiz(addQuizDto);
-            addQuizDto.lastModification = quiz.lastModification;
-            expect(quiz).toEqual(addQuizDto);
+
+            expect(quizModelTest.create).toHaveBeenCalledWith(addQuizDto);
+            expect(quiz.lastModification).not.toEqual(addQuizDto.lastModification);
         });
 
         it('addQuiz() should not add quiz when an error occurs', async () => {
@@ -123,8 +126,9 @@ describe('quizService', () => {
         });
     });
 
-    describe('modifyQuiz', () => {
-        const addQuizDto: QuizDto = {
+    describe('upsertQuiz', () => {
+        const upsertQuizDto: QuizDto = {
+            _id: quizStub()._id,
             id: quizStub().id,
             title: quizStub().title,
             description: quizStub().description,
@@ -134,61 +138,95 @@ describe('quizService', () => {
             isHidden: quizStub().isHidden,
         };
 
-        it('modifyQuiz() should modify a quiz', async () => {
-            jest.spyOn(quizModelTest, 'findOneAndReplace').mockResolvedValue(addQuizDto);
-            const quiz = await quizServiceTest.modifyQuiz(addQuizDto);
-            addQuizDto.lastModification = quiz.lastModification;
-            expect(quiz).toEqual(addQuizDto);
+        it('should modify a quiz lastModification field', async () => {
+            jest.spyOn(quizModelTest, 'findOneAndReplace').mockResolvedValue({ ...upsertQuizDto });
+            const quiz = await quizServiceTest.upsertQuiz(upsertQuizDto);
+
+            expect(quiz.lastModification).not.toEqual(upsertQuizDto.lastModification);
         });
 
-        it('modifyQuiz() should not modify a quiz when an error occurs', async () => {
-            jest.spyOn(quizModelTest, 'findOneAndReplace').mockRejectedValue(addQuizDto);
-            await expect(quizServiceTest.modifyQuiz(addQuizDto)).rejects.toMatch('Failed to modify quiz');
+        it('should update a quiz if it exists', async () => {
+            jest.spyOn(quizModelTest, 'findOne').mockResolvedValue({ ...upsertQuizDto });
+            await quizServiceTest.upsertQuiz(upsertQuizDto);
+
+            expect(quizModelTest.findOneAndReplace).toHaveBeenCalled();
+        });
+
+        it("should create a quiz if it doesn't exists", async () => {
+            jest.spyOn(quizModelTest, 'findOne').mockResolvedValue(null);
+            jest.spyOn(quizModelTest, 'create').mockResolvedValue({ ...upsertQuizDto } as any);
+            await quizServiceTest.upsertQuiz(upsertQuizDto);
+
+            expect(quizModelTest.create).toHaveBeenCalledWith(upsertQuizDto);
+        });
+
+        it('should not modify a quiz when an error occurs', async () => {
+            jest.spyOn(quizModelTest, 'findOne').mockResolvedValue(upsertQuizDto);
+            jest.spyOn(quizModelTest, 'findOneAndReplace').mockRejectedValue(upsertQuizDto);
+            await expect(quizServiceTest.upsertQuiz(upsertQuizDto)).rejects.toMatch('Failed to modify quiz');
         });
     });
 
     describe('hideQuizById', () => {
-        const addQuizDto: QuizDto = {
+        const hideQuizDto: QuizDto = {
+            _id: quizStub()._id,
             id: quizStub().id,
             title: quizStub().title,
             description: quizStub().description,
             questions: quizStub().questions,
             duration: quizStub().duration,
             lastModification: quizStub().lastModification,
-            isHidden: false,
+            isHidden: true,
         };
 
-        it('hideQuizById() should modify a quiz', async () => {
-            jest.spyOn(quizModelTest, 'findOne').mockResolvedValue(addQuizDto);
-            const quiz = await quizModelTest.findOne({ _id: addQuizDto.id });
-            quiz.isHidden = true;
-            quiz.lastModification = new Date();
+        it('should toggle a quiz isHidden field to false', async () => {
+            hideQuizDto.isHidden = true;
+            jest.spyOn(quizModelTest, 'findOne').mockResolvedValue({ ...hideQuizDto });
+            const quiz = await quizModelTest.findOne({ _id: hideQuizDto._id });
+            quiz.isHidden = !hideQuizDto.isHidden;
+
             jest.spyOn(quizModelTest, 'findOneAndUpdate').mockResolvedValue(quiz);
-            const quizUpdated = await quizServiceTest.hideQuizById(addQuizDto.id);
-            addQuizDto.lastModification = quizUpdated.lastModification;
-            addQuizDto.isHidden = true;
-            expect(quizUpdated).toEqual(addQuizDto);
+            const quizUpdated = await quizServiceTest.hideQuizById(hideQuizDto._id);
+
+            expect(quizUpdated.isHidden).not.toEqual(hideQuizDto.isHidden);
         });
 
-        it('hideQuizById() should not modify a quiz when findOne returns null', async () => {
+        it('should toggle a quiz isHidden field to true', async () => {
+            hideQuizDto.isHidden = false;
+            jest.spyOn(quizModelTest, 'findOne').mockResolvedValue({ ...hideQuizDto });
+            const quiz = await quizModelTest.findOne({ _id: hideQuizDto._id });
+            quiz.isHidden = !hideQuizDto.isHidden;
+
+            jest.spyOn(quizModelTest, 'findOneAndUpdate').mockResolvedValue(quiz);
+            const quizUpdated = await quizServiceTest.hideQuizById(hideQuizDto._id);
+
+            expect(quizUpdated.isHidden).not.toEqual(hideQuizDto.isHidden);
+        });
+
+        it('should not modify a quiz when no quiz matches passed ID', async () => {
             jest.spyOn(quizModelTest, 'findOne').mockReturnValue(null);
-            await expect(quizServiceTest.hideQuizById(addQuizDto.id)).rejects.toMatch(`Can't find quiz with ID ${addQuizDto.id}`);
+
+            await expect(quizServiceTest.hideQuizById(hideQuizDto._id)).rejects.toMatch(`Can't find quiz with ID ${hideQuizDto._id}`);
         });
 
-        it('hideQuizById() should not modify a quiz when an error occurs', async () => {
-            jest.spyOn(quizModelTest, 'findOne').mockRejectedValue(addQuizDto);
-            await expect(quizServiceTest.hideQuizById(addQuizDto.id)).rejects.toMatch('Failed to toggle quiz hidden state');
+        it('should not modify a quiz when an error occurs', async () => {
+            jest.spyOn(quizModelTest, 'findOne').mockRejectedValue(hideQuizDto);
+
+            await expect(quizServiceTest.hideQuizById(hideQuizDto._id)).rejects.toMatch('Failed to toggle quiz hidden state');
         });
     });
 
     describe('deleQuizById', () => {
-        it('deleteQuizById should delete quiz', async () => {
-            const quiz = await quizServiceTest.deleteQuizById(quizStub().id);
+        it('should delete quiz', async () => {
+            const quiz = await quizServiceTest.deleteQuizById(quizStub()._id);
+
             expect(quiz).toEqual(undefined);
         });
-        it('deleteQuizById should not delete quiz when an error occurs', async () => {
+
+        it('should not delete quiz when an error occurs', async () => {
             jest.spyOn(quizModelTest, 'findByIdAndDelete').mockRejectedValue(quizStub());
-            await expect(quizServiceTest.deleteQuizById(quizStub().id)).rejects.toMatch('Failed to delete quiz');
+
+            await expect(quizServiceTest.deleteQuizById(quizStub()._id)).rejects.toMatch('Failed to delete quiz');
         });
     });
 });

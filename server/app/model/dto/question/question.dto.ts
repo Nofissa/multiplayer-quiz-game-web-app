@@ -5,6 +5,7 @@ import { IsQuestionType } from '@app/validators/is-question-type.validator';
 import { QuestionType } from '@common/question-type';
 import { Type } from 'class-transformer';
 import { ArrayMaxSize, ArrayMinSize, IsArray, IsDate, IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min, ValidateNested } from 'class-validator';
+import 'reflect-metadata';
 
 export class QuestionDto {
     @IsString()

@@ -6,6 +6,17 @@ import { badUserCredentialStub, goodUserCredentialStub } from './stubs/user.cred
 
 describe('AuthService', () => {
     let authServiceTest: AuthService;
+    const goodPayloadMock: AuthPayload = {
+        token: jsonwebtoken.sign({}, process.env.PRIVATE_RSA_KEY, { algorithm: 'RS256' }),
+    };
+
+    const badPayloadMock: AuthPayload = {
+        token: 'ashjsdfsdkgfwsd',
+    };
+
+    const nullTokenPayloadMock: AuthPayload = {
+        token: null,
+    };
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
@@ -20,36 +31,26 @@ describe('AuthService', () => {
     });
 
     describe('authenticate', () => {
-        const goodPayloadMock: AuthPayload = {
-            token: jsonwebtoken.sign({}, process.env.PRIVATE_RSA_KEY, { algorithm: 'RS256' }),
-        };
-
-        it('should return the right token if credentials validated', async () => {
+        it('should return the right token if good credentials', async () => {
             expect(await authServiceTest.authenticate(goodUserCredentialStub())).toEqual(goodPayloadMock);
         });
 
-        it('should reject with "Invalid credentials" if wrong credentials', async () => {
+        it('should reject if wrong credentials', async () => {
             await expect(authServiceTest.authenticate(badUserCredentialStub())).rejects.toMatch('Invalid credentials');
         });
     });
 
-    describe('verifyAuth()', () => {
-        const goodPayloadMock: AuthPayload = {
-            token: jsonwebtoken.sign({}, process.env.PRIVATE_RSA_KEY, { algorithm: 'RS256' }),
-        };
-
-        const badPayloadMock: AuthPayload = {
-            token: null,
-        };
-
-        it('verify should be called with the right token if payload validated', async () => {
-            jest.spyOn(jsonwebtoken, 'verify');
-            await authServiceTest.verifyAuth(goodPayloadMock);
-            expect(jsonwebtoken.verify).toHaveBeenCalledWith(goodPayloadMock.token, process.env.PUBLIC_RSA_KEY);
+    describe('verifyAuth', () => {
+        it('should not reject if good token', async () => {
+            await expect(authServiceTest.verifyAuth(goodPayloadMock)).resolves.toBeUndefined();
         });
 
-        it('verify should reject if no token', async () => {
-            await expect(authServiceTest.verifyAuth(badPayloadMock)).rejects.toMatch('No token in payload');
+        it('should reject if bad token', async () => {
+            await expect(authServiceTest.verifyAuth(badPayloadMock)).rejects.toThrow();
+        });
+
+        it('should reject if no token', async () => {
+            await expect(authServiceTest.verifyAuth(nullTokenPayloadMock)).rejects.toMatch('No token in payload');
         });
     });
 });
