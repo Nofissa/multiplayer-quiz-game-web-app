@@ -3,7 +3,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { quizStub } from '@app/TestStubs/quiz.stubs';
-import { QuizHttpService } from '@app/services/quiz-http.service';
+import { QuizHttpService } from '@app/services/quiz-http/quiz-http.service';
 import { of, throwError } from 'rxjs';
 import { QuizDetailsDialogComponent } from './quiz-details-dialog.component';
 

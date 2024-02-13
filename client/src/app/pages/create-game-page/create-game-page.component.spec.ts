@@ -7,7 +7,7 @@ import { Router } from '@angular/router';
 import { quizStub } from '@app/TestStubs/quiz.stubs';
 import { QuizDetailsDialogComponent } from '@app/components/dialogs/quiz-details-dialog/quiz-details-dialog.component';
 import { Quiz } from '@app/interfaces/quiz';
-import { QuizHttpService } from '@app/services/quiz-http.service';
+import { QuizHttpService } from '@app/services/quiz-http/quiz-http.service';
 import { of } from 'rxjs';
 import { SwiperModule } from 'swiper/angular';
 import { CreateGamePageComponent } from './create-game-page.component';
