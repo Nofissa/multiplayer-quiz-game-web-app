@@ -1,4 +1,4 @@
-import { QuizDto } from '@app/model/dto/quiz/quiz.dto'; // Update the path accordingly
+import { QuizDto } from '@app/model/dto/quiz/quiz.dto';
 import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
 import 'reflect-metadata';
