@@ -32,11 +32,21 @@
     justify-content: space-evenly;
     display: flex;
     flex-direction: row;
+    height: 100vh;
+}
+
+#quiz-creation-page > * {
+    padding: 0px 20px;
 }
 
 form {
-    width: 50%;
     align-items: center;
+    background-color: var(--secondary-bg-color);
+    color: var(--secondary-fg-color);
+    padding: 15px;
+    border-radius: 15px;
+    width: 100%;
+    max-width: 600px;
 }
 
 #text-editables {
@@ -48,4 +58,25 @@ form {
     visibility: hidden;
 }
 
+.form-wrapper {
+    display: flex;
+    flex-grow: 2;
+    justify-content: center;
+    height: 100%;
+    align-items: center;
+}
 
+.question-bank-wrapper {
+    display: flex;
+    justify-content: center;
+    height: 100%;
+    align-items: center;
+}
+
+h3 {
+    margin: 15px;
+}
+
+.header {
+    height: 100px;
+}
