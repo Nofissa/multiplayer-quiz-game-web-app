@@ -9,9 +9,9 @@ import { QuestionListOptions } from '@app/interfaces/question-list-options';
 import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog-data';
 import { MaterialServicesProvider } from '@app/providers/material-services.provider';
 import { QuestionServicesProvider } from '@app/providers/question-services.provider';
-import { QuestionHttpService } from '@app/services/question-http.service';
-import { QuestionInteractionService } from '@app/services/question-interaction.service';
-import { QuestionSharingService } from '@app/services/question-sharing.service';
+import { QuestionHttpService } from '@app/services/question-http/question-http.service';
+import { QuestionInteractionService } from '@app/services/question-interaction/question-interaction.service';
+import { QuestionSharingService } from '@app/services/question-sharing/question-sharing.service';
 
 const NOT_FOUND_INDEX = -1;
 const SNACK_BAR_DURATION_MS = 3000;

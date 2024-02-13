@@ -4,9 +4,9 @@ import { Router } from '@angular/router';
 import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
 import { Quiz } from '@app/interfaces/quiz';
 import { GameServicesProvider } from '@app/providers/game-services.provider';
-import { GameService } from '@app/services/game-service';
-import { KeyBindingService } from '@app/services/key-binding.service';
-import { TimerService } from '@app/services/timer-service';
+import { GameService } from '@app/services/game/game.service';
+import { KeyBindingService } from '@app/services/key-binding/key-binding.service';
+import { TimerService } from '@app/services/timer/timer.service';
 import { Choice } from '@common/choice';
 import { EvaluationPayload } from '@common/evaluation-payload';
 

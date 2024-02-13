@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
 import { Choice, Question } from '@app/model/database/question';
 import { ChoiceDto } from '@app/model/dto/choice/choice.dto';
 import { EvaluationPayload } from '@common/evaluation-payload';
+import { Injectable } from '@nestjs/common';
 
 const BONUS = 1.2;
+const NO_BONUS = 0;
 
 @Injectable()
 export class GameService {
@@ -17,7 +18,7 @@ export class GameService {
         if (areEqualSets) {
             return { correctAnswers, score: question.points * BONUS };
         } else {
-            return { correctAnswers, score: 0 };
+            return { correctAnswers, score: NO_BONUS };
         }
     }
 }

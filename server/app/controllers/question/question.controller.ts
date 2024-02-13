@@ -24,7 +24,7 @@ export class QuestionController {
             const allQuestions: Question[] = await this.questionService.getAllQuestions();
             response.status(HttpStatus.OK).json(allQuestions);
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send(error.message);
+            response.status(HttpStatus.NOT_FOUND).send('Cannot find questions');
         }
     }
 
@@ -38,7 +38,7 @@ export class QuestionController {
             const addedQuestion: Question = await this.questionService.addQuestion(dto);
             response.status(HttpStatus.CREATED).json(addedQuestion);
         } catch (error) {
-            response.status(HttpStatus.INTERNAL_SERVER_ERROR).send(error.message);
+            response.status(HttpStatus.BAD_REQUEST).send('Cannot add question');
         }
     }
 
@@ -52,7 +52,7 @@ export class QuestionController {
             const updatedQuestion: Question = await this.questionService.updateQuestion(dto);
             response.status(HttpStatus.OK).json(updatedQuestion);
         } catch (error) {
-            response.status(HttpStatus.INTERNAL_SERVER_ERROR).send(error.message);
+            response.status(HttpStatus.BAD_REQUEST).send('Error while updating question');
         }
     }
 
@@ -65,7 +65,7 @@ export class QuestionController {
             await this.questionService.deleteQuestionById(id);
             response.status(HttpStatus.OK).send();
         } catch (error) {
-            response.status(HttpStatus.INTERNAL_SERVER_ERROR).send(error.message);
+            response.status(HttpStatus.NOT_FOUND).send('Cant find question to delete');
         }
     }
 }
