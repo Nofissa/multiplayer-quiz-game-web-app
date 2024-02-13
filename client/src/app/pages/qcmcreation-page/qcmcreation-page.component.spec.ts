@@ -17,8 +17,9 @@ import { MaterialServicesProvider } from '@app/providers/material-services.provi
 import { FormBuilder } from '@angular/forms';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { questionStub } from '@app/TestStubs/question.stubs';
+import { quizStub } from '@app/TestStubs/quiz.stubs';
 
-fdescribe('QCMCreationPageComponent', () => {
+describe('QCMCreationPageComponent', () => {
     let component: QCMCreationPageComponent;
     let fixture: ComponentFixture<QCMCreationPageComponent>;
     let snackBarSpy: SpyObj<MatSnackBar>;
@@ -30,22 +31,13 @@ fdescribe('QCMCreationPageComponent', () => {
     let mockQuestionSubject: Subject<Question>;
     let mockQuizSubject: Subject<Quiz>;
     let mockQuestions: Question[];
-    let mockQuiz: Quiz;
+    let mockQuizs: Quiz;
     let mockEditedQuiz: Quiz;
 
     const basicBeforeAll = (): void => {
         mockQuestions = questionStub();
 
-        mockQuiz = {
-            id: 'Some ID',
-            title: 'Some Title here',
-            description: 'Some description here',
-            duration: 10,
-            questions: [mockQuestions[0]],
-            isHidden: true,
-            lastModification: new Date(),
-            _id: '',
-        };
+        mockQuizs = quizStub();
 
         mockEditedQuiz = {
             id: 'Some ID',
@@ -134,7 +126,7 @@ fdescribe('QCMCreationPageComponent', () => {
         });
 
         it('should submitQuiz update quiz if all fileds are valid and quiz exists', () => {
-            component.quiz = mockQuiz;
+            component.quiz = mockQuizs;
             component.formGroup.controls.title.patchValue(mockEditedQuiz.title);
             component.formGroup.controls.description.patchValue(mockEditedQuiz.description);
             component.questionsContainer = mockEditedQuiz.questions;
@@ -146,7 +138,7 @@ fdescribe('QCMCreationPageComponent', () => {
         });
 
         it('should submitQuiz not update quiz if all fileds are valid and quiz exists but error is thrown', () => {
-            component.quiz = mockQuiz;
+            component.quiz = mockQuizs;
             component.formGroup.controls.title.patchValue(mockEditedQuiz.title);
             component.formGroup.controls.description.patchValue(mockEditedQuiz.description);
             component.questionsContainer = mockEditedQuiz.questions;
@@ -167,8 +159,8 @@ fdescribe('QCMCreationPageComponent', () => {
         });
 
         it('should SubmitQuiz not be able to submit a quiz when there are no questions', () => {
-            component.formGroup.controls.title.patchValue(mockQuiz.title);
-            component.formGroup.controls.description.patchValue(mockQuiz.description);
+            component.formGroup.controls.title.patchValue(mockQuizs.title);
+            component.formGroup.controls.description.patchValue(mockQuizs.description);
             component.submitQuiz();
             fixture.detectChanges();
             expect(quizHttpServiceSpy.createQuiz).not.toHaveBeenCalled();
@@ -262,18 +254,18 @@ fdescribe('QCMCreationPageComponent', () => {
             });
 
             it('should submitQuiz create quiz if all fileds are valid and quiz does not exist', () => {
-                component.formGroup.controls.title.patchValue(mockQuiz.title);
-                component.formGroup.controls.description.patchValue(mockQuiz.description);
+                component.formGroup.controls.title.patchValue(mockQuizs.title);
+                component.formGroup.controls.description.patchValue(mockQuizs.description);
                 component.submitQuiz();
-                mockQuizSubject.next(mockQuiz);
+                mockQuizSubject.next(mockQuizs);
                 fixture.detectChanges();
                 expect(quizHttpServiceSpy.updateQuiz).not.toHaveBeenCalled();
                 expect(quizHttpServiceSpy.createQuiz).toHaveBeenCalled();
             });
 
             it('should submitQuiz not create quiz if all fileds are valid and quiz does not exist but error is thrown', () => {
-                component.formGroup.controls.title.patchValue(mockQuiz.title);
-                component.formGroup.controls.description.patchValue(mockQuiz.description);
+                component.formGroup.controls.title.patchValue(mockQuizs.title);
+                component.formGroup.controls.description.patchValue(mockQuizs.description);
                 component.submitQuiz();
                 mockQuizSubject.error(throwError(() => new Error('This is an error')));
                 fixture.detectChanges();
@@ -283,7 +275,7 @@ fdescribe('QCMCreationPageComponent', () => {
             });
 
             it('should SubmitQuiz not be able to submit a quiz when quiz title is empty', () => {
-                component.formGroup.controls.description.patchValue(mockQuiz.description);
+                component.formGroup.controls.description.patchValue(mockQuizs.description);
                 component.submitQuiz();
                 fixture.detectChanges();
                 expect(quizHttpServiceSpy.createQuiz).not.toHaveBeenCalled();
@@ -292,7 +284,7 @@ fdescribe('QCMCreationPageComponent', () => {
             });
 
             it('should SubmitQuiz not be able to submit a quiz when quiz description is empty', () => {
-                component.formGroup.controls.title.patchValue(mockQuiz.title);
+                component.formGroup.controls.title.patchValue(mockQuizs.title);
                 component.submitQuiz();
                 fixture.detectChanges();
                 expect(quizHttpServiceSpy.createQuiz).not.toHaveBeenCalled();
@@ -310,7 +302,7 @@ fdescribe('QCMCreationPageComponent', () => {
 
             const activatedRouteSpy = { queryParamMap: of(paramMap) };
 
-            quizHttpServiceSpy.getQuizById.and.callFake(() => of(mockQuiz));
+            quizHttpServiceSpy.getQuizById.and.callFake(() => of(mockQuizs));
 
             await TestBed.configureTestingModule({
                 declarations: [QCMCreationPageComponent],
@@ -334,10 +326,10 @@ fdescribe('QCMCreationPageComponent', () => {
 
         it('should present all fields from quiz when modifying one', () => {
             expect(quizHttpServiceSpy.getQuizById).toHaveBeenCalled();
-            expect(component.quiz).toEqual(mockQuiz);
-            expect(component.formGroup.value.title).toBe(mockQuiz.title);
-            expect(component.formGroup.value.description).toBe(mockQuiz.description);
-            expect(component.questionsContainer).toEqual(mockQuiz.questions);
+            expect(component.quiz).toEqual(mockQuizs);
+            expect(component.formGroup.value.title).toBe(mockQuizs.title);
+            expect(component.formGroup.value.description).toBe(mockQuizs.description);
+            expect(component.questionsContainer).toEqual(mockQuizs.questions);
         });
     });
 });
