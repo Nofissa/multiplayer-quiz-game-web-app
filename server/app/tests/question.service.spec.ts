@@ -73,6 +73,16 @@ describe('QuestionService', () => {
             choices: questionStub()[0].choices,
             lastModification: questionStub()[0].lastModification,
         };
+
+        const addQuestionDtoId: QuestionDto = {
+            _id: '123456789012345678901234',
+            type: questionStub()[0].type,
+            text: questionStub()[0].text,
+            points: questionStub()[0].points,
+            choices: questionStub()[0].choices,
+            lastModification: questionStub()[0].lastModification,
+        };
+
         it('addQuiz() should add a quiz if the question doesnt already exists in the DB', async () => {
             jest.spyOn(questionModelTest, 'create').mockResolvedValue(addQuestionDto as any);
             jest.spyOn(questionModelTest, 'findOne').mockResolvedValue(null);
@@ -82,7 +92,7 @@ describe('QuestionService', () => {
         });
 
         it('addQuestion should not add question when it already exists in the DB', async () => {
-            jest.spyOn(questionModelTest, 'findOne').mockResolvedValue(addQuestionDto);
+            jest.spyOn(questionModelTest, 'findOne').mockResolvedValue(addQuestionDtoId);
             await expect(questionServiceTest.addQuestion(addQuestionDto)).rejects.toMatch('Invalid question');
         });
 
@@ -103,6 +113,15 @@ describe('QuestionService', () => {
             lastModification: questionStub()[0].lastModification,
         };
 
+        const updateQuestionDtoId: QuestionDto = {
+            _id: '123456789012345678901234',
+            type: questionStub()[0].type,
+            text: questionStub()[0].text,
+            points: questionStub()[0].points,
+            choices: questionStub()[0].choices,
+            lastModification: questionStub()[0].lastModification,
+        };
+
         it('updateQuestion() should modify a question if the modified question is correct', async () => {
             jest.spyOn(questionModelTest, 'findOneAndReplace').mockResolvedValue(updateQuestionDto);
             jest.spyOn(questionModelTest, 'findOne').mockResolvedValue(null);
@@ -113,7 +132,7 @@ describe('QuestionService', () => {
         });
 
         it('updateQuestion() should not modify a question if the modified question is incorrect', async () => {
-            jest.spyOn(questionModelTest, 'findOne').mockResolvedValue(updateQuestionDto);
+            jest.spyOn(questionModelTest, 'findOne').mockResolvedValue(updateQuestionDtoId);
             await expect(questionServiceTest.updateQuestion(updateQuestionDto)).rejects.toMatch('Invalid question');
         });
 
@@ -151,15 +170,15 @@ describe('QuestionService', () => {
             expect(bool).toEqual(true);
         });
 
-        it('validateQuestion should return true if question._id !== dto._id the in the bd', async () => {
+        it('validateQuestion should return false if question._id !== dto._id the in the bd', async () => {
             jest.spyOn(questionModelTest, 'findOne').mockResolvedValue(validateQuestionDtoCopy);
             const bool = await questionServiceTest.validateQuestion(validateQuestionDto);
-            expect(bool).toEqual(true);
+            expect(bool).toEqual(false);
         });
-        it('validateQuestion should return false if question._id === dto._id the in the bd', async () => {
+        it('validateQuestion should return true if question._id === dto._id the in the bd', async () => {
             jest.spyOn(questionModelTest, 'findOne').mockResolvedValue(validateQuestionDto);
             const bool = await questionServiceTest.validateQuestion(validateQuestionDto);
-            expect(bool).toEqual(false);
+            expect(bool).toEqual(true);
         });
     });
 });

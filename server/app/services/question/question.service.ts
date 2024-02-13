@@ -57,7 +57,7 @@ export class QuestionService {
         if (question === null) {
             return true;
         } else {
-            return question._id !== dto._id;
+            return question._id === dto._id;
         }
     }
 }
