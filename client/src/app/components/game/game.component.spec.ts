@@ -487,5 +487,11 @@ describe('GameComponent', () => {
 
             expect(router.navigateByUrl).toHaveBeenCalledWith('/home');
         });
+
+        it('should start the timer if the quiz exists', () => {
+            const timerSpy = spyOn(timerServiceSpy, 'startTimer');
+            component.ngOnChanges();
+            expect(timerSpy).toHaveBeenCalled();
+        });
     });
 });
