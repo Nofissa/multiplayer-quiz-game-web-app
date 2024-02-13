@@ -18,6 +18,7 @@ describe('QuizListComponent', () => {
     let isQuizNameTakenSpy: jasmine.Spy;
     let tryParseSpy: jasmine.Spy;
     let handleImportSubscriptionSpy: jasmine.Spy;
+    let filecheckerSpy: jasmine.Spy;
 
     const mockQuiz: Quiz = {
         _id: '1',
@@ -60,6 +61,7 @@ describe('QuizListComponent', () => {
         isQuizNameTakenSpy = spyOn(component, 'isQuizNameTaken').and.callThrough();
         tryParseSpy = spyOn(component, 'tryParse').and.callThrough();
         handleImportSubscriptionSpy = spyOn(component, 'handleImportSubscription').and.callThrough();
+        filecheckerSpy = spyOn(component, 'filechecker').and.callThrough();
         fixture.detectChanges();
     });
 
@@ -133,7 +135,7 @@ describe('QuizListComponent', () => {
     it('should not import quiz if parsing fails', () => {
         tryParseSpy.and.returnValue(null);
         component['importQuiz'](mockProgressEvent);
-        component.quizzes = mockQuizzes;
+        component.quizzes = [mockQuiz];
         expect(component.quizzes.length).toBe(1);
     });
 
@@ -151,5 +153,39 @@ describe('QuizListComponent', () => {
         component['openPromptDialog'](mockQuiz);
         expect(mockDialog.open).toHaveBeenCalled();
         expect(isQuizNameTakenSpy).toHaveBeenCalled();
+    });
+
+    it('should readfile parse if quiz is different', () => {
+        mockQuizHttpService.createQuiz.and.returnValue(of(mockQuiz));
+        component['readFiles'](mockProgressEvent);
+        expect(tryParseSpy).toHaveBeenCalled();
+    });
+
+    it('should readfile open dialog if quiz is same', () => {
+        isQuizNameTakenSpy.and.returnValue(true);
+        mockDialog.open.and.returnValue(mockDialogRef);
+        handleImportSubscriptionSpy.and.stub();
+        component['readFiles'](mockProgressEvent);
+        expect(tryParseSpy).toHaveBeenCalled();
+        expect(isQuizNameTakenSpy).toHaveBeenCalled();
+    });
+
+    it('should return if file is null', () => {
+        tryParseSpy.and.returnValue(null);
+        component['readFiles'](mockProgressEvent);
+        expect(tryParseSpy).toHaveBeenCalled();
+    });
+
+    it('should file check', () => {
+        const event = { target: { files: [{}] } } as unknown as Event;
+        const result = component['filechecker'](event);
+        expect(result).toBeTrue();
+    });
+
+    it('should import with no problems', () => {
+        filecheckerSpy.and.returnValue(true);
+        mockQuizHttpService.createQuiz.and.returnValue(of(mockQuiz));
+        component['importQuiz'](mockProgressEvent);
+        expect(filecheckerSpy).toHaveBeenCalled();
     });
 });
