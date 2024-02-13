@@ -114,7 +114,7 @@ describe('UpsertQuestionDialogComponent', () => {
         expect(choiceArray).toBe(MIN_CHOICE_COUNT);
     });
 
-    it('should choicesArray contain all initially input choices', () => {
+    it('should ensure that the choicesArray contains all initially input choices', () => {
         const formGroupValue = correctUpsertValues.question.choices;
         const componentChoicesArray = component.formGroup.get('choices');
 
@@ -148,7 +148,7 @@ describe('UpsertQuestionDialogComponent', () => {
         expect(choiceArray).toBe(MAX_CHOICE_COUNT);
     });
 
-    it('should choicesArray contain all input choices when choice is added', () => {
+    it('should choicesArray contains all input choices when choice is added', () => {
         const formGroupValue: Choice[] = [];
         correctUpsertValues.question.choices.forEach((choice) => {
             formGroupValue.push(choice);
@@ -169,7 +169,7 @@ describe('UpsertQuestionDialogComponent', () => {
         }
     });
 
-    it('should choicesArray contain all input choices when last choice is removed', () => {
+    it('should ensure choicesArray contains all input choices when last choice is removed', () => {
         const formGroupValue = correctUpsertValues.question.choices;
         component.addAnswer();
         component.removeAnswerAt(2);
@@ -181,7 +181,7 @@ describe('UpsertQuestionDialogComponent', () => {
         }
     });
 
-    it('should choicesArray contain all input choices when first choice is removed', () => {
+    it('should ensure choicesArray contains all input choices when first choice is removed', () => {
         const formGroupValue: Choice[] = [];
         correctUpsertValues.question.choices.forEach((choice) => {
             formGroupValue.push(choice);
@@ -202,7 +202,7 @@ describe('UpsertQuestionDialogComponent', () => {
         }
     });
 
-    it('should change toogle status', () => {
+    it('should change toggle status in toggle', () => {
         expect(component.qcmToggled).toBeFalsy();
         component.doToggle();
         fixture.detectChanges();
