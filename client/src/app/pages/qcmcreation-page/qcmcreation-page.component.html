@@ -22,6 +22,7 @@
                 formControlName="description" required></textarea>
         </mat-form-field>
         <div id="questions-container" class="flex-column">
+            <label>Questions</label>
             <app-question-list id="question-list" [questions]="questionsContainer"
                 [interactionService]="questionInteractionService"
                 [options]="{share: true, create: true, edit: true, delete: true, drag:true, numberOrder: true}"></app-question-list>
