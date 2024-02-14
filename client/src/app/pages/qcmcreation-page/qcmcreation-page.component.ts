@@ -89,7 +89,7 @@ export class QCMCreationPageComponent implements OnInit {
             });
 
             this.questionSharingService.subscribe((question: Question) => {
-                if (!this.questionsContainer.find((x) => x._id === question._id)) {
+                if (this.questionsContainer.every((x) => x.text !== question.text)) {
                     this.questionsContainer.push(question);
                 }
             });
