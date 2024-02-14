@@ -1,6 +1,23 @@
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+</head>
+<div class="header">
+    <app-logo size="m"></app-logo>
+</div>
+<span *ngIf="isTest" class="testMode">MODE TEST</span>
 <div class="container">
-    <app-sidebar id="sidebar"></app-sidebar>
-    <section class="play-area-container">
-        <app-play-area class="play-area" tabindex="0"></app-play-area>
-    </section>
+    <div class="game-area">
+        <app-game [quiz]="quiz" [isTest]="isTest"></app-game>
+    </div>
+    <div class="right-panel">
+        <div class="chat-room">
+            <div class="messages-zone font-color text-centered">
+                <h3>Salon de clavardage</h3>
+            </div>
+            <mat-form-field appearance="outline">
+                <mat-label>Message</mat-label>
+                <textarea matInput id="chattingArea" class="write-message" placeholder="Envoyer un message"> </textarea>
+            </mat-form-field>
+        </div>
+    </div>
 </div>

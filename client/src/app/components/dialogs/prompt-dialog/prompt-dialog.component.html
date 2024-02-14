@@ -1,0 +1,23 @@
+<h2 mat-dialog-title>{{ data.title }}</h2>
+<form [formGroup]="formGroup">
+    <mat-dialog-content>
+        <h5 class="text-centered">{{ data.message }}</h5>
+        <div class="form-wrapper">
+            <mat-form-field appearance="outline">
+                <mat-label>{{ data.placeholder }}</mat-label>
+                <input matInput type="{{ data.hideAnswer ? 'password' : 'text' }}" formControlName="value"
+                    value="{{ data.value }}">
+            </mat-form-field>
+        </div>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+        <div class="actions-wrapper">
+            <button mat-raised-button (click)="submit()">
+                {{ data.submitText }}
+            </button>
+            <button mat-raised-button (click)="cancel()">
+                {{ data.cancelText }}
+            </button>
+        </div>
+    </mat-dialog-actions>
+</form>

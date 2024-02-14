@@ -1,9 +1,13 @@
-import { HttpErrorResponse } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { CommunicationService } from '@app/services/communication.service';
-import { Message } from '@common/message';
-import { BehaviorSubject } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Router } from '@angular/router';
+import { AuthService } from '@app/services/auth/auth.service';
+import { SessionService } from '@app/services/session/session.service';
+import { AuthPayload } from '@common/auth-payload';
+import { MaterialServicesProvider } from '@app/providers/material-services.provider';
+import { SecurityServicesProvider } from '@app/providers/security-services.provider';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { PromptDialogComponent } from '@app/components/dialogs/prompt-dialog/prompt-dialog.component';
 
 @Component({
     selector: 'app-main-page',
@@ -11,38 +15,66 @@ import { map } from 'rxjs/operators';
     styleUrls: ['./main-page.component.scss'],
 })
 export class MainPageComponent {
-    readonly title: string = 'LOG2990';
-    message: BehaviorSubject<string> = new BehaviorSubject<string>('');
+    private readonly authService: AuthService;
+    private readonly sessionService: SessionService;
+    private readonly dialogService: MatDialog;
+    private readonly snackBarService: MatSnackBar;
 
-    constructor(private readonly communicationService: CommunicationService) {}
-
-    sendTimeToServer(): void {
-        const newTimeMessage: Message = {
-            title: 'Hello from the client',
-            body: 'Time is : ' + new Date().toString(),
-        };
-        // Important de ne pas oublier "subscribe" ou l'appel ne sera jamais lancé puisque personne l'observe
-        this.communicationService.basicPost(newTimeMessage).subscribe({
-            next: (response) => {
-                const responseString = `Le serveur a reçu la requête a retourné un code ${response.status} : ${response.statusText}`;
-                this.message.next(responseString);
-            },
-            error: (err: HttpErrorResponse) => {
-                const responseString = `Le serveur ne répond pas et a retourné : ${err.message}`;
-                this.message.next(responseString);
-            },
-        });
+    constructor(
+        securityServicesProvider: SecurityServicesProvider,
+        materialServicesProvider: MaterialServicesProvider,
+        private readonly router: Router,
+    ) {
+        this.authService = securityServicesProvider.auth;
+        this.sessionService = securityServicesProvider.session;
+        this.dialogService = materialServicesProvider.dialog;
+        this.snackBarService = materialServicesProvider.snackBar;
     }
 
-    getMessagesFromServer(): void {
-        this.communicationService
-            .basicGet()
-            // Cette étape transforme l'objet Message en un seul string
-            .pipe(
-                map((message: Message) => {
-                    return `${message.title} ${message.body}`;
-                }),
-            )
-            .subscribe(this.message);
+    validateAdmin() {
+        const token = this.sessionService.getSession();
+
+        if (token) {
+            this.authService.verify({ token: token ? token : '' }).subscribe({
+                next: () => {
+                    this.router.navigate(['/admin']);
+                },
+                error: () => {
+                    this.promptAdminLogin();
+                },
+            });
+        } else {
+            this.promptAdminLogin();
+        }
+    }
+
+    private promptAdminLogin() {
+        const dialogRef = this.dialogService.open(PromptDialogComponent, {
+            width: '50%',
+            data: {
+                title: 'Authentification',
+                message: 'Veuillez entrer le mot de passe administrateur',
+                placeholder: 'Mot de passe',
+                value: '',
+                submitText: 'Valider',
+                cancelText: 'Annuler',
+                hideAnswer: true,
+            },
+        });
+
+        dialogRef.afterClosed().subscribe(({ value }) => {
+            this.authService.login({ username: 'Admin', password: value }).subscribe({
+                next: (payload: AuthPayload) => {
+                    this.sessionService.setSession(payload.token);
+                    this.router.navigate(['/admin']);
+                },
+                error: () => {
+                    this.snackBarService.open("Échec de l'authentification", 'OK', {
+                        verticalPosition: 'top',
+                        panelClass: ['base-snackbar'],
+                    });
+                },
+            });
+        });
     }
 }

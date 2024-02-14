@@ -1,0 +1,18 @@
+.buttons-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.edit-button {
+    background-color: var(--answer-color-blue);
+}
+
+.export-button {
+    background-color: var(--main-bg-color);
+}
+
+.delete-button {
+    background-color: var(--answer-color-red);
+}

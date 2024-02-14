@@ -1,3 +1,13 @@
+:root {
+    --back-color : #121212;
+    --objet-color : aliceblue;
+}
+
+.logo {
+    width: 500px;
+    height: 500px;
+}
+
 .container {
     min-height: 100vh;
     height: auto;
@@ -10,35 +20,63 @@
     align-items: center;
 }
 
+.admin-container {
+    margin-top: auto;
+    margin-left: auto;
+}
+
 .button {
+    width: 550px;
+    height: 120px;
+    padding: 8px 22px;
+    border-radius: 6px;
+    background-color: aliceblue;
+    transition: all 0.2s ease;
     margin-top: 10px;
     text-align: center;
+    font-size: 24px;
+    font-weight: bold;
 }
+
+
+.button:hover {
+    transform: scale(0.96);
+}
+
+.button.admin-button {
+    width: 200px;
+    height: 80px;
+    text-align: center;
+}
+
 
 .team-name {
-    margin-top: 0.25em;
-    margin-bottom: 0.25em;
-    color: green;
-}
-
-.header-item {
-    justify-content: center;
-    text-align: center;
+    margin-top: auto;
+    margin-bottom: auto;
 }
 
 .footer-item {
-    text-align: center;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+    color: aliceblue;
+    font-weight: bold;
 }
 
-.footer-item p :nth-child(even) {
-    color: orange;
-}
-.footer-item p :nth-child(odd) {
-    color: blue;
+.trademark {
+    display: flex;
+    flex-direction: column;
+
 }
 
 .server-message {
     justify-content: center;
     width: 20%;
-    min-width: min-content;
+    min-height: min-content;
+}
+
+.header {
+    height: 500px;
+    justify-content: center;
 }

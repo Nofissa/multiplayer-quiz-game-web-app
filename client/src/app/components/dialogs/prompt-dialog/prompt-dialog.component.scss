@@ -1,0 +1,22 @@
+.form-wrapper {
+    display: flex;
+    flex-direction: column;
+}
+
+mat-dialog-actions {
+    justify-content: center;
+    width: 100%;
+    padding: 0px 24px 20px 24px;
+}
+
+.mat-mdc-dialog-title {
+    text-align: center;
+}
+
+mat-dialog-content mat-form-field {
+    margin: 2% 0px;
+}
+
+.text-centered {
+    text-align: center;
+}
