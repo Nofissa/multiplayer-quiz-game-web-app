@@ -90,7 +90,7 @@ export class QuizListComponent implements OnInit {
             },
             error: (error: HttpErrorResponse) => {
                 if (error.error.message.length) {
-                    this.handleSnackbarError(error.message);
+                    this.handleSnackbarError(error.error.message);
                 } else {
                     this.handleSnackbarError('Erreur lors de la création du quiz');
                 }
