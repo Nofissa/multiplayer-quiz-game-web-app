@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Quiz } from '@app/interfaces/quiz';
 import { QuizHttpService } from '@app/services/quiz-http/quiz-http.service';
 
@@ -15,6 +15,7 @@ export class GamePageComponent implements OnInit {
     constructor(
         private readonly quizHttpService: QuizHttpService,
         private readonly activatedRoute: ActivatedRoute,
+        private readonly router: Router,
     ) {}
 
     ngOnInit() {
@@ -25,8 +26,13 @@ export class GamePageComponent implements OnInit {
     loadQuiz() {
         const quizId = this.activatedRoute.snapshot.queryParams['quizId'];
 
-        this.quizHttpService.getVisibleQuizById(quizId).subscribe((quiz: Quiz) => {
-            this.quiz = quiz;
+        this.quizHttpService.getVisibleQuizById(quizId).subscribe({
+            next: (quiz: Quiz) => {
+                this.quiz = quiz;
+            },
+            error: () => {
+                this.router.navigateByUrl('/create-game');
+            },
         });
     }
 

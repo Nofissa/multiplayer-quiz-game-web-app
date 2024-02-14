@@ -3,20 +3,29 @@
 @import 'swiper/scss/pagination';
 @import 'swiper/css/effect-coverflow';
 
-.container {
+.create-game-page-wrapper {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.create-game-container {
     height: 100%;
     width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
 }
 
 .slider-effectCoverFlow {
-    width: 50%;
-    height: 10 px;
-    margin: 40px auto;
-
+    box-sizing: border-box;
     .swiper {
         width: 100%;
-        padding-top: 250px;
-        padding-bottom: 250px;
+        padding-top: 25%;
+        padding-bottom: 25%;
     }
 
     .swiper-slide,
@@ -28,7 +37,6 @@
         justify-content: center;
         align-items: center;
         cursor: pointer;
-
         width: 300px;
         height: 300px;
         transition:
@@ -91,4 +99,8 @@
         font-size: 15px;
         font-weight: bold;
     }
+}
+
+.header {
+    height: 100px;
 }

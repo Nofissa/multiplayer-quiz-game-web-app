@@ -1,7 +1,7 @@
 // for mongodb's _id fields
 /* eslint-disable no-underscore-dangle */
 import { Component, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, ParamMap } from '@angular/router';
@@ -12,8 +12,10 @@ import { MaterialServicesProvider } from '@app/providers/material-services.provi
 import { QuestionInteractionService } from '@app/services/question-interaction/question-interaction.service';
 import { QuestionSharingService } from '@app/services/question-sharing/question-sharing.service';
 import { QuizHttpService } from '@app/services/quiz-http/quiz-http.service';
+import { SNACK_MESSAGE_DURATION } from '@app/constants';
 
 const ID_LENGTH = 10;
+const DURATION = 10;
 
 @Component({
     selector: 'app-qcmcreation-page',
@@ -42,10 +44,6 @@ export class QCMCreationPageComponent implements OnInit {
         this.snackBarService = materialServicesProvider.snackBar;
     }
 
-    get questions(): FormArray {
-        return this.formGroup.get('questions') as FormArray;
-    }
-
     ngOnInit() {
         this.activatedRoute.queryParamMap.subscribe((paramMap: ParamMap) => {
             const quizId = paramMap.get('quizId');
@@ -53,7 +51,7 @@ export class QCMCreationPageComponent implements OnInit {
             this.setupForm();
 
             if (quizId) {
-                this.quizHttpService.getVisibleQuizById(quizId).subscribe((quiz: Quiz) => {
+                this.quizHttpService.getQuizById(quizId).subscribe((quiz: Quiz) => {
                     if (quiz) {
                         this.quiz = quiz;
                         this.questionsContainer = this.quiz.questions;
@@ -76,7 +74,7 @@ export class QCMCreationPageComponent implements OnInit {
 
             this.questionInteractionService.registerOnEditQuestion((question: Question) => {
                 const dialogRef = this.dialogService.open(UpsertQuestionDialogComponent, {
-                    data: { title: 'Moddifier une question', question },
+                    data: { title: 'Modifier une question', question },
                 });
                 dialogRef.afterClosed().subscribe({
                     next: (data: Question) => {
@@ -136,7 +134,47 @@ export class QCMCreationPageComponent implements OnInit {
         });
     }
 
-    generateRandomString(length: number = ID_LENGTH): string {
+    submitQuiz() {
+        if (this.questionsContainer.length !== 0 && this.formGroup.valid) {
+            const quiz: Quiz = {
+                id: this.quiz ? this.quiz.id : this.generateRandomString(),
+                title: this.formGroup.value.title,
+                description: this.formGroup.value.description,
+                duration: this.formGroup.value.duration,
+                questions: this.questionsContainer,
+                isHidden: true,
+                lastModification: new Date(),
+                // eslint-disable-next-line no-underscore-dangle
+                _id: this.quiz ? this.quiz._id : '',
+            };
+
+            if (this.quiz) {
+                this.quizHttpService.updateQuiz(quiz).subscribe({
+                    next: (updatedQuiz: Quiz) => {
+                        this.quiz = updatedQuiz;
+                        this.snackBarService.open('Le quiz a été enregistré avec succès', '', { duration: SNACK_MESSAGE_DURATION });
+                    },
+                    error: () => {
+                        this.snackBarService.open("Le quiz n'a pas pu être modifié", '', { duration: SNACK_MESSAGE_DURATION });
+                    },
+                });
+            } else {
+                this.quizHttpService.createQuiz(quiz).subscribe({
+                    next: (createdQuiz: Quiz) => {
+                        this.quiz = createdQuiz;
+                        this.snackBarService.open('Le quiz a été enregistré avec succès', '', { duration: SNACK_MESSAGE_DURATION });
+                    },
+                    error: () => {
+                        this.snackBarService.open("Le quiz n'a pas pu être créer", '', { duration: SNACK_MESSAGE_DURATION });
+                    },
+                });
+            }
+        } else {
+            this.snackBarService.open("L'un des paramètres est erroné, veuillez réessayer", '', { duration: SNACK_MESSAGE_DURATION });
+        }
+    }
+
+    private generateRandomString(length: number = ID_LENGTH): string {
         const lettersAndDigits = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         let randomString = '';
 
@@ -148,52 +186,15 @@ export class QCMCreationPageComponent implements OnInit {
         return randomString;
     }
 
-    submitQuiz() {
-        if (this.questionsContainer.length !== 0) {
-            const quiz: Quiz = {
-                id: this.generateRandomString(),
-                title: this.formGroup.value.title,
-                description: this.formGroup.value.description,
-                duration: 10,
-                questions: this.questionsContainer,
-                isHidden: true,
-                lastModification: new Date(),
-                _id: this.quiz._id,
-            };
-
-            if (this.quiz) {
-                this.quizHttpService.updateQuiz(quiz).subscribe({
-                    next: (updatedQuiz: Quiz) => {
-                        this.quiz = updatedQuiz;
-                        this.snackBarService.open('Le quiz a été enregistré avec succès', '', { duration: 2000 });
-                    },
-                    error: () => {
-                        this.snackBarService.open("Le quiz n'a pas pu être modifié", '', { duration: 2000 });
-                    },
-                });
-            } else {
-                this.quizHttpService.createQuiz(quiz).subscribe({
-                    next: (createdQuiz: Quiz) => {
-                        this.quiz = createdQuiz;
-                        this.snackBarService.open('Le quiz a été enregistré avec succès', '', { duration: 2000 });
-                    },
-                    error: () => {
-                        this.snackBarService.open("Le quiz n'a pas pu être créer", '', { duration: 2000 });
-                    },
-                });
-            }
-        } else {
-            this.snackBarService.open("L'un des paramètres est erroné, veuillez réessayer", '', { duration: 3000 });
-        }
-    }
-
     private setupForm(quiz?: Quiz) {
         const title = quiz?.title ? quiz.title : '';
         const description = quiz?.description ? quiz.description : '';
+        const duration = quiz?.duration ? quiz.duration : DURATION;
 
         this.formGroup = this.formBuilder.group({
             title: [title, Validators.required],
             description: [description, Validators.required],
+            duration: [duration, Validators.required],
         });
     }
 }

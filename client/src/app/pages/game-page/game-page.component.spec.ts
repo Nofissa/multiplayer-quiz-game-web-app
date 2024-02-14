@@ -5,7 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Quiz } from '@app/interfaces/quiz';
 import { QuizHttpService } from '@app/services/quiz-http/quiz-http.service';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { GamePageComponent } from './game-page.component';
 
 describe('gamePage', () => {
@@ -68,14 +68,6 @@ describe('gamePage', () => {
         expect(placeholderAttribute).toBe('Envoyer un message');
     });
 
-    it('should contain logo during the game', () => {
-        fixture.detectChanges();
-        const logo = fixture.debugElement.query(By.css('.logo'));
-        expect(logo).toBeTruthy();
-        const srcAttribute = logo.nativeElement.getAttribute('src');
-        expect(srcAttribute).toBe('/assets/img/logo.png');
-    });
-
     it('should go in test mode when queryParams isTest is true', () => {
         fixture = TestBed.createComponent(GamePageComponent);
         component = fixture.componentInstance;
@@ -114,5 +106,15 @@ describe('gamePage', () => {
 
         expect(quizHttpService.getVisibleQuizById).toHaveBeenCalledWith('a1b2c3');
         expect(component.quiz).toEqual(mockQuiz);
+    }));
+
+    it('should navigate to /create-game if there is an error loading the quiz', fakeAsync(() => {
+        spyOn(quizHttpService, 'getVisibleQuizById').and.returnValue(throwError(() => 'Error'));
+        spyOn(component['router'], 'navigateByUrl');
+
+        component.loadQuiz();
+        tick();
+
+        expect(component['router'].navigateByUrl).toHaveBeenCalledWith('/create-game');
     }));
 });

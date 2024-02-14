@@ -23,6 +23,8 @@ const SNACK_BAR_DURATION_MS = 3000;
     providers: [QuestionInteractionService],
 })
 export class QuestionBankComponent implements OnInit {
+    private static hasSetupServices = false;
+
     @Input()
     options: QuestionListOptions;
 
@@ -47,23 +49,11 @@ export class QuestionBankComponent implements OnInit {
     ngOnInit() {
         this.loadQuestions();
 
-        this.questionSharingService.subscribe((question: Question) => {
-            if (!this.questions.includes(question)) {
-                this.addQuestion(question);
-            }
-        });
-        this.questionInteractionService.registerOnAddQuestion(() => {
-            this.openAddQuestionDialog();
-        });
-        this.questionInteractionService.registerOnEditQuestion((question: Question) => {
-            this.openEditQuestionDialog(question);
-        });
-        this.questionInteractionService.registerOnDeleteQuestion((question: Question) => {
-            this.openDeleteQuestionDialog(question);
-        });
-        this.questionInteractionService.registerOnShareQuestion((question: Question) => {
-            this.shareQuestion(question);
-        });
+        if (!QuestionBankComponent.hasSetupServices) {
+            this.setupServices();
+
+            QuestionBankComponent.hasSetupServices = true;
+        }
     }
 
     openAddQuestionDialog() {
@@ -130,6 +120,27 @@ export class QuestionBankComponent implements OnInit {
             if (isSubmited) {
                 this.deleteQuestion(question);
             }
+        });
+    }
+
+    private setupServices() {
+        this.questionSharingService.subscribe((question: Question) => {
+            if (this.questions.every((x) => x.text !== question.text)) {
+                this.addQuestion(question);
+            }
+        });
+
+        this.questionInteractionService.registerOnAddQuestion(() => {
+            this.openAddQuestionDialog();
+        });
+        this.questionInteractionService.registerOnEditQuestion((question: Question) => {
+            this.openEditQuestionDialog(question);
+        });
+        this.questionInteractionService.registerOnDeleteQuestion((question: Question) => {
+            this.openDeleteQuestionDialog(question);
+        });
+        this.questionInteractionService.registerOnShareQuestion((question: Question) => {
+            this.shareQuestion(question);
         });
     }
 
