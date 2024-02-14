@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -28,24 +29,38 @@ export class QuizListComponent implements OnInit {
     importQuiz(event: Event) {
         this.fetchQuizzes();
         const file = (event.target as HTMLInputElement)?.files?.[0];
-        if (file) {
+        if (this.filechecker(event)) {
             const reader = new FileReader();
             reader.onload = (e) => {
-                const quiz = this.tryParse(e);
-                if (!quiz) {
-                    return;
-                }
-                if (this.isQuizNameTaken(quiz)) {
-                    this.openPromptDialog(quiz);
-                } else {
-                    this.handleImportSubscription(quiz);
-                }
+                this.readFiles(e);
             };
-            reader.readAsText(file);
+            if (file) {
+                reader.readAsText(file);
+            }
         }
     }
 
-    private openPromptDialog(quiz: Quiz) {
+    readFiles(e: ProgressEvent<FileReader>) {
+        const quiz = this.tryParse(e);
+        if (!quiz) {
+            return;
+        }
+        if (this.isQuizNameTaken(quiz)) {
+            this.openPromptDialog(quiz);
+        } else {
+            this.handleImportSubscription(quiz);
+        }
+    }
+
+    filechecker(event: Event) {
+        const file = (event.target as HTMLInputElement)?.files?.[0];
+        if (file) {
+            return true;
+        }
+        return false;
+    }
+
+    openPromptDialog(quiz: Quiz) {
         const dialogRef = this.dialog.open(PromptDialogComponent, {
             width: '30%',
             data: {
@@ -58,8 +73,8 @@ export class QuizListComponent implements OnInit {
                 hideAnswer: false,
             },
         });
-        dialogRef.afterClosed().subscribe((value) => {
-            quiz.title = value.value;
+        dialogRef.afterClosed().subscribe((data) => {
+            quiz.title = data.value;
             if (this.isQuizNameTaken(quiz)) {
                 this.handleSnackbarError('Nom de quiz déjà existant');
             } else {
@@ -68,13 +83,13 @@ export class QuizListComponent implements OnInit {
         });
     }
 
-    private handleImportSubscription(quiz: Quiz) {
+    handleImportSubscription(quiz: Quiz) {
         this.quizHttpService.createQuiz(quiz).subscribe({
             next: (createdQuiz: Quiz) => {
                 this.quizzes.push(createdQuiz);
             },
-            error: (error: Error) => {
-                if (error.message.length) {
+            error: (error: HttpErrorResponse) => {
+                if (error.error.message.length) {
                     this.handleSnackbarError(error.message);
                 } else {
                     this.handleSnackbarError('Erreur lors de la création du quiz');
@@ -83,7 +98,7 @@ export class QuizListComponent implements OnInit {
         });
     }
 
-    private tryParse(e: ProgressEvent<FileReader>): Quiz | null {
+    tryParse(e: ProgressEvent<FileReader>): Quiz | null {
         try {
             return JSON.parse(e.target?.result as string);
         } catch (error) {
@@ -92,7 +107,7 @@ export class QuizListComponent implements OnInit {
         }
     }
 
-    private isQuizNameTaken(quiz: Quiz): boolean {
+    isQuizNameTaken(quiz: Quiz): boolean {
         return this.quizzes.some((q) => q.title === quiz.title);
     }
 
@@ -104,8 +119,10 @@ export class QuizListComponent implements OnInit {
     }
 
     private fetchQuizzes() {
-        this.quizHttpService.getAllQuizzes().subscribe((quizzes: Quiz[]) => {
-            this.quizzes = quizzes;
-        });
+        if (this.quizHttpService.getAllQuizzes()) {
+            this.quizHttpService.getAllQuizzes().subscribe((quizzes: Quiz[]) => {
+                this.quizzes = quizzes;
+            });
+        }
     }
 }

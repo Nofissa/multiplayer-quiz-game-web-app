@@ -45,9 +45,12 @@ export class QuizComponent {
 
     deleteQuiz() {
         // eslint-disable-next-line no-underscore-dangle
-        this.quizHttpService.deleteQuizById(this.quiz._id).subscribe(() => {
-            this.isDeleted = true;
-        });
+        if (this.quizHttpService.deleteQuizById(this.quiz._id)) {
+            // eslint-disable-next-line no-underscore-dangle
+            this.quizHttpService.deleteQuizById(this.quiz._id).subscribe(() => {
+                this.isDeleted = true;
+            });
+        }
     }
 
     editQuiz() {
