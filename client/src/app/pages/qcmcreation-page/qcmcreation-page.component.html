@@ -33,7 +33,7 @@
                         [interactionService]="questionInteractionService"
                         [options]="{share: true, create: true, edit: true, delete: true, drag:true, numberOrder: true}"></app-question-list>
                 </div>
-                <button id="submit-quiz" type="submit" (click)="submitQuiz()" mat-flat-button>
+                <button id="submit-quiz" (mouseUp)="submitQuiz()" mat-flat-button>
                     Valider
                 </button>
             </form>
