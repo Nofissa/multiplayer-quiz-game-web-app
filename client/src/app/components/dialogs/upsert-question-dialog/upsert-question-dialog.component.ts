@@ -6,9 +6,9 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Choice } from '@common/choice';
 import { Question } from '@app/interfaces/question';
 import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog-data';
+import { MAX_CHOICE_COUNT, MIN_CHOICE_COUNT, SNACK_MESSAGE_DURATION, POINT_VALUE_BASE_MULTIPLE } from '@app/constants';
 
-const MAX_CHOICE_COUNT = 4;
-const POINT_VALUE_BASE_MULTIPLE = 10;
+const ID_LENGTH = 10;
 
 @Component({
     selector: 'app-upsert-question-dialog',
@@ -20,6 +20,7 @@ export class UpsertQuestionDialogComponent {
     formBuilder: FormBuilder = new FormBuilder();
     formGroup: FormGroup;
     choicesArray: FormArray;
+    toggle: boolean;
 
     constructor(
         @Inject(MAT_DIALOG_DATA) readonly data: UpsertQuestionDialogData,
@@ -36,6 +37,8 @@ export class UpsertQuestionDialogComponent {
             [Validators.required, this.oneFalseValidator(), this.oneTrueValidator()],
         ) as FormArray<FormGroup>;
 
+        this.toggle = this.data.question.type === 'QCM' ? false : true;
+
         this.formGroup = this.formBuilder.group({
             text: [this.data.question.text, Validators.required],
             choices: this.choicesArray,
@@ -51,22 +54,46 @@ export class UpsertQuestionDialogComponent {
         return this.formGroup.controls['choices'] as FormArray<FormGroup>;
     }
 
+    get qcmToggled() {
+        return this.toggle;
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     drop(event: CdkDragDrop<any[]>): void {
         moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
     }
 
+    generateRandomString(length: number = ID_LENGTH): string {
+        const lettersAndDigits = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let randomString = '';
+
+        for (let i = 0; i < length; i++) {
+            const randomIndex: number = Math.floor(Math.random() * lettersAndDigits.length);
+            randomString += lettersAndDigits.charAt(randomIndex);
+        }
+
+        return randomString;
+    }
+
     addAnswer() {
-        this.choicesArray.push(
-            this.formBuilder.group({
-                text: ['', Validators.required],
-                isCorrect: [false],
-            }),
-        );
+        if (this.choicesArray.length < MAX_CHOICE_COUNT) {
+            this.choicesArray.push(
+                this.formBuilder.group({
+                    text: ['', Validators.required],
+                    isCorrect: [false],
+                }),
+            );
+        }
+    }
+
+    doToggle() {
+        this.toggle = !this.toggle;
     }
 
     removeAnswerAt(index: number) {
-        this.choicesArray.removeAt(index);
+        if (this.choicesArray.length > MIN_CHOICE_COUNT) {
+            this.choicesArray.removeAt(index);
+        }
     }
 
     cancel() {
@@ -74,19 +101,35 @@ export class UpsertQuestionDialogComponent {
     }
 
     submit() {
-        if (this.formGroup.valid) {
+        if (this.formGroup.valid && !this.toggle) {
             const question: Question = {
-                type: 'QCM',
+                type: this.toggle ? 'QRL' : 'QCM',
                 text: this.formGroup.value.text,
                 points: this.formGroup.value.points,
                 choices: this.formGroup.value.choices,
                 lastModification: new Date(),
-                _id: '',
+                // eslint-disable-next-line no-underscore-dangle
+                _id: this.data.question._id ? this.data.question._id : this.generateRandomString(),
             };
 
             this.dialogRef.close(question);
         } else {
-            this.snackBar.open("L'un des paramètres est erroné, veuillez réessayer", '', { duration: 2000 });
+            let snackString = 'Une erreur est présente dans les champs :';
+
+            if (this.toggle) {
+                snackString += " QRL n'est pas implémenté,";
+            } else {
+                if (!this.formGroup.controls.text.valid) {
+                    snackString += ' question,';
+                }
+                if (!this.formGroup.controls.choices.valid) {
+                    snackString += ' réponses,';
+                }
+                if (!this.formGroup.controls.points.valid) {
+                    snackString += ' points,';
+                }
+            }
+            this.snackBar.open(snackString + ' veuillez réessayer', '', { duration: SNACK_MESSAGE_DURATION });
         }
     }
 

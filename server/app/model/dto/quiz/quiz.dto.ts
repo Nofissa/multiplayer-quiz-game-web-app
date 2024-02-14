@@ -1,7 +1,7 @@
 import { QuestionDto } from '@app/model/dto/question/question.dto';
 import { Type } from 'class-transformer';
 import { IsArray, IsBoolean, IsDate, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
-
+import 'reflect-metadata';
 export class QuizDto {
     @IsString({ message: "le champ '_id' de quiz devrait être une chaîne de caractères" })
     @IsOptional()
