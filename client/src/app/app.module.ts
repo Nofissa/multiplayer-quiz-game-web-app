@@ -20,7 +20,6 @@ import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { SwiperModule } from 'swiper/angular';
 import { LoaderAnimationComponent } from './components/animations/loader-animation/loader-animation.component';
 import { ConfirmationDialogComponent } from './components/dialogs/confirmation-dialog/confirmation-dialog.component';
-import { LoginDialogComponent } from './components/dialogs/login-dialog/login-dialog.component';
 import { PromptDialogComponent } from './components/dialogs/prompt-dialog/prompt-dialog.component';
 import { QuizDetailsDialogComponent } from './components/dialogs/quiz-details-dialog/quiz-details-dialog.component';
 import { UpsertQuestionDialogComponent } from './components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
@@ -55,7 +54,6 @@ import { WaitingRoomPageComponent } from './pages/waiting-room-page/waiting-room
         ConfirmationDialogComponent,
         QuizListComponent,
         QuizComponent,
-        LoginDialogComponent,
         QuestionListComponent,
         ConfirmationDialogComponent,
         QuestionBankComponent,
