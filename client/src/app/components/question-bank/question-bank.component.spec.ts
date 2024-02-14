@@ -83,6 +83,8 @@ describe('QuestionBankComponent', () => {
         fixture = TestBed.createComponent(QuestionBankComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
+        component.ngOnInit();
+        QuestionBankComponent['hasSetupServices'] = false;
         component.questions = [];
     });
 
@@ -114,6 +116,7 @@ describe('QuestionBankComponent', () => {
             expect(questionSharingServiceSpy.share).toHaveBeenCalled();
             expect(addQuestionSpy).toHaveBeenCalled();
         });
+
         it('should add a question to questions[] when a question is submitted', () => {
             dialogRefSpy.afterClosed.and.callFake(() => of({ ...mockQuestions[0] }));
             component.openAddQuestionDialog();

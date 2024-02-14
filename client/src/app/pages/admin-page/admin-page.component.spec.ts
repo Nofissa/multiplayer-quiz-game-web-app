@@ -1,6 +1,6 @@
 /* eslint-disable max-classes-per-file */
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -16,14 +16,9 @@ class MockSessionService {
     }
 }
 
-class MockAuthService {
-    verify() {
-        return of();
-    }
-}
-
 describe('adminPage', () => {
     const mockRouter = jasmine.createSpyObj('Router', ['navigateByUrl']);
+    let verifySpy: jasmine.Spy;
     let component: AdminPageComponent;
     let fixture: ComponentFixture<AdminPageComponent>;
 
@@ -33,17 +28,26 @@ describe('adminPage', () => {
             imports: [RouterTestingModule, HttpClientTestingModule],
             providers: [
                 SecurityServicesProvider,
-                { provide: AuthService, useClass: MockAuthService },
+                AuthService,
                 { provide: SessionService, useClass: MockSessionService },
                 { provide: Router, useValue: mockRouter },
             ],
         }).compileComponents();
+
+        const authService = TestBed.inject(AuthService);
+        verifySpy = spyOn(authService, 'verify');
+        verifySpy.and.returnValue(of(undefined));
     });
 
     beforeEach(() => {
         fixture = TestBed.createComponent(AdminPageComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
+    });
+
+    afterEach(() => {
+        verifySpy.calls.reset();
+        mockRouter.navigateByUrl.calls.reset();
     });
 
     it('should create component', () => {
@@ -101,15 +105,15 @@ describe('adminPage', () => {
     });
 
     it('should redirect to home page on verification error', () => {
-        component['authService'].verify = jasmine.createSpy().and.returnValue(throwError(() => new Error('Verification error')));
+        verifySpy.and.returnValue(throwError(() => new Error('Verification error')));
         component.ngOnInit();
         expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('/');
     });
 
-    it('should not redirect on successful verification', fakeAsync(() => {
-        spyOn(component.getSession(), 'getSession').and.returnValue('token');
+    it('should not redirect on successful verification', () => {
+        verifySpy.and.returnValue(of(undefined));
+        spyOn(component['sessionService'], 'getSession').and.returnValue('validToken');
         component.ngOnInit();
-        tick();
         expect(mockRouter.navigateByUrl).not.toHaveBeenCalled();
-    }));
+    });
 });

@@ -128,7 +128,7 @@ describe('CreateGamePageComponent', () => {
         const dialogConfig = getDialogConfig();
         dialogConfig.onNotFound();
         expect(dialogRefMock.close).toHaveBeenCalled();
-        expect(snackBarMock.open).toHaveBeenCalledWith("Le quiz n'est plus disponible", 'OK', jasmine.any(Object));
+        expect(snackBarMock.open).toHaveBeenCalledWith("Le quiz n'est plus disponible, veuillez en sélectionner un autre", 'OK', jasmine.any(Object));
         expect(component.loadQuizzes).toHaveBeenCalled();
     });
 });
