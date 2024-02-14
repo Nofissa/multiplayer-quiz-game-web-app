@@ -60,7 +60,7 @@ export class CreateGamePageComponent implements OnInit {
                 },
                 onNotFound: () => {
                     dialogRef.close();
-                    this.snackBarService.open("Le quiz n'est plus disponible", 'OK', {
+                    this.snackBarService.open("Le quiz n'est plus disponible, veuillez en sélectionner un autre", 'OK', {
                         duration: SNACK_BAR_DURATION_MS,
                         verticalPosition: 'top',
                         panelClass: ['base-snackbar'],
