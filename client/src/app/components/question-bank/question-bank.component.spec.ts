@@ -12,7 +12,7 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { questionStub } from '@app/TestStubs/question.stubs';
 
-fdescribe('QuestionBankComponent', () => {
+describe('QuestionBankComponent', () => {
     let component: QuestionBankComponent;
     let fixture: ComponentFixture<QuestionBankComponent>;
 

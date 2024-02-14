@@ -129,7 +129,7 @@ describe('MainPage', () => {
 
     describe('promptAdminLogin', () => {
         it('should set session and navigate to admin page after successful login', fakeAsync(() => {
-            const dialogRefSpyObj = jasmine.createSpyObj({ afterClosed: of({ password: 'adminPassword' }) });
+            const dialogRefSpyObj = jasmine.createSpyObj({ afterClosed: of({ value: 'adminPassword' }) });
 
             authServiceSpy.login.and.returnValue(of({ token: 'validToken' }));
             dialogServiceSpy.open.and.returnValue(dialogRefSpyObj);
@@ -144,7 +144,7 @@ describe('MainPage', () => {
         }));
 
         it('should show snackbar on authentication failure', fakeAsync(() => {
-            const dialogRefSpyObj = jasmine.createSpyObj({ afterClosed: of({ password: 'invalidAdminPassword' }) });
+            const dialogRefSpyObj = jasmine.createSpyObj({ afterClosed: of({ value: 'invalidAdminPassword' }) });
 
             authServiceSpy.login.and.returnValue(throwError(() => 'Invalid credentials'));
             dialogServiceSpy.open.and.returnValue(dialogRefSpyObj);

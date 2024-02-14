@@ -4,6 +4,7 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { QuizHttpService } from './quiz-http.service';
 import { Quiz } from '@app/interfaces/quiz';
+import { HttpErrorResponse } from '@angular/common/http';
 
 describe('QuizHttpService', () => {
     let service: QuizHttpService;
@@ -156,8 +157,8 @@ describe('QuizHttpService', () => {
         const errorMessage = 'Internal Server Error';
         service.getAllQuizzes().subscribe({
             next: () => fail('Expected an error, but the request succeeded'),
-            error: (error) => {
-                expect(error).toEqual(errorMessage);
+            error: (errorResponse: HttpErrorResponse) => {
+                expect(errorResponse.error).toEqual(errorMessage);
             },
         });
 
