@@ -28,6 +28,7 @@ export class QuizDto {
     lastModification?: Date;
 
     @IsArray({ message: "le champ 'questions' de quiz devrait être un tableau" })
+    @Type(() => QuestionDto)
     @ValidateNested({ each: true })
     questions: QuestionDto[];
 

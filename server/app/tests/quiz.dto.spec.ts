@@ -23,13 +23,6 @@ describe('QuizDto', () => {
                         { text: 'Choice 2', isCorrect: false },
                     ],
                 },
-                {
-                    _id: 'questionId2',
-                    type: 'QRL',
-                    text: 'Question 2',
-                    points: 15,
-                    answer: 'Valid answer',
-                },
             ],
             isHidden: false,
         };

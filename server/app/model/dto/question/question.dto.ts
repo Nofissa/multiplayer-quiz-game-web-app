@@ -34,6 +34,7 @@ export class QuestionDto {
     @ArrayMaxSize(ValidationValues.MaxAnswersSize, {
         message: `le champ 'choices' de question devrait être de taille plus petite ou égale ${ValidationValues.MaxAnswersSize}`,
     })
+    @Type(() => ChoiceDto)
     @ValidateNested({ each: true })
     choices: ChoiceDto[];
 
