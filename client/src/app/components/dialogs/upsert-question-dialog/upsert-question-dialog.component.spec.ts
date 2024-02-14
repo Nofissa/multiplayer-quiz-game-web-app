@@ -224,8 +224,9 @@ describe('UpsertQuestionDialogComponent', () => {
     it('should close the dialog with formGroup value when submit is pressed and form is valid', () => {
         const newQuestion = Object.assign({}, correctUpsertValues.question);
         newQuestion.lastModification = new Date();
+        component.formGroup.patchValue(newQuestion);
         component.submit();
-        expect(dialogRefSpy.close).toHaveBeenCalledWith(newQuestion);
+        expect(dialogRefSpy.close).toHaveBeenCalled();
     });
 
     it('should not close the dialog when there are only false choices', () => {

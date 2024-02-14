@@ -123,7 +123,7 @@ export class QuestionBankComponent implements OnInit {
         });
     }
 
-    private setupServices() {
+    setupServices() {
         this.questionSharingService.subscribe((question: Question) => {
             if (this.questions.every((x) => x.text !== question.text)) {
                 this.addQuestion(question);
