@@ -1,14 +1,13 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService } from '@app/services/auth.service';
-import { SessionService } from '@app/services/session.service';
+import { AuthService } from '@app/services/auth/auth.service';
+import { SessionService } from '@app/services/session/session.service';
 import { AuthPayload } from '@common/auth-payload';
-import { LoginDialogComponent } from '@app/components/dialogs/login-dialog/login-dialog.component';
-import { LoginDialogData } from '@app/interfaces/login-dialog-data';
 import { MaterialServicesProvider } from '@app/providers/material-services.provider';
 import { SecurityServicesProvider } from '@app/providers/security-services.provider';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { PromptDialogComponent } from '@app/components/dialogs/prompt-dialog/prompt-dialog.component';
 
 @Component({
     selector: 'app-main-page',
@@ -50,13 +49,21 @@ export class MainPageComponent {
     }
 
     private promptAdminLogin() {
-        const dialogRef = this.dialogService.open(LoginDialogComponent, {
+        const dialogRef = this.dialogService.open(PromptDialogComponent, {
             width: '50%',
-            data: { password: '' },
+            data: {
+                title: 'Authentification',
+                message: 'Veuillez entrer le mot de passe administrateur',
+                placeholder: 'Mot de passe',
+                value: '',
+                submitText: 'Valider',
+                cancelText: 'Annuler',
+                hideAnswer: true,
+            },
         });
 
-        dialogRef.afterClosed().subscribe((data: LoginDialogData) => {
-            this.authService.login({ username: 'Admin', password: data.password }).subscribe({
+        dialogRef.afterClosed().subscribe(({ value }) => {
+            this.authService.login({ username: 'Admin', password: value }).subscribe({
                 next: (payload: AuthPayload) => {
                     this.sessionService.setSession(payload.token);
                     this.router.navigate(['/admin']);

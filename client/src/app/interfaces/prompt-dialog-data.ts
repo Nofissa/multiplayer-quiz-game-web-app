@@ -5,4 +5,5 @@ export interface PromptDialogData {
     value: string;
     submitText: string;
     cancelText: string;
+    hideAnswer: boolean;
 }

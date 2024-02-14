@@ -1,3 +1,5 @@
+// for mongodb's _id fields
+/* eslint-disable no-underscore-dangle */
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
@@ -7,9 +9,9 @@ import { UpsertQuestionDialogComponent } from '@app/components/dialogs/upsert-qu
 import { Question } from '@app/interfaces/question';
 import { Quiz } from '@app/interfaces/quiz';
 import { MaterialServicesProvider } from '@app/providers/material-services.provider';
-import { QuestionInteractionService } from '@app/services/question-interaction.service';
-import { QuestionSharingService } from '@app/services/question-sharing.service';
-import { QuizHttpService } from '@app/services/quiz-http.service';
+import { QuestionInteractionService } from '@app/services/question-interaction/question-interaction.service';
+import { QuestionSharingService } from '@app/services/question-sharing/question-sharing.service';
+import { QuizHttpService } from '@app/services/quiz-http/quiz-http.service';
 
 const ID_LENGTH = 10;
 
@@ -89,7 +91,6 @@ export class QCMCreationPageComponent implements OnInit {
             });
 
             this.questionSharingService.subscribe((question: Question) => {
-                // eslint-disable-next-line no-underscore-dangle
                 if (!this.questionsContainer.find((x) => x._id === question._id)) {
                     this.questionsContainer.push(question);
                 }
@@ -157,7 +158,7 @@ export class QCMCreationPageComponent implements OnInit {
                 questions: this.questionsContainer,
                 isHidden: true,
                 lastModification: new Date(),
-                _id: '',
+                _id: this.quiz._id,
             };
 
             if (this.quiz) {

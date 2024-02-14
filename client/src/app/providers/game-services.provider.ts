@@ -1,7 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import { Injectable } from '@angular/core';
-import { KeyBindingService } from '@app/services/key-binding.service';
-import { TimerService } from '@app/services/timer-service';
+import { KeyBindingService } from '@app/services/key-binding/key-binding.service';
+import { TimerService } from '@app/services/timer/timer.service';
 
 @Injectable({
     providedIn: 'root',

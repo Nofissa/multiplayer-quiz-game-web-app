@@ -1,8 +1,8 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
 import { SecurityServicesProvider } from '@app/providers/security-services.provider';
-import { AuthService } from '@app/services/auth.service';
-import { SessionService } from '@app/services/session.service';
+import { AuthService } from '@app/services/auth/auth.service';
+import { SessionService } from '@app/services/session/session.service';
 
 @Component({
     selector: 'app-admin-page',

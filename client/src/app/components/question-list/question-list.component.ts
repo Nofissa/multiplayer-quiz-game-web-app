@@ -2,8 +2,8 @@
 import { Component, Input } from '@angular/core';
 import { Question } from '@app/interfaces/question';
 import { QuestionListOptions } from '@app/interfaces/question-list-options';
-import { QuestionInteractionService } from '@app/services/question-interaction.service';
-import { QuestionSharingService } from '@app/services/question-sharing.service';
+import { QuestionInteractionService } from '@app/services/question-interaction/question-interaction.service';
+import { QuestionSharingService } from '@app/services/question-sharing/question-sharing.service';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 @Component({

@@ -1,7 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import { Injectable } from '@angular/core';
-import { AuthService } from '@app/services/auth.service';
-import { SessionService } from '@app/services/session.service';
+import { AuthService } from '@app/services/auth/auth.service';
+import { SessionService } from '@app/services/session/session.service';
 
 @Injectable({
     providedIn: 'root',
