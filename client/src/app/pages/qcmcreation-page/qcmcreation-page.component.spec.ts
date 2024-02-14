@@ -5,7 +5,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { QCMCreationPageComponent } from './qcmcreation-page.component';
 import { ActivatedRoute } from '@angular/router';
-import { Subject, of } from 'rxjs';
+import { Subject, of, throwError } from 'rxjs';
 import { Quiz } from '@app/interfaces/quiz';
 import { Question } from '@app/interfaces/question';
 import { UpsertQuestionDialogComponent } from '@app/components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
@@ -15,7 +15,6 @@ import SpyObj = jasmine.SpyObj;
 import { QuestionSharingService } from '@app/services/question-sharing/question-sharing.service';
 import { MaterialServicesProvider } from '@app/providers/material-services.provider';
 import { FormBuilder } from '@angular/forms';
-import { throwError } from 'rxjs/internal/observable/throwError';
 import { questionStub } from '@app/TestStubs/question.stubs';
 import { quizStub } from '@app/TestStubs/quiz.stubs';
 
