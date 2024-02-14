@@ -59,7 +59,9 @@ export class QuizComponent {
     }
 
     exportQuiz() {
-        const blob = new Blob([JSON.stringify(this.quiz)], { type: 'text/json;charset=utf-8' });
+        // eslint-disable-next-line no-unused-vars
+        const { isHidden, ...quizCopy } = this.quiz;
+        const blob = new Blob([JSON.stringify(quizCopy)], { type: 'text/json;charset=utf-8' });
         saveAs(blob, `${this.quiz.title}.json`);
     }
 

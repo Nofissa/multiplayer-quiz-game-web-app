@@ -54,6 +54,19 @@ export class QuestionBankComponent implements OnInit {
 
             QuestionBankComponent.hasSetupServices = true;
         }
+
+        this.questionInteractionService.registerOnAddQuestion(() => {
+            this.openAddQuestionDialog();
+        });
+        this.questionInteractionService.registerOnEditQuestion((question: Question) => {
+            this.openEditQuestionDialog(question);
+        });
+        this.questionInteractionService.registerOnDeleteQuestion((question: Question) => {
+            this.openDeleteQuestionDialog(question);
+        });
+        this.questionInteractionService.registerOnShareQuestion((question: Question) => {
+            this.shareQuestion(question);
+        });
     }
 
     openAddQuestionDialog() {
@@ -125,22 +138,9 @@ export class QuestionBankComponent implements OnInit {
 
     setupServices() {
         this.questionSharingService.subscribe((question: Question) => {
-            if (this.questions.every((x) => x.text !== question.text)) {
+            if (!this.questions.includes(question)) {
                 this.addQuestion(question);
             }
-        });
-
-        this.questionInteractionService.registerOnAddQuestion(() => {
-            this.openAddQuestionDialog();
-        });
-        this.questionInteractionService.registerOnEditQuestion((question: Question) => {
-            this.openEditQuestionDialog(question);
-        });
-        this.questionInteractionService.registerOnDeleteQuestion((question: Question) => {
-            this.openDeleteQuestionDialog(question);
-        });
-        this.questionInteractionService.registerOnShareQuestion((question: Question) => {
-            this.shareQuestion(question);
         });
     }
 
