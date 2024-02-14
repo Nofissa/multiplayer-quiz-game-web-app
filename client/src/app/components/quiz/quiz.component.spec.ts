@@ -3,7 +3,7 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
 import { Quiz } from '@app/interfaces/quiz';
-import { QuizHttpService } from '@app/services/quiz-http.service';
+import { QuizHttpService } from '@app/services/quiz-http/quiz-http.service';
 import { saveAs } from 'file-saver';
 import { of } from 'rxjs';
 import { QuizComponent } from './quiz.component';

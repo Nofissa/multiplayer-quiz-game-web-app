@@ -5,8 +5,8 @@ import { By } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { SecurityServicesProvider } from '@app/providers/security-services.provider';
-import { AuthService } from '@app/services/auth.service';
-import { SessionService } from '@app/services/session.service';
+import { AuthService } from '@app/services/auth/auth.service';
+import { SessionService } from '@app/services/session/session.service';
 import { of, throwError } from 'rxjs';
 import { AdminPageComponent } from './admin-page.component';
 
