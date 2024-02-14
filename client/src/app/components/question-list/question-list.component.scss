@@ -1,5 +1,6 @@
 .container {
     height: auto;
+    width: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -20,6 +21,12 @@
 .text-centered {
     display: block;
     text-align: center;
+}
+
+.text-index {
+    color: black;
+    text-align: center;
+    align-self: center;
 }
 
 .centered {
@@ -92,6 +99,7 @@
     min-height: 80px;
     height: fit-content;
     border-radius: 5px;
+    width: 95%;
 }
 
 .question-body {
@@ -182,7 +190,7 @@
 }
 
 .action-add {
-    color: var(--secondary-fg-color);
+    color: var(--answer-color-blue);
     font-size: 2.5rem;
 }
 

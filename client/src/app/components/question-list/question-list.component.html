@@ -1,6 +1,9 @@
 <div *ngIf="options.drag" CDKDropListGroup class="drag-container container">
     <div cdkDropList [cdkDropListData]="questions" (cdkDropListDropped)="drop($event)" class="list scrollable column">
         <div *ngFor="let question of questions; let i = index" class="question-container" cdkDrag>
+            <div *ngIf="options.numberOrder" class="text-index">
+                <p class="text-index">{{i+1}}</p>
+            </div>
             <div class="question-body column">
                 <div *ngIf="options.edit || options.delete || options.share" class="overlay">
                     <div class="actions">
@@ -20,13 +23,9 @@
                         </div>
                     </div>
                 </div>
-                <div class="question-header">
-                    <div *ngIf="options.numberOrder" class="question-index">
-                        {{i+1}}
-                    </div>
-                    <div class="question-content">
-                        <span class="text-centered">{{ question.text }}</span>
-                    </div>
+
+                <div class="question-content">
+                    <span class="text-centered">{{ question.text }}</span>
                 </div>
                 <div *ngIf="options.displayLastModified" class="last-modified-wrapper">
                     <span class="text-centered">

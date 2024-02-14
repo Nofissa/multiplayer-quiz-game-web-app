@@ -1,3 +1,9 @@
+.header-container {
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
 #editable-textfields-containers {
     justify-content: space-evenly;
 }
@@ -5,6 +11,10 @@
 .flex-column {
     display: flex;
     flex-direction: column;
+}
+
+.fields-container{
+    width: 100%;
 }
 
 .flex-row {
@@ -20,6 +30,8 @@
 
 #questions-container {
     width : 100%;
+    justify-content: center;
+    align-items: center;
 }
 
 #description {
@@ -27,12 +39,20 @@
     resize: none;
 }
 
+.quiz-edit-form{
+    max-width: 500px;
+    margin: 20px;
+    width: 100%;
+    display: flex;
+    flex-grow: 2;
+    justify-content: center;
+    align-items: center;
+}
 
 #quiz-creation-page {
     justify-content: space-evenly;
     display: flex;
     flex-direction: row;
-    height: 100vh;
 }
 
 #quiz-creation-page > * {
@@ -46,7 +66,26 @@ form {
     padding: 15px;
     border-radius: 15px;
     width: 100%;
-    max-width: 600px;
+    max-width: 500px;
+}
+
+.slider-container{
+    margin: 10px;
+    justify-content: center;
+    align-content: center;
+}
+
+.slider-container label{
+    text-align: center;
+}
+
+.slider-container{
+    justify-content: center;
+    align-content: center;
+}
+
+.slider-container label{
+    text-align: center;
 }
 
 #text-editables {
@@ -58,13 +97,12 @@ form {
     visibility: hidden;
 }
 
-.form-wrapper {
-    display: flex;
-    flex-grow: 2;
-    justify-content: center;
-    height: 100%;
-    align-items: center;
+app-question-list {
+    display: contents;
+    width: 100%;
+    justify-self: center;
 }
+
 
 .question-bank-wrapper {
     display: flex;
@@ -79,4 +117,9 @@ h3 {
 
 .header {
     height: 100px;
+}
+
+app-question-bank{
+    justify-self: center;
+    margin: 20px;
 }

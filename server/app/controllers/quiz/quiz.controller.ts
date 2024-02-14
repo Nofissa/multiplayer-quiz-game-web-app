@@ -43,15 +43,15 @@ export class QuizController {
             if (quiz) {
                 response.status(HttpStatus.OK).json(quiz);
             } else {
-                response.status(HttpStatus.NOT_FOUND).send('cannot find quiz');
+                response.status(HttpStatus.NOT_FOUND).send("Can't find quiz");
             }
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send('error while getting the quiz');
+            response.status(HttpStatus.NOT_FOUND).send('Error while getting the quiz');
         }
     }
 
     @ApiCreatedResponse({
-        description: 'Add new question',
+        description: 'Create a new quiz',
     })
     @ApiNotFoundResponse({
         description: 'Return NOT_FOUND http status when request fails',
@@ -63,29 +63,29 @@ export class QuizController {
             const createdQuiz = await this.quizService.addQuiz(dto);
             response.status(HttpStatus.CREATED).json(createdQuiz);
         } catch (error) {
-            response.status(HttpStatus.BAD_REQUEST).send('Cant add quiz');
+            response.status(HttpStatus.BAD_REQUEST).send("Can't add quiz");
         }
     }
 
     @ApiOkResponse({
-        description: 'Modify a quiz',
+        description: 'Update or insert a quiz',
         type: Quiz,
     })
     @ApiNotFoundResponse({
         description: 'Return NOT_FOUND http status when request fails',
     })
     @Put('/')
-    async modifyQuiz(@Body() dto: QuizDto, @Res() response: Response) {
+    async upsertQuiz(@Body() dto: QuizDto, @Res() response: Response) {
         try {
-            const quiz: Quiz = await this.quizService.modifyQuiz(dto);
+            const quiz: Quiz = await this.quizService.upsertQuiz(dto);
             response.status(HttpStatus.OK).json(quiz);
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send('Cant find quiz to modify');
+            response.status(HttpStatus.NOT_FOUND).send("Can't find quiz to modify");
         }
     }
 
     @ApiOkResponse({
-        description: 'Toggle the hidden state of quiz',
+        description: 'Toggle the visibility of a quiz',
         type: Quiz,
     })
     @ApiNotFoundResponse({
@@ -97,7 +97,7 @@ export class QuizController {
             const quiz: Quiz = await this.quizService.hideQuizById(id);
             response.status(HttpStatus.OK).json(quiz);
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send('Cant find quiz to hide');
+            response.status(HttpStatus.NOT_FOUND).send("Can't find quiz to hide");
         }
     }
 
@@ -113,7 +113,7 @@ export class QuizController {
             await this.quizService.deleteQuizById(id);
             response.status(HttpStatus.OK).send();
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send('Cant find quiz to delete');
+            response.status(HttpStatus.NOT_FOUND).send("Can't find quiz to delete");
         }
     }
 }
