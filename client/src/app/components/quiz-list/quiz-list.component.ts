@@ -55,6 +55,7 @@ export class QuizListComponent implements OnInit {
                 value: '',
                 submitText: 'Corriger',
                 cancelText: 'Annuler',
+                hideAnswer: false,
             },
         });
         dialogRef.afterClosed().subscribe((value) => {
