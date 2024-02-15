@@ -67,7 +67,7 @@ describe('QuizListComponent', () => {
 
     it('should return a Quiz object on successful parsing', () => {
         tryParseSpy.and.callThrough();
-        const result = component['tryParse'](mockProgressEvent);
+        const result = component['parseQuiz'](mockProgressEvent);
 
         expect(result).toEqual(
             jasmine.objectContaining({ _id: '1', id: '1', title: 'Quiz Title', questions: [], duration: '15', description: 'Quiz Title' }),
@@ -76,7 +76,7 @@ describe('QuizListComponent', () => {
 
     it('should return null on unsuccessful parsing', () => {
         tryParseSpy.calls.reset();
-        const result = component['tryParse']('{}' as unknown as ProgressEvent<FileReader>);
+        const result = component['parseQuiz']('{}' as unknown as ProgressEvent<FileReader>);
 
         expect(result).toBeNull();
     });
@@ -157,7 +157,7 @@ describe('QuizListComponent', () => {
 
     it('should readfile parse if quiz is different', () => {
         mockQuizHttpService.createQuiz.and.returnValue(of(mockQuiz));
-        component['readFiles'](mockProgressEvent);
+        component['readFile'](mockProgressEvent);
         expect(tryParseSpy).toHaveBeenCalled();
     });
 
@@ -165,14 +165,14 @@ describe('QuizListComponent', () => {
         isQuizNameTakenSpy.and.returnValue(true);
         mockDialog.open.and.returnValue(mockDialogRef);
         handleImportSubscriptionSpy.and.stub();
-        component['readFiles'](mockProgressEvent);
+        component['readFile'](mockProgressEvent);
         expect(tryParseSpy).toHaveBeenCalled();
         expect(isQuizNameTakenSpy).toHaveBeenCalled();
     });
 
     it('should return if file is null', () => {
         tryParseSpy.and.returnValue(null);
-        component['readFiles'](mockProgressEvent);
+        component['readFile'](mockProgressEvent);
         expect(tryParseSpy).toHaveBeenCalled();
     });
 
