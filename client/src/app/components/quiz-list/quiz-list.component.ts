@@ -5,6 +5,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { PromptDialogComponent } from '@app/components/dialogs/prompt-dialog/prompt-dialog.component';
 import { Quiz } from '@app/interfaces/quiz';
 import { QuizHttpService } from '@app/services/quiz-http/quiz-http.service';
+import { Observable } from 'rxjs';
 
 const SNACKBAR_DURATION = 5000;
 
@@ -23,21 +24,26 @@ export class QuizListComponent implements OnInit {
     ) {}
 
     ngOnInit() {
-        this.fetchQuizzes();
+        this.observeFetchQuizzes().subscribe((quizzes: Quiz[]) => {
+            this.quizzes = quizzes;
+        });
     }
 
     importQuiz(event: Event) {
-        this.fetchQuizzes();
-        const file = (event.target as HTMLInputElement)?.files?.[0];
-        if (this.filechecker(event)) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                this.readFiles(e);
-            };
-            if (file) {
-                reader.readAsText(file);
+        this.observeFetchQuizzes().subscribe((quizzes: Quiz[]) => {
+            this.quizzes = quizzes;
+            const file = (event.target as HTMLInputElement)?.files?.[0];
+
+            if (this.filechecker(event)) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    this.readFiles(e);
+                };
+                if (file) {
+                    reader.readAsText(file);
+                }
             }
-        }
+        });
     }
 
     readFiles(e: ProgressEvent<FileReader>) {
@@ -118,11 +124,7 @@ export class QuizListComponent implements OnInit {
         });
     }
 
-    private fetchQuizzes() {
-        if (this.quizHttpService.getAllQuizzes()) {
-            this.quizHttpService.getAllQuizzes().subscribe((quizzes: Quiz[]) => {
-                this.quizzes = quizzes;
-            });
-        }
+    private observeFetchQuizzes(): Observable<Quiz[]> {
+        return this.quizHttpService.getAllQuizzes();
     }
 }
