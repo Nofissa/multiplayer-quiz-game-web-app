@@ -10,12 +10,9 @@ class IsValidChoicesConstraint implements ValidatorConstraintInterface {
 
         return hasTrue && hasFalse;
     }
-
-    defaultMessage(args: ValidationArguments) {
-        return args.constraints[0] || "Le champ 'choices' devrait contenir au moins une entrée valide et une autre entrée invalide";
-    }
 }
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export const IsValidChoices = (validationOptions?: ValidationOptions) => {
     return (object: object, propertyName: string) => {
         registerDecorator({
