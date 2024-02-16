@@ -39,9 +39,7 @@ export class QuizListComponent implements OnInit {
                 reader.onload = (progessEvent) => {
                     this.readFile(progessEvent);
                 };
-                if (file) {
-                    reader.readAsText(file);
-                }
+                reader.readAsText(file);
             }
         });
     }
@@ -53,7 +51,7 @@ export class QuizListComponent implements OnInit {
             return;
         }
 
-        if (this.isQuizNameTaken(quiz)) {
+        if (this.quizzes.some((q) => q.title === quiz.title)) {
             this.openPromptDialog(quiz);
         } else {
             this.handleImportSubscription(quiz);
@@ -105,10 +103,6 @@ export class QuizListComponent implements OnInit {
                 }
             },
         });
-    }
-
-    isQuizNameTaken(quiz: Quiz): boolean {
-        return this.quizzes.some((q) => q.title === quiz.title);
     }
 
     private parseQuiz(e: ProgressEvent<FileReader>): Quiz | null {

@@ -14,13 +14,8 @@ import { saveAs } from 'file-saver';
 export class QuizComponent {
     @Input()
     quiz: Quiz;
-    @Input()
-    onDelete: (quiz: Quiz) => void;
-
     @Output()
-    refresh = new EventEmitter<void>();
-
-    isDeleted: boolean = false;
+    delete = new EventEmitter<Quiz>(); // Output event for deletion
 
     constructor(
         // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -46,7 +41,7 @@ export class QuizComponent {
     }
 
     deleteQuiz() {
-        this.onDelete(this.quiz);
+        this.delete.emit(this.quiz);
     }
 
     editQuiz() {
