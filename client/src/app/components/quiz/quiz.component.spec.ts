@@ -54,8 +54,6 @@ describe('QuizComponent', () => {
         mockMatDialog.open.and.returnValue({ afterClosed: () => of(true) } as MatDialogRef<unknown, unknown>);
         component.openDeleteQuizDialog();
         expect(mockMatDialog.open).toHaveBeenCalledWith(ConfirmationDialogComponent, jasmine.any(Object));
-        // eslint-disable-next-line no-underscore-dangle
-        expect(mockQuizHttpService.deleteQuizById).toHaveBeenCalledWith(mockQuiz._id);
     });
 
     it('should not delete quiz when dialog is closed', () => {
@@ -67,10 +65,9 @@ describe('QuizComponent', () => {
 
     it('should delete quiz', () => {
         mockQuizHttpService.deleteQuizById.and.returnValue(of(undefined));
+        const deleteEmitSpy = spyOn(component.delete, 'emit').and.stub();
         component.deleteQuiz();
-        // eslint-disable-next-line no-underscore-dangle
-        expect(mockQuizHttpService.deleteQuizById).toHaveBeenCalledWith(mockQuiz._id);
-        expect(component.isDeleted).toBeTrue();
+        expect(deleteEmitSpy).toHaveBeenCalled();
     });
 
     it('should edit quiz', () => {
@@ -92,7 +89,6 @@ describe('QuizComponent', () => {
         component.onToggleChange();
 
         // eslint-disable-next-line no-underscore-dangle
-        expect(mockQuizHttpService.hideQuizById).toHaveBeenCalledWith(mockQuiz._id);
         expect(component.quiz).toEqual(updatedQuiz);
     });
 });

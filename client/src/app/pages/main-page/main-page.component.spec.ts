@@ -119,6 +119,19 @@ describe('MainPage', () => {
 
             expect(dialogServiceSpy.open).toHaveBeenCalled();
         }));
+
+        it('should call open prompt dialog upon error', fakeAsync(() => {
+            const dialogRefSpyObj = jasmine.createSpyObj({ afterClosed: of({ value: 'adminPassword' }) });
+            sessionServiceSpy.getSession.and.returnValue('token');
+            authServiceSpy.verify.and.returnValue(throwError(() => 'Error'));
+            authServiceSpy.login.and.returnValue(throwError(() => 'Error'));
+            dialogServiceSpy.open.and.returnValue(dialogRefSpyObj);
+
+            component.validateAdmin();
+            tick();
+
+            expect(dialogServiceSpy.open).toHaveBeenCalled();
+        }));
     });
 
     describe('promptAdminLogin', () => {
