@@ -37,4 +37,9 @@ export class TimerService {
         clearInterval(this.interval);
         this.interval = undefined;
     }
+
+    pauseTimer() {
+        clearInterval(this.interval);
+        this.interval = undefined;
+    }
 }
