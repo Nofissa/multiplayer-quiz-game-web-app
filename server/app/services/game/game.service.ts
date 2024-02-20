@@ -1,13 +1,13 @@
 import { Game } from '@app/classes/game';
+import { Player } from '@app/classes/player';
 import { generateRandomPin } from '@app/helpers/pin';
 import { Organizer } from '@app/interfaces/organizer';
 import { Choice, Question } from '@app/model/database/question';
 import { ChoiceDto } from '@app/model/dto/choice/choice.dto';
+import { QuizService } from '@app/services/quiz/quiz.service';
 import { EvaluationPayload } from '@common/evaluation-payload';
 import { Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
-import { QuizService } from '@app/services/quiz/quiz.service';
-import { Player } from '@app/classes/player';
 
 const BONUS = 1.2;
 const NO_POINTS = 0;
@@ -28,15 +28,32 @@ export class GameService {
         const quiz = await this.quizService.getQuizById(quizId);
         const organizer: Organizer = { socket, username };
         const game = new Game(pin, quiz, organizer);
-
         this.activeGames.set(pin, game);
+
+        return game;
     }
 
     joinGame(socket: Socket, pin: string, username: string) {
         const player = new Player(socket, username);
         const game = this.activeGames.get(pin);
+        if (game) {
+            game.players.set(socket.id, player);
+            return game.players.get(socket.id);
+        } else {
+            return 'error';
+        }
+    }
 
-        game.players.set(socket.id, player);
+    validatePin(pin: string) {
+        return this.activeGames.get(pin) !== undefined;
+    }
+
+    validateUsername(pin: string, username: string) {
+        const game = this.activeGames.get(pin);
+        if (game) {
+            return ![...game.players.entries()].some(([key, value]) => value.username === username);
+        }
+        return false;
     }
 
     disconnect(socketId: string) {

@@ -9,8 +9,9 @@ import { QuestionService } from './services/question/question.service';
 import { QuizService } from './services/quiz/quiz.service';
 import { AuthController } from './controllers/auth/auth.controller';
 import { AuthService } from './services/auth/auth.service';
-import { GameController } from './controllers/game/game.controller';
 import { GameService } from './services/game/game.service';
+import { GameGateway } from './gateways/game.gateway';
+import { GameEventManager } from './classes/game-event-handler';
 
 @Module({
     imports: [
@@ -27,7 +28,7 @@ import { GameService } from './services/game/game.service';
             { name: Quiz.name, schema: quizSchema },
         ]),
     ],
-    controllers: [AuthController, GameController, QuestionController, QuizController],
-    providers: [AuthService, GameService, QuestionService, QuizService, Logger],
+    controllers: [AuthController, QuestionController, QuizController],
+    providers: [AuthService, GameService, QuestionService, QuizService, Logger, GameGateway, GameEventManager],
 })
 export class AppModule {}
