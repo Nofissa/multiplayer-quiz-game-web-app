@@ -1,4 +1,4 @@
-import { GameEventManager } from '@app/classes/game-event-handler';
+import { GameEventManager } from '@app/classes/game-event-manager';
 import { GameService } from '@app/services/game/game.service';
 import {
     ConnectedSocket,
