@@ -6,8 +6,11 @@ import { Component } from '@angular/core';
     styleUrls: ['./waiting-room-page.component.scss'],
 })
 export class WaitingRoomPageComponent {
+    
+    // constructor(private readonly activatedRoute: ActivatedRoute) {}
 
-    // constructor() {
+    // ngOnInit(): void {
         
     // }
+
 }

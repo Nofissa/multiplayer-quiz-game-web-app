@@ -1,5 +1,7 @@
 import { Game } from '@app/classes/game';
 import { Player } from '@app/classes/player';
+import { GameState } from '@app/enums/game-state';
+import { PlayerState } from '@app/enums/player-state';
 import { generateRandomPin } from '@app/helpers/pin';
 import { Organizer } from '@app/interfaces/organizer';
 import { Choice, Question } from '@app/model/database/question';
@@ -26,11 +28,16 @@ export class GameService {
         }
 
         const quiz = await this.quizService.getQuizById(quizId);
-        const organizer: Organizer = { socket, username };
-        const game = new Game(pin, quiz, organizer);
-        this.activeGames.set(pin, game);
 
-        return game;
+        if (quiz) {
+            const organizer: Organizer = { socket, username };
+            const game = new Game(pin, quiz, organizer);
+            if (game) {
+                this.activeGames.set(pin, game);
+                return game.pin;
+            }
+        }
+        return undefined;
     }
 
     joinGame(socket: Socket, pin: string, username: string) {
@@ -38,22 +45,65 @@ export class GameService {
         const game = this.activeGames.get(pin);
         if (game) {
             game.players.set(socket.id, player);
-            return game.players.get(socket.id);
+            this.playerListViewUpdate(pin);
+            return game.players.has(socket.id);
         } else {
-            return 'error';
+            return false;
         }
     }
 
+    abandonGame(client: Socket, pin: string) {
+        const game = this.activeGames.get(pin);
+        if (game) {
+            if (game.state !== GameState.Opened) {
+                Array.from(game.players.entries())
+                    .filter(([socketId]) => socketId === client.id)
+                    .forEach(([socketId]) => {
+                        game.players.get(socketId).state = PlayerState.Abandonned;
+                    });
+                this.playerListViewUpdate(pin);
+                return game.players.get(client.id).state === PlayerState.Abandonned;
+            } else {
+                game.players.delete(client.id);
+                this.playerListViewUpdate(pin);
+                return !game.players.has(client.id);
+            }
+        }
+        return false;
+    }
+
+    banFromGame(username: string, pin: string) {
+        const game = this.activeGames.get(pin);
+        if (game) {
+            Array.from(game.players.entries())
+                .filter(([, player]) => username === player.username)
+                .forEach(([socketId]) => {
+                    game.players.get(socketId).state = PlayerState.Banned;
+                });
+            this.playerListViewUpdate(pin);
+            return true;
+        }
+        return false;
+    }
+
+    // Join Game Validators
     validatePin(pin: string) {
-        return this.activeGames.get(pin) !== undefined;
+        return this.activeGames.has(pin);
     }
 
     validateUsername(pin: string, username: string) {
         const game = this.activeGames.get(pin);
         if (game) {
-            return ![...game.players.entries()].some(([key, value]) => value.username === username);
+            return ![...game.players.entries()].some(([, value]) => value.username === username);
         }
-        return false;
+        return true;
+    }
+
+    playerListViewUpdate(pin: string) {
+        const game = this.activeGames.get(pin);
+        game.players.forEach((player) => {
+            player.socket.emit('updateList', JSON.stringify(game.players));
+        });
     }
 
     disconnect(socketId: string) {

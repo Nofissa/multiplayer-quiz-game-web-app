@@ -11,7 +11,7 @@ import { AuthController } from './controllers/auth/auth.controller';
 import { AuthService } from './services/auth/auth.service';
 import { GameService } from './services/game/game.service';
 import { GameGateway } from './gateways/game.gateway';
-import { GameEventManager } from './classes/game-event-handler';
+import { GameEventManager } from './classes/game-event-manager';
 
 @Module({
     imports: [

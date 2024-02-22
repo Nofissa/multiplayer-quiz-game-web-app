@@ -34,36 +34,48 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     @SubscribeMessage('createGame')
-    async handleCreation(@MessageBody() data: string, @ConnectedSocket() client: Socket): Promise<string> {
+    async handleCreation(@MessageBody() quizId: string, @ConnectedSocket() client: Socket): Promise<string> {
         try {
-            const pin = await this.gameService.createGame(client, data, 'username');
-            return 'this sentence' + '   ' + pin.pin;
+            const pin = await this.gameService.createGame(client, quizId, 'username');
+            return pin;
         } catch (err) {
             return err;
         }
     }
 
     @SubscribeMessage('joinGame')
-    async handleJoin(@MessageBody() object: string, @ConnectedSocket() client: Socket): Promise<string> {
+    handleJoin(@MessageBody() object: string, @ConnectedSocket() client: Socket): boolean {
         try {
-            const object1 = JSON.parse(object);
-            const players = await this.gameService.joinGame(client, object1.pin, object1.username);
-            return 'this sentence';
+            const stringObject = JSON.parse(object);
+            const isJoined = this.gameService.joinGame(client, stringObject.pin, stringObject.username);
+            return isJoined;
         } catch (err) {
             return err;
         }
     }
 
+    @SubscribeMessage('abandonGame')
+    handleAbandon(@MessageBody() object: string, @ConnectedSocket() client: Socket): boolean {
+        try {
+            const stringObject = JSON.parse(object);
+            const isAbandoned = this.gameService.abandonGame(client, stringObject.pin);
+            return isAbandoned;
+        } catch (err) {
+            return err;
+        }
+    }
+
+    // Join Game Validators
     @SubscribeMessage('validPin')
     handlePinValidation(@MessageBody() object: string): boolean {
-        const object1 = JSON.parse(object);
-        return this.gameService.validatePin(object1.pin) ? true : false;
+        const stringObject = JSON.parse(object);
+        return this.gameService.validatePin(stringObject.pin);
     }
 
     @SubscribeMessage('validUsername')
     handleUsernameValidation(@MessageBody() object: string): boolean {
-        const object1 = JSON.parse(object);
-        return this.gameService.validateUsername(object1.pin, object1.username);
+        const stringObject = JSON.parse(object);
+        return this.gameService.validateUsername(stringObject.pin, stringObject.username);
     }
 
     handleConnection(socket: Socket) {

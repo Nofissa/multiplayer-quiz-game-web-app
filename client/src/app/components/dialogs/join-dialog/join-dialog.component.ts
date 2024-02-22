@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { AbstractControl, AsyncValidatorFn, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { Socket, io } from 'socket.io-client';
@@ -10,7 +10,7 @@ const PIN_LENGTH = 4;
     templateUrl: './join-dialog.component.html',
     styleUrls: ['./join-dialog.component.scss'],
 })
-export class JoinDialogComponent {
+export class JoinDialogComponent implements OnDestroy {
     formGroup: FormGroup;
     private pin: string = '';
     private username: string = '';
@@ -24,6 +24,12 @@ export class JoinDialogComponent {
             pin: [this.pin, [Validators.required], [this.validatePin()]],
             username: [this.username, [Validators.required], [this.validateUsername()]],
         });
+    }
+
+    ngOnDestroy(): void {
+        if (this.socket) {
+            this.socket.disconnect();
+        }
     }
 
     cancel() {
