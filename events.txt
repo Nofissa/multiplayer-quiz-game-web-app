@@ -1,0 +1,13 @@
+Event                   Parametres                              Sortie
+=====================================================================================================
+createGame              ({ quizId: string })                    pin: string (organisateur de la game)
+joinGame                ({ pin: string, username: string })     1. { players: Player[] } (tout le monde dans la game) 2. { chatlogs: ChatLog[] } (socket qui a soumis)
+abandonGame             ({ pin: string })                       Player[] (tout le monde dans la game)
+cancelGame              ({ pin: string })                       void (tout le monde dans la game)
+selectChoice            ({ pin: string, choiceIndex: number })  Submission[] (organisateur de la game)
+submitChoices           ({ pin: string })                       1. { score: number, fastest: boolean } (socket qui a soumis) 2. { isOver: boolean } (tout le monde)
+toggleWaitingRoomLock   ({ pin: string })                       GameState (tout le monde dans la game)
+startTimer              ({ pin: string })                       number (tout le monde dans la game)
+pauseTimer              ({ pin: string })                       number (tout le monde dans la game) // pour sprint 3
+loadNextQuestion        ({ pin: string })                       Question (tout le monde dans la game)
+sendMessage             ({ pin: string, message: string })      Chatlog[] (tout le monde dans la game)

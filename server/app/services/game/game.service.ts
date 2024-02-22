@@ -20,7 +20,7 @@ export class GameService {
 
     constructor(private readonly quizService: QuizService) {}
 
-    async createGame(socket: Socket, quizId: string, username: string) {
+    async createGame(socket: Socket, quizId: string, username: string): Promise<string> {
         let pin = generateRandomPin();
 
         while (this.activeGames.has(pin)) {

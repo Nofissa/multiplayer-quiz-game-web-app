@@ -10,9 +10,10 @@ export class Game {
     quiz: Quiz;
     organizer: Organizer;
     state: GameState;
-    players: Map<string, Player> = new Map();
     chatlogs: Chatlog[] = [];
-    submissions: Submission[] = [];
+    currentQuestionIndex: number = 0;
+    players: Map<string, Player> = new Map();
+    submissions: Map<string, Submission> = new Map();
 
     constructor(pin: string, quiz: Quiz, organizer: Organizer) {
         this.pin = pin;
