@@ -1,0 +1,40 @@
+.mat-mdc-progress-bar {
+    --mdc-linear-progress-active-indicator-height: 20px;
+    --mdc-linear-progress-track-height: 20px !important;
+    width: 70%;
+
+}
+
+// ::ng-deep .mat-mdc-progress-bar {
+//     background: black;
+// }
+
+.choice-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.progress-container {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.histogramme {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    max-height: 66vh;
+    width: 50vw;
+    color: black;
+    background-color: white;
+    border-radius: 15px;
+    border: 2px black solid;
+    overflow: hidden;
+    justify-content: center;
+    align-items: center;
+}

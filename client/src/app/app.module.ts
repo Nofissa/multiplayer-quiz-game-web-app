@@ -8,6 +8,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
@@ -24,6 +25,8 @@ import { PromptDialogComponent } from './components/dialogs/prompt-dialog/prompt
 import { QuizDetailsDialogComponent } from './components/dialogs/quiz-details-dialog/quiz-details-dialog.component';
 import { UpsertQuestionDialogComponent } from './components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
 import { GameComponent } from './components/game/game.component';
+import { HistogrammeComponent } from './components/histogramme/histogramme/histogramme.component';
+import { NavHeaderComponent } from './components/nav-header/nav-header.component';
 import { QuestionBankComponent } from './components/question-bank/question-bank.component';
 import { QuestionListComponent } from './components/question-list/question-list.component';
 import { QuizListComponent } from './components/quiz-list/quiz-list.component';
@@ -31,10 +34,9 @@ import { QuizComponent } from './components/quiz/quiz.component';
 import { AppRoutingModule } from './modules/app-routing.module';
 import { AdminPageComponent } from './pages/admin-page/admin-page.component';
 import { CreateGamePageComponent } from './pages/create-game-page/create-game-page.component';
+import { PlayerResultsPageComponent } from './pages/player-results-page/player-results-page.component';
 import { QCMCreationPageComponent } from './pages/qcmcreation-page/qcmcreation-page.component';
 import { WaitingRoomPageComponent } from './pages/waiting-room-page/waiting-room-page.component';
-import { NavHeaderComponent } from './components/nav-header/nav-header.component';
-
 /**
  * Main module that is used in main.ts.
  * All automatically generated components will appear in this module.
@@ -64,6 +66,8 @@ import { NavHeaderComponent } from './components/nav-header/nav-header.component
         LoaderAnimationComponent,
         PromptDialogComponent,
         NavHeaderComponent,
+        HistogrammeComponent,
+        PlayerResultsPageComponent,
     ],
     imports: [
         AppRoutingModule,
@@ -90,6 +94,7 @@ import { NavHeaderComponent } from './components/nav-header/nav-header.component
         CdkDropList,
         MatSliderModule,
         MatSnackBarModule,
+        MatProgressBarModule,
     ],
 
     providers: [],

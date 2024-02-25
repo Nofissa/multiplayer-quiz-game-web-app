@@ -1,13 +1,13 @@
 import { Component } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
+import { PromptDialogComponent } from '@app/components/dialogs/prompt-dialog/prompt-dialog.component';
+import { MaterialServicesProvider } from '@app/providers/material-services.provider';
+import { SecurityServicesProvider } from '@app/providers/security-services.provider';
 import { AuthService } from '@app/services/auth/auth.service';
 import { SessionService } from '@app/services/session/session.service';
 import { AuthPayload } from '@common/auth-payload';
-import { MaterialServicesProvider } from '@app/providers/material-services.provider';
-import { SecurityServicesProvider } from '@app/providers/security-services.provider';
-import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { PromptDialogComponent } from '@app/components/dialogs/prompt-dialog/prompt-dialog.component';
 
 @Component({
     selector: 'app-main-page',
