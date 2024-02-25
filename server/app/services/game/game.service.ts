@@ -1,18 +1,21 @@
 import { Game } from '@app/classes/game';
-import { Player } from '@app/classes/player';
-import { GameState } from '@app/enums/game-state';
-import { PlayerState } from '@app/enums/player-state';
+import { ClientPlayer } from '@app/classes/client-player';
+import { PlayerState } from '@common/player-state';
 import { generateRandomPin } from '@app/helpers/pin';
-import { Organizer } from '@app/interfaces/organizer';
-import { Choice, Question } from '@app/model/database/question';
-import { ChoiceDto } from '@app/model/dto/choice/choice.dto';
+import { Question } from '@app/model/database/question';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { EvaluationPayload } from '@common/evaluation-payload';
+import { JoinGamePayload } from '@common/join-game-payload';
 import { Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
+import { Player } from '@common/player';
+import { GameEventPayload } from '@app/interfaces/game-event-payload';
+import { DisconnectPayload } from '@app/interfaces/disconnect-payload';
+import { Submission } from '@common/submission';
 
-const BONUS = 1.2;
 const NO_POINTS = 0;
+const NO_BONUS_MULTIPLIER = 1;
+const BONUS_MULTIPLIER = 1.2;
 
 @Injectable()
 export class GameService {
@@ -20,121 +23,168 @@ export class GameService {
 
     constructor(private readonly quizService: QuizService) {}
 
-<<<<<<< Updated upstream
-    async createGame(socket: Socket, quizId: string, username: string): Promise<string> {
-=======
-    async createGame(socket: Socket, quizId: string, username: string): Game {
->>>>>>> Stashed changes
+    async createGame(client: Socket, quizId: string): Promise<GameEventPayload<string>> {
+        const quiz = await this.quizService.getQuizById(quizId);
+
+        if (!quiz) {
+            Promise.reject(`No Quiz with ID ${quizId} exists`);
+        }
+
         let pin = generateRandomPin();
 
         while (this.activeGames.has(pin)) {
             pin = generateRandomPin();
         }
 
-        const quiz = await this.quizService.getQuizById(quizId);
+        const game = new Game(pin, quiz, client);
+        this.activeGames.set(pin, game);
 
-        if (quiz) {
-            const organizer: Organizer = { socket, username };
-            const game = new Game(pin, quiz, organizer);
-            if (game) {
-                this.activeGames.set(pin, game);
-                return game.pin;
-            }
+        return {
+            pin: game.pin,
+            organizer: game.organizer,
+            client,
+            data: null,
+        };
+    }
+
+    joinGame(client: Socket, pin: string, username: string): GameEventPayload<JoinGamePayload> {
+        const game = this.getGame(pin);
+        const player = new ClientPlayer(client, username);
+
+        if (Array.from(game.clientPlayers.values()).some((x) => x.player.username === username && x.player.state === PlayerState.Playing)) {
+            throw new Error(`Username ${username} is already taken for game ${pin}`);
         }
-        return undefined;
+
+        game.clientPlayers.set(client.id, player);
+
+        const players = Array.from(game.clientPlayers.values()).map((x) => x.player);
+        const payload = { players, chatlogs: game.chatlogs };
+
+        return {
+            pin: game.pin,
+            organizer: game.organizer,
+            client,
+            data: payload,
+        };
     }
 
-    joinGame(socket: Socket, pin: string, username: string) {
-        const player = new Player(socket, username);
-        const game = this.activeGames.get(pin);
-        if (game) {
-            game.players.set(socket.id, player);
-            this.playerListViewUpdate(pin);
-            return game.players.has(socket.id);
-        } else {
-            return false;
+    playerAbandon(client: Socket, pin: string): GameEventPayload<Player[]> {
+        const game = this.getGame(pin);
+        const clientPlayer = game.clientPlayers.get(client.id);
+
+        clientPlayer.player.state = PlayerState.Abandonned;
+
+        const clientPlayers = Array.from(game.clientPlayers.values());
+        const players = clientPlayers.map((x) => x.player);
+
+        return {
+            pin: game.pin,
+            organizer: game.organizer,
+            client,
+            data: players,
+        };
+    }
+
+    playerBan(client: Socket, pin: string, username: string): GameEventPayload<Player[]> {
+        const game = this.getGame(pin);
+
+        if (!this.isOrganizer(game, client.id)) {
+            throw new Error(`Client ${client.id} can't ban in game ${pin}`);
         }
-    }
 
-    abandonGame(client: Socket, pin: string) {
-        const game = this.activeGames.get(pin);
-        if (game) {
-            if (game.state !== GameState.Opened) {
-                Array.from(game.players.entries())
-                    .filter(([socketId]) => socketId === client.id)
-                    .forEach(([socketId]) => {
-                        game.players.get(socketId).state = PlayerState.Abandonned;
-                    });
-                this.playerListViewUpdate(pin);
-                return game.players.get(client.id).state === PlayerState.Abandonned;
-            } else {
-                game.players.delete(client.id);
-                this.playerListViewUpdate(pin);
-                return !game.players.has(client.id);
-            }
-        }
-        return false;
-    }
-
-    banFromGame(username: string, pin: string) {
-        const game = this.activeGames.get(pin);
-        if (game) {
-            Array.from(game.players.entries())
-                .filter(([, player]) => username === player.username)
-                .forEach(([socketId]) => {
-                    game.players.get(socketId).state = PlayerState.Banned;
-                });
-            this.playerListViewUpdate(pin);
-            return true;
-        }
-        return false;
-    }
-
-    // Join Game Validators
-    validatePin(pin: string) {
-        return this.activeGames.has(pin);
-    }
-
-    validateUsername(pin: string, username: string) {
-        const game = this.activeGames.get(pin);
-        if (game) {
-            return ![...game.players.entries()].some(([, value]) => value.username === username);
-        }
-        return true;
-    }
-
-    playerListViewUpdate(pin: string) {
-        const game = this.activeGames.get(pin);
-        game.players.forEach((player) => {
-            player.socket.emit('updateList', JSON.stringify(game.players));
+        const clientPlayer = Array.from(game.clientPlayers.values()).find((x) => {
+            return x.player.username.toLowerCase() === username.toLowerCase() && x.player.state === PlayerState.Playing;
         });
+
+        if (clientPlayer) {
+            clientPlayer.player.state = PlayerState.Banned;
+        }
+
+        const clientPlayers = Array.from(game.clientPlayers.values());
+        const players = clientPlayers.map((x) => x.player);
+
+        return {
+            pin: game.pin,
+            organizer: game.organizer,
+            client,
+            data: players,
+        };
     }
 
-    disconnect(socketId: string) {
+    evaluateChoices(client: Socket, pin: string): GameEventPayload<EvaluationPayload> {
+        const game = this.getGame(pin);
+
+        if (game.submissions.get(client.id).isFinal) {
+            throw new Error(`Client ${client.id} already submitted their choices`);
+        }
+
+        game.submissions.get(client.id).isFinal = true;
+
+        const question = game.quiz.questions[game.currentQuestionIndex];
+        const submission = game.submissions.get(client.id);
+
+        const isGoodAnswer = this.isGoodAnswer(question, submission);
+        const isFirstGoodEvaluation =
+            isGoodAnswer && Array.from(game.submissions.values()).filter((x) => x.isFinal && this.isGoodAnswer(question, x)).length === 1;
+        const isLastEvaluation = Array.from(game.submissions.values()).filter((x) => x.isFinal).length === game.clientPlayers.size;
+
+        let score = isGoodAnswer ? question.points : NO_POINTS;
+        score *= isFirstGoodEvaluation ? BONUS_MULTIPLIER : NO_BONUS_MULTIPLIER;
+        const payload = {
+            correctAnswers: question.choices.filter((x) => x.isCorrect),
+            score,
+            isFirstGoodEvaluation,
+            isLastEvaluation,
+        };
+
+        return {
+            pin: game.pin,
+            organizer: game.organizer,
+            client,
+            data: payload,
+        };
+    }
+
+    disconnect(client: Socket): DisconnectPayload {
+        const toCancel = [];
+        const toAbandon = [];
+
         // for each matched organizer, remove all organizer games
         Array.from(this.activeGames.entries())
-            .filter(([, game]) => game.organizer.socket.id === socketId)
+            .filter(([, game]) => game.organizer.id === client.id)
             .forEach(([pin]) => {
-                this.activeGames.delete(pin);
+                toCancel.push(pin);
             });
 
         // for each games, remove matching players
-        Array.from(this.activeGames.values()).forEach((game) => {
-            game.players.delete(socketId);
-        });
+        Array.from(this.activeGames.entries())
+            .filter(([, game]) => Array.from(game.clientPlayers.values()).some((x) => x.socket.id === client.id))
+            .forEach(([pin]) => {
+                toAbandon.push(pin);
+            });
+
+        return { toCancel, toAbandon };
     }
 
-    evaluateChoices(chosenAnswers: ChoiceDto[], question: Question): EvaluationPayload {
-        const correctAnswers: Choice[] = question.choices.filter((x) => x.isCorrect);
-        const correctAnswerTexts: Set<string> = new Set(correctAnswers.map((x) => x.text));
-        const chosenAnswerTexts: Set<string> = new Set(chosenAnswers.map((x) => x.text));
+    private getGame(pin: string): Game {
+        const game = this.activeGames.get(pin);
 
-        const areEqualSets = correctAnswerTexts.size === chosenAnswerTexts.size && [...correctAnswerTexts].every((x) => chosenAnswerTexts.has(x));
-
-        if (areEqualSets) {
-            return { correctAnswers, score: question.points * BONUS };
-        } else {
-            return { correctAnswers, score: NO_POINTS };
+        if (!game) {
+            throw new Error(`No game with pin ${pin} exists`);
         }
+
+        return game;
+    }
+
+    private isOrganizer(game: Game, clientId: string) {
+        return game.organizer.id === clientId;
+    }
+
+    private isGoodAnswer(question: Question, submission: Submission) {
+        const correctAnswers = question.choices.filter((x) => x.isCorrect);
+        const correctAnswerTexts: Set<string> = new Set(correctAnswers.map((x) => x.text));
+        const selectedAnswerTexts: Set<string> = new Set(Array.from(submission.selectedChoices.values()).map((x) => x.text));
+
+        return correctAnswerTexts.size === selectedAnswerTexts.size && Array.from(correctAnswerTexts).every((x) => selectedAnswerTexts.has(x));
     }
 }

@@ -1,88 +1,90 @@
-import { GameEventManager } from '@app/classes/game-event-manager';
+import { GameEventDispatcher } from '@app/classes/game-event-dispatcher';
 import { GameService } from '@app/services/game/game.service';
-import {
-    ConnectedSocket,
-    MessageBody,
-    OnGatewayConnection,
-    OnGatewayDisconnect,
-    SubscribeMessage,
-    WebSocketGateway,
-    WebSocketServer,
-} from '@nestjs/websockets';
+import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
-@WebSocketGateway(3001, {
+@WebSocketGateway(parseInt(process.env.PORT, 10), {
     cors: {
-        origin: 'http://localhost:4200',
-        methods: ['GET', 'POST'],
-        transports: ['websocket', 'polling'],
+        origin: '*',
+        transports: ['websocket'],
         credentials: false,
     },
     allowEIO3: true,
 })
-export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
-    @WebSocketServer() socketServer: Server;
+export class GameGateway implements OnGatewayDisconnect {
+    @WebSocketServer() server: Server;
+    private gameEventDispatcher: GameEventDispatcher;
 
-    constructor(
-        private readonly gameService: GameService,
-        private readonly gameEventManager: GameEventManager,
-    ) {}
-
-    @SubscribeMessage('events')
-    handleMessage(@MessageBody() data: string, @ConnectedSocket() client: Socket): string {
-        return data;
+    constructor(private readonly gameService: GameService) {
+        this.gameEventDispatcher = new GameEventDispatcher(this.server);
     }
 
     @SubscribeMessage('createGame')
-    async handleCreation(@MessageBody() quizId: string, @ConnectedSocket() client: Socket): Promise<string> {
+    async createGame(@ConnectedSocket() client: Socket, @MessageBody() { quizId }: { quizId: string }) {
         try {
-            const pin = await this.gameService.createGame(client, quizId, 'username');
-            return pin;
+            const payload = await this.gameService.createGame(client, quizId);
+            client.join(payload.pin);
+
+            this.gameEventDispatcher.sendToOrganizer('createGame', payload);
         } catch (err) {
             return err;
         }
     }
 
     @SubscribeMessage('joinGame')
-    handleJoin(@MessageBody() object: string, @ConnectedSocket() client: Socket): boolean {
+    joinGame(@ConnectedSocket() client: Socket, @MessageBody() { pin, username }: { pin: string; username: string }) {
         try {
-            const stringObject = JSON.parse(object);
-            const isJoined = this.gameService.joinGame(client, stringObject.pin, stringObject.username);
-            return isJoined;
+            const payload = this.gameService.joinGame(client, pin, username);
+            client.join(payload.pin);
+
+            this.gameEventDispatcher.sendToGame('joinGame', payload);
         } catch (err) {
             return err;
         }
     }
 
-    @SubscribeMessage('abandonGame')
-    handleAbandon(@MessageBody() object: string, @ConnectedSocket() client: Socket): boolean {
+    @SubscribeMessage('playerAbandon')
+    playerAbandon(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
         try {
-            const stringObject = JSON.parse(object);
-            const isAbandoned = this.gameService.abandonGame(client, stringObject.pin);
-            return isAbandoned;
+            const payload = this.gameService.playerAbandon(client, pin);
+            client.leave(pin);
+
+            this.gameEventDispatcher.sendToGame('playerAbandon', payload);
         } catch (err) {
             return err;
         }
     }
 
-    // Join Game Validators
-    @SubscribeMessage('validPin')
-    handlePinValidation(@MessageBody() object: string): boolean {
-        const stringObject = JSON.parse(object);
-        return this.gameService.validatePin(stringObject.pin);
+    @SubscribeMessage('playerBan')
+    playerBan(@ConnectedSocket() client: Socket, @MessageBody() { pin, username }: { pin: string; username: string }) {
+        try {
+            const payload = this.gameService.playerBan(client, pin, username);
+
+            this.gameEventDispatcher.sendToGame('playerBan', payload);
+        } catch (err) {
+            return err;
+        }
     }
 
-    @SubscribeMessage('validUsername')
-    handleUsernameValidation(@MessageBody() object: string): boolean {
-        const stringObject = JSON.parse(object);
-        return this.gameService.validateUsername(stringObject.pin, stringObject.username);
+    @SubscribeMessage('submitChoices')
+    submitChoices(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
+        try {
+            const payload = this.gameService.evaluateChoices(client, pin);
+
+            this.gameEventDispatcher.sendToClient('submitChoices', payload);
+        } catch (err) {
+            return err;
+        }
     }
 
-    handleConnection(socket: Socket) {
-        this.gameEventManager.registerHandlers(socket);
-    }
+    handleDisconnect(client: Socket) {
+        const payload = this.gameService.disconnect(client);
 
-    handleDisconnect(socket: Socket) {
-        this.gameService.disconnect(socket.id);
+        payload.toCancel.forEach(() => {
+            // TODO: call this.cancelGame(client, { pin });
+        });
+        payload.toAbandon.forEach((pin) => {
+            this.playerAbandon(client, { pin });
+        });
     }
 }
