@@ -37,6 +37,7 @@ import { CreateGamePageComponent } from './pages/create-game-page/create-game-pa
 import { PlayerResultsPageComponent } from './pages/player-results-page/player-results-page.component';
 import { QCMCreationPageComponent } from './pages/qcmcreation-page/qcmcreation-page.component';
 import { WaitingRoomPageComponent } from './pages/waiting-room-page/waiting-room-page.component';
+import { HistogrammeSwiperComponent } from './components/histogramme-swiper/histogramme-swiper.component';
 /**
  * Main module that is used in main.ts.
  * All automatically generated components will appear in this module.
@@ -68,6 +69,7 @@ import { WaitingRoomPageComponent } from './pages/waiting-room-page/waiting-room
         NavHeaderComponent,
         HistogrammeComponent,
         PlayerResultsPageComponent,
+        HistogrammeSwiperComponent,
     ],
     imports: [
         AppRoutingModule,
