@@ -33,8 +33,8 @@ export class GameGateway implements OnGatewayInit, OnGatewayDisconnect {
             client.join(payload.pin);
 
             this.gameEventDispatcher.sendToOrganizer('createGame', payload);
-        } catch (err) {
-            return err;
+        } catch (error) {
+            client.emit('error', error.message);
         }
     }
 
@@ -45,8 +45,8 @@ export class GameGateway implements OnGatewayInit, OnGatewayDisconnect {
             client.join(payload.pin);
 
             this.gameEventDispatcher.sendToGame('joinGame', payload);
-        } catch (err) {
-            return err;
+        } catch (error) {
+            client.emit('error', error.message);
         }
     }
 
@@ -57,8 +57,8 @@ export class GameGateway implements OnGatewayInit, OnGatewayDisconnect {
             client.leave(pin);
 
             this.gameEventDispatcher.sendToGame('playerAbandon', payload);
-        } catch (err) {
-            return err;
+        } catch (error) {
+            client.emit('error', error.message);
         }
     }
 
@@ -68,8 +68,8 @@ export class GameGateway implements OnGatewayInit, OnGatewayDisconnect {
             const payload = this.gameService.playerBan(client, pin, username);
 
             this.gameEventDispatcher.sendToGame('playerBan', payload);
-        } catch (err) {
-            return err;
+        } catch (error) {
+            client.emit('error', error.message);
         }
     }
 
@@ -79,8 +79,8 @@ export class GameGateway implements OnGatewayInit, OnGatewayDisconnect {
             const payload = this.gameService.evaluateChoices(client, pin);
 
             this.gameEventDispatcher.sendToClient('submitChoices', payload);
-        } catch (err) {
-            return err;
+        } catch (error) {
+            client.emit('error', error.message);
         }
     }
 

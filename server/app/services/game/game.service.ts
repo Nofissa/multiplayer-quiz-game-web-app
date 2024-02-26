@@ -12,6 +12,7 @@ import { Player } from '@common/player';
 import { GameEventPayload } from '@app/interfaces/game-event-payload';
 import { DisconnectPayload } from '@app/interfaces/disconnect-payload';
 import { Submission } from '@common/submission';
+import { GameState } from '@common/game-state';
 
 const NO_POINTS = 0;
 const NO_BONUS_MULTIPLIER = 1;
@@ -27,7 +28,7 @@ export class GameService {
         const quiz = await this.quizService.getQuizById(quizId);
 
         if (!quiz) {
-            Promise.reject(`No Quiz with ID ${quizId} exists`);
+            Promise.reject(`Aucun quiz ne correspond a l'identifiant ${quizId}`);
         }
 
         let pin = generateRandomPin();
@@ -50,14 +51,23 @@ export class GameService {
     joinGame(client: Socket, pin: string, username: string): GameEventPayload<JoinGamePayload> {
         const game = this.getGame(pin);
         const player = new ClientPlayer(client, username);
+        const clientPlayers = Array.from(game.clientPlayers.values());
 
-        if (Array.from(game.clientPlayers.values()).some((x) => x.player.username === username && x.player.state === PlayerState.Playing)) {
-            throw new Error(`Username ${username} is already taken for game ${pin}`);
+        if (game.state !== GameState.Opened) {
+            throw new Error(`La partie ${pin} n'est pas ouverte`);
+        }
+
+        if (username.toLowerCase() === 'organisateur') {
+            throw new Error('Le nom "Organisateur" est réservé');
+        }
+
+        if (clientPlayers.some((x) => x.player.username.toLowerCase() === username.toLowerCase() && x.player.state === PlayerState.Playing)) {
+            throw new Error(`Le nom d'utilisateur "${username}" est déjà pris`);
         }
 
         game.clientPlayers.set(client.id, player);
 
-        const players = Array.from(game.clientPlayers.values()).map((x) => x.player);
+        const players = clientPlayers.map((x) => x.player);
         const payload = { pin, players, chatlogs: game.chatlogs };
 
         return {
@@ -86,7 +96,7 @@ export class GameService {
         const game = this.getGame(pin);
 
         if (!this.isOrganizer(game, client.id)) {
-            throw new Error(`Client ${client.id} can't ban in game ${pin}`);
+            throw new Error(`Vous n'êtes pas organisateur de la partie ${pin}`);
         }
 
         const clientPlayer = Array.from(game.clientPlayers.values()).find((x) => {
@@ -109,7 +119,7 @@ export class GameService {
         const game = this.getGame(pin);
 
         if (game.submissions.get(client.id).isFinal) {
-            throw new Error(`Client ${client.id} already submitted their choices`);
+            throw new Error('Vous avez déjà soumis vos choix pour cette question');
         }
 
         game.submissions.get(client.id).isFinal = true;
@@ -117,10 +127,10 @@ export class GameService {
         const question = game.quiz.questions[game.currentQuestionIndex];
         const submission = game.submissions.get(client.id);
 
+        const gameSubmissions = Array.from(game.submissions.values());
         const isGoodAnswer = this.isGoodAnswer(question, submission);
-        const isFirstGoodEvaluation =
-            isGoodAnswer && Array.from(game.submissions.values()).filter((x) => x.isFinal && this.isGoodAnswer(question, x)).length === 1;
-        const isLastEvaluation = Array.from(game.submissions.values()).filter((x) => x.isFinal).length === game.clientPlayers.size;
+        const isFirstGoodEvaluation = isGoodAnswer && gameSubmissions.filter((x) => x.isFinal && this.isGoodAnswer(question, x)).length === 1;
+        const isLastEvaluation = gameSubmissions.filter((x) => x.isFinal).length === game.clientPlayers.size;
 
         let score = isGoodAnswer ? question.points : NO_POINTS;
         score *= isFirstGoodEvaluation ? BONUS_MULTIPLIER : NO_BONUS_MULTIPLIER;
@@ -142,16 +152,17 @@ export class GameService {
     disconnect(client: Socket): DisconnectPayload {
         const toCancel = [];
         const toAbandon = [];
+        const gameEntries = Array.from(this.activeGames.entries());
 
         // for each matched organizer, remove all organizer games
-        Array.from(this.activeGames.entries())
+        gameEntries
             .filter(([, game]) => game.organizer.id === client.id)
             .forEach(([pin]) => {
                 toCancel.push(pin);
             });
 
         // for each games, remove matching players
-        Array.from(this.activeGames.entries())
+        gameEntries
             .filter(([, game]) => Array.from(game.clientPlayers.values()).some((x) => x.socket.id === client.id))
             .forEach(([pin]) => {
                 toAbandon.push(pin);
@@ -164,7 +175,7 @@ export class GameService {
         const game = this.activeGames.get(pin);
 
         if (!game) {
-            throw new Error(`No game with pin ${pin} exists`);
+            throw new Error(`Aucune partie ne correspond au pin ${pin}`);
         }
 
         return game;
