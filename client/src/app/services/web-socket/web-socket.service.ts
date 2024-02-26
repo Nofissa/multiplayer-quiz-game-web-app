@@ -18,7 +18,6 @@ export class WebSocketService {
     on<T>(eventName: string, callback: (data: T) => void): Subscription {
         return new Observable<T>((observer) => {
             this.socketInstance.on(eventName, (data: T) => {
-                console.log(data);
                 observer.next(data);
             });
 

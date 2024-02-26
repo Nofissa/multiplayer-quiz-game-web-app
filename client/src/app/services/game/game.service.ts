@@ -41,7 +41,7 @@ export class GameService {
         this.webSocketService.emit('playerAbandon', { pin, username });
     }
 
-    onPlayerAbandon(callback: (players: Player[]) => void): Subscription {
+    onPlayerAbandon(callback: (quitter: Player) => void): Subscription {
         return this.webSocketService.on('playerAbandon', callback);
     }
 
@@ -49,7 +49,7 @@ export class GameService {
         this.webSocketService.emit('playerBan', { pin, username });
     }
 
-    onPlayerBan(callback: (players: Player[]) => void): Subscription {
+    onPlayerBan(callback: (bannedPlayer: Player) => void): Subscription {
         return this.webSocketService.on('playerBan', callback);
     }
 
