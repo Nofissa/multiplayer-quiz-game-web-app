@@ -1,11 +1,11 @@
 <div class="histogramme">
     <h3>{{ data.question }}</h3>
     <div *ngFor="let choice of data.choices" class="choice-container">
-        <legend>{{ choice.text }}</legend>
+        <legend>{{ choice.choice.text }}</legend>
         <div class="progress-container">
             <mat-progress-bar value="{{adjust(choice.playersSelected)}}" 
-                            [class.correct]="choice.isCorrect"
-                            [class.incorrect]="!choice.isCorrect"></mat-progress-bar>
+                            [class.correct]="choice.choice.isCorrect"
+                            [class.incorrect]="!choice.choice.isCorrect"></mat-progress-bar>
             <p>{{ choice.playersSelected }}</p>
         </div>
     </div>

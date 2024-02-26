@@ -1,5 +1,6 @@
+import { Choice } from '@common/choice';
+
 export interface HistogrammeChoiceData {
-    text: string;
+    choice: Choice;
     playersSelected: number;
-    isCorrect: boolean;
 }

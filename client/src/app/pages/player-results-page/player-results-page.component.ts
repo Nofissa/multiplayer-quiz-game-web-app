@@ -12,24 +12,20 @@ export class PlayerResultsPageComponent {
             question: 'hee',
             choices: [
                 {
-                    text: 'choice',
+                    choice: { text: 'choice', isCorrect: true },
                     playersSelected: 10,
-                    isCorrect: true,
                 },
                 {
-                    text: 'choice',
+                    choice: { text: 'choice', isCorrect: true },
                     playersSelected: 10,
-                    isCorrect: true,
                 },
                 {
-                    text: 'choice',
+                    choice: { text: 'choice', isCorrect: false },
                     playersSelected: 10,
-                    isCorrect: false,
                 },
                 {
-                    text: 'choice',
+                    choice: { text: 'choice', isCorrect: false },
                     playersSelected: 10,
-                    isCorrect: false,
                 },
             ],
         },
@@ -37,9 +33,8 @@ export class PlayerResultsPageComponent {
             question: 'hee',
             choices: [
                 {
-                    text: 'choice',
+                    choice: { text: 'choice', isCorrect: true },
                     playersSelected: 10,
-                    isCorrect: true,
                 },
             ],
         },
