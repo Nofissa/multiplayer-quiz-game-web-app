@@ -1,4 +1,4 @@
-import { Choice } from '@common/choice';
+import { Choice } from './choice';
 
 export interface Submission {
     selectedChoices: Choice[];
