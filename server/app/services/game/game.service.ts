@@ -130,15 +130,15 @@ export class GameService {
 
         const gameSubmissions = Array.from(game.submissions.values());
         const isGoodAnswer = this.isGoodAnswer(question, submission);
-        const isFirstGoodEvaluation = isGoodAnswer && gameSubmissions.filter((x) => x.isFinal && this.isGoodAnswer(question, x)).length === 1;
+        const isFirstEvaluation = gameSubmissions.filter((x) => x.isFinal).length === 1;
         const isLastEvaluation = gameSubmissions.filter((x) => x.isFinal).length === game.clientPlayers.size;
 
         let score = isGoodAnswer ? question.points : NO_POINTS;
-        score *= isFirstGoodEvaluation ? BONUS_MULTIPLIER : NO_BONUS_MULTIPLIER;
+        score *= isFirstEvaluation ? BONUS_MULTIPLIER : NO_BONUS_MULTIPLIER;
         const payload = {
             correctAnswers: question.choices.filter((x) => x.isCorrect),
             score,
-            isFirstGoodEvaluation,
+            isFirstGoodEvaluation: isGoodAnswer && isFirstEvaluation,
             isLastEvaluation,
         };
 
