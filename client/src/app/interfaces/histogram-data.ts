@@ -1,6 +1,6 @@
-import { HistogrammeChoice } from './histogramme-choice';
+import { HistogrammeChoiceData } from './histogramme-choice-data';
 
 export interface HistogrammeData {
     question: string;
-    choices: HistogrammeChoice[];
+    choices: HistogrammeChoiceData[];
 }

@@ -3,7 +3,9 @@
     <div *ngFor="let choice of data.choices" class="choice-container">
         <legend>{{ choice.text }}</legend>
         <div class="progress-container">
-            <mat-progress-bar value="{{adjust(choice.playersSelected)}}" ></mat-progress-bar>
+            <mat-progress-bar value="{{adjust(choice.playersSelected)}}" 
+                            [class.correct]="choice.isCorrect"
+                            [class.incorrect]="!choice.isCorrect"></mat-progress-bar>
             <p>{{ choice.playersSelected }}</p>
         </div>
     </div>

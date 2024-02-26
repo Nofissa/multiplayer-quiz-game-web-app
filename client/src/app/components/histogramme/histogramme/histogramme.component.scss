@@ -2,12 +2,17 @@
     --mdc-linear-progress-active-indicator-height: 20px;
     --mdc-linear-progress-track-height: 20px !important;
     width: 70%;
-
 }
 
-// ::ng-deep .mat-mdc-progress-bar {
-//     background: black;
-// }
+::ng-deep .mat-mdc-progress-bar.correct {
+    --mdc-linear-progress-active-indicator-color: green;
+    background: lightgreen;
+}
+
+::ng-deep .mat-mdc-progress-bar.incorrect {
+    --mdc-linear-progress-active-indicator-color: red;
+    background: lightcoral;
+}
 
 .choice-container {
     display: flex;

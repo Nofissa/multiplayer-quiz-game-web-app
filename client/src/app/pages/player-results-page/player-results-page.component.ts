@@ -14,18 +14,22 @@ export class PlayerResultsPageComponent {
                 {
                     text: 'choice',
                     playersSelected: 10,
+                    isCorrect: true,
                 },
                 {
                     text: 'choice',
                     playersSelected: 10,
+                    isCorrect: true,
                 },
                 {
                     text: 'choice',
                     playersSelected: 10,
+                    isCorrect: false,
                 },
                 {
                     text: 'choice',
                     playersSelected: 10,
+                    isCorrect: false,
                 },
             ],
         },
@@ -35,9 +39,10 @@ export class PlayerResultsPageComponent {
                 {
                     text: 'choice',
                     playersSelected: 10,
+                    isCorrect: true,
                 },
             ],
         },
     ];
-    numberOfPlayers: number = 10;
+    numberOfPlayers: number = 30;
 }
