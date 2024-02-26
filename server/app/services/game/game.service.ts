@@ -168,14 +168,12 @@ export class GameService {
         const toAbandon = [];
         const gameEntries = Array.from(this.activeGames.entries());
 
-        // for each matched organizer, remove all organizer games
         gameEntries
             .filter(([, game]) => game.organizer.id === client.id)
             .forEach(([pin]) => {
                 toCancel.push(pin);
             });
 
-        // for each games, remove matching players
         gameEntries
             .filter(([, game]) => Array.from(game.clientPlayers.values()).some((x) => x.socket.id === client.id))
             .forEach(([pin]) => {
