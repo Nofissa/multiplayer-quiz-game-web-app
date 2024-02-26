@@ -28,6 +28,14 @@ export class TimerService {
         this.counter = newTime;
     }
 
+    handleTimer() {
+        this.sio.on('connection', (socket) => {
+            socket.on('startTimer', (pin: string) => {
+                this.startTimer(pin);
+            });
+        });
+    }
+
     private startTimer(pin: string, startValue: number) {
         if (this.interval || !this.gameService.activeGames.has(pin)) return;
         const game = this.gameService.getGame(pin);
