@@ -185,7 +185,7 @@ export class GameService {
         return { toCancel, toAbandon };
     }
 
-    private getGame(pin: string): Game {
+    getGame(pin: string): Game {
         const game = this.activeGames.get(pin);
 
         if (!game) {
@@ -200,10 +200,12 @@ export class GameService {
     }
 
     private isGoodAnswer(question: Question, submission: Submission) {
-        const correctAnswers = question.choices.filter((x) => x.isCorrect);
-        const correctAnswerTexts: Set<string> = new Set(correctAnswers.map((x) => x.text));
-        const selectedAnswerTexts: Set<string> = new Set(Array.from(submission.selectedChoices.values()).map((x) => x.text));
+        const correctAnswersIndices = new Set(question.choices.filter((x) => x.isCorrect).map((_, index) => index));
+        const selectedAnswersIndices = new Set(submission.choices.filter((x) => x.isSelected).map((x) => x.index));
 
-        return correctAnswerTexts.size === selectedAnswerTexts.size && Array.from(correctAnswerTexts).every((x) => selectedAnswerTexts.has(x));
+        return (
+            correctAnswersIndices.size === selectedAnswersIndices.size &&
+            Array.from(selectedAnswersIndices).every((x) => selectedAnswersIndices.has(x))
+        );
     }
 }
