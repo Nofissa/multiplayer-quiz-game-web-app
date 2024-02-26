@@ -84,6 +84,28 @@ export class GameGateway implements OnGatewayInit, OnGatewayDisconnect {
         }
     }
 
+    @SubscribeMessage('cancelGame')
+    cancelGame(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
+        try {
+            const payload = this.gameService.cancelGame(client, pin);
+
+            this.gameEventDispatcher.sendToClient('cancelGame', payload);
+        } catch (err) {
+            return err;
+        }
+    }
+
+    @SubscribeMessage('toggleGameLock')
+    toggleGameLock(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
+        try {
+            const payload = this.gameService.toggleGameLock(client, pin);
+
+            this.gameEventDispatcher.sendToClient('toggleGameLock', payload);
+        } catch (err) {
+            return err;
+        }
+    }
+
     afterInit() {
         this.gameEventDispatcher = new GameEventDispatcher(this.server);
     }
@@ -91,8 +113,8 @@ export class GameGateway implements OnGatewayInit, OnGatewayDisconnect {
     handleDisconnect(client: Socket) {
         const payload = this.gameService.disconnect(client);
 
-        payload.toCancel.forEach(() => {
-            // TODO: call this.cancelGame(client, { pin });
+        payload.toCancel.forEach((pin) => {
+            this.cancelGame(client, { pin });
         });
         payload.toAbandon.forEach((pin) => {
             this.playerAbandon(client, { pin });

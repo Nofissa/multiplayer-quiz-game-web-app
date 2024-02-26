@@ -1,17 +1,18 @@
-import { Game } from '@app/classes/game';
 import { ClientPlayer } from '@app/classes/client-player';
-import { PlayerState } from '@common/player-state';
+import { Game } from '@app/classes/game';
 import { generateRandomPin } from '@app/helpers/pin';
+import { DisconnectPayload } from '@app/interfaces/disconnect-payload';
+import { GameEventPayload } from '@app/interfaces/game-event-payload';
 import { Question } from '@app/model/database/question';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { EvaluationPayload } from '@common/evaluation-payload';
+import { GameState } from '@common/game-state';
 import { JoinGamePayload } from '@common/join-game-payload';
+import { Player } from '@common/player';
+import { PlayerState } from '@common/player-state';
+import { Submission } from '@common/submission';
 import { Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
-import { Player } from '@common/player';
-import { GameEventPayload } from '@app/interfaces/game-event-payload';
-import { DisconnectPayload } from '@app/interfaces/disconnect-payload';
-import { Submission } from '@common/submission';
 
 const NO_POINTS = 0;
 const NO_BONUS_MULTIPLIER = 1;
@@ -158,6 +159,59 @@ export class GameService {
             });
 
         return { toCancel, toAbandon };
+    }
+
+    cancelGame(client: Socket, pin: string) {
+        const game = this.getGame(pin);
+        const deletedGame = this.activeGames.delete(pin);
+
+        if (!deletedGame) {
+            throw new Error(`An error occured whil trying to delete the game with pin : ${pin}`);
+        }
+
+        const organizatorPayload: GameEventPayload<string> = {
+            pin: game.pin,
+            organizer: game.organizer,
+            client,
+            data: 'All the player left. Game has been canceled',
+        };
+
+        const playerPayload: GameEventPayload<string> = {
+            pin: game.pin,
+            organizer: game.organizer,
+            client,
+            data: 'Organizator canceled the game',
+        };
+
+        if (Array.from(game.clientPlayers.values()).every((player) => player.player.state === PlayerState.Abandonned)) {
+            return organizatorPayload;
+        } else {
+            return playerPayload;
+        }
+    }
+    toggleGameLock(client: Socket, pin: string) {
+        const game = this.getGame(pin);
+
+        const lockPayload: GameEventPayload<string> = {
+            pin: game.pin,
+            client,
+            organizer: game.organizer,
+            data: 'The game has been locked by the Organizer',
+        };
+
+        const unlockPayload: GameEventPayload<string> = {
+            pin: game.pin,
+            client,
+            organizer: game.organizer,
+            data: 'The game has been unlocked by the Organizer',
+        };
+        if (game.state === GameState.Opened) {
+            game.state = GameState.Closed;
+            return lockPayload;
+        } else {
+            game.state = GameState.Opened;
+            return unlockPayload;
+        }
     }
 
     private getGame(pin: string): Game {
