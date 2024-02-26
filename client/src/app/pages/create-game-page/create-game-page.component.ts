@@ -65,9 +65,9 @@ export class CreateGamePageComponent implements OnInit, OnDestroy {
         const dialogRef = this.dialogService.open(QuizDetailsDialogComponent, {
             data: {
                 quiz,
-                onStartGame: (receivedQuiz: Quiz) => {
+                onCreateGame: (receivedQuiz: Quiz) => {
                     dialogRef.close();
-                    this.startGame(receivedQuiz);
+                    this.createGame(receivedQuiz);
                 },
                 onTestGame: (receivedQuiz: Quiz) => {
                     dialogRef.close();
@@ -86,7 +86,7 @@ export class CreateGamePageComponent implements OnInit, OnDestroy {
         });
     }
 
-    private startGame(quiz: Quiz) {
+    private createGame(quiz: Quiz) {
         this.gameService.createGame(quiz._id);
     }
 
