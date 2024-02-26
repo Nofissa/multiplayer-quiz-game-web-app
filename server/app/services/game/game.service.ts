@@ -1,11 +1,16 @@
-import { Game } from '@app/classes/game';
 import { ClientPlayer } from '@app/classes/client-player';
-import { PlayerState } from '@common/player-state';
+import { Game } from '@app/classes/game';
 import { generateRandomPin } from '@app/helpers/pin';
+import { DisconnectPayload } from '@app/interfaces/disconnect-payload';
+import { GameEventPayload } from '@app/interfaces/game-event-payload';
 import { Question } from '@app/model/database/question';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { EvaluationPayload } from '@common/evaluation-payload';
+import { GameState } from '@common/game-state';
 import { JoinGamePayload } from '@common/join-game-payload';
+import { Player } from '@common/player';
+import { PlayerState } from '@common/player-state';
+import { Submission } from '@common/submission';
 import { Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
 import { Player } from '@common/player';
@@ -185,7 +190,87 @@ export class GameService {
         return { toCancel, toAbandon };
     }
 
-    getGame(pin: string): Game {
+    cancelGame(client: Socket, pin: string): GameEventPayload<string> {
+        const game = this.getGame(pin);
+        this.activeGames.delete(pin);
+
+        const isOrganizer = this.isOrganizer(game, client.id);
+        const gameHasPlayersLeft = Array.from(game.clientPlayers.values()).some((player) => player.player.state === PlayerState.Playing);
+        if (gameHasPlayersLeft && !isOrganizer) {
+            throw new Error(`Vous n'êtes pas organisateur de la partie ${pin}`);
+        }
+        const payload: GameEventPayload<string> = {
+            pin: game.pin,
+            organizer: game.organizer,
+            client,
+            data: gameHasPlayersLeft ? 'Organizor canceled the game' : 'All the player left. Game has been canceled',
+        };
+
+        return payload;
+    }
+
+    toggleGameLock(client: Socket, pin: string): GameEventPayload<GameState> {
+        const game = this.getGame(pin);
+
+        const isOrganizer = this.isOrganizer(game, client.id);
+
+        if (!isOrganizer) {
+            throw new Error(`Vous n'êtes pas organisateur de la partie ${pin}`);
+        }
+
+        switch (game.state) {
+            case GameState.Opened:
+                game.state = GameState.Closed;
+                break;
+            case GameState.Closed:
+                game.state = GameState.Opened;
+                break;
+            default:
+                throw new Error('La partie ne peut pas être verouillée/déverouillée');
+        }
+
+        return {
+            pin: game.pin,
+            client,
+            organizer: game.organizer,
+            data: game.state,
+        };
+    }
+
+    nextQuestion(client: Socket, pin: string): GameEventPayload<Question> {
+        const game = this.getGame(pin);
+        if (!this.isOrganizer(game, client.id)) {
+            throw new Error(`Vous n'êtes pas organisateur de la partie ${pin}`);
+        }
+
+        game.submissions.clear();
+        game.currentQuestionIndex++;
+
+        return { pin: game.pin, client, organizer: game.organizer, data: game.quiz.questions[game.currentQuestionIndex] };
+    }
+
+    toggleSelectChoice(client: Socket, pin: string, choiceIndex: number): GameEventPayload<Submission> {
+        const game = this.getGame(pin);
+        let playerSubmission = game.submissions.get(client.id);
+        if (!playerSubmission) {
+            playerSubmission = {
+                choices: game.quiz.questions[game.currentQuestionIndex].choices.map((_, index) => {
+                    return { index, isSelected: false };
+                }),
+                isFinal: false,
+            };
+        }
+        playerSubmission.choices[choiceIndex].isSelected = !playerSubmission.choices[choiceIndex].isSelected;
+
+        return {
+            pin: game.pin,
+            client,
+            organizer: game.organizer,
+            data: playerSubmission,
+        };
+    }
+
+    private getGame(pin: string): Game {
         const game = this.activeGames.get(pin);
 
         if (!game) {

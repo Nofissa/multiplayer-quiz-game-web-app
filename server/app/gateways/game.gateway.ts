@@ -113,6 +113,51 @@ export class GameGateway implements OnGatewayInit, OnGatewayDisconnect {
         }
     }
 
+    @SubscribeMessage('cancelGame')
+    cancelGame(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
+        try {
+            const payload = this.gameService.cancelGame(client, pin);
+
+            this.gameEventDispatcher.sendToGame('cancelGame', payload);
+            this.server.in(pin).socketsLeave(pin);
+        } catch (err) {
+            return err;
+        }
+    }
+
+    @SubscribeMessage('toggleGameLock')
+    toggleGameLock(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
+        try {
+            const payload = this.gameService.toggleGameLock(client, pin);
+
+            this.gameEventDispatcher.sendToGame('toggleGameLock', payload);
+        } catch (err) {
+            return err;
+        }
+    }
+
+    @SubscribeMessage('nextQuestion')
+    nextQuestion(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
+        try {
+            const payload = this.gameService.nextQuestion(client, pin);
+
+            this.gameEventDispatcher.sendToGame('nextQuestion', payload);
+        } catch (err) {
+            return err;
+        }
+    }
+
+    @SubscribeMessage('toggleSelectChoice')
+    toggleSelectChoice(@ConnectedSocket() client: Socket, @MessageBody() { pin, choiceIndex }: { pin: string; choiceIndex: number }) {
+        try {
+            const payload = this.gameService.toggleSelectChoice(client, pin, choiceIndex);
+
+            this.gameEventDispatcher.sendToOrganizer('toggleSelectChoice', payload);
+        } catch (err) {
+            return err;
+        }
+    }
+
     afterInit() {
         this.gameEventDispatcher = new GameEventDispatcher(this.server);
     }
@@ -120,8 +165,8 @@ export class GameGateway implements OnGatewayInit, OnGatewayDisconnect {
     handleDisconnect(client: Socket) {
         const payload = this.gameService.disconnect(client);
 
-        payload.toCancel.forEach(() => {
-            // TODO: call this.cancelGame(client, { pin });
+        payload.toCancel.forEach((pin) => {
+            this.cancelGame(client, { pin });
         });
         payload.toAbandon.forEach((pin) => {
             this.playerAbandon(client, { pin });
