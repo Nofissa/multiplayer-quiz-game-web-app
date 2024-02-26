@@ -1,30 +1,30 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { TimerService } from '@app/services/timer/timer.service';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-timer-component',
     templateUrl: './timer.component.html',
     styleUrls: ['./timer.component.scss'],
 })
-export class TimerComponent {
+export class TimerComponent implements OnInit, OnDestroy {
     secondsLeft: number;
+    private timerTickSubscription: Subscription;
 
     constructor(private timerService: TimerService) {}
 
-    startTimer(duration: number) {
-        this.timerService.startTimer(duration);
-        if (this.timerService.onTick) {
-            this.timerService.onTick.subscribe(() => {
-                this.secondsLeft = this.timerService.time;
-            });
+    ngOnInit() {
+        this.timerTickSubscription = this.timerService.onStartTimer((duration: number) => {
+            this.secondsLeft = duration;
+        });
+        this.timerTickSubscription = this.timerService.onTimerTick((remainingSeconds: number) => {
+            this.secondsLeft = remainingSeconds;
+        });
+    }
+
+    ngOnDestroy() {
+        if (!this.timerTickSubscription.closed) {
+            this.timerTickSubscription.unsubscribe();
         }
-    }
-
-    stopTimer() {
-        this.timerService.stopTimer();
-    }
-
-    pauseTimer() {
-        this.timerService.pauseTimer();
     }
 }

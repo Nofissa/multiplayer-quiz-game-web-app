@@ -12,12 +12,16 @@ export class TimerService {
         this.webSocketService.emit('startTimer', { pin });
     }
 
+    onStartTimer(callback: (duration: number) => void): Subscription {
+        return this.webSocketService.on('startTimer', callback);
+    }
+
     onTimerTick(callback: (remainingSeconds: number) => void): Subscription {
         return this.webSocketService.on('timerTick', callback);
     }
 
     pauseTimer() {
-        clearInterval(this.interval);
-        this.interval = undefined;
+        // clearInterval(this.interval);
+        // this.interval = undefined;
     }
 }

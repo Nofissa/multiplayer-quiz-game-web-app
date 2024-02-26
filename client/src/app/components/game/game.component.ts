@@ -96,15 +96,7 @@ export class GameComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     startTimer() {
-        // this.timerService.startTimer(this.quiz.duration);
-        // if (this.timerService.onTick) {
-        //     this.timerService.onTick.subscribe(() => {
-        //         // this.secondsLeft = this.time;
-        //         if (this.time === 0) {
-        //             this.validateChoices();
-        //         }
-        //     });
-        // }
+        this.timerService.startTimer('6649');
     }
 
     isSelected(choice: Choice): boolean {
