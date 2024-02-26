@@ -1,23 +1,30 @@
 import { GameEventDispatcher } from '@app/classes/game-event-dispatcher';
 import { GameService } from '@app/services/game/game.service';
-import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import {
+    ConnectedSocket,
+    MessageBody,
+    OnGatewayDisconnect,
+    OnGatewayInit,
+    SubscribeMessage,
+    WebSocketGateway,
+    WebSocketServer,
+} from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
-@WebSocketGateway(parseInt(process.env.PORT, 10), {
+@WebSocketGateway({
     cors: {
-        origin: '*',
-        transports: ['websocket'],
+        origin: 'http://localhost:4200',
+        methods: ['GET', 'POST'],
+        transports: ['websocket', 'polling'],
         credentials: false,
     },
-    allowEIO3: true,
 })
-export class GameGateway implements OnGatewayDisconnect {
-    @WebSocketServer() server: Server;
+export class GameGateway implements OnGatewayInit, OnGatewayDisconnect {
+    @WebSocketServer()
+    private server: Server;
     private gameEventDispatcher: GameEventDispatcher;
 
-    constructor(private readonly gameService: GameService) {
-        this.gameEventDispatcher = new GameEventDispatcher(this.server);
-    }
+    constructor(private readonly gameService: GameService) {}
 
     @SubscribeMessage('createGame')
     async createGame(@ConnectedSocket() client: Socket, @MessageBody() { quizId }: { quizId: string }) {
@@ -75,6 +82,10 @@ export class GameGateway implements OnGatewayDisconnect {
         } catch (err) {
             return err;
         }
+    }
+
+    afterInit() {
+        this.gameEventDispatcher = new GameEventDispatcher(this.server);
     }
 
     handleDisconnect(client: Socket) {

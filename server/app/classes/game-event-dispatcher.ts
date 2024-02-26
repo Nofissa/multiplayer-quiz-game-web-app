@@ -21,8 +21,8 @@ export class GameEventDispatcher {
     }
 
     sendToGame<T>(eventName: string, payload: GameEventPayload<T>) {
-        const { pin: gamePin, data } = payload;
+        const { pin, data } = payload;
 
-        this.server.to(gamePin).emit(eventName, data);
+        this.server.to(pin).emit(eventName, data);
     }
 }

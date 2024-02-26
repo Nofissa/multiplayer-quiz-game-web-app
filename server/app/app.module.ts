@@ -11,7 +11,6 @@ import { AuthController } from './controllers/auth/auth.controller';
 import { AuthService } from './services/auth/auth.service';
 import { GameService } from './services/game/game.service';
 import { GameGateway } from './gateways/game.gateway';
-import { GameEventManager } from './classes/game-event-manager';
 
 @Module({
     imports: [
@@ -29,6 +28,6 @@ import { GameEventManager } from './classes/game-event-manager';
         ]),
     ],
     controllers: [AuthController, QuestionController, QuizController],
-    providers: [AuthService, GameService, QuestionService, QuizService, Logger, GameGateway, GameEventManager],
+    providers: [AuthService, GameService, QuestionService, QuizService, Logger, GameGateway],
 })
 export class AppModule {}

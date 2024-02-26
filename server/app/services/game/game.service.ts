@@ -43,7 +43,7 @@ export class GameService {
             pin: game.pin,
             organizer: game.organizer,
             client,
-            data: null,
+            data: game.pin,
         };
     }
 
@@ -58,7 +58,7 @@ export class GameService {
         game.clientPlayers.set(client.id, player);
 
         const players = Array.from(game.clientPlayers.values()).map((x) => x.player);
-        const payload = { players, chatlogs: game.chatlogs };
+        const payload = { pin, players, chatlogs: game.chatlogs };
 
         return {
             pin: game.pin,
@@ -68,24 +68,21 @@ export class GameService {
         };
     }
 
-    playerAbandon(client: Socket, pin: string): GameEventPayload<Player[]> {
+    playerAbandon(client: Socket, pin: string): GameEventPayload<Player> {
         const game = this.getGame(pin);
         const clientPlayer = game.clientPlayers.get(client.id);
 
         clientPlayer.player.state = PlayerState.Abandonned;
 
-        const clientPlayers = Array.from(game.clientPlayers.values());
-        const players = clientPlayers.map((x) => x.player);
-
         return {
             pin: game.pin,
             organizer: game.organizer,
             client,
-            data: players,
+            data: clientPlayer.player,
         };
     }
 
-    playerBan(client: Socket, pin: string, username: string): GameEventPayload<Player[]> {
+    playerBan(client: Socket, pin: string, username: string): GameEventPayload<Player> {
         const game = this.getGame(pin);
 
         if (!this.isOrganizer(game, client.id)) {
@@ -100,14 +97,11 @@ export class GameService {
             clientPlayer.player.state = PlayerState.Banned;
         }
 
-        const clientPlayers = Array.from(game.clientPlayers.values());
-        const players = clientPlayers.map((x) => x.player);
-
         return {
             pin: game.pin,
             organizer: game.organizer,
             client,
-            data: players,
+            data: clientPlayer.player,
         };
     }
 
