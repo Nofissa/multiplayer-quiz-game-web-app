@@ -1,12 +1,14 @@
 /* eslint-disable no-underscore-dangle */
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { QuizDetailsDialogComponent } from '@app/components/dialogs/quiz-details-dialog/quiz-details-dialog.component';
 import { Quiz } from '@app/interfaces/quiz';
 import { MaterialServicesProvider } from '@app/providers/material-services.provider';
+import { GameService } from '@app/services/game/game.service';
 import { QuizHttpService } from '@app/services/quiz-http/quiz-http.service';
+import { Subscription } from 'rxjs';
 import SwiperCore, { EffectCoverflow, Navigation, Pagination } from 'swiper';
 
 SwiperCore.use([Navigation, Pagination, EffectCoverflow]);
@@ -19,16 +21,18 @@ const SNACK_BAR_DURATION_MS = 3000;
     styleUrls: ['./create-game-page.component.scss'],
     encapsulation: ViewEncapsulation.None,
 })
-export class CreateGamePageComponent implements OnInit {
+export class CreateGamePageComponent implements OnInit, OnDestroy {
     quizzArray: Quiz[];
 
     private readonly dialogService: MatDialog;
     private readonly snackBarService: MatSnackBar;
+    private createGameSubscription: Subscription;
 
     constructor(
         materialServicesProvider: MaterialServicesProvider,
         private readonly router: Router,
         private readonly quizHttpService: QuizHttpService,
+        private readonly gameService: GameService,
     ) {
         this.dialogService = materialServicesProvider.dialog;
         this.snackBarService = materialServicesProvider.snackBar;
@@ -36,6 +40,17 @@ export class CreateGamePageComponent implements OnInit {
 
     ngOnInit() {
         this.loadQuizzes();
+        this.createGameSubscription = this.gameService.onCreateGame((pin: string) => {
+            if (pin) {
+                this.router.navigate(['/waiting-room'], { queryParams: { pin } });
+            }
+        });
+    }
+
+    ngOnDestroy(): void {
+        if (!this.createGameSubscription.closed) {
+            this.createGameSubscription.unsubscribe();
+        }
     }
 
     loadQuizzes(): void {
@@ -72,7 +87,7 @@ export class CreateGamePageComponent implements OnInit {
     }
 
     private startGame(quiz: Quiz) {
-        this.router.navigate(['/waiting-room'], { queryParams: { quizId: quiz._id } });
+        this.gameService.createGame(quiz._id);
     }
 
     private testGame(quiz: Quiz) {

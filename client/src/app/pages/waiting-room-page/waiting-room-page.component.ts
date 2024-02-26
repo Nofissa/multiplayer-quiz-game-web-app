@@ -5,12 +5,4 @@ import { Component } from '@angular/core';
     templateUrl: './waiting-room-page.component.html',
     styleUrls: ['./waiting-room-page.component.scss'],
 })
-export class WaitingRoomPageComponent {
-    
-    // constructor(private readonly activatedRoute: ActivatedRoute) {}
-
-    // ngOnInit(): void {
-        
-    // }
-
-}
+export class WaitingRoomPageComponent {}
