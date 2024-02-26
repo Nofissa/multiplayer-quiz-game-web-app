@@ -1,56 +1,48 @@
-import { Injectable } from '@angular/core';
-import * as http from 'http';
-import { Observable, Subject } from 'rxjs';
-import * as io from 'socket.io';
-import { GameService } from '../game/game.service';
+import { Subject, Subscription } from 'rxjs';
+import { Socket } from 'socket.io';
+import { Game } from '@app/classes/game';
 
-@Injectable
 export class TimerService {
     private onTickSubject = new Subject<number>();
-    private sio: io.Server;
-    // disabled lint here because if I place it on the first line, onTickSubject would be used before its declaration
-    // eslint-disable-next-line @typescript-eslint/member-ordering
-    onTick: Observable<number> = this.onTickSubject.asObservable();
-    private interval: number | undefined;
     private readonly tick = 1000;
-    private counter = 0;
-    constructor(
-        server: http.Server,
-        private gameService: GameService,
-    ) {
-        this.sio = new io.Server(server, { cors: { origin: '*', methods: ['GET', 'POST'] } });
-    }
+    private counters: Map<string, number> = new Map();
+    private intervals: Map<string, NodeJS.Timer | undefined> = new Map();
+    private tickSubscriptions: Map<string, Subscription> = new Map();
 
-    get time() {
-        return this.counter;
-    }
-    private set time(newTime: number) {
-        this.counter = newTime;
-    }
+    startTimer(client: Socket, game: Game, callback: (remainingTime: number) => void): number {
+        const pin = game.pin;
 
-    handleTimer() {
-        this.sio.on('startTimer', (pin: string) => {
-            this.startTimer(pin);
-        });
-    }
+        if (game.organizer.id !== client.id) {
+            throw new Error(`Seul l'organisateur de la partie ${pin} peut lancer la minuterie`);
+        }
 
-    private startTimer(pin: string, startValue: number) {
-        if (this.interval || !this.gameService.activeGames.has(pin)) return;
-        const game = this.gameService.getGame(pin);
-        this.time = startValue;
-        this.interval = window.setInterval(() => {
-            if (this.time > 0) {
-                this.sio.to(game).emit('timerTick', this.time);
-                this.time--;
-                this.onTickSubject.next(this.time);
+        if (this.intervals.get(pin)) {
+            throw new Error(`La partie ${pin} a déjà une minuterie lancée`);
+        }
+
+        if (this.counters.get(pin) === undefined) {
+            this.counters.set(pin, game.quiz.duration);
+        }
+
+        const interval = setInterval(() => {
+            if (this.counters.get(pin) > 0) {
+                this.counters.set(pin, this.counters.get(pin) - 1);
+                this.onTickSubject.next(this.counters.get(pin));
             } else {
-                this.stopTimer();
+                this.stopTimer(pin);
             }
         }, this.tick);
+
+        this.intervals.set(pin, interval);
+        this.tickSubscriptions.set(pin, this.onTickSubject.subscribe(callback));
+
+        return this.counters.get(pin);
     }
 
-    private stopTimer() {
-        clearInterval(this.interval);
-        this.interval = undefined;
+    stopTimer(pin: string) {
+        clearInterval(this.intervals.get(pin));
+        this.intervals.delete(pin);
+        this.counters.delete(pin);
+        this.tickSubscriptions.delete(pin);
     }
 }

@@ -1,5 +1,6 @@
 import { GameEventDispatcher } from '@app/classes/game-event-dispatcher';
 import { GameService } from '@app/services/game/game.service';
+import { TimerService } from '@app/services/timer/timer.service';
 import {
     ConnectedSocket,
     MessageBody,
@@ -24,7 +25,10 @@ export class GameGateway implements OnGatewayInit, OnGatewayDisconnect {
     private server: Server;
     private gameEventDispatcher: GameEventDispatcher;
 
-    constructor(private readonly gameService: GameService) {}
+    constructor(
+        private readonly gameService: GameService,
+        private readonly timerService: TimerService,
+    ) {}
 
     @SubscribeMessage('createGame')
     async createGame(@ConnectedSocket() client: Socket, @MessageBody() { quizId }: { quizId: string }) {
@@ -90,6 +94,20 @@ export class GameGateway implements OnGatewayInit, OnGatewayDisconnect {
             const payload = this.gameService.sendMessage(client, pin, message);
 
             this.gameEventDispatcher.sendToGame('sendMessage', payload);
+        } catch (error) {
+            client.emit('error', error.message);
+        }
+    }
+
+    @SubscribeMessage('startTimer')
+    startTimer(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
+        try {
+            const game = this.gameService.getGame(pin);
+
+            const duration = this.timerService.startTimer(client, game, (remainingTime) => {
+                this.server.to(pin).emit('timerTick', remainingTime);
+            });
+            this.server.to(pin).emit('startTimer', duration);
         } catch (error) {
             client.emit('error', error.message);
         }
