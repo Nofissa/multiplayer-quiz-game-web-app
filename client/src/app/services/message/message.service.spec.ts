@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
-import { TimerService } from './timer.service';
+import { MessageService } from './message.service';
 
-describe('TimerService', () => {
-    let service: TimerService;
+describe('MessageService', () => {
+    let service: MessageService;
 
     beforeEach(() => {
         TestBed.configureTestingModule({});
-        service = TestBed.inject(TimerService);
+        service = TestBed.inject(MessageService);
     });
 
     it('should be created', () => {
