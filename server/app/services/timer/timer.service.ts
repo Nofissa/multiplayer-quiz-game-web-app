@@ -30,7 +30,7 @@ export class TimerService {
 
     private startTimer(pin: string, startValue: number) {
         if (this.interval || !this.gameService.activeGames.has(pin)) return;
-        const game = this.gameService.activeGames.get(pin);
+        const game = this.gameService.getGame(pin);
         this.time = startValue;
         this.interval = window.setInterval(() => {
             if (this.time > 0) {
