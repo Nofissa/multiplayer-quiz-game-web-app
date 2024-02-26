@@ -34,7 +34,7 @@ import { CreateGamePageComponent } from './pages/create-game-page/create-game-pa
 import { QCMCreationPageComponent } from './pages/qcmcreation-page/qcmcreation-page.component';
 import { WaitingRoomPageComponent } from './pages/waiting-room-page/waiting-room-page.component';
 import { LogoComponent } from './components/logo/logo.component';
-import { JoinGameDialogComponent } from './components/dialogs/join-dialog/join-game-dialog.component';
+import { JoinGameDialogComponent } from './components/dialogs/join-game-dialog/join-game-dialog.component';
 
 /**
  * Main module that is used in main.ts.

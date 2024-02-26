@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 
-// const PIN_LENGTH = 4;
+const PIN_LENGTH = 4;
 
 @Component({
     selector: 'app-join-game-dialog',
@@ -19,7 +19,7 @@ export class JoinGameDialogComponent {
         private readonly dialogRef: MatDialogRef<JoinGameDialogComponent>,
     ) {
         this.formGroup = this.formBuilder.group({
-            pin: [this.pin, [Validators.required]],
+            pin: [this.pin, [Validators.required, this.pinValidator()]],
             username: [this.username, [Validators.required]],
         });
     }
@@ -32,5 +32,15 @@ export class JoinGameDialogComponent {
         if (this.formGroup.valid) {
             this.dialogRef.close(this.formGroup.value);
         }
+    }
+
+    private pinValidator(): ValidatorFn {
+        return (control: AbstractControl): ValidationErrors | null => {
+            const pin: string = control.value;
+            const isValidPinLength = pin.length === PIN_LENGTH;
+            const containsOnlyNumbers = /^\d+$/.test(pin);
+
+            return isValidPinLength && containsOnlyNumbers ? null : { okPinLength: true };
+        };
     }
 }

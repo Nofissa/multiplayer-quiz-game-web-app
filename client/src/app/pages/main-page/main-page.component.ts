@@ -8,7 +8,7 @@ import { SecurityServicesProvider } from '@app/providers/security-services.provi
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { PromptDialogComponent } from '@app/components/dialogs/prompt-dialog/prompt-dialog.component';
-import { JoinGameDialogComponent } from '@app/components/dialogs/join-dialog/join-game-dialog.component';
+import { JoinGameDialogComponent } from '@app/components/dialogs/join-game-dialog/join-game-dialog.component';
 import { GameService } from '@app/services/game/game.service';
 import { Subscription } from 'rxjs';
 import { JoinGamePayload } from '@common/join-game-payload';
