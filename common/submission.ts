@@ -1,6 +1,4 @@
-import { Choice } from './choice';
-
 export interface Submission {
-    selectedChoices: Choice[];
+    choices: { index: number; isSelected: boolean }[];
     isFinal: boolean;
 }

@@ -107,6 +107,28 @@ export class GameGateway implements OnGatewayInit, OnGatewayDisconnect {
         }
     }
 
+    @SubscribeMessage('nextQuestion')
+    nextQuestion(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
+        try {
+            const payload = this.gameService.nextQuestion(client, pin);
+
+            this.gameEventDispatcher.sendToGame('nextQuestion', payload);
+        } catch (err) {
+            return err;
+        }
+    }
+
+    @SubscribeMessage('toggleSelectChoice')
+    toggleSelectChoice(@ConnectedSocket() client: Socket, @MessageBody() { pin, choiceIndex }: { pin: string; choiceIndex: number }) {
+        try {
+            const payload = this.gameService.toggleSelectChoice(client, pin, choiceIndex);
+
+            this.gameEventDispatcher.sendToOrganizer('toggleSelectChoice', payload);
+        } catch (err) {
+            return err;
+        }
+    }
+
     afterInit() {
         this.gameEventDispatcher = new GameEventDispatcher(this.server);
     }

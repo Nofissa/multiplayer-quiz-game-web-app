@@ -208,6 +208,39 @@ export class GameService {
         };
     }
 
+    nextQuestion(client: Socket, pin: string): GameEventPayload<Question> {
+        const game = this.getGame(pin);
+        if (!this.isOrganizer(game, client.id)) {
+            throw new Error(`Vous n'êtes pas organisateur de la partie ${pin}`);
+        }
+
+        game.submissions.clear();
+        game.currentQuestionIndex++;
+
+        return { pin: game.pin, client, organizer: game.organizer, data: game.quiz.questions[game.currentQuestionIndex] };
+    }
+
+    toggleSelectChoice(client: Socket, pin: string, choiceIndex: number): GameEventPayload<Submission> {
+        const game = this.getGame(pin);
+        let playerSubmission = game.submissions.get(client.id);
+        if (!playerSubmission) {
+            playerSubmission = {
+                choices: game.quiz.questions[game.currentQuestionIndex].choices.map((_, index) => {
+                    return { index, isSelected: false };
+                }),
+                isFinal: false,
+            };
+        }
+        playerSubmission.choices[choiceIndex].isSelected = !playerSubmission.choices[choiceIndex].isSelected;
+
+        return {
+            pin: game.pin,
+            client,
+            organizer: game.organizer,
+            data: playerSubmission,
+        };
+    }
+
     private getGame(pin: string): Game {
         const game = this.activeGames.get(pin);
 
