@@ -84,6 +84,17 @@ export class GameGateway implements OnGatewayInit, OnGatewayDisconnect {
         }
     }
 
+    @SubscribeMessage('sendMessage')
+    sendMessage(@ConnectedSocket() client: Socket, @MessageBody() { pin, message }: { pin: string; message: string }) {
+        try {
+            const payload = this.gameService.sendMessage(client, pin, message);
+
+            this.gameEventDispatcher.sendToGame('sendMessage', payload);
+        } catch (error) {
+            client.emit('error', error.message);
+        }
+    }
+
     afterInit() {
         this.gameEventDispatcher = new GameEventDispatcher(this.server);
     }

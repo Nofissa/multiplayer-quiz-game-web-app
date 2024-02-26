@@ -11,4 +11,4 @@ L toggleGameLock            ({ pin: string })                       GameState (t
 I startTimer                ({ pin: string })                       number (tout le monde dans la game)
 I pauseTimer                ({ pin: string })                       number (tout le monde dans la game) // pour sprint 3
 L loadNextQuestion          ({ pin: string })                       Question (tout le monde dans la game)
-N sendMessage               ({ pin: string, message: string })      Chatlog[] (tout le monde dans la game)
+N sendMessage               ({ pin: string, message: string })      Chatlog (tout le monde dans la game)

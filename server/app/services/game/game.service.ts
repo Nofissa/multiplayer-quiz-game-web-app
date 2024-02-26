@@ -13,6 +13,7 @@ import { GameEventPayload } from '@app/interfaces/game-event-payload';
 import { DisconnectPayload } from '@app/interfaces/disconnect-payload';
 import { Submission } from '@common/submission';
 import { GameState } from '@common/game-state';
+import { Chatlog } from '@common/chatlog';
 
 const NO_POINTS = 0;
 const NO_BONUS_MULTIPLIER = 1;
@@ -146,6 +147,19 @@ export class GameService {
             organizer: game.organizer,
             client,
             data: payload,
+        };
+    }
+
+    sendMessage(client: Socket, pin: string, message: string): GameEventPayload<Chatlog> {
+        const game = this.getGame(pin);
+        const clientPlayer = game.clientPlayers.get(client.id);
+        const chatlog = { message, author: clientPlayer.player.username, date: new Date() };
+
+        return {
+            pin,
+            organizer: game.organizer,
+            client,
+            data: chatlog,
         };
     }
 
