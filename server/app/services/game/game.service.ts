@@ -13,11 +13,6 @@ import { PlayerState } from '@common/player-state';
 import { Submission } from '@common/submission';
 import { Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
-import { Player } from '@common/player';
-import { GameEventPayload } from '@app/interfaces/game-event-payload';
-import { DisconnectPayload } from '@app/interfaces/disconnect-payload';
-import { Submission } from '@common/submission';
-import { GameState } from '@common/game-state';
 import { Chatlog } from '@common/chatlog';
 
 const NO_POINTS = 0;
@@ -270,7 +265,7 @@ export class GameService {
         };
     }
 
-    private getGame(pin: string): Game {
+    getGame(pin: string): Game {
         const game = this.activeGames.get(pin);
 
         if (!game) {
