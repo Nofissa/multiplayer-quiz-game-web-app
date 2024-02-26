@@ -29,10 +29,8 @@ export class TimerService {
     }
 
     handleTimer() {
-        this.sio.on('connection', (socket) => {
-            socket.on('startTimer', (pin: string) => {
-                this.startTimer(pin);
-            });
+        this.sio.on('startTimer', (pin: string) => {
+            this.startTimer(pin);
         });
     }
 
