@@ -1,5 +1,5 @@
 /* eslint-disable no-underscore-dangle */
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
@@ -12,6 +12,7 @@ import { QuestionServicesProvider } from '@app/providers/question-services.provi
 import { QuestionHttpService } from '@app/services/question-http/question-http.service';
 import { QuestionInteractionService } from '@app/services/question-interaction/question-interaction.service';
 import { QuestionSharingService } from '@app/services/question-sharing/question-sharing.service';
+import { Subscription } from 'rxjs';
 
 const NOT_FOUND_INDEX = -1;
 const SNACK_BAR_DURATION_MS = 3000;
@@ -22,13 +23,13 @@ const SNACK_BAR_DURATION_MS = 3000;
     styleUrls: ['./question-bank.component.scss'],
     providers: [QuestionInteractionService],
 })
-export class QuestionBankComponent implements OnInit {
-    private static hasSetupServices = false;
-
+export class QuestionBankComponent implements OnInit, OnDestroy {
     @Input()
     options: QuestionListOptions;
 
     questions: Question[] = [];
+
+    shareSubscription: Subscription = new Subscription();
 
     private readonly dialogService: MatDialog;
     private readonly snackBarService: MatSnackBar;
@@ -48,25 +49,13 @@ export class QuestionBankComponent implements OnInit {
 
     ngOnInit() {
         this.loadQuestions();
+        this.setupServices();
+    }
 
-        if (!QuestionBankComponent.hasSetupServices) {
-            this.setupServices();
-
-            QuestionBankComponent.hasSetupServices = true;
+    ngOnDestroy() {
+        if (!this.shareSubscription?.closed) {
+            this.shareSubscription.unsubscribe();
         }
-
-        this.questionInteractionService.registerOnAddQuestion(() => {
-            this.openAddQuestionDialog();
-        });
-        this.questionInteractionService.registerOnEditQuestion((question: Question) => {
-            this.openEditQuestionDialog(question);
-        });
-        this.questionInteractionService.registerOnDeleteQuestion((question: Question) => {
-            this.openDeleteQuestionDialog(question);
-        });
-        this.questionInteractionService.registerOnShareQuestion((question: Question) => {
-            this.shareQuestion(question);
-        });
     }
 
     openAddQuestionDialog() {
@@ -136,11 +125,27 @@ export class QuestionBankComponent implements OnInit {
         });
     }
 
-    setupServices() {
-        this.questionSharingService.subscribe((question: Question) => {
-            if (!this.questions.includes(question)) {
-                this.addQuestion(question);
+    private setupServices() {
+        this.shareSubscription = this.questionSharingService.subscribe((sharedQuestion: Question) => {
+            if (!this.questions.includes(sharedQuestion)) {
+                this.addQuestion(sharedQuestion);
             }
+        });
+
+        this.questionInteractionService.registerOnAddQuestion(() => {
+            this.openAddQuestionDialog();
+        });
+
+        this.questionInteractionService.registerOnEditQuestion((question: Question) => {
+            this.openEditQuestionDialog(question);
+        });
+
+        this.questionInteractionService.registerOnDeleteQuestion((question: Question) => {
+            this.openDeleteQuestionDialog(question);
+        });
+
+        this.questionInteractionService.registerOnShareQuestion((question: Question) => {
+            this.shareQuestion(question);
         });
     }
 

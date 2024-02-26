@@ -59,14 +59,12 @@ describe('QCMCreationPageComponent', () => {
         quizHttpServiceSpy.createQuiz.and.callFake(() => mockQuizSubject);
         quizHttpServiceSpy.updateQuiz.and.callFake(() => mockQuizSubject);
         questionSharingServiceSpy = jasmine.createSpyObj('QuestionSharingService', ['share', 'subscribe']);
-        questionSharingServiceSpy['callbacks'] = [];
-        questionSharingServiceSpy.subscribe.and.callFake((callback: (data: Question) => void) => {
-            questionSharingServiceSpy['callbacks'].push(callback);
+        questionSharingServiceSpy['shareSubject'] = new Subject();
+        questionSharingServiceSpy.subscribe.and.callFake((callback: (question: Question) => void) => {
+            return questionSharingServiceSpy['shareSubject'].subscribe(callback);
         });
         questionSharingServiceSpy.share.and.callFake((question: Question) => {
-            questionSharingServiceSpy['callbacks'].forEach((callback: (data: Question) => void) => {
-                callback(question);
-            });
+            questionSharingServiceSpy['shareSubject'].next(question);
         });
         matServiceProvierSpy = new MaterialServicesProvider(dialogSpy, snackBarSpy) as SpyObj<MaterialServicesProvider>;
         mockQuestionSubject = new Subject<Question>();

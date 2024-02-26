@@ -14,11 +14,8 @@ import { saveAs } from 'file-saver';
 export class QuizComponent {
     @Input()
     quiz: Quiz;
-
     @Output()
-    refresh = new EventEmitter<void>();
-
-    isDeleted: boolean = false;
+    delete = new EventEmitter<Quiz>(); // Output event for deletion
 
     constructor(
         // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -44,13 +41,7 @@ export class QuizComponent {
     }
 
     deleteQuiz() {
-        // eslint-disable-next-line no-underscore-dangle
-        if (this.quizHttpService.deleteQuizById(this.quiz._id)) {
-            // eslint-disable-next-line no-underscore-dangle
-            this.quizHttpService.deleteQuizById(this.quiz._id).subscribe(() => {
-                this.isDeleted = true;
-            });
-        }
+        this.delete.emit(this.quiz);
     }
 
     editQuiz() {

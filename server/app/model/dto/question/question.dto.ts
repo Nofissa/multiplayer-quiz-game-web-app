@@ -2,6 +2,7 @@ import { ValidationValues } from '@app/enums/validation-values';
 import { ChoiceDto } from '@app/model/dto/choice/choice.dto';
 import { IsMultipleOf } from '@app/validators/is-multiple-of.validator';
 import { IsQuestionType } from '@app/validators/is-question-type.validator';
+import { IsValidChoices } from '@app/validators/is-valid-choices.validator';
 import { QuestionType } from '@common/question-type';
 import { Type } from 'class-transformer';
 import { ArrayMaxSize, ArrayMinSize, IsArray, IsDate, IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min, ValidateNested } from 'class-validator';
@@ -35,6 +36,9 @@ export class QuestionDto {
         message: `le champ 'choices' de question devrait être de taille plus petite ou égale ${ValidationValues.MaxAnswersSize}`,
     })
     @Type(() => ChoiceDto)
+    @IsValidChoices({
+        message: "Le champ 'choices' de question devrait contenir au moins une entrée valide et une autre entrée invalide",
+    })
     @ValidateNested({ each: true })
     choices: ChoiceDto[];
 

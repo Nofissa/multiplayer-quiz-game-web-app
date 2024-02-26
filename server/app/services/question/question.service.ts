@@ -4,6 +4,7 @@ import { QuestionDto } from '@app/model/dto/question/question.dto';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { escapeRegExp } from '@app/helpers/regex';
 
 @Injectable()
 export class QuestionService {
@@ -53,7 +54,8 @@ export class QuestionService {
     }
 
     async validateQuestion(dto: QuestionDto): Promise<boolean> {
-        const regex = new RegExp(`${dto.text}`, 'i'); // for case unsensitive search
+        const escapedText = escapeRegExp(dto.text);
+        const regex = new RegExp(`^${escapedText}$`, 'i'); // for case unsensitive search
         const question = await this.model.findOne({ text: { $regex: regex } });
 
         if (question === null) {

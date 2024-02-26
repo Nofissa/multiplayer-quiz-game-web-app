@@ -1,6 +1,6 @@
 // for mongodb's _id fields
 /* eslint-disable no-underscore-dangle */
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -13,6 +13,7 @@ import { QuestionInteractionService } from '@app/services/question-interaction/q
 import { QuestionSharingService } from '@app/services/question-sharing/question-sharing.service';
 import { QuizHttpService } from '@app/services/quiz-http/quiz-http.service';
 import { SNACK_MESSAGE_DURATION } from '@app/constants';
+import { Subscription } from 'rxjs';
 
 const ID_LENGTH = 10;
 const DURATION = 10;
@@ -23,11 +24,12 @@ const DURATION = 10;
     styleUrls: ['./qcmcreation-page.component.scss'],
     providers: [QuestionInteractionService],
 })
-export class QCMCreationPageComponent implements OnInit {
+export class QCMCreationPageComponent implements OnInit, OnDestroy {
     formGroup: FormGroup;
     questionsContainer: Question[] = [];
     quiz: Quiz;
 
+    private shareSubscription: Subscription = new Subscription();
     private readonly dialogService: MatDialog;
     private readonly snackBarService: MatSnackBar;
 
@@ -88,12 +90,18 @@ export class QCMCreationPageComponent implements OnInit {
                 });
             });
 
-            this.questionSharingService.subscribe((question: Question) => {
+            this.shareSubscription = this.questionSharingService.subscribe((question: Question) => {
                 if (this.questionsContainer.every((x) => x.text !== question.text)) {
                     this.questionsContainer.push(question);
                 }
             });
         });
+    }
+
+    ngOnDestroy(): void {
+        if (!this.shareSubscription?.closed) {
+            this.shareSubscription.unsubscribe();
+        }
     }
 
     deleteQuestion(question: Question) {

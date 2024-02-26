@@ -15,4 +15,9 @@ export class TimerService {
     onTimerTick(callback: (remainingSeconds: number) => void): Subscription {
         return this.webSocketService.on('timerTick', callback);
     }
+
+    pauseTimer() {
+        clearInterval(this.interval);
+        this.interval = undefined;
+    }
 }

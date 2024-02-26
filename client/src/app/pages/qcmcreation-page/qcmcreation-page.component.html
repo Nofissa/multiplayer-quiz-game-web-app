@@ -1,6 +1,4 @@
-<div class="header">
-    <app-logo size="m" verticalAlign="left"></app-logo>
-</div>
+<app-nav-header></app-nav-header>
 <div id="quiz-creation-page">
     <div class="main-container">
         <div class="flex-row fields-container">
@@ -34,7 +32,7 @@
                         [options]="{share: true, create: true, edit: true, delete: true, drag:true, numberOrder: true}"></app-question-list>
                 </div>
                 <button id="submit-quiz" (mouseUp)="submitQuiz()" mat-flat-button>
-                    Valider
+                    Soumettre
                 </button>
             </form>
         </div>
