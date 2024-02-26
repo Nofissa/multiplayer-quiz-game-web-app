@@ -161,57 +161,51 @@ export class GameService {
         return { toCancel, toAbandon };
     }
 
-    cancelGame(client: Socket, pin: string) {
+    cancelGame(client: Socket, pin: string): GameEventPayload<string> {
         const game = this.getGame(pin);
-        const deletedGame = this.activeGames.delete(pin);
+        this.activeGames.delete(pin);
 
-        if (!deletedGame) {
-            throw new Error(`An error occured whil trying to delete the game with pin : ${pin}`);
+        const isOrganizer = this.isOrganizer(game, client.id);
+        const gameHasPlayersLeft = Array.from(game.clientPlayers.values()).some((player) => player.player.state === PlayerState.Playing);
+        if (gameHasPlayersLeft && !isOrganizer) {
+            throw new Error(`Vous n'êtes pas organisateur de la partie ${pin}`);
         }
-
-        const organizatorPayload: GameEventPayload<string> = {
+        const payload: GameEventPayload<string> = {
             pin: game.pin,
             organizer: game.organizer,
             client,
-            data: 'All the player left. Game has been canceled',
+            data: gameHasPlayersLeft ? 'Organizor canceled the game' : 'All the player left. Game has been canceled',
         };
 
-        const playerPayload: GameEventPayload<string> = {
-            pin: game.pin,
-            organizer: game.organizer,
-            client,
-            data: 'Organizator canceled the game',
-        };
-
-        if (Array.from(game.clientPlayers.values()).every((player) => player.player.state === PlayerState.Abandonned)) {
-            return organizatorPayload;
-        } else {
-            return playerPayload;
-        }
+        return payload;
     }
-    toggleGameLock(client: Socket, pin: string) {
+
+    toggleGameLock(client: Socket, pin: string): GameEventPayload<GameState> {
         const game = this.getGame(pin);
 
-        const lockPayload: GameEventPayload<string> = {
-            pin: game.pin,
-            client,
-            organizer: game.organizer,
-            data: 'The game has been locked by the Organizer',
-        };
+        const isOrganizer = this.isOrganizer(game, client.id);
 
-        const unlockPayload: GameEventPayload<string> = {
+        if (!isOrganizer) {
+            throw new Error(`Vous n'êtes pas organisateur de la partie ${pin}`);
+        }
+
+        switch (game.state) {
+            case GameState.Opened:
+                game.state = GameState.Closed;
+                break;
+            case GameState.Closed:
+                game.state = GameState.Opened;
+                break;
+            default:
+                throw new Error('La partie ne peut pas être verouillée/déverouillée');
+        }
+
+        return {
             pin: game.pin,
             client,
             organizer: game.organizer,
-            data: 'The game has been unlocked by the Organizer',
+            data: game.state,
         };
-        if (game.state === GameState.Opened) {
-            game.state = GameState.Closed;
-            return lockPayload;
-        } else {
-            game.state = GameState.Opened;
-            return unlockPayload;
-        }
     }
 
     private getGame(pin: string): Game {

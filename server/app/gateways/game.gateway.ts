@@ -89,7 +89,8 @@ export class GameGateway implements OnGatewayInit, OnGatewayDisconnect {
         try {
             const payload = this.gameService.cancelGame(client, pin);
 
-            this.gameEventDispatcher.sendToClient('cancelGame', payload);
+            this.gameEventDispatcher.sendToGame('cancelGame', payload);
+            this.server.in(pin).socketsLeave(pin);
         } catch (err) {
             return err;
         }
@@ -100,7 +101,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayDisconnect {
         try {
             const payload = this.gameService.toggleGameLock(client, pin);
 
-            this.gameEventDispatcher.sendToClient('toggleGameLock', payload);
+            this.gameEventDispatcher.sendToGame('toggleGameLock', payload);
         } catch (err) {
             return err;
         }
