@@ -10,11 +10,12 @@ import { Subscription } from 'rxjs';
 export class TimerComponent implements OnInit, OnDestroy {
     secondsLeft: number;
     private timerTickSubscription: Subscription;
+    private startTimerSubscription: Subscription;
 
     constructor(private timerService: TimerService) {}
 
     ngOnInit() {
-        this.timerTickSubscription = this.timerService.onStartTimer((duration: number) => {
+        this.startTimerSubscription = this.timerService.onStartTimer((duration: number) => {
             this.secondsLeft = duration;
         });
         this.timerTickSubscription = this.timerService.onTimerTick((remainingSeconds: number) => {
@@ -25,6 +26,9 @@ export class TimerComponent implements OnInit, OnDestroy {
     ngOnDestroy() {
         if (!this.timerTickSubscription.closed) {
             this.timerTickSubscription.unsubscribe();
+        }
+        if (!this.startTimerSubscription.closed) {
+            this.startTimerSubscription.unsubscribe();
         }
     }
 }

@@ -53,12 +53,12 @@ export class GameService {
         return this.webSocketService.on('playerBan', callback);
     }
 
-    selectChoice(pin: string, choiceIndex: number) {
-        this.webSocketService.emit('selectChoice', { pin, choiceIndex });
+    toggleSelectChoice(pin: string, choiceIndex: number) {
+        this.webSocketService.emit('toggleSelectChoice', { pin, choiceIndex });
     }
 
-    onSelectChoice(callback: (submissions: Submission[]) => void): Subscription {
-        return this.webSocketService.on('selectChoice', callback);
+    onToggleSelectChoice(callback: (submissions: Submission[]) => void): Subscription {
+        return this.webSocketService.on('toggleSelectChoice', callback);
     }
 
     submitChoices(pin: string) {
