@@ -1,16 +1,21 @@
+import { Injectable } from '@nestjs/common';
 import { Subject, Subscription } from 'rxjs';
 import { Socket } from 'socket.io';
-import { Game } from '@app/classes/game';
+import { GameService } from '@app/services/game/game.service';
 
+const TICK_TIME_MS = 1000;
+
+@Injectable()
 export class TimerService {
     private onTickSubject = new Subject<number>();
-    private readonly tick = 1000;
     private counters: Map<string, number> = new Map();
     private intervals: Map<string, NodeJS.Timer | undefined> = new Map();
     private tickSubscriptions: Map<string, Subscription> = new Map();
 
-    startTimer(client: Socket, game: Game, callback: (remainingTime: number) => void): number {
-        const pin = game.pin;
+    constructor(private readonly gameService: GameService) {}
+
+    startTimer(client: Socket, pin: string, callback: (remainingTime: number) => void): number {
+        const game = this.gameService.getGame(pin);
 
         if (game.organizer.id !== client.id) {
             throw new Error(`Seul l'organisateur de la partie ${pin} peut lancer la minuterie`);
@@ -31,7 +36,7 @@ export class TimerService {
             } else {
                 this.stopTimer(pin);
             }
-        }, this.tick);
+        }, TICK_TIME_MS);
 
         this.intervals.set(pin, interval);
         this.tickSubscriptions.set(pin, this.onTickSubject.subscribe(callback));

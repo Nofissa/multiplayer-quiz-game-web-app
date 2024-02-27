@@ -12,6 +12,7 @@ import { AuthService } from './services/auth/auth.service';
 import { GameService } from './services/game/game.service';
 import { GameGateway } from './gateways/game.gateway';
 import { TimerService } from './services/timer/timer.service';
+import { MessageService } from './services/message/message.service';
 
 @Module({
     imports: [
@@ -29,6 +30,6 @@ import { TimerService } from './services/timer/timer.service';
         ]),
     ],
     controllers: [AuthController, QuestionController, QuizController],
-    providers: [AuthService, GameService, QuestionService, QuizService, TimerService, GameGateway, Logger],
+    providers: [GameGateway, AuthService, GameService, MessageService, QuestionService, QuizService, TimerService, Logger],
 })
 export class AppModule {}
