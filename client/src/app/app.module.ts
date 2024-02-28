@@ -34,6 +34,7 @@ import { CreateGamePageComponent } from './pages/create-game-page/create-game-pa
 import { QCMCreationPageComponent } from './pages/qcmcreation-page/qcmcreation-page.component';
 import { WaitingRoomPageComponent } from './pages/waiting-room-page/waiting-room-page.component';
 import { NavHeaderComponent } from './components/nav-header/nav-header.component';
+import { ChatRoomComponent } from './components/chat-room/chat-room.component';
 
 /**
  * Main module that is used in main.ts.
@@ -64,6 +65,7 @@ import { NavHeaderComponent } from './components/nav-header/nav-header.component
         LoaderAnimationComponent,
         PromptDialogComponent,
         NavHeaderComponent,
+        ChatRoomComponent,
     ],
     imports: [
         AppRoutingModule,
