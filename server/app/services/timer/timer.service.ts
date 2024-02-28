@@ -3,7 +3,8 @@ import { Subject, Subscription } from 'rxjs';
 import { Socket } from 'socket.io';
 import { GameService } from '@app/services/game/game.service';
 
-const TICK_TIME_MS = 1000;
+const TICK_PER_SECOND = 10;
+const ONE_SECOND_MS = 1000;
 
 @Injectable()
 export class TimerService {
@@ -31,12 +32,12 @@ export class TimerService {
 
         const interval = setInterval(() => {
             if (this.counters.get(pin) > 0) {
-                this.counters.set(pin, this.counters.get(pin) - 1);
+                this.counters.set(pin, this.counters.get(pin) - 1 / TICK_PER_SECOND);
                 this.onTickSubject.next(this.counters.get(pin));
             } else {
                 this.stopTimer(pin);
             }
-        }, TICK_TIME_MS);
+        }, ONE_SECOND_MS / TICK_PER_SECOND);
 
         this.intervals.set(pin, interval);
         this.tickSubscriptions.set(pin, this.onTickSubject.subscribe(callback));

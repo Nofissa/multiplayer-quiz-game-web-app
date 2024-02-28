@@ -28,7 +28,7 @@ describe('TimerComponent', () => {
         component.startTimer(duration);
         tick(FIVE_SECONDS_MS);
 
-        expect(component.secondsLeft).toEqual(expectedSecondsLeft);
+        expect(component.remainingTime).toEqual(expectedSecondsLeft);
         component.stopTimer();
     }));
 
