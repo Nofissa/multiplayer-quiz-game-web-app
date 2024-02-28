@@ -87,6 +87,22 @@ body {
     height: auto !important;
 }
 
+.error-snackbar * {
+    background-color: var(--answer-color-red) !important;
+}
+
+.error-snackbar button {
+    color: var(--main-fg-color) !important;
+}
+
+.error-snackbar .mat-mdc-snack-bar-label {
+    color: var(--main-fg-color) !important;
+}
+
+.error-snackbar .mat-mdc-button-touch-target {
+    height: auto !important;
+}
+
 .header {
     position: relative;
 }
