@@ -9,7 +9,7 @@ import { environment } from 'src/environments/environment';
     providedIn: 'root',
 })
 export class QuizHttpService {
-    private readonly baseUrl: string = `${environment.serverUrl}/quizzes`;
+    private readonly baseUrl: string = `${environment.apiUrl}/quizzes`;
 
     constructor(private readonly http: HttpClient) {}
 

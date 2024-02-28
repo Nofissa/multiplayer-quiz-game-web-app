@@ -24,16 +24,19 @@ import { PromptDialogComponent } from './components/dialogs/prompt-dialog/prompt
 import { QuizDetailsDialogComponent } from './components/dialogs/quiz-details-dialog/quiz-details-dialog.component';
 import { UpsertQuestionDialogComponent } from './components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
 import { GameComponent } from './components/game/game.component';
+import { NavHeaderComponent } from './components/nav-header/nav-header.component';
 import { QuestionBankComponent } from './components/question-bank/question-bank.component';
 import { QuestionListComponent } from './components/question-list/question-list.component';
 import { QuizListComponent } from './components/quiz-list/quiz-list.component';
 import { QuizComponent } from './components/quiz/quiz.component';
+import { TimerComponent } from './components/timer/timer.component';
 import { AppRoutingModule } from './modules/app-routing.module';
 import { AdminPageComponent } from './pages/admin-page/admin-page.component';
 import { CreateGamePageComponent } from './pages/create-game-page/create-game-page.component';
 import { QCMCreationPageComponent } from './pages/qcmcreation-page/qcmcreation-page.component';
 import { WaitingRoomPageComponent } from './pages/waiting-room-page/waiting-room-page.component';
-import { NavHeaderComponent } from './components/nav-header/nav-header.component';
+import { HostGamePageComponent } from './pages/host-game-page/host-game-page.component';
+import { JoinGameDialogComponent } from './components/dialogs/join-game-dialog/join-game-dialog.component';
 import { ChatRoomComponent } from './components/chat-room/chat-room.component';
 
 /**
@@ -65,6 +68,9 @@ import { ChatRoomComponent } from './components/chat-room/chat-room.component';
         LoaderAnimationComponent,
         PromptDialogComponent,
         NavHeaderComponent,
+        TimerComponent,
+        HostGamePageComponent,
+        JoinGameDialogComponent,
         ChatRoomComponent,
     ],
     imports: [

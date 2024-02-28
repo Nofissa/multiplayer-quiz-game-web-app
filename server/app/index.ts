@@ -5,10 +5,9 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 const bootstrap = async () => {
     const app = await NestFactory.create(AppModule);
+    app.enableCors();
     app.setGlobalPrefix('api');
     app.useGlobalPipes(new ValidationPipe());
-    app.enableCors();
-
     const config = new DocumentBuilder()
         .setTitle('Cadriciel Serveur')
         .setDescription('Serveur du projet de base pour le cours de LOG2990')

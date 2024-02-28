@@ -1,14 +1,12 @@
-import { Component, HostListener, Input, OnChanges, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, HostListener, OnChanges, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
 import { Quiz } from '@app/interfaces/quiz';
 import { GameServicesProvider } from '@app/providers/game-services.provider';
-import { GameService } from '@app/services/game/game.service';
 import { KeyBindingService } from '@app/services/key-binding/key-binding.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { Choice } from '@common/choice';
-import { EvaluationPayload } from '@common/evaluation-payload';
 
 const THREE_SECOND_IN_MS = 3000;
 
@@ -40,13 +38,13 @@ export class GameComponent implements OnInit, OnChanges, OnDestroy {
         gameServicesProvider: GameServicesProvider,
         private readonly dialog: MatDialog,
         private readonly router: Router,
-        private readonly gameService: GameService,
     ) {
         this.timerService = gameServicesProvider.timer;
         this.keyBindingService = gameServicesProvider.keyBinding;
     }
+
     get time(): number {
-        return this.timerService.time;
+        return 0;
     }
 
     @HostListener('window:keydown', ['$event'])
@@ -76,7 +74,8 @@ export class GameComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     ngOnDestroy() {
-        this.timerService.stopTimer();
+        return;
+        // this.timerService.stopTimer();
     }
 
     setupKeyBindings() {
@@ -97,15 +96,7 @@ export class GameComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     startTimer() {
-        this.timerService.startTimer(this.quiz.duration);
-        if (this.timerService.onTick) {
-            this.timerService.onTick.subscribe(() => {
-                // this.secondsLeft = this.time;
-                if (this.time === 0) {
-                    this.validateChoices();
-                }
-            });
-        }
+        this.timerService.startTimer('6649');
     }
 
     isSelected(choice: Choice): boolean {
@@ -133,15 +124,15 @@ export class GameComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     validateChoices() {
-        this.timerService.stopTimer();
+        // this.timerService.stopTimer();
         this.questionValidated = true;
         // lint disabled on this line because it's a mongodb id
         // eslint-disable-next-line no-underscore-dangle
-        this.gameService.validateAnswers(this.selectedChoices, this.quiz._id, this.currentQuestionIndex).subscribe({
-            next: (response: EvaluationPayload) => {
-                this.allocatePoints(response.score);
-            },
-        });
+        // this.gameService.validateAnswers(this.selectedChoices, this.quiz._id, this.currentQuestionIndex).subscribe({
+        //     next: (response: EvaluationPayload) => {
+        //         this.allocatePoints(response.score);
+        //     },
+        // });
         this.nextQuestion();
     }
 
