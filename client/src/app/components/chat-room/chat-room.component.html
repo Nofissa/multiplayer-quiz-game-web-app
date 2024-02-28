@@ -5,5 +5,8 @@
     <mat-form-field appearance="outline">
         <mat-label>Message</mat-label>
         <textarea matInput id="chattingArea" class="write-message" placeholder="Envoyer un message"> </textarea>
+        <button matSuffix mat-icon-button class="send-button" (click)="sendMessage()">
+            <mat-icon>send</mat-icon>
+        </button>
     </mat-form-field>
 </div>
