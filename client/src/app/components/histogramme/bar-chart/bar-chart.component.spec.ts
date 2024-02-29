@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { HistogrammeComponent } from './histogramme.component';
+import { BarChartComponent } from './bar-chart.component';
 
 describe('HistogrammeComponent', () => {
-    let component: HistogrammeComponent;
-    let fixture: ComponentFixture<HistogrammeComponent>;
+    let component: BarChartComponent;
+    let fixture: ComponentFixture<BarChartComponent>;
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            declarations: [HistogrammeComponent],
+            declarations: [BarChartComponent],
         });
-        fixture = TestBed.createComponent(HistogrammeComponent);
+        fixture = TestBed.createComponent(BarChartComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

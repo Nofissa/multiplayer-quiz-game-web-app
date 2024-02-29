@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { HistogrammeSwiperComponent } from './histogramme-swiper.component';
+import { BarChartSwiperComponent } from './bar-chart-swiper.component';
 
 describe('HistogrammeSwiperComponent', () => {
-    let component: HistogrammeSwiperComponent;
-    let fixture: ComponentFixture<HistogrammeSwiperComponent>;
+    let component: BarChartSwiperComponent;
+    let fixture: ComponentFixture<BarChartSwiperComponent>;
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            declarations: [HistogrammeSwiperComponent],
+            declarations: [BarChartSwiperComponent],
         });
-        fixture = TestBed.createComponent(HistogrammeSwiperComponent);
+        fixture = TestBed.createComponent(BarChartSwiperComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

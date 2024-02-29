@@ -1,6 +1,6 @@
 import { Choice } from '@common/choice';
 
-export interface HistogrammeChoiceData {
+export interface BarChartChoiceData {
     choice: Choice;
     playersSelected: number;
 }

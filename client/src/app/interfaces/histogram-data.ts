@@ -1,6 +1,6 @@
-import { HistogrammeChoiceData } from './histogramme-choice-data';
+import { BarChartChoiceData } from './histogramme-choice-data';
 
-export interface HistogrammeData {
+export interface BarChartData {
     question: string;
-    choices: HistogrammeChoiceData[];
+    choices: BarChartChoiceData[];
 }

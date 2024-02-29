@@ -37,8 +37,8 @@ export class GameService {
         return this.webSocketService.on('cancelGame', callback);
     }
 
-    playerAbandon(pin: string, username: string) {
-        this.webSocketService.emit('playerAbandon', { pin, username });
+    playerAbandon(pin: string) {
+        this.webSocketService.emit('playerAbandon', { pin });
     }
 
     onPlayerAbandon(callback: (quitter: Player) => void): Subscription {

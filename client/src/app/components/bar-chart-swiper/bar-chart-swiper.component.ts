@@ -1,18 +1,18 @@
 import { Component, Input, ViewEncapsulation } from '@angular/core';
-import { HistogrammeData } from '@app/interfaces/histogram-data';
+import { BarChartData } from '@app/interfaces/histogram-data';
 import SwiperCore, { EffectCoverflow, Navigation, Pagination } from 'swiper';
 
 SwiperCore.use([Navigation, Pagination, EffectCoverflow]);
 
 @Component({
     selector: 'app-histogramme-swiper',
-    templateUrl: './histogramme-swiper.component.html',
-    styleUrls: ['./histogramme-swiper.component.scss'],
+    templateUrl: './bar-chart-swiper.component.html',
+    styleUrls: ['./bar-chart-swiper.component.scss'],
     encapsulation: ViewEncapsulation.None,
 })
-export class HistogrammeSwiperComponent {
+export class BarChartSwiperComponent {
     @Input()
-    answers: HistogrammeData[];
+    answers: BarChartData[];
 
     @Input()
     numberOfPlayers: number;

@@ -1,16 +1,16 @@
 import { Component, Input } from '@angular/core';
-import { HistogrammeData } from '@app/interfaces/histogram-data';
+import { BarChartData } from '@app/interfaces/histogram-data';
 
 const PERCENT_MULTPLIER = 100;
 
 @Component({
     selector: 'app-histogramme',
-    templateUrl: './histogramme.component.html',
-    styleUrls: ['./histogramme.component.scss'],
+    templateUrl: './bar-chart.component.html',
+    styleUrls: ['./bar-chart.component.scss'],
 })
-export class HistogrammeComponent {
+export class BarChartComponent {
     @Input()
-    data: HistogrammeData;
+    data: BarChartData;
 
     @Input()
     numberOfPlayers: number;
