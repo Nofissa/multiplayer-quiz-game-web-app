@@ -5,4 +5,9 @@ import { Component } from '@angular/core';
     templateUrl: './waiting-room-page.component.html',
     styleUrls: ['./waiting-room-page.component.scss'],
 })
-export class WaitingRoomPageComponent {}
+export class WaitingRoomPageComponent {
+
+    leaveGame() {
+        console.log("hello");
+    }
+}

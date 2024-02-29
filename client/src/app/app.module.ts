@@ -20,11 +20,13 @@ import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { SwiperModule } from 'swiper/angular';
 import { LoaderAnimationComponent } from './components/animations/loader-animation/loader-animation.component';
+import { ChatRoomComponent } from './components/chat-room/chat-room.component';
 import { ConfirmationDialogComponent } from './components/dialogs/confirmation-dialog/confirmation-dialog.component';
 import { PromptDialogComponent } from './components/dialogs/prompt-dialog/prompt-dialog.component';
 import { QuizDetailsDialogComponent } from './components/dialogs/quiz-details-dialog/quiz-details-dialog.component';
 import { UpsertQuestionDialogComponent } from './components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
 import { GameComponent } from './components/game/game.component';
+import { HistogrammeSwiperComponent } from './components/histogramme-swiper/histogramme-swiper.component';
 import { HistogrammeComponent } from './components/histogramme/histogramme/histogramme.component';
 import { NavHeaderComponent } from './components/nav-header/nav-header.component';
 import { QuestionBankComponent } from './components/question-bank/question-bank.component';
@@ -37,7 +39,6 @@ import { CreateGamePageComponent } from './pages/create-game-page/create-game-pa
 import { PlayerResultsPageComponent } from './pages/player-results-page/player-results-page.component';
 import { QCMCreationPageComponent } from './pages/qcmcreation-page/qcmcreation-page.component';
 import { WaitingRoomPageComponent } from './pages/waiting-room-page/waiting-room-page.component';
-import { HistogrammeSwiperComponent } from './components/histogramme-swiper/histogramme-swiper.component';
 /**
  * Main module that is used in main.ts.
  * All automatically generated components will appear in this module.
@@ -70,6 +71,7 @@ import { HistogrammeSwiperComponent } from './components/histogramme-swiper/hist
         HistogrammeComponent,
         PlayerResultsPageComponent,
         HistogrammeSwiperComponent,
+        ChatRoomComponent,
     ],
     imports: [
         AppRoutingModule,
