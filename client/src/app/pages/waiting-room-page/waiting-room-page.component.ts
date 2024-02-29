@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-waiting-room-page',
@@ -6,8 +7,10 @@ import { Component } from '@angular/core';
     styleUrls: ['./waiting-room-page.component.scss'],
 })
 export class WaitingRoomPageComponent {
+    constructor(private readonly router: Router) {}
 
     leaveGame() {
-        console.log("hello");
+        //TODO RAJOUTER le socket service et transmettre l'abandon du joueur côté serveur
+        this.router.navigate(['home']);
     }
 }
