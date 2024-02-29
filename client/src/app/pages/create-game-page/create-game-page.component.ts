@@ -42,7 +42,7 @@ export class CreateGamePageComponent implements OnInit, OnDestroy {
         this.loadQuizzes();
         this.createGameSubscription = this.gameService.onCreateGame((pin: string) => {
             if (pin) {
-                this.router.navigate(['/waiting-room'], { queryParams: { pin } });
+                this.router.navigate(['/host-game'], { queryParams: { pin } });
             }
         });
     }

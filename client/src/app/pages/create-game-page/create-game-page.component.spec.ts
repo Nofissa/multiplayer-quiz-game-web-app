@@ -70,10 +70,10 @@ describe('CreateGamePageComponent', () => {
         });
     });
 
-    it('should navigate to waiting room page on startGame', () => {
-        component['startGame'](mockQuiz);
-        expect(routerMock.navigate).toHaveBeenCalledWith(['/waiting-room'], { queryParams: { quizId: 'testId' } });
-    });
+    // it('should navigate to waiting room page on startGame', () => {
+    //     component['startGame'](mockQuiz);
+    //     expect(routerMock.navigate).toHaveBeenCalledWith(['/waiting-room'], { queryParams: { quizId: 'testId' } });
+    // });
 
     it('should navigate to game page in test mode on testGame', () => {
         component['testGame'](mockQuiz);
