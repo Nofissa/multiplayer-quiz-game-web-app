@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { BarChartData } from '@app/interfaces/histogram-data';
+import { questionStub } from '@app/TestStubs/question.stubs';
+import { submissionStub } from '@app/TestStubs/submission.stubs';
+import { BarChartData } from '@app/interfaces/bar-chart-data';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 
 @Component({
@@ -12,34 +14,12 @@ export class PlayerResultsPageComponent implements OnInit {
     // temporary until web socket service for histogram is implemented
     answers: BarChartData[] = [
         {
-            question: 'hee',
-            choices: [
-                {
-                    choice: { text: 'choice', isCorrect: true },
-                    playersSelected: 10,
-                },
-                {
-                    choice: { text: 'choice', isCorrect: true },
-                    playersSelected: 10,
-                },
-                {
-                    choice: { text: 'choice', isCorrect: false },
-                    playersSelected: 10,
-                },
-                {
-                    choice: { text: 'choice', isCorrect: false },
-                    playersSelected: 10,
-                },
-            ],
+            question: questionStub()[0],
+            submissions: submissionStub(),
         },
         {
-            question: 'hee',
-            choices: [
-                {
-                    choice: { text: 'choice', isCorrect: true },
-                    playersSelected: 10,
-                },
-            ],
+            question: questionStub()[1],
+            submissions: submissionStub(),
         },
     ];
     numberOfPlayers: number = 30;

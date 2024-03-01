@@ -7,7 +7,7 @@ import { PromptDialogComponent } from '@app/components/dialogs/prompt-dialog/pro
 import { MaterialServicesProvider } from '@app/providers/material-services.provider';
 import { SecurityServicesProvider } from '@app/providers/security-services.provider';
 import { AuthService } from '@app/services/auth/auth.service';
-import { GameService } from '@app/services/game/game.service';
+import { GameService } from '@app/services/game/game-service/game.service';
 import { SessionService } from '@app/services/session/session.service';
 import { AuthPayload } from '@common/auth-payload';
 import { JoinGamePayload } from '@common/join-game-payload';

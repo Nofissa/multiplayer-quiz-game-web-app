@@ -1,1 +1,5 @@
-<p>Vue de jeu de l'organisateur</p>
+<app-nav-header [backArrow]="false"></app-nav-header>
+<div class="grid-container">
+    <app-bar-chart-swiper [answers]="answers" [numberOfPlayers]="numberOfPlayers"></app-bar-chart-swiper>
+    <app-chat-room></app-chat-room>
+</div>

@@ -1,12 +1,12 @@
 <div class="histogramme">
-    <h3>{{ data.question }}</h3>
-    <div *ngFor="let choice of data.choices" class="choice-container">
-        <legend>{{ choice.choice.text }}</legend>
+    <h3 class="question-container">{{ data.question.text }}</h3>
+    <div *ngFor="let choice of data.question.choices; let i = index;" class="choice-container">
+        <legend>{{ choice.text }}</legend>
         <div class="progress-container">
-            <mat-progress-bar value="{{adjust(choice.playersSelected)}}" 
-                            [class.correct]="choice.choice.isCorrect"
-                            [class.incorrect]="!choice.choice.isCorrect"></mat-progress-bar>
-            <p>{{ choice.playersSelected }}</p>
+            <mat-progress-bar value="{{adjust(i)}}" 
+                            [class.correct]="choice.isCorrect"
+                            [class.incorrect]="!choice.isCorrect"></mat-progress-bar>
+            <p>{{ numberOfPlayers() }}</p>
         </div>
     </div>
 </div>

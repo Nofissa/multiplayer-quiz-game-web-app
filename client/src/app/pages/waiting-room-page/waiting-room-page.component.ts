@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { GameService } from '@app/services/game/game.service';
+import { GameService } from '@app/services/game/game-service/game.service';
 import { TimerService } from '@app/services/timer/timer.service';
 
 @Component({
