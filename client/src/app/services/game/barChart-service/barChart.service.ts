@@ -1,9 +1,9 @@
 import { BarChartData } from '@app/interfaces/bar-chart-data';
 import { Question } from '@app/interfaces/question';
+import { Submission } from '@common/submission';
 
 export class BarChartService {
-    numberOfPlayers: number;
-    private barChartData: BarChartData[];
+    private barChartData: BarChartData[] = [];
 
     addQuestion(question: Question) {
         const newBarchartData: BarChartData = {
@@ -13,16 +13,16 @@ export class BarChartService {
         this.barChartData.push(newBarchartData);
     }
 
-    updateBarChartData() {
-        // this.barChartData = submission.map((x) => {
-        //     retunr { question: 'asl', choices: x.choices.map((choice) => {
-        //         return { choice:  }
-        //     }) }
-        // });
-        // submission[0].choices.forEach((index) => {
-        //     return index;
-        // });
-
+    updateBarChartData(submission: Submission[]) {
+        this.barChartData[this.barChartData.length - 1].submissions = submission;
         return null;
+    }
+
+    getBarChart(index: number) {
+        return this.barChartData[index];
+    }
+
+    getAllBarChart() {
+        return this.barChartData;
     }
 }

@@ -9,14 +9,15 @@ import { GameService } from '@app/services/game/game-service/game.service';
     styleUrls: ['./host-game-page.component.scss'],
 })
 export class HostGamePageComponent {
-    answers: BarChartData[] = [];
-    numberOfPlayers: number = 30;
 
-    constructor(
-        private readonly gameService: GameService,
-        private readonly barChartService: BarChartService,
-    ) {
+    private barChartService: BarChartService;
+    constructor(private readonly gameService: GameService) {
+        this.barChartService = new BarChartService();
         this.gameService.onToggleSelectChoice(this.barChartService.updateBarChartData);
         this.gameService.onNextQuestion(this.barChartService.addQuestion);
+    }
+
+    get barCharts(): BarChartData[] {
+        return this.barChartService.getAllBarChart();
     }
 }
