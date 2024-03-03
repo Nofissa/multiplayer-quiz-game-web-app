@@ -17,6 +17,7 @@ export class PlayerListComponent implements OnInit {
     players: Player[] = [];
     playerJoinSub: Subscription;
     playerBanSub: Subscription;
+    playerAbdSub: Subscription;
     private readonly gameService: GameService;
 
     constructor(gameService: GameService) {
@@ -26,6 +27,9 @@ export class PlayerListComponent implements OnInit {
     ngOnInit() {
         this.playerJoinSub = this.gameService.onJoinGame((payload) => {
             this.players = payload.players;
+        });
+        this.playerAbdSub = this.gameService.onPlayerAbandon((player) => {
+            this.players = this.players.filter((p) => p.username !== player.username);
         });
         this.playerBanSub = this.gameService.onPlayerBan((player) => {
             this.players = this.players.filter((p) => p.username !== player.username);
