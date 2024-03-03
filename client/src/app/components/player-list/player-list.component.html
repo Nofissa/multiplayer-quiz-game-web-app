@@ -1,4 +1,7 @@
 <mat-list *ngFor="let player of players">
-    <mat-list-item>Player</mat-list-item>
+    <div class="player-container">
+        <mat-list-item>{{ player.username }}</mat-list-item>
+        <button *ngIf="isHost" mat-raised-button color="primary" (click)="banPlayer(player)">Kick</button>
+    </div>
     <mat-divider></mat-divider>
 </mat-list>
