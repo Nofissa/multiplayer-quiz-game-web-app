@@ -13,7 +13,7 @@ import { QuizHttpService } from '@app/services/quiz-http/quiz-http.service';
 export class QuizDetailsDialogComponent {
     constructor(
         @Inject(MAT_DIALOG_DATA)
-        readonly data: { quiz: Quiz; onStartGame: (quiz: Quiz) => void; onTestGame: (quiz: Quiz) => void; onNotFound: () => void },
+        readonly data: { quiz: Quiz; onCreateGame: (quiz: Quiz) => void; onTestGame: (quiz: Quiz) => void; onNotFound: () => void },
         private readonly dialogRef: MatDialogRef<QuizDetailsDialogComponent>,
         private readonly quizHttpService: QuizHttpService,
     ) {}
@@ -21,7 +21,7 @@ export class QuizDetailsDialogComponent {
     startGame() {
         this.quizHttpService.getVisibleQuizById(this.data.quiz._id).subscribe({
             next: (quiz: Quiz) => {
-                this.data.onStartGame(quiz);
+                this.data.onCreateGame(quiz);
             },
             error: (error: HttpErrorResponse) => {
                 if (error.status === HttpStatusCode.NotFound) {

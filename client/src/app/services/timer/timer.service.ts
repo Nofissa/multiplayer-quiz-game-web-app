@@ -1,40 +1,27 @@
 import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { WebSocketService } from '@app/services/web-socket/web-socket.service';
+import { Subscription } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
 })
 export class TimerService {
-    private onTickSubject = new Subject<number>();
-    // disabled lint here because if I place it on the first line, onTickSubject would be used before its declaration
-    // eslint-disable-next-line @typescript-eslint/member-ordering
-    onTick: Observable<number> = this.onTickSubject.asObservable();
-    private interval: number | undefined;
-    private readonly tick = 1000;
+    constructor(private readonly webSocketService: WebSocketService) {}
 
-    private counter = 0;
-    get time() {
-        return this.counter;
-    }
-    private set time(newTime: number) {
-        this.counter = newTime;
+    startTimer(pin: string) {
+        this.webSocketService.emit('startTimer', { pin });
     }
 
-    startTimer(startValue: number) {
-        if (this.interval) return;
-        this.time = startValue;
-        this.interval = window.setInterval(() => {
-            if (this.time > 0) {
-                this.time--;
-                this.onTickSubject.next(this.time);
-            } else {
-                this.stopTimer();
-            }
-        }, this.tick);
+    onStartTimer(callback: (duration: number) => void): Subscription {
+        return this.webSocketService.on('startTimer', callback);
     }
 
-    stopTimer() {
-        clearInterval(this.interval);
-        this.interval = undefined;
+    onTimerTick(callback: (remainingSeconds: number) => void): Subscription {
+        return this.webSocketService.on('timerTick', callback);
+    }
+
+    pauseTimer() {
+        // clearInterval(this.interval);
+        // this.interval = undefined;
     }
 }

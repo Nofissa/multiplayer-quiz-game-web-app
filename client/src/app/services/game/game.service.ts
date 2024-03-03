@@ -1,23 +1,79 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Choice } from '@common/choice';
+import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { EvaluationPayload } from '@common/evaluation-payload';
-import { Observable } from 'rxjs';
-import { environment } from 'src/environments/environment';
+import { JoinGamePayload } from '@common/join-game-payload';
+import { Player } from '@common/player';
+import { Submission } from '@common/submission';
+import { GameState } from '@common/game-state';
+import { Subscription } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
 })
 export class GameService {
-    private readonly baseUrl = `${environment.serverUrl}/game`;
-    constructor(private http: HttpClient) {}
+    constructor(private readonly webSocketService: WebSocketService) {}
 
-    get apiUrl() {
-        return this.baseUrl;
+    createGame(quizId: string) {
+        this.webSocketService.emit('createGame', { quizId });
     }
 
-    validateAnswers(selectedChoices: Choice[], quizID: string, questionIndex: number): Observable<EvaluationPayload> {
-        const url = `${this.baseUrl}/evaluateChoices/${quizID}?questionIndex=${questionIndex}`;
-        return this.http.post<EvaluationPayload>(url, selectedChoices);
+    onCreateGame(callback: (pin: string) => void): Subscription {
+        return this.webSocketService.on('createGame', callback);
+    }
+
+    joinGame(pin: string, username: string) {
+        this.webSocketService.emit('joinGame', { pin, username });
+    }
+
+    onJoinGame(callback: (payload: JoinGamePayload) => void): Subscription {
+        return this.webSocketService.on('joinGame', callback);
+    }
+
+    cancelGame(pin: string) {
+        this.webSocketService.emit('cancelGame', { pin });
+    }
+
+    onCancelGame(callback: () => void): Subscription {
+        return this.webSocketService.on('cancelGame', callback);
+    }
+
+    playerAbandon(pin: string, username: string) {
+        this.webSocketService.emit('playerAbandon', { pin, username });
+    }
+
+    onPlayerAbandon(callback: (quitter: Player) => void): Subscription {
+        return this.webSocketService.on('playerAbandon', callback);
+    }
+
+    playerBan(pin: string, username: string) {
+        this.webSocketService.emit('playerBan', { pin, username });
+    }
+
+    onPlayerBan(callback: (bannedPlayer: Player) => void): Subscription {
+        return this.webSocketService.on('playerBan', callback);
+    }
+
+    toggleSelectChoice(pin: string, choiceIndex: number) {
+        this.webSocketService.emit('toggleSelectChoice', { pin, choiceIndex });
+    }
+
+    onToggleSelectChoice(callback: (submissions: Submission[]) => void): Subscription {
+        return this.webSocketService.on('toggleSelectChoice', callback);
+    }
+
+    submitChoices(pin: string) {
+        this.webSocketService.emit('submitChoices', { pin });
+    }
+
+    onSubmitChoices(callback: (payload: EvaluationPayload) => void): Subscription {
+        return this.webSocketService.on('submitChoices', callback);
+    }
+
+    toggleGameLock(pin: string) {
+        this.webSocketService.emit('toggleGameLock', { pin });
+    }
+
+    onToggleGameLock(callback: (gameState: GameState) => void): Subscription {
+        return this.webSocketService.on('toggleGameLock', callback);
     }
 }
