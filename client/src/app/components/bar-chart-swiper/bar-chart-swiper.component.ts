@@ -12,7 +12,7 @@ SwiperCore.use([Navigation, Pagination, EffectCoverflow]);
 })
 export class BarChartSwiperComponent {
     @Input()
-    answers: BarChartData[];
+    data: BarChartData[];
 
     @Input()
     numberOfPlayers: number;

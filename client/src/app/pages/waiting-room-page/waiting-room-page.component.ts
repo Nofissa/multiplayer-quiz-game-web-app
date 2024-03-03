@@ -10,6 +10,8 @@ import { TimerService } from '@app/services/timer/timer.service';
 })
 export class WaitingRoomPageComponent implements OnInit {
     private pin: string;
+
+    // eslint-disable-next-line max-params
     constructor(
         private readonly timerService: TimerService,
         private readonly activatedRoute: ActivatedRoute,

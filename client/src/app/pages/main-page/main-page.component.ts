@@ -26,6 +26,7 @@ export class MainPageComponent implements OnInit, OnDestroy {
 
     private joinGameSubscription: Subscription;
 
+    // eslint-disable-next-line max-params
     constructor(
         private readonly gameService: GameService,
         securityServicesProvider: SecurityServicesProvider,

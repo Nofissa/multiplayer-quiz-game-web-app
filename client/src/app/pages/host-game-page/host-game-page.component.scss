@@ -1,5 +1,49 @@
 .grid-container {
     display: grid;
     grid-template-columns: 75% 25%;
-    margin: 30px;
+    grid-template-rows: 15% 35% 40% 10%;
+    grid-template-areas:
+        'nav-header nav-header'
+        'bar-chart chat-room'
+        'question-list chat-room'
+        'lock-button button';
+    height: 90vh;
+    justify-content: center;
+}
+
+.lock-button {
+    height: 100px;
+    width: 100px;
+    grid-area: lock-button;
+    justify-self: center;
+}
+
+.lock-icon {
+    font-size: 100px;
+}
+
+.nav-header {
+    grid-area: nav-header;
+}
+
+.bar-chart {
+    margin: 10px;
+    grid-area: bar-chart;
+    justify-self: center;
+}
+
+.chat-room {
+    margin: 10px;
+    grid-area: chat-room;
+    justify-self: center;
+}
+
+.start-button {
+    grid-area: button;
+    background-color: white;
+}
+
+.next-button {
+    grid-area: button;
+    background-color: white;
 }

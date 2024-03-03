@@ -16,8 +16,8 @@
         [navigation]="true"
         class="mySwiper"
     >
-        <ng-template swiperSlide *ngFor="let histogramme of answers">
-            <app-bar-chart [data]="histogramme"></app-bar-chart>
+        <ng-template swiperSlide *ngFor="let barChart of data">
+            <app-bar-chart [data]="barChart"></app-bar-chart>
         </ng-template>
     </swiper>
 </div>

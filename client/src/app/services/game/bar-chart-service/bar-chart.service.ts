@@ -18,8 +18,8 @@ export class BarChartService {
         return null;
     }
 
-    getBarChart(index: number) {
-        return this.barChartData[index];
+    getLatestBarChart() {
+        return this.barChartData[this.barChartData.length - 1];
     }
 
     getAllBarChart() {

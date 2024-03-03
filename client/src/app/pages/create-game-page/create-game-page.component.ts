@@ -28,6 +28,7 @@ export class CreateGamePageComponent implements OnInit, OnDestroy {
     private readonly snackBarService: MatSnackBar;
     private createGameSubscription: Subscription;
 
+    // eslint-disable-next-line max-params
     constructor(
         materialServicesProvider: MaterialServicesProvider,
         private readonly router: Router,

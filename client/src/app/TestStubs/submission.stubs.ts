@@ -1,4 +1,4 @@
-import { Submission } from "@common/submission";
+import { Submission } from '@common/submission';
 
 const submissions = [
     {
@@ -44,4 +44,4 @@ const submissions = [
 
 export const submissionStub = (): Submission[] => {
     return submissions;
-}
+};

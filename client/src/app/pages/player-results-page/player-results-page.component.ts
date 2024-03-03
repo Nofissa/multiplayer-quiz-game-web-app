@@ -12,7 +12,7 @@ import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 })
 export class PlayerResultsPageComponent implements OnInit {
     // temporary until web socket service for histogram is implemented
-    answers: BarChartData[] = [
+    data: BarChartData[] = [
         {
             question: questionStub()[0],
             submissions: submissionStub(),
@@ -22,7 +22,6 @@ export class PlayerResultsPageComponent implements OnInit {
             submissions: submissionStub(),
         },
     ];
-    numberOfPlayers: number = 30;
 
     private pin: string;
 

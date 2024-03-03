@@ -1,4 +1,7 @@
 export interface Submission {
-    choices: { index: number; isSelected: boolean }[];
+    choices: { 
+        index: number;
+        isSelected: boolean;
+    }[];
     isFinal: boolean;
 }
