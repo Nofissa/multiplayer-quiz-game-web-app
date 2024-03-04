@@ -13,14 +13,14 @@ export class BarChartComponent {
     data: BarChartData;
 
     adjust(index: number) {
-        const playersSelected = this.data.submissions.reduce((acc, submission) => {
+        const playersSelected = this.data.submissions.reduce((totalSelections, submission) => {
             submission.choices.forEach((choice) => {
                 if (choice.index === index && choice.isSelected) {
-                    acc++;
+                    totalSelections++;
                 }
             });
 
-            return acc;
+            return totalSelections;
         }, 0);
 
         return Math.round((playersSelected / this.numberOfPlayers()) * PERCENT_MULTPLIER);
