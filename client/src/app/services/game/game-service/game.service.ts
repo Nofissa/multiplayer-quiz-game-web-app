@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
+import { Question } from '@app/interfaces/question';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { EvaluationPayload } from '@common/evaluation-payload';
+import { GameState } from '@common/game-state';
 import { JoinGamePayload } from '@common/join-game-payload';
 import { Player } from '@common/player';
 import { Submission } from '@common/submission';
-import { GameState } from '@common/game-state';
 import { Subscription } from 'rxjs';
 
 @Injectable({
@@ -37,8 +38,8 @@ export class GameService {
         return this.webSocketService.on('cancelGame', callback);
     }
 
-    playerAbandon(pin: string, username: string) {
-        this.webSocketService.emit('playerAbandon', { pin, username });
+    playerAbandon(pin: string) {
+        this.webSocketService.emit('playerAbandon', { pin });
     }
 
     onPlayerAbandon(callback: (quitter: Player) => void): Subscription {
@@ -75,5 +76,9 @@ export class GameService {
 
     onToggleGameLock(callback: (gameState: GameState) => void): Subscription {
         return this.webSocketService.on('toggleGameLock', callback);
+    }
+
+    onNextQuestion(callback: (question: Question) => void): Subscription {
+        return this.webSocketService.on('nextQuestion', callback);
     }
 }
