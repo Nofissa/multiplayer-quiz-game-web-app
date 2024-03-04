@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { TimerService } from '@app/services/timer/timer.service';
 import { Subscription } from 'rxjs';
 
@@ -10,6 +10,8 @@ const WHEEL_COLOR_COUNT = 4;
     styleUrls: ['./timer.component.scss'],
 })
 export class TimerComponent implements OnInit, OnDestroy {
+    @Input()
+    pin: string;
     maxDuration: number;
     remainingTime: number;
     strokeDashoffset: number = 0;
@@ -26,11 +28,11 @@ export class TimerComponent implements OnInit, OnDestroy {
     constructor(private timerService: TimerService) {}
 
     ngOnInit() {
-        this.startTimerSubscription = this.timerService.onStartTimer((duration: number) => {
+        this.startTimerSubscription = this.timerService.onStartTimer(this.pin, (duration: number) => {
             this.maxDuration = duration;
             this.update(duration);
         });
-        this.timerTickSubscription = this.timerService.onTimerTick((remainingTime: number) => {
+        this.timerTickSubscription = this.timerService.onTimerTick(this.pin, (remainingTime: number) => {
             this.update(Math.max(0, remainingTime));
         });
     }

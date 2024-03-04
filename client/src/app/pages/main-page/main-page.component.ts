@@ -11,7 +11,8 @@ import { PromptDialogComponent } from '@app/components/dialogs/prompt-dialog/pro
 import { JoinGameDialogComponent } from '@app/components/dialogs/join-game-dialog/join-game-dialog.component';
 import { GameService } from '@app/services/game/game.service';
 import { Subscription } from 'rxjs';
-import { JoinGamePayload } from '@common/join-game-payload';
+import { GameInitBundle } from '@common/game-init-bundle';
+import { GameEventPayload } from '@common/game-event-payload';
 
 @Component({
     selector: 'app-main-page',
@@ -39,7 +40,7 @@ export class MainPageComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
-        this.joinGameSubscription = this.gameService.onJoinGame((payload: JoinGamePayload) => {
+        this.joinGameSubscription = this.gameService.onJoinGameNoPin((payload: GameEventPayload<GameInitBundle>) => {
             this.router.navigate(['waiting-room'], { queryParams: { pin: payload.pin } });
         });
     }
