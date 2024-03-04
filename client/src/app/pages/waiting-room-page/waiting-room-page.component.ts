@@ -11,6 +11,7 @@ import { TimerService } from '@app/services/timer/timer.service';
 export class WaitingRoomPageComponent implements OnInit {
     private pin: string;
 
+    // Dissabled lint due to the extra number of unrelated services needed here
     // eslint-disable-next-line max-params
     constructor(
         private readonly timerService: TimerService,
@@ -25,7 +26,6 @@ export class WaitingRoomPageComponent implements OnInit {
     }
 
     leaveGame() {
-        // TODO RAJOUTER le socket service et transmettre l'abandon du joueur côté serveur
         this.gameService.playerAbandon(this.pin);
         this.router.navigate(['home']);
     }

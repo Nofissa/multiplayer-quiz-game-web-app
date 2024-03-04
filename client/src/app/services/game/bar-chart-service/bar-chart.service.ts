@@ -15,7 +15,6 @@ export class BarChartService {
 
     updateBarChartData(submission: Submission[]) {
         this.barChartData[this.barChartData.length - 1].submissions = submission;
-        return null;
     }
 
     getLatestBarChart() {
