@@ -198,6 +198,19 @@ export class GameService {
         return game;
     }
 
+    startGame(pin: string, client: Socket): Question {
+        const game = this.getGame(pin);
+        if (this.isOrganizer(game, client.id)) {
+            if (game.state === GameState.Closed) {
+                game.state = GameState.Started;
+                return game.quiz.questions[0];
+            }
+
+            throw new Error('La partie ne peut pas être démarrée');
+        }
+        throw new Error("Seul l'organisateur peut démarrer une partie");
+    }
+
     disconnect(client: Socket): DisconnectPayload {
         const toCancel = [];
         const toAbandon = [];

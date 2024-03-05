@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { BarChartData } from '@app/interfaces/bar-chart-data';
 import { Question } from '@app/interfaces/question';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { EvaluationPayload } from '@common/evaluation-payload';
@@ -80,5 +81,25 @@ export class GameService {
 
     onNextQuestion(callback: (question: Question) => void): Subscription {
         return this.webSocketService.on('nextQuestion', callback);
+    }
+
+    sendPlayerResults(pin: string, results: BarChartData[]) {
+        this.webSocketService.emit('sendPlayerResults', { pin, results });
+    }
+
+    onSendPlayerResults(callback: (chartData: BarChartData[]) => void): Subscription {
+        return this.webSocketService.on('sendPlayerResults', callback);
+    }
+
+    playerLeaveGameEnd(pin: string) {
+        this.webSocketService.emit('playerLeaveGame', { pin });
+    }
+
+    startGame(pin: string) {
+        this.webSocketService.emit('startGame', { pin });
+    }
+
+    onStartGame(callback: (question: Question) => void): Subscription {
+        return this.webSocketService.on('startGame', callback);
     }
 }

@@ -1,6 +1,8 @@
+import { Question } from '@app/model/database/question';
 import { GameService } from '@app/services/game/game.service';
 import { MessageService } from '@app/services/message/message.service';
 import { TimerService } from '@app/services/timer/timer.service';
+import { Submission } from '@common/submission';
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
@@ -146,6 +148,37 @@ export class GameGateway implements OnGatewayDisconnect {
             const chatlog = this.messageService.sendMessage(client, pin, message);
 
             this.server.to(pin).emit('sendMessage', chatlog);
+        } catch (error) {
+            client.emit('error', error.message);
+        }
+    }
+
+    @SubscribeMessage('sendPlayerResults')
+    getBarChartData(
+        @ConnectedSocket() client: Socket,
+        @MessageBody() { pin, results }: { pin: string; results: { question: Question; submissions: Submission[] }[] },
+    ) {
+        try {
+            this.server.to(pin).emit('sendPlayerResults', results);
+        } catch (error) {
+            client.emit('error', error.message);
+        }
+    }
+
+    @SubscribeMessage('playerLeaveGameEnd')
+    playerLeaveGameEnd(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
+        try {
+            client.leave(pin);
+        } catch (error) {
+            client.emit('error', error.message);
+        }
+    }
+
+    @SubscribeMessage('startGame')
+    startGame(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
+        try {
+            const firstQuestion = this.gameService.startGame(pin, client);
+            this.server.to(pin).emit('startGame', firstQuestion);
         } catch (error) {
             client.emit('error', error.message);
         }

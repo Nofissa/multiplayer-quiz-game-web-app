@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { questionStub } from '@app/TestStubs/question.stubs';
+import { submissionStub } from '@app/TestStubs/submission.stubs';
 import { BarChartData } from '@app/interfaces/bar-chart-data';
+import { Question } from '@app/interfaces/question';
 import { BarChartService } from '@app/services/game/bar-chart-service/bar-chart.service';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { GameState } from '@common/game-state';
@@ -15,16 +18,12 @@ export class HostGamePageComponent implements OnInit {
     isEnded: boolean = false;
     gameState: GameState = GameState.Opened;
 
-    private barChartService: BarChartService = new BarChartService();
+    private barChartService: BarChartService;
 
     constructor(
         private readonly gameService: GameService,
         private readonly activatedRoute: ActivatedRoute,
-    ) {
-        this.gameService.onToggleSelectChoice(this.barChartService.updateBarChartData);
-        this.gameService.onNextQuestion(this.barChartService.addQuestion);
-        this.gameService.onToggleGameLock((gameState: GameState) => (this.gameState = gameState));
-    }
+    ) {}
 
     get barCharts(): BarChartData[] {
         return this.barChartService.getAllBarChart();
@@ -36,6 +35,11 @@ export class HostGamePageComponent implements OnInit {
 
     ngOnInit() {
         this.pin = this.activatedRoute.snapshot.queryParams['pin'];
+        this.barChartService = new BarChartService();
+        this.gameService.onToggleSelectChoice(this.barChartService.updateBarChartData);
+        this.gameService.onNextQuestion(this.barChartService.addQuestion);
+        this.gameService.onToggleGameLock((gameState: GameState) => (this.gameState = gameState));
+        this.gameService.onStartGame(this.handleStartGame);
     }
 
     isLocked() {
@@ -52,11 +56,31 @@ export class HostGamePageComponent implements OnInit {
 
     startGame() {
         // TODO
-        return;
+        console.log('game is started');
+        this.gameService.startGame(this.pin);
     }
 
     nextQuestion() {
         // TODO
         return;
+    }
+
+    endGame() {
+        this.gameService.sendPlayerResults(this.pin, [
+            {
+                question: questionStub()[0],
+                submissions: submissionStub(),
+            },
+            {
+                question: questionStub()[1],
+                submissions: submissionStub(),
+            },
+        ]);
+        return;
+    }
+
+    handleStartGame(question: Question) {
+        console.log("i am called" + question);
+        //this.barChartService.addQuestion(question);
     }
 }

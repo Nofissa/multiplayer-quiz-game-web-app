@@ -24,4 +24,8 @@ export class BarChartService {
     getAllBarChart() {
         return this.barChartData;
     }
+
+    setData(chartData: BarChartData[]) {
+        this.barChartData = chartData;
+    }
 }
