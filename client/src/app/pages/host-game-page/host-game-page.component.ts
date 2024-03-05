@@ -49,4 +49,14 @@ export class HostGamePageComponent implements OnInit {
     toggleLock() {
         this.gameService.toggleGameLock(this.pin);
     }
+
+    startGame() {
+        // TODO
+        return;
+    }
+
+    nextQuestion() {
+        // TODO
+        return;
+    }
 }

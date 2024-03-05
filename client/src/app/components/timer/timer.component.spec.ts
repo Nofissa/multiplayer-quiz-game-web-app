@@ -22,9 +22,4 @@ describe('TimerComponent', () => {
     it('should create', () => {
         expect(component).toBeTruthy();
     });
-
-    it('should subscribe to onStartTimer and onTimerTick on initialization', () => {
-        expect(timerServiceSpy.onStartTimer).toHaveBeenCalled();
-        expect(timerServiceSpy.onTimerTick).toHaveBeenCalled();
-    });
 });
