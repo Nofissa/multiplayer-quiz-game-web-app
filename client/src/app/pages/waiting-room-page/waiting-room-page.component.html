@@ -1,6 +1,10 @@
 <app-nav-header></app-nav-header>
-<div class="waiting-text">
-    <h3>En attente des autres joueurs...</h3>
+<div class="container">
+    <div class="waiting-area">
+        <h3>En attente des autres joueurs...</h3>
+        <app-loader-animation></app-loader-animation>
+    </div>
+    <div class="right-panel">
+        <app-chat-room></app-chat-room>
+    </div>
 </div>
-<app-loader-animation></app-loader-animation>
-<app-timer-component></app-timer-component>

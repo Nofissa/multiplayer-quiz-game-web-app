@@ -15,7 +15,6 @@ export class WaitingRoomPageComponent implements OnInit {
 
     ngOnInit() {
         const pin = this.activatedRoute.snapshot.queryParams['pin'];
-
         this.timerService.startTimer(pin);
     }
 }

@@ -1,10 +1,22 @@
 <div class="chat-room">
     <div class="messages-zone font-color text-centered">
         <h3>Salon de clavardage</h3>
+        <ul id="message-list">
+            <li *ngFor="let chatlog of chatlogsArray">{{ chatlog.message }}</li>
+            <!-- {{ chatlog.author }}:  -->
+        </ul>
     </div>
     <mat-form-field appearance="outline">
         <mat-label>Message</mat-label>
-        <textarea matInput id="chattingArea" class="write-message" placeholder="Envoyer un message"> </textarea>
+        <textarea
+            matInput
+            id="chattingArea"
+            [(ngModel)]="chatMessage"
+            (keydown.enter)="sendMessage()"
+            class="write-message"
+            placeholder="Envoyer un message"
+        >
+        </textarea>
         <button matSuffix mat-icon-button class="send-button" (click)="sendMessage()">
             <mat-icon>send</mat-icon>
         </button>

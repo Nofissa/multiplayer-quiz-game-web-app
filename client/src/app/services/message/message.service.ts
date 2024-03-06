@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Subscription } from 'rxjs';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { Chatlog } from '@common/chatlog';
+import { Subscription } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class MessageService {
@@ -11,7 +11,7 @@ export class MessageService {
         this.webSocketService.emit('sendMessage', { pin, message });
     }
 
-    onSendMessage(callback: (chatlogs: Chatlog[]) => void): Subscription {
+    onSendMessage(callback: (chatlogs: Chatlog) => void): Subscription {
         return this.webSocketService.on('sendMessage', callback);
     }
 }
