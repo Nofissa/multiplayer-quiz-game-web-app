@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { Chatlog } from '@common/chatlog';
-import { applyIfPinMatches } from '@app/utils/condition-applications/conditional-applications';
+import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
 
 @Injectable({ providedIn: 'root' })
 export class MessageService {
