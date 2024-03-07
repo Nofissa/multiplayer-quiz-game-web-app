@@ -97,7 +97,6 @@ import { JoinGameDialogComponent } from './components/dialogs/join-game-dialog/j
         MatSliderModule,
         MatSnackBarModule,
     ],
-
     providers: [],
     bootstrap: [AppComponent],
 })
