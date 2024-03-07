@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
+import { Question } from '@app/interfaces/question';
 import { Evaluation } from '@common/evaluation';
 import { GameInitBundle } from '@common/game-init-bundle';
 import { GameEventPayload } from '@common/game-event-payload';
@@ -7,7 +8,7 @@ import { Player } from '@common/player';
 import { Submission } from '@common/submission';
 import { GameState } from '@common/game-state';
 import { Subscription } from 'rxjs';
-import { applyIfPinMatches } from '@app/utils/condition-applications/conditional-applications';
+import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
 
 @Injectable({
     providedIn: 'root',
@@ -73,6 +74,22 @@ export class GameService {
 
     onSubmitChoices(pin: string, callback: (evaluation: Evaluation) => void): Subscription {
         return this.webSocketService.on('submitChoices', applyIfPinMatches(pin, callback));
+    }
+
+    getCurrentQuestion(pin: string) {
+        this.webSocketService.emit('getCurrentQuestion', { pin });
+    }
+
+    onGetCurrentQuestion(pin: string, callback: (question: Question) => void): Subscription {
+        return this.webSocketService.on('getCurrentQuestion', applyIfPinMatches(pin, callback));
+    }
+
+    nextQuestion(pin: string) {
+        this.webSocketService.emit('nextQuestion', { pin });
+    }
+
+    onNextQuestion(pin: string, callback: (question: Question) => void): Subscription {
+        return this.webSocketService.on('nextQuestion', applyIfPinMatches(pin, callback));
     }
 
     toggleGameLock(pin: string) {
