@@ -116,6 +116,18 @@ export class GameGateway implements OnGatewayDisconnect {
         }
     }
 
+    @SubscribeMessage('getCurrentQuestion')
+    getCurrentQuestion(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
+        try {
+            const question = this.gameService.getGame(pin).currentQuestion;
+
+            const payload: GameEventPayload<Question> = { pin, data: question };
+            this.server.to(pin).emit('getCurrentQuestion', payload);
+        } catch (error) {
+            client.emit('error', error.message);
+        }
+    }
+
     @SubscribeMessage('nextQuestion')
     nextQuestion(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
         try {
