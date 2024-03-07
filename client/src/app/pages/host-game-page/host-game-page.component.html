@@ -1,20 +1,16 @@
-
 <div class="grid-container">
     <app-nav-header class="nav-header" [backArrow]="false"></app-nav-header>
-    <div *ngIf="isStarted()">
-        <app-bar-chart-swiper class="bar-chart" *ngIf="isEnded" [data]="barCharts" ></app-bar-chart-swiper>
-        <app-bar-chart class="bar-chart" *ngIf="!isEnded" [data]="barChart"></app-bar-chart>
-    </div>
-    <app-chat-room class="chat-room"></app-chat-room>
+    <app-bar-chart-swiper class="bar-chart" *ngIf="isEnded()" [data]="barCharts"></app-bar-chart-swiper>
+    <app-bar-chart class="bar-chart" *ngIf="isStarted()" [data]="barChart"></app-bar-chart>
 
+    <app-chat-room class="chat-room"></app-chat-room>
 
     <button class="lock-button" mat-raised-button (click)="toggleLock()">
         <mat-icon class="lock-icon" *ngIf="!isLocked()" fontIcon="lock_open"></mat-icon>
         <mat-icon class="lock-icon" *ngIf="isLocked()" fontIcon="lock"></mat-icon>
     </button>
     <div class="flex-column">
-        <button class="start-button" mat-raised-button *ngIf="isLocked() && !isStarted()" (click)="startGame()">START</button>
         <button class="next-button" mat-raised-button *ngIf="isLocked() && isStarted()" (click)="nextQuestion()">NEXT</button>
-        <button class="end-button" mat-raised-button (click)="endGame()">END ME</button>
+        <button class="end-button" mat-raised-button (mouseup)="endGame()" *ngIf="!isEnded()">END ME</button>
     </div>
 </div>

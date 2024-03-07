@@ -16,7 +16,6 @@ import { Submission } from '@common/submission';
 })
 export class HostGamePageComponent implements OnInit {
     pin: string;
-    isEnded: boolean = false;
     gameState: GameState = GameState.Opened;
 
     private barChartService: BarChartService;
@@ -44,8 +43,9 @@ export class HostGamePageComponent implements OnInit {
             this.barChartService.addQuestion(question);
         });
         this.gameService.onToggleGameLock((gameState: GameState) => (this.gameState = gameState));
-        this.gameService.onStartGame((question: Question) => {
-            this.handleStartGame(question);
+
+        this.gameService.onEndGame((gameState: GameState) => {
+            this.handleEndGame(gameState);
         });
     }
 
@@ -57,14 +57,16 @@ export class HostGamePageComponent implements OnInit {
         return this.gameState === GameState.Started;
     }
 
+    isEnded() {
+        return this.gameState === GameState.Ended;
+    }
+
     toggleLock() {
         this.gameService.toggleGameLock(this.pin);
     }
 
     startGame() {
         // TODO
-        console.log('game is started');
-        this.gameService.startGame(this.pin);
     }
 
     nextQuestion() {
@@ -73,6 +75,21 @@ export class HostGamePageComponent implements OnInit {
     }
 
     endGame() {
+        this.gameService.endGame(this.pin);
+    }
+
+    handleEndGame(gameState: GameState) {
+        this.gameState = gameState;
+        this.barChartService.setData([
+            {
+                question: questionStub()[0],
+                submissions: submissionStub(),
+            },
+            {
+                question: questionStub()[1],
+                submissions: submissionStub(),
+            },
+        ]);
         this.gameService.sendPlayerResults(this.pin, [
             {
                 question: questionStub()[0],
@@ -83,11 +100,5 @@ export class HostGamePageComponent implements OnInit {
                 submissions: submissionStub(),
             },
         ]);
-        return;
-    }
-
-    handleStartGame(question: Question) {
-        console.log('i am called' + question);
-        this.barChartService.addQuestion(question);
     }
 }

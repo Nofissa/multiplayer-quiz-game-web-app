@@ -121,7 +121,7 @@ export class GameGateway implements OnGatewayDisconnect {
     toggleSelectChoice(@ConnectedSocket() client: Socket, @MessageBody() { pin, choiceIndex }: { pin: string; choiceIndex: number }) {
         try {
             const submission = this.gameService.toggleSelectChoice(client, pin, choiceIndex);
-            const organizer = this.gameService.getGame(pin).organizer;
+            const organizer = this.gameService.getOrganizer(pin);
 
             organizer.emit('toggleSelectChoice', submission);
         } catch (error) {
@@ -160,6 +160,16 @@ export class GameGateway implements OnGatewayDisconnect {
     ) {
         try {
             this.server.to(pin).emit('sendPlayerResults', results);
+        } catch (error) {
+            client.emit('error', error.message);
+        }
+    }
+
+    @SubscribeMessage('endGame')
+    handleEndGame(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
+        try {
+            const gameState = this.gameService.endGame(pin, client);
+            this.server.to(pin).emit('endGame', gameState);
         } catch (error) {
             client.emit('error', error.message);
         }

@@ -95,11 +95,11 @@ export class GameService {
         this.webSocketService.emit('playerLeaveGame', { pin });
     }
 
-    startGame(pin: string) {
-        this.webSocketService.emit('startGame', { pin });
+    endGame(pin: string) {
+        this.webSocketService.emit('endGame', { pin });
     }
 
-    onStartGame(callback: (question: Question) => void): Subscription {
-        return this.webSocketService.on('startGame', callback);
+    onEndGame(callback: (gameState: GameState) => void): Subscription {
+        return this.webSocketService.on('endGame', callback);
     }
 }

@@ -3,7 +3,6 @@ import { ActivatedRoute } from '@angular/router';
 import { BarChartData } from '@app/interfaces/bar-chart-data';
 import { BarChartService } from '@app/services/game/bar-chart-service/bar-chart.service';
 import { GameService } from '@app/services/game/game-service/game.service';
-// import { BarChartService } from '@app/services/game/bar-chart-service/bar-chart.service';
 
 @Component({
     selector: 'app-player-results-page',
@@ -16,9 +15,11 @@ export class PlayerResultsPageComponent implements OnInit {
     constructor(
         private readonly activatedRoute: ActivatedRoute,
         private readonly gameService: GameService,
-        private barChartService: BarChartService,
+        private readonly barChartService: BarChartService,
     ) {
-        this.gameService.onSendPlayerResults(this.setBarChartData);
+        this.gameService.onSendPlayerResults((chartData: BarChartData[]) => {
+            this.setBarChartData(chartData);
+        });
     }
 
     get chartData(): BarChartData[] {

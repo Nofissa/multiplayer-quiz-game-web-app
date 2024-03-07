@@ -198,6 +198,16 @@ export class GameService {
         return game;
     }
 
+    getOrganizer(pin: string): Socket {
+        const game = this.games.get(pin);
+
+        if (!game) {
+            throw new Error(`Aucune partie ne correspond au pin ${pin}`);
+        }
+
+        return game.organizer;
+    }
+
     startGame(pin: string, client: Socket): Question {
         const game = this.getGame(pin);
         if (this.isOrganizer(game, client.id)) {
@@ -209,6 +219,20 @@ export class GameService {
             throw new Error('La partie ne peut pas être démarrée');
         }
         throw new Error("Seul l'organisateur peut démarrer une partie");
+    }
+
+    endGame(pin: string, client: Socket): GameState {
+        const game = this.getGame(pin);
+        if (this.isOrganizer(game, client.id)) {
+            game.state = GameState.Ended;
+            return game.state;
+            // if (game.state === GameState.Started) {
+
+            // }
+
+            // throw new Error('La partie ne peut pas être terminée');
+        }
+        throw new Error("Seul l'organisateur peut terminer une partie");
     }
 
     disconnect(client: Socket): DisconnectPayload {

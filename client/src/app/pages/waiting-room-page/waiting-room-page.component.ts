@@ -20,8 +20,9 @@ export class WaitingRoomPageComponent implements OnInit {
 
     ngOnInit() {
         this.pin = this.activatedRoute.snapshot.queryParams['pin'];
-        this.gameService.onStartGame(() => {
-            this.handleStartGame();
+
+        this.gameService.onEndGame(() => {
+            this.handleEndGame();
         });
     }
 
@@ -30,7 +31,7 @@ export class WaitingRoomPageComponent implements OnInit {
         this.router.navigate(['home']);
     }
 
-    handleStartGame() {
-        this.router.navigate(['game'], { queryParams: { pin: this.pin } });
+    handleEndGame() {
+        this.router.navigate(['results-page']);
     }
 }
