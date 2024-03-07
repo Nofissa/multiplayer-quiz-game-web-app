@@ -7,6 +7,7 @@ import { Question } from '@app/interfaces/question';
 import { BarChartService } from '@app/services/game/bar-chart-service/bar-chart.service';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { GameState } from '@common/game-state';
+import { Submission } from '@common/submission';
 
 @Component({
     selector: 'app-host-game-page',
@@ -36,10 +37,16 @@ export class HostGamePageComponent implements OnInit {
     ngOnInit() {
         this.pin = this.activatedRoute.snapshot.queryParams['pin'];
         this.barChartService = new BarChartService();
-        this.gameService.onToggleSelectChoice(this.barChartService.updateBarChartData);
-        this.gameService.onNextQuestion(this.barChartService.addQuestion);
+        this.gameService.onToggleSelectChoice((submission: Submission[]) => {
+            this.barChartService.updateBarChartData(submission);
+        });
+        this.gameService.onNextQuestion((question: Question) => {
+            this.barChartService.addQuestion(question);
+        });
         this.gameService.onToggleGameLock((gameState: GameState) => (this.gameState = gameState));
-        this.gameService.onStartGame(this.handleStartGame);
+        this.gameService.onStartGame((question: Question) => {
+            this.handleStartGame(question);
+        });
     }
 
     isLocked() {
@@ -80,7 +87,7 @@ export class HostGamePageComponent implements OnInit {
     }
 
     handleStartGame(question: Question) {
-        console.log("i am called" + question);
-        //this.barChartService.addQuestion(question);
+        console.log('i am called' + question);
+        this.barChartService.addQuestion(question);
     }
 }

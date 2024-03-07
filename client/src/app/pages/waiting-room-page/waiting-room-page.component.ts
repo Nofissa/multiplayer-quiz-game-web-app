@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Question } from '@app/interfaces/question';
 import { GameService } from '@app/services/game/game-service/game.service';
 
 @Component({
@@ -21,8 +20,8 @@ export class WaitingRoomPageComponent implements OnInit {
 
     ngOnInit() {
         this.pin = this.activatedRoute.snapshot.queryParams['pin'];
-        this.gameService.onStartGame((question: Question) => {
-            this.handleStartGame(question);
+        this.gameService.onStartGame(() => {
+            this.handleStartGame();
         });
     }
 
@@ -31,7 +30,7 @@ export class WaitingRoomPageComponent implements OnInit {
         this.router.navigate(['home']);
     }
 
-    handleStartGame(question: Question) {
+    handleStartGame() {
         this.router.navigate(['game'], { queryParams: { pin: this.pin } });
     }
 }
