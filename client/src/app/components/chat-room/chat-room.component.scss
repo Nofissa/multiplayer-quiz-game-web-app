@@ -6,11 +6,17 @@
     border: 1px solid black;
     padding: 10px;
     background-color: aliceblue;
+    max-width: 321px;
 }
 
 .messages-zone {
     flex-grow: 1;
     padding: 10px;
+    overflow-y: auto;
+    max-height: 700px;
+    max-width: 321px;
+    display: flex;
+    flex-direction: column;
 }
 
 .write-message {
@@ -26,6 +32,61 @@ h3 {
     text-align: center;
 }
 
+#message-list {
+    list-style: none;
+    padding: 0;
+    width: 100%;
+}
+
 #message-list li {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+}
+
+#message-list li.receiver {
+    justify-content: flex-start;
+}
+
+.message-content {
+    max-width: 60%;
+    padding: 8px 12px;
+    border-radius: 18px;
+    word-wrap: break-word;
+    position: relative;
+    min-width: 50px;
+}
+.message-info {
+    padding-bottom: 15px; /* Add padding to create space above the date */
+}
+
+.sender .message-content {
+    background-color: #0079fa;
+    color: white;
+}
+
+.receiver .message-content {
+    background-color: #e5e5ea;
     color: black;
+}
+
+.author-name {
+    font-weight: 450;
+    font-size: 0.8em;
+    color: black;
+    margin-bottom: 2px;
+}
+
+.message-text {
+    padding-top: 3px;
+    word-break: break-word;
+}
+
+.message-date {
+    position: absolute;
+    bottom: 4px;
+    right: 8px;
+    font-size: 0.55em;
+    color: #302d2d;
+    white-space: nowrap;
 }

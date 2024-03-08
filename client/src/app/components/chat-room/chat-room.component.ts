@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { MessageService } from '@app/services/message/message.service';
+import { UserService } from '@app/services/user/user-service';
 import { Chatlog } from '@common/chatlog';
 import { Subscription } from 'rxjs';
 
@@ -17,6 +18,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     constructor(
         private messageService: MessageService,
         private readonly activatedRoute: ActivatedRoute,
+        private userService: UserService,
     ) {}
 
     ngOnInit() {
@@ -34,5 +36,9 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
         const pin = this.activatedRoute.snapshot.queryParams['pin'];
         this.messageService.sendMessage(pin, this.chatMessage);
         this.chatMessage = '';
+    }
+
+    isCurrentUser(author: string): boolean {
+        return author === this.userService.getUsername();
     }
 }
