@@ -9,11 +9,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-<<<<<<< HEAD
 import { MatListModule } from '@angular/material/list';
-=======
-import { MatProgressBarModule } from '@angular/material/progress-bar';
->>>>>>> origin/dev
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSliderModule } from '@angular/material/slider';
