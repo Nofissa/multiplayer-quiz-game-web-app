@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Question } from '@app/interfaces/question';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { Question } from '@app/interfaces/question';
 import { Evaluation } from '@common/evaluation';
@@ -6,7 +7,6 @@ import { GameInitBundle } from '@common/game-init-bundle';
 import { GameEventPayload } from '@common/game-event-payload';
 import { Player } from '@common/player';
 import { Submission } from '@common/submission';
-import { GameState } from '@common/game-state';
 import { Subscription } from 'rxjs';
 import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
 
@@ -44,8 +44,8 @@ export class GameService {
         return this.webSocketService.on('cancelGame', applyIfPinMatches(pin, callback));
     }
 
-    playerAbandon(pin: string, username: string) {
-        this.webSocketService.emit('playerAbandon', { pin, username });
+    playerAbandon(pin: string) {
+        this.webSocketService.emit('playerAbandon', { pin });
     }
 
     onPlayerAbandon(pin: string, callback: (quitter: Player) => void): Subscription {
@@ -98,5 +98,9 @@ export class GameService {
 
     onToggleGameLock(pin: string, callback: (gameState: GameState) => void): Subscription {
         return this.webSocketService.on('toggleGameLock', applyIfPinMatches(pin, callback));
+    }
+
+    onNextQuestion(callback: (question: Question) => void): Subscription {
+        return this.webSocketService.on('nextQuestion', callback);
     }
 }

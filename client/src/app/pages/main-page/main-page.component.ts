@@ -1,15 +1,16 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { AuthService } from '@app/services/auth/auth.service';
-import { SessionService } from '@app/services/session/session.service';
-import { AuthPayload } from '@common/auth-payload';
-import { MaterialServicesProvider } from '@app/providers/material-services.provider';
-import { SecurityServicesProvider } from '@app/providers/security-services.provider';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { PromptDialogComponent } from '@app/components/dialogs/prompt-dialog/prompt-dialog.component';
+import { Router } from '@angular/router';
 import { JoinGameDialogComponent } from '@app/components/dialogs/join-game-dialog/join-game-dialog.component';
-import { GameService } from '@app/services/game/game.service';
+import { PromptDialogComponent } from '@app/components/dialogs/prompt-dialog/prompt-dialog.component';
+import { MaterialServicesProvider } from '@app/providers/material-services.provider';
+import { SecurityServicesProvider } from '@app/providers/security-services.provider';
+import { AuthService } from '@app/services/auth/auth.service';
+import { GameService } from '@app/services/game/game-service/game.service';
+import { SessionService } from '@app/services/session/session.service';
+import { AuthPayload } from '@common/auth-payload';
+import { JoinGamePayload } from '@common/join-game-payload';
 import { Subscription } from 'rxjs';
 import { GameInitBundle } from '@common/game-init-bundle';
 import { GameEventPayload } from '@common/game-event-payload';
@@ -27,6 +28,7 @@ export class MainPageComponent implements OnInit, OnDestroy {
 
     private joinGameSubscription: Subscription;
 
+    // eslint-disable-next-line max-params
     constructor(
         private readonly gameService: GameService,
         securityServicesProvider: SecurityServicesProvider,

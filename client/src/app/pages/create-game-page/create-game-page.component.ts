@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
 import { QuizDetailsDialogComponent } from '@app/components/dialogs/quiz-details-dialog/quiz-details-dialog.component';
 import { Quiz } from '@app/interfaces/quiz';
 import { MaterialServicesProvider } from '@app/providers/material-services.provider';
-import { GameService } from '@app/services/game/game.service';
+import { GameService } from '@app/services/game/game-service/game.service';
 import { QuizHttpService } from '@app/services/quiz-http/quiz-http.service';
 import { Subscription } from 'rxjs';
 import SwiperCore, { EffectCoverflow, Navigation, Pagination } from 'swiper';
@@ -28,6 +28,7 @@ export class CreateGamePageComponent implements OnInit, OnDestroy {
     private readonly snackBarService: MatSnackBar;
     private createGameSubscription: Subscription;
 
+    // eslint-disable-next-line max-params
     constructor(
         materialServicesProvider: MaterialServicesProvider,
         private readonly router: Router,
@@ -42,7 +43,7 @@ export class CreateGamePageComponent implements OnInit, OnDestroy {
         this.loadQuizzes();
         this.createGameSubscription = this.gameService.onCreateGame((pin: string) => {
             if (pin) {
-                this.router.navigate(['/waiting-room'], { queryParams: { pin } });
+                this.router.navigate(['/host-game'], { queryParams: { pin } });
             }
         });
     }
