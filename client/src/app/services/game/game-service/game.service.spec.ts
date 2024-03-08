@@ -76,6 +76,7 @@ describe('GameService', () => {
 
         expect(stubData.callback).toHaveBeenCalledWith(stubData.pin1);
     });
+
     it('should raise joinGame event', () => {
         const username = 'user123';
         gameService.joinGame(stubData.pin1, username);
@@ -129,9 +130,8 @@ describe('GameService', () => {
     });
 
     it('should raise playerAbandon event', () => {
-        const username = 'user123';
-        gameService.playerAbandon(stubData.pin1, username);
-        expect(webSocketServiceSpy.emit).toHaveBeenCalledWith(stubData.playerAbandonEventName, { pin: stubData.pin1, username });
+        gameService.playerAbandon(stubData.pin1);
+        expect(webSocketServiceSpy.emit).toHaveBeenCalledWith(stubData.playerAbandonEventName, { pin: stubData.pin1 });
     });
 
     it('should subscribe to playerAbandon event and call the callback if pin matches', () => {

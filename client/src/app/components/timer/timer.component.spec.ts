@@ -11,6 +11,7 @@ describe('TimerComponent', () => {
     let timerServiceSpy: jasmine.SpyObj<TimerService>;
     let webSocketServiceSpy: jasmine.SpyObj<WebSocketService>;
     const stubData = {
+        pin: '1234',
         maxDuration: 60,
         remainingTime: 30,
     };
@@ -58,19 +59,17 @@ describe('TimerComponent', () => {
     });
 
     it('should subscribe to onStartTimer and onTimerTick on initialization', () => {
-        const pin = '1234';
         timerServiceSpy.onStartTimer.and.returnValue(of(stubData.maxDuration).subscribe());
         timerServiceSpy.onTimerTick.and.returnValue(of(stubData.remainingTime).subscribe());
-        component.pin = pin;
+        component.pin = stubData.pin;
         component.ngOnInit();
 
-        expect(timerServiceSpy.onStartTimer).toHaveBeenCalledWith(pin, jasmine.any(Function));
-        expect(timerServiceSpy.onTimerTick).toHaveBeenCalledWith(pin, jasmine.any(Function));
+        expect(timerServiceSpy.onStartTimer).toHaveBeenCalledWith(stubData.pin, jasmine.any(Function));
+        expect(timerServiceSpy.onTimerTick).toHaveBeenCalledWith(stubData.pin, jasmine.any(Function));
     });
 
     it('should update remaining time and maxDuration on onStartTimer', () => {
-        const pin = '1234';
-        component.pin = pin;
+        component.pin = stubData.pin;
 
         timerServiceSpy.onStartTimer.and.callFake((_pin: string, callback: (remainingTime: number) => void) => {
             callback(stubData.maxDuration);
@@ -83,8 +82,7 @@ describe('TimerComponent', () => {
     });
 
     it('should update remaining time on onTimerTick', () => {
-        const pin = '1234';
-        component.pin = pin;
+        component.pin = stubData.pin;
 
         timerServiceSpy.onTimerTick.and.callFake((_pin: string, callback: (remainingTime: number) => void) => {
             callback(stubData.remainingTime);
@@ -96,11 +94,10 @@ describe('TimerComponent', () => {
     });
 
     it('should close subscriptions on ngOnDestroy', () => {
-        const pin = '1234';
         timerServiceSpy.onStartTimer.and.returnValue(of(stubData.maxDuration).subscribe());
         timerServiceSpy.onTimerTick.and.returnValue(of(stubData.remainingTime).subscribe());
 
-        component.pin = pin;
+        component.pin = stubData.pin;
         component.ngOnInit();
         component.ngOnDestroy();
 
