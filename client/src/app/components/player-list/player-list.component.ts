@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { GameService } from '@app/services/game/game.service';
 import { Player } from '@common/player';
+import { PlayerState } from '@common/player-state';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -14,6 +15,7 @@ export class PlayerListComponent implements OnInit {
     @Input()
     pin: string;
 
+    playerStates = PlayerState;
     players: Player[] = [];
     playerJoinSub: Subscription;
     playerBanSub: Subscription;
@@ -29,10 +31,12 @@ export class PlayerListComponent implements OnInit {
             this.players = payload.players;
         });
         this.playerAbdSub = this.gameService.onPlayerAbandon((player) => {
-            this.players = this.players.filter((p) => p.username !== player.username);
+            const index = this.players.findIndex((p) => p.username === player.username);
+            this.players[index] = player;
         });
         this.playerBanSub = this.gameService.onPlayerBan((player) => {
-            this.players = this.players.filter((p) => p.username !== player.username);
+            const index = this.players.findIndex((p) => p.username === player.username);
+            this.players[index] = player;
         });
     }
 

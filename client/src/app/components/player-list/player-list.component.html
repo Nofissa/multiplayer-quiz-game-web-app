@@ -1,7 +1,18 @@
-<mat-list *ngFor="let player of players">
-    <div class="player-container">
-        <mat-list-item>{{ player.username }}</mat-list-item>
-        <button *ngIf="isHost" mat-raised-button color="primary" (click)="banPlayer(player)">Kick</button>
-    </div>
-    <mat-divider></mat-divider>
-</mat-list>
+<div class="list-container">
+    <h1>Liste de joueurs</h1>
+    <mat-list *ngFor="let player of players">
+        <div class="players-container">
+            <mat-list-item
+                [ngClass]="{
+                    banned: player.state === playerStates.Banned,
+                    playing: player.state === playerStates.Playing,
+                    abandoned: player.state === playerStates.Abandonned
+                }"
+            >
+                {{ player.username }}
+            </mat-list-item>
+            <button *ngIf="isHost && player.state === playerStates.Playing" mat-raised-button color="warn" (click)="banPlayer(player)">Kick</button>
+        </div>
+        <mat-divider></mat-divider>
+    </mat-list>
+</div>

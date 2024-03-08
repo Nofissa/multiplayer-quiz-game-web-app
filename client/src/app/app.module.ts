@@ -4,10 +4,12 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatDividerModule } from '@angular/material/divider';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatListModule } from '@angular/material/list';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
@@ -20,11 +22,13 @@ import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { SwiperModule } from 'swiper/angular';
 import { LoaderAnimationComponent } from './components/animations/loader-animation/loader-animation.component';
 import { ConfirmationDialogComponent } from './components/dialogs/confirmation-dialog/confirmation-dialog.component';
+import { JoinGameDialogComponent } from './components/dialogs/join-game-dialog/join-game-dialog.component';
 import { PromptDialogComponent } from './components/dialogs/prompt-dialog/prompt-dialog.component';
 import { QuizDetailsDialogComponent } from './components/dialogs/quiz-details-dialog/quiz-details-dialog.component';
 import { UpsertQuestionDialogComponent } from './components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
 import { GameComponent } from './components/game/game.component';
 import { NavHeaderComponent } from './components/nav-header/nav-header.component';
+import { PlayerListComponent } from './components/player-list/player-list.component';
 import { QuestionBankComponent } from './components/question-bank/question-bank.component';
 import { QuestionListComponent } from './components/question-list/question-list.component';
 import { QuizListComponent } from './components/quiz-list/quiz-list.component';
@@ -33,10 +37,9 @@ import { TimerComponent } from './components/timer/timer.component';
 import { AppRoutingModule } from './modules/app-routing.module';
 import { AdminPageComponent } from './pages/admin-page/admin-page.component';
 import { CreateGamePageComponent } from './pages/create-game-page/create-game-page.component';
+import { HostGamePageComponent } from './pages/host-game-page/host-game-page.component';
 import { QCMCreationPageComponent } from './pages/qcmcreation-page/qcmcreation-page.component';
 import { WaitingRoomPageComponent } from './pages/waiting-room-page/waiting-room-page.component';
-import { HostGamePageComponent } from './pages/host-game-page/host-game-page.component';
-import { JoinGameDialogComponent } from './components/dialogs/join-game-dialog/join-game-dialog.component';
 
 /**
  * Main module that is used in main.ts.
@@ -70,6 +73,7 @@ import { JoinGameDialogComponent } from './components/dialogs/join-game-dialog/j
         TimerComponent,
         HostGamePageComponent,
         JoinGameDialogComponent,
+        PlayerListComponent,
     ],
     imports: [
         AppRoutingModule,
@@ -96,6 +100,8 @@ import { JoinGameDialogComponent } from './components/dialogs/join-game-dialog/j
         CdkDropList,
         MatSliderModule,
         MatSnackBarModule,
+        MatDividerModule,
+        MatListModule,
     ],
 
     providers: [],
