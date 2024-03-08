@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
 import { Location } from '@angular/common';
+import { Component, Input } from '@angular/core';
 
 @Component({
     selector: 'app-nav-header',
@@ -7,6 +7,9 @@ import { Location } from '@angular/common';
     styleUrls: ['./nav-header.component.scss'],
 })
 export class NavHeaderComponent {
+    @Input()
+    backArrow = true;
+
     constructor(private readonly location: Location) {}
 
     back() {
