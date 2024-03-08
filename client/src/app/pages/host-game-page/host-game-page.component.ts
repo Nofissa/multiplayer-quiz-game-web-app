@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { BarChartData } from '@app/interfaces/bar-chart-data';
+import { Quiz } from '@app/interfaces/quiz';
 import { BarChartService } from '@app/services/game/bar-chart-service/bar-chart.service';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { GameState } from '@common/game-state';
@@ -11,9 +12,13 @@ import { GameState } from '@common/game-state';
     styleUrls: ['./host-game-page.component.scss'],
 })
 export class HostGamePageComponent implements OnInit {
+    @Input()
+    quiz: Quiz;
+
     pin: string;
     isEnded: boolean = false;
     gameState: GameState = GameState.Opened;
+    currentQuestionIndex: number = 0;
 
     private barChartService: BarChartService = new BarChartService();
 
@@ -52,11 +57,11 @@ export class HostGamePageComponent implements OnInit {
 
     startGame() {
         // TODO
+        this.gameState = GameState.Started;
         return;
     }
 
     nextQuestion() {
-        // TODO
         return;
     }
 }

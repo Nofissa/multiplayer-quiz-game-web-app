@@ -5,7 +5,7 @@ import { TimerComponent } from './timer.component';
 describe('TimerComponent', () => {
     let component: TimerComponent;
     let fixture: ComponentFixture<TimerComponent>;
-    let timerServiceSpy: jasmine.SpyObj<TimerService>;
+    // let timerServiceSpy: jasmine.SpyObj<TimerService>;
 
     beforeEach(() => {
         const spy = jasmine.createSpyObj('TimerService', ['onStartTimer', 'onTimerTick']);
@@ -15,7 +15,7 @@ describe('TimerComponent', () => {
         });
         fixture = TestBed.createComponent(TimerComponent);
         component = fixture.componentInstance;
-        timerServiceSpy = TestBed.inject(TimerService) as jasmine.SpyObj<TimerService>;
+        // timerServiceSpy = TestBed.inject(TimerService) as jasmine.SpyObj<TimerService>;
         fixture.detectChanges();
     });
 
