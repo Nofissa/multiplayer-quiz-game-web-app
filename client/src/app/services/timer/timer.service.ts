@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { Subscription } from 'rxjs';
+import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
 
 @Injectable({
     providedIn: 'root',
@@ -12,16 +13,11 @@ export class TimerService {
         this.webSocketService.emit('startTimer', { pin });
     }
 
-    onStartTimer(callback: (duration: number) => void): Subscription {
-        return this.webSocketService.on('startTimer', callback);
+    onStartTimer(pin: string, callback: (startTime: number) => void): Subscription {
+        return this.webSocketService.on('startTimer', applyIfPinMatches(pin, callback));
     }
 
-    onTimerTick(callback: (remainingSeconds: number) => void): Subscription {
-        return this.webSocketService.on('timerTick', callback);
-    }
-
-    pauseTimer() {
-        // clearInterval(this.interval);
-        // this.interval = undefined;
+    onTimerTick(pin: string, callback: (remainingTime: number) => void): Subscription {
+        return this.webSocketService.on('timerTick', applyIfPinMatches(pin, callback));
     }
 }

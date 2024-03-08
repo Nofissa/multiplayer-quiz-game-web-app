@@ -1,6 +1,6 @@
 import { Choice } from './choice'
 
-export interface EvaluationPayload {
+export interface Evaluation {
     correctAnswers: Choice[];
     score: number;
     isFirstGoodEvaluation: boolean;

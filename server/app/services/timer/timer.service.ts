@@ -3,12 +3,12 @@ import { Subject, Subscription } from 'rxjs';
 import { Socket } from 'socket.io';
 import { GameService } from '@app/services/game/game.service';
 
-const TICK_PER_SECOND = 10;
+const TICK_PER_SECOND = 1;
 const ONE_SECOND_MS = 1000;
 
 @Injectable()
 export class TimerService {
-    private onTickSubject = new Subject<number>();
+    private tickSubjects: Map<string, Subject<number>> = new Map<string, Subject<number>>();
     private counters: Map<string, number> = new Map();
     private intervals: Map<string, NodeJS.Timer | undefined> = new Map();
     private tickSubscriptions: Map<string, Subscription> = new Map();
@@ -30,17 +30,17 @@ export class TimerService {
             this.counters.set(pin, game.quiz.duration);
         }
 
+        this.tickSubjects.set(pin, new Subject());
         const interval = setInterval(() => {
-            if (this.counters.get(pin) > 0) {
-                this.counters.set(pin, this.counters.get(pin) - 1 / TICK_PER_SECOND);
-                this.onTickSubject.next(this.counters.get(pin));
-            } else {
+            this.counters.set(pin, this.counters.get(pin) - 1 / TICK_PER_SECOND);
+            this.tickSubjects.get(pin).next(this.counters.get(pin));
+            if (this.counters.get(pin) <= 0) {
                 this.stopTimer(pin);
             }
         }, ONE_SECOND_MS / TICK_PER_SECOND);
 
         this.intervals.set(pin, interval);
-        this.tickSubscriptions.set(pin, this.onTickSubject.subscribe(callback));
+        this.tickSubscriptions.set(pin, this.tickSubjects.get(pin).subscribe(callback));
 
         return this.counters.get(pin);
     }
@@ -50,5 +50,6 @@ export class TimerService {
         this.intervals.delete(pin);
         this.counters.delete(pin);
         this.tickSubscriptions.delete(pin);
+        this.tickSubjects.get(pin).unsubscribe();
     }
 }
