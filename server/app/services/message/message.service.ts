@@ -1,7 +1,7 @@
+import { GameService } from '@app/services/game/game.service';
+import { Chatlog } from '@common/chatlog';
 import { Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
-import { Chatlog } from '@common/chatlog';
-import { GameService } from '@app/services/game/game.service';
 
 const MAX_MESSAGE_LENGTH = 200;
 
@@ -11,9 +11,14 @@ export class MessageService {
 
     sendMessage(client: Socket, pin: string, message: string): Chatlog {
         const game = this.gameService.getGame(pin);
-        const clientPlayer = game.clientPlayers.get(client.id);
-        const chatlog = { message: message.substring(0, MAX_MESSAGE_LENGTH), author: clientPlayer.player.username, date: new Date() };
+        const organizerId = this.gameService.getOrganizerId(pin);
 
-        return chatlog;
+        const author = client.id === organizerId ? 'Organisateur' : game.clientPlayers.get(client.id)?.player.username || 'Unknown';
+
+        return {
+            message: message.substring(0, MAX_MESSAGE_LENGTH),
+            author,
+            date: new Date(),
+        };
     }
 }
