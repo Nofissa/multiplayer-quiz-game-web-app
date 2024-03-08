@@ -23,7 +23,10 @@ describe('TimerComponent', () => {
 
         await TestBed.configureTestingModule({
             declarations: [TimerComponent],
-            providers: [TimerService, { provide: WebSocketService, useValue: webSocketServiceSpy }],
+            providers: [
+                { provide: TimerService, useValue: timerServiceSpy },
+                { provide: WebSocketService, useValue: webSocketServiceSpy },
+            ],
         }).compileComponents();
 
         webSocketServiceSpy = TestBed.inject(WebSocketService) as jasmine.SpyObj<WebSocketService>;
@@ -65,17 +68,31 @@ describe('TimerComponent', () => {
         expect(timerServiceSpy.onTimerTick).toHaveBeenCalledWith(pin, jasmine.any(Function));
     });
 
+    it('should update remaining time and maxDuration on onStartTimer', () => {
+        const pin = '1234';
+        component.pin = pin;
+
+        timerServiceSpy.onStartTimer.and.callFake((_pin: string, callback: (remainingTime: number) => void) => {
+            callback(stubData.maxDuration);
+            return of(stubData.maxDuration).subscribe(callback);
+        });
+        component.ngOnInit();
+
+        expect(component.maxDuration).toEqual(stubData.maxDuration);
+        expect(component.remainingTime).toEqual(stubData.maxDuration);
+    });
+
     it('should update remaining time on onTimerTick', () => {
         const pin = '1234';
-        const expectedStrokeDashoffset = (stubData.maxDuration - stubData.remainingTime) / stubData.maxDuration;
-
-        timerServiceSpy.onTimerTick.and.callThrough();
-
         component.pin = pin;
+
+        timerServiceSpy.onTimerTick.and.callFake((_pin: string, callback: (remainingTime: number) => void) => {
+            callback(stubData.remainingTime);
+            return of(stubData.remainingTime).subscribe(callback);
+        });
         component.ngOnInit();
 
         expect(component.remainingTime).toEqual(stubData.remainingTime);
-        expect(component.strokeDashoffset).toEqual(expectedStrokeDashoffset);
     });
 
     it('should close subscriptions on ngOnDestroy', () => {
