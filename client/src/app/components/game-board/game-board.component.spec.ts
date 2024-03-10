@@ -12,7 +12,7 @@ import { GameService } from '@app/services/game/game-service/game.service';
 import { KeyBindingService } from '@app/services/key-binding/key-binding.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { of } from 'rxjs';
-import { GameComponent } from './game.component';
+import { GameBoardComponent } from './game-board.component';
 
 export const quizStub: Quiz = {
     id: 'test',
@@ -37,9 +37,9 @@ export const quizStub: Quiz = {
     _id: 'testsststst',
 };
 
-describe('GameComponent', () => {
-    let component: GameComponent;
-    let fixture: ComponentFixture<GameComponent>;
+describe('GameBoardComponent', () => {
+    let component: GameBoardComponent;
+    let fixture: ComponentFixture<GameBoardComponent>;
     let timerServiceSpy: jasmine.SpyObj<TimerService>;
     let keyBindingServiceSpy: jasmine.SpyObj<KeyBindingService>;
     let gameServicesProviderSpy: jasmine.SpyObj<GameServicesProvider>;
@@ -60,7 +60,7 @@ describe('GameComponent', () => {
         (gameServicesProviderSpy as any).keyBindingService = keyBindingServiceSpy;
 
         await TestBed.configureTestingModule({
-            declarations: [GameComponent],
+            declarations: [GameBoardComponent],
             imports: [RouterTestingModule, HttpClientTestingModule],
             providers: [
                 GameServicesProvider,
@@ -81,7 +81,7 @@ describe('GameComponent', () => {
 
     describe('Display', () => {
         beforeEach(() => {
-            fixture = TestBed.createComponent(GameComponent);
+            fixture = TestBed.createComponent(GameBoardComponent);
             component = fixture.componentInstance;
             component.quiz = quizStub;
             fixture.detectChanges();
@@ -247,7 +247,7 @@ describe('GameComponent', () => {
 
     describe('tsLogic', () => {
         beforeEach(() => {
-            fixture = TestBed.createComponent(GameComponent);
+            fixture = TestBed.createComponent(GameBoardComponent);
             component = fixture.componentInstance;
             component.quiz = quizStub;
             fixture.detectChanges();
@@ -336,7 +336,7 @@ describe('GameComponent', () => {
 
         it('isSelected() should return true if the choice is selected', () => {
             const choice = component.quiz.questions[component.currentQuestionIndex].choices[0];
-            component.selectedChoices = [choice];
+            component.selectedChoiceIndexes = [choice];
             const result = component.isSelected(choice);
 
             expect(result).toBe(true);
@@ -344,7 +344,7 @@ describe('GameComponent', () => {
 
         it('isSelected() should return false if the choice is not selected', () => {
             const choice = component.quiz.questions[component.currentQuestionIndex].choices[0];
-            component.selectedChoices = [component.quiz.questions[component.currentQuestionIndex].choices[1]];
+            component.selectedChoiceIndexes = [component.quiz.questions[component.currentQuestionIndex].choices[1]];
             const result = component.isSelected(choice);
 
             expect(result).toBe(false);
@@ -352,18 +352,18 @@ describe('GameComponent', () => {
 
         it('toggleChoiceSelection() should remove the choice if it is already selected', () => {
             const choice = component.quiz.questions[component.currentQuestionIndex].choices[0];
-            component.selectedChoices = [choice];
+            component.selectedChoiceIndexes = [choice];
             component.toggleChoiceSelection(choice);
 
-            expect(component.selectedChoices).not.toContain(choice);
+            expect(component.selectedChoiceIndexes).not.toContain(choice);
         });
 
         it('toggleChoiceSelection() should add the choice if it is not already selected', () => {
             const choice = component.quiz.questions[component.currentQuestionIndex].choices[0];
-            expect(component.selectedChoices.length).toBe(0);
+            expect(component.selectedChoiceIndexes.length).toBe(0);
             component.toggleChoiceSelection(choice);
 
-            expect(component.selectedChoices.length).toBe(1);
+            expect(component.selectedChoiceIndexes.length).toBe(1);
         });
 
         it('should allocate points for a correct answer', () => {
@@ -373,7 +373,7 @@ describe('GameComponent', () => {
             component.allocatePoints(addedPoints);
 
             expect(component.score).toBe(initialScore + addedPoints);
-            expect(component.selectedChoices).toEqual([]);
+            expect(component.selectedChoiceIndexes).toEqual([]);
         });
 
         it('should not allocate points for an incorrect answer', () => {
@@ -382,7 +382,7 @@ describe('GameComponent', () => {
             component.allocatePoints(0);
 
             expect(component.score).toBe(initialScore);
-            expect(component.selectedChoices).toEqual([]);
+            expect(component.selectedChoiceIndexes).toEqual([]);
         });
 
         it('should open confirmation dialog and navigate on result true', () => {
