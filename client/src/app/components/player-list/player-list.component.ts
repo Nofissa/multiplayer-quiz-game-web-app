@@ -16,40 +16,40 @@ export class PlayerListComponent implements OnInit {
     isHost: boolean;
     @Input()
     pin: string;
+    @Input()
+    isStatic: boolean;
+    @Input()
+    staticPlayers: Player[];
 
     playerStates = PlayerState;
     players: Player[] = [];
     playerJoinSub: Subscription;
     playerBanSub: Subscription;
     playerAbandonSub: Subscription;
-    questionFinished: Subscription;
 
     constructor(private readonly gameService: GameService) {}
 
     ngOnInit() {
-        this.playerJoinSub = this.gameService.onJoinGame((payload) => {
-            this.players = payload.players;
-        });
-        this.playerAbandonSub = this.gameService.onPlayerAbandon((player) => {
-            const index = this.players.findIndex((p) => p.username === player.username);
-            if (index !== NOT_FOUND_INDEX) {
-                this.players[index] = player;
-            }
-        });
-        this.playerBanSub = this.gameService.onPlayerBan((player) => {
-            const index = this.players.findIndex((p) => p.username === player.username);
-            if (index !== NOT_FOUND_INDEX) {
-                this.players[index] = player;
-            }
-        });
-        /*
-        //TODO:
-        idealement faire un service qui detect quand la questions est fini puis utilise gameservice du server pour getGame()
-        this.questionFinished = this.gameService.onQuestionFinished((payload) => {
-            this.players = payload.game.players;
-            this.players.sort((a, b) => b.score - a.score);
-        });
-        */
+        if (!this.isStatic) {
+            this.playerJoinSub = this.gameService.onJoinGame((payload) => {
+                this.players = payload.players;
+            });
+            this.playerBanSub = this.gameService.onPlayerBan((player) => {
+                const index = this.players.findIndex((p) => p.username === player.username);
+                if (index !== NOT_FOUND_INDEX) {
+                    this.players[index] = player;
+                }
+            });
+            this.playerAbandonSub = this.gameService.onPlayerAbandon((player) => {
+                const index = this.players.findIndex((p) => p.username === player.username);
+                if (index !== NOT_FOUND_INDEX) {
+                    this.players[index] = player;
+                }
+            });
+        } else {
+            this.staticPlayers.sort((a, b) => b.score - a.score);
+            this.players = this.staticPlayers;
+        }
     }
 
     banPlayer(player: Player) {

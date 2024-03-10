@@ -17,10 +17,6 @@
     margin: 0 auto;
 }
 
-.player-container > * {
-    //margin: 10px;
-}
-
 mat-list {
     width: 100%;
 }
@@ -37,14 +33,14 @@ h1 {
     color: #000;
 }
 
-.banned {
+.banned .player-name {
     color: red !important;
 }
 
-.playing {
+.playing .player-name {
     color: green;
 }
 
-.abandoned {
+.abandoned .player-name {
     color: gray;
 }
