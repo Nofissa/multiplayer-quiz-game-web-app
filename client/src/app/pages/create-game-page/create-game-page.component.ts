@@ -1,5 +1,6 @@
+// for moongodb _id fields
 /* eslint-disable no-underscore-dangle */
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
@@ -8,7 +9,6 @@ import { Quiz } from '@app/interfaces/quiz';
 import { MaterialServicesProvider } from '@app/providers/material-services.provider';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { QuizHttpService } from '@app/services/quiz-http/quiz-http.service';
-import { Subscription } from 'rxjs';
 import SwiperCore, { EffectCoverflow, Navigation, Pagination } from 'swiper';
 
 SwiperCore.use([Navigation, Pagination, EffectCoverflow]);
@@ -21,12 +21,11 @@ const SNACK_BAR_DURATION_MS = 3000;
     styleUrls: ['./create-game-page.component.scss'],
     encapsulation: ViewEncapsulation.None,
 })
-export class CreateGamePageComponent implements OnInit, OnDestroy {
+export class CreateGamePageComponent implements OnInit {
     quizzArray: Quiz[];
 
     private readonly dialogService: MatDialog;
     private readonly snackBarService: MatSnackBar;
-    private createGameSubscription: Subscription;
 
     // eslint-disable-next-line max-params
     constructor(
@@ -41,17 +40,6 @@ export class CreateGamePageComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.loadQuizzes();
-        this.createGameSubscription = this.gameService.onCreateGame((pin: string) => {
-            if (pin) {
-                this.router.navigate(['/host-game'], { queryParams: { pin } });
-            }
-        });
-    }
-
-    ngOnDestroy(): void {
-        if (!this.createGameSubscription.closed) {
-            this.createGameSubscription.unsubscribe();
-        }
     }
 
     loadQuizzes(): void {
@@ -88,10 +76,20 @@ export class CreateGamePageComponent implements OnInit, OnDestroy {
     }
 
     private createGame(quiz: Quiz) {
+        this.gameService.onCreateGame((pin: string) => {
+            if (pin) {
+                this.router.navigate(['/host-game'], { queryParams: { pin } });
+            }
+        });
         this.gameService.createGame(quiz._id);
     }
 
     private testGame(quiz: Quiz) {
-        this.router.navigate(['/game'], { queryParams: { quizId: quiz._id, isTest: true } });
+        this.gameService.onCreateGame((pin: string) => {
+            this.gameService.getCurrentQuestion(pin);
+            this.gameService.joinGame(pin, 'Testeur');
+            this.router.navigate(['/game'], { queryParams: { pin, isTest: true } });
+        });
+        this.gameService.createGame(quiz._id);
     }
 }

@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Quiz } from '@app/interfaces/quiz';
-import { QuizHttpService } from '@app/services/quiz-http/quiz-http.service';
+import { ActivatedRoute } from '@angular/router';
+import { Question } from '@app/interfaces/question';
+import { GameCacheService } from '@app/services/game-cache/game-cache.service';
+import { GameService } from '@app/services/game/game-service/game.service';
+import { Player } from '@common/player';
 
 @Component({
     selector: 'app-game-page',
@@ -9,36 +11,20 @@ import { QuizHttpService } from '@app/services/quiz-http/quiz-http.service';
     styleUrls: ['./game-page.component.scss'],
 })
 export class GamePageComponent implements OnInit {
-    quiz: Quiz;
+    pin: string;
+    question: Question | null;
+    player: Player | null;
     isTest: boolean;
 
     constructor(
-        private readonly quizHttpService: QuizHttpService,
         private readonly activatedRoute: ActivatedRoute,
-        private readonly router: Router,
+        private readonly gameCacheService: GameCacheService,
     ) {}
 
     ngOnInit() {
-        this.loadQuiz();
-        this.loadMode();
-    }
-
-    loadQuiz() {
-        const quizId = this.activatedRoute.snapshot.queryParams['quizId'];
-
-        this.quizHttpService.getVisibleQuizById(quizId).subscribe({
-            next: (quiz: Quiz) => {
-                this.quiz = quiz;
-            },
-            error: () => {
-                this.router.navigateByUrl('/create-game');
-            },
-        });
-    }
-
-    loadMode() {
-        const isTest = this.activatedRoute.snapshot.queryParams['isTest'];
-
-        this.isTest = isTest === 'true';
+        this.pin = this.activatedRoute.snapshot.queryParams['pin'];
+        this.isTest = this.activatedRoute.snapshot.queryParams['isTest'] === 'true';
+        this.question = this.gameCacheService.getCurrentQuestion(this.pin);
+        this.player = this.gameCacheService.getSelfPlayer(this.pin);
     }
 }
