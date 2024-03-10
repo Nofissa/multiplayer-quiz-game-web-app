@@ -1,5 +1,5 @@
+import { applyIfPinMatches } from '@app/utils/condition-applications/conditional-applications';
 import { GameEventPayload } from '@common/game-event-payload';
-import { applyIfPinMatches } from './conditional-applications';
 
 describe('applyIfPinMatches', () => {
     it('should apply the function if the pin matches', () => {

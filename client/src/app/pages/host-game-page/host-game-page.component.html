@@ -1,38 +1,22 @@
 <div class="grid-container">
     <app-nav-header class="nav-header" [backArrow]="false"></app-nav-header>
     <div *ngIf="isStarted()">
-        <app-bar-chart-swiper class="bar-chart" *ngIf="isEnded" [data]="barCharts"></app-bar-chart-swiper>
-        <app-bar-chart class="bar-chart" *ngIf="!isEnded" [data]="barChart"></app-bar-chart>
-        <div class="question-box font-color">
-            <span id="questionText" class="text-centered">{{ quiz.questions[currentQuestionIndex].text }}</span>
+        <div *ngIf="question" class="question-box font-color">
+            <span id="questionText" class="text-centered">{{ question.text }}</span>
             <span id="value" class="text-centered"
-                ><strong>{{ quiz.questions[currentQuestionIndex].points }} points</strong></span
+                ><strong>{{ question.points }} points</strong></span
             >
         </div>
-        <div class="answers-grid font-color">
-            <div
-                *ngFor="let choice of quiz.questions[currentQuestionIndex].choices; index as i"
-                [ngClass]="{
-                    'answer-box': true,
-                    'answer-box1': (i + 1) % 4 === 1,
-                    'answer-box2': (i + 1) % 4 === 2,
-                    'answer-box3': (i + 1) % 4 === 3,
-                    'answer-box4': (i + 1) % 4 === 0
-                }"
-            >
-                {{ i + 1 }}. {{ choice.text }}
-            </div>
-            <div class="timer-wrapper">
-                <app-timer-component></app-timer-component>
-            </div>
-        </div>
+        <app-timer-component [pin]="pin" (timerExpired)="onTimerExpired()"></app-timer-component>
+        <app-bar-chart-swiper class="bar-chart" *ngIf="isEnded" [data]="barCharts"></app-bar-chart-swiper>
+        <!-- <app-bar-chart class="bar-chart" *ngIf="!isEnded" [data]="barChart"></app-bar-chart> -->
     </div>
     <app-chat-room class="chat-room"></app-chat-room>
 
-    <button class="lock-button" mat-raised-button (click)="toggleLock()">
+    <button *ngIf="!isStarted()" class="lock-button" mat-raised-button (click)="toggleLock()">
         <mat-icon class="lock-icon" *ngIf="!isLocked()" fontIcon="lock_open"></mat-icon>
         <mat-icon class="lock-icon" *ngIf="isLocked()" fontIcon="lock"></mat-icon>
     </button>
     <button class="start-button" mat-raised-button *ngIf="isLocked() && !isStarted()" (click)="startGame()">COMMENCER</button>
-    <button class="next-button" mat-raised-button *ngIf="isLocked() && isStarted()" (click)="nextQuestion()">SUIVANT</button>
+    <button class="next-button" mat-raised-button *ngIf="nextAvailable" (click)="nextQuestion()">SUIVANT</button>
 </div>
