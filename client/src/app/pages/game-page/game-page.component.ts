@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Question } from '@app/interfaces/question';
 import { GameCacheService } from '@app/services/game-cache/game-cache.service';
-import { GameService } from '@app/services/game/game-service/game.service';
 import { Player } from '@common/player';
 
 @Component({
