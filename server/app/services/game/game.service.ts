@@ -6,11 +6,11 @@ import { Question } from '@app/model/database/question';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { Evaluation } from '@common/evaluation';
 import { GameState } from '@common/game-state';
-import { GameInitBundle } from '@common/game-init-bundle';
 import { PlayerState } from '@common/player-state';
 import { Submission } from '@common/submission';
 import { Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
+import { Player } from '@common/player';
 
 const NO_POINTS = 0;
 const NO_BONUS_MULTIPLIER = 1;
@@ -41,16 +41,16 @@ export class GameService {
         return game.pin;
     }
 
-    joinGame(client: Socket, pin: string, username: string): GameInitBundle {
+    joinGame(client: Socket, pin: string, username: string): Player {
         const game = this.getGame(pin);
-        const player = new ClientPlayer(client, username);
+        const clientPlayer = new ClientPlayer(client, username);
         const clientPlayers = Array.from(game.clientPlayers.values());
 
         if (game.state !== GameState.Opened) {
             throw new Error(`La partie ${pin} n'est pas ouverte`);
         }
 
-        if (game.clientPlayers.has(client.id)) {
+        if (game.clientPlayers.has(client.id) && game.clientPlayers.get(client.id)?.player.state === PlayerState.Playing) {
             throw new Error('Vous êtes déjà dans cette partie');
         }
 
@@ -66,12 +66,9 @@ export class GameService {
             throw new Error(`Le nom d'utilisateur "${username}" est déjà pris`);
         }
 
-        game.clientPlayers.set(client.id, player);
+        game.clientPlayers.set(client.id, clientPlayer);
 
-        const players = Array.from(game.clientPlayers.values()).map((x) => x.player);
-        const payload = { pin, players, chatlogs: game.chatlogs };
-
-        return payload;
+        return clientPlayer.player;
     }
 
     playerAbandon(client: Socket, pin: string): ClientPlayer {
@@ -178,12 +175,12 @@ export class GameService {
         return game.currentQuestion;
     }
 
-    toggleSelectChoice(client: Socket, pin: string, choiceIndex: number): Submission {
+    toggleSelectChoice(client: Socket, pin: string, choiceIndex: number): Submission[] {
         const game = this.getGame(pin);
         const submission = this.getOrCreateSubmission(client, game);
         submission.choices[choiceIndex].isSelected = !submission.choices[choiceIndex].isSelected;
 
-        return submission;
+        return Array.from(game.currentQuestionSubmissions.values());
     }
 
     getGame(pin: string): Game {
