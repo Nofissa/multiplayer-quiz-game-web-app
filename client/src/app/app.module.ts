@@ -2,7 +2,9 @@ import { CdkDrag, CdkDropList, CdkDropListGroup } from '@angular/cdk/drag-drop';
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -42,7 +44,6 @@ import { HostGamePageComponent } from './pages/host-game-page/host-game-page.com
 import { PlayerResultsPageComponent } from './pages/player-results-page/player-results-page.component';
 import { QCMCreationPageComponent } from './pages/qcmcreation-page/qcmcreation-page.component';
 import { WaitingRoomPageComponent } from './pages/waiting-room-page/waiting-room-page.component';
-
 /**
  * Main module that is used in main.ts.
  * All automatically generated components will appear in this module.
@@ -106,6 +107,8 @@ import { WaitingRoomPageComponent } from './pages/waiting-room-page/waiting-room
         MatSliderModule,
         MatSnackBarModule,
         MatProgressBarModule,
+        MatBadgeModule,
+        MatCardModule,
     ],
 
     providers: [],

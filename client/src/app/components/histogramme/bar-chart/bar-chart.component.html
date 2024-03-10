@@ -1,12 +1,45 @@
-<div class="histogramme">
+<div class="bar-chart">
     <h3 class="question-container">{{ data.question.text }}</h3>
-    <div *ngFor="let choice of data.question.choices; let i = index;" class="choice-container">
-        <legend>{{ choice.text }}</legend>
-        <div class="progress-container">
-            <mat-progress-bar value="{{adjust(i)}}" 
-                            [class.correct]="choice.isCorrect"
-                            [class.incorrect]="!choice.isCorrect"></mat-progress-bar>
-            <p>{{ numberOfPlayers() }}</p>
+
+    <div class="bar-chart-container">
+        <div *ngFor="let choice of data.question.choices; let i = index" class="bar-container">
+            <mat-progress-bar
+                class="progress-bar-{{ i }}"
+                value="{{ adjust(i) }}"
+                [class.correct]="choice.isCorrect"
+                [class.incorrect]="!choice.isCorrect"
+            ></mat-progress-bar>
+            <p>{{ playersSelected(i) }}</p>
         </div>
     </div>
+
+    <div class="choice-container">
+        <mat-card *ngFor="let choice of data.question.choices; let i = index" class="choice-{{ i }} choice flex-row">
+            <mat-card-content *ngIf="choice.isCorrect" matBadge="✔" matBadgePosition="above after" matBadgeColor="primary" matBadgeSize="large">{{
+                choice.text
+            }}</mat-card-content>
+            <mat-card-content *ngIf="!choice.isCorrect" matBadge="✘" matBadgePosition="above after" matBadgeColor="warn" matBadgeSize="large">{{
+                choice.text
+            }}</mat-card-content>
+        </mat-card>
+    </div>
+
+    <!-- <div *ngFor="let choice of data.question.choices; let i = index" class="choice-container flex-row">
+        <div class="id-number">
+            <p>{{ i + 1 }}</p>
+        </div>
+        <div class="flex-column progress-bar-container">
+            <legend>{{ choice.text }}</legend>
+            <div class="progress-container">
+                <mat-progress-bar
+                    value="{{ adjust(i) }}"
+                    [class.correct]="choice.isCorrect"
+                    [class.incorrect]="!choice.isCorrect"
+                    mode="determinate"
+                    vertical
+                ></mat-progress-bar>
+                <p>{{ playersSelected(i) }}</p>
+            </div>
+        </div>
+    </div> -->
 </div>
