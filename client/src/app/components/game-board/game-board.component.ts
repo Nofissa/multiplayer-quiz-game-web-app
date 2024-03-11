@@ -9,6 +9,8 @@ import { KeyBindingService } from '@app/services/key-binding/key-binding.service
 import { TimerService } from '@app/services/timer/timer.service';
 import { Player } from '@common/player';
 import { Subscription } from 'rxjs';
+import { GameHttpService } from '@app/services/game-http/game-http.service';
+import { PlayerService } from '@app/services/player/player.service';
 
 const NOT_FOUND_INDEX = -1;
 
@@ -22,15 +24,15 @@ export class GameBoardComponent implements OnInit, OnDestroy {
     @Input()
     pin: string;
     @Input()
-    question: Question | null;
-    @Input()
-    player: Player | null;
-    @Input()
     isTest: boolean;
+
+    question: Question;
+    player: Player | null;
 
     hasSubmited: boolean = false;
     selectedChoiceIndexes: number[] = [];
 
+    readonly gameHttpService: GameHttpService;
     readonly gameService: GameService;
     readonly timerService: TimerService;
     readonly keyBindingService: KeyBindingService;
@@ -41,9 +43,11 @@ export class GameBoardComponent implements OnInit, OnDestroy {
 
     constructor(
         gameServicesProvider: GameServicesProvider,
+        private readonly playerService: PlayerService,
         private readonly dialog: MatDialog,
         private readonly router: Router,
     ) {
+        this.gameHttpService = gameServicesProvider.gameHttpService;
         this.gameService = gameServicesProvider.gameService;
         this.timerService = gameServicesProvider.timerService;
         this.keyBindingService = gameServicesProvider.keyBindingService;
@@ -66,14 +70,19 @@ export class GameBoardComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
+        this.player = this.playerService.getPlayer(this.pin);
+        this.gameHttpService.getGameSnapshotByPin(this.pin).subscribe((snapshot) => {
+            this.question = snapshot.questions[snapshot.currentQuestionIndex];
+        });
         this.submitChoicesSubscription = this.gameService.onSubmitChoices(this.pin, (evaluation) => {
             if (evaluation.isLastEvaluation) {
+                this.playerService.syncPlayer(this.pin);
                 // result view;
             }
         });
         this.timerTickSubscription = this.timerService.onTimerTick(this.pin, (remainingTime) => {
             if (remainingTime === 0) {
-                // result view;
+                this.submitChoices();
             }
         });
         this.setupKeyBindings();
