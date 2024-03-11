@@ -8,7 +8,7 @@ import { environment } from 'src/environments/environment';
 @Injectable({
     providedIn: 'root',
 })
-export class QuizHttpService {
+export class GameHttpService {
     private readonly baseUrl: string = `${environment.apiUrl}/games`;
 
     constructor(private readonly http: HttpClient) {}
