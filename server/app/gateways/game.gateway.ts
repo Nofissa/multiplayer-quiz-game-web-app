@@ -7,6 +7,7 @@ import { GameEventPayload } from '@common/game-event-payload';
 import { GameState } from '@common/game-state';
 import { Player } from '@common/player';
 import { Submission } from '@common/submission';
+import { GameSnapshot } from '@common/game-snapshot';
 import { JoinGamePayload } from '@common/join-game-payload';
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
@@ -150,8 +151,40 @@ export class GameGateway implements OnGatewayDisconnect {
         try {
             const submissions = this.gameService.toggleSelectChoice(client, pin, choiceIndex);
             const payload: GameEventPayload<Submission[]> = { pin, data: submissions };
+            const organizer = this.gameService.getGame(pin).organizer;
 
-            this.server.to(pin).emit('toggleSelectChoice', payload);
+            organizer.emit('toggleSelectChoice', payload);
+        } catch (error) {
+            client.emit('error', error.message);
+        }
+    }
+
+    @SubscribeMessage('getGameSnapshot')
+    getGameSnapshot(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
+        try {
+            const game = this.gameService.getGame(pin);
+            const snapshot: GameSnapshot = {
+                chatlogs: game.chatlogs,
+                players: Array.from(game.clientPlayers.values()).map((x) => x.player),
+                selfPlayer: game.clientPlayers.get(client.id).player,
+                currentQuestionIndex: game.currentQuestionIndex,
+                questions: game.quiz.questions.map((x) => {
+                    return {
+                        // Disabled because it comes from mongodb
+                        // eslint-disable-next-line no-underscore-dangle
+                        _id: x._id,
+                        type: x.type,
+                        text: x.text,
+                        points: x.points,
+                        choices: x.choices,
+                        lastModification: x.lastModification,
+                    };
+                }),
+                questionSubmissions: game.questionSubmissions.map((x) => Array.from(x.values())),
+            };
+
+            const payload: GameEventPayload<GameSnapshot> = { pin, data: snapshot };
+            this.server.emit('getGameSnapshot', payload);
         } catch (error) {
             client.emit('error', error.message);
         }

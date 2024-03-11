@@ -12,8 +12,8 @@ export class Game {
     state: GameState;
     chatlogs: Chatlog[] = [];
     clientPlayers: Map<string, ClientPlayer> = new Map();
-    private questionSubmissions: Map<string, Submission>[] = [new Map()];
-    private currentQuestionIndex: number = 0;
+    questionSubmissions: Map<string, Submission>[] = [new Map()];
+    currentQuestionIndex: number = 0;
 
     constructor(pin: string, quiz: Quiz, organizer: Socket) {
         this.pin = pin;
