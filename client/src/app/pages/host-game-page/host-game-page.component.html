@@ -1,12 +1,10 @@
-
 <div class="grid-container">
     <app-nav-header class="nav-header" [backArrow]="false"></app-nav-header>
     <div *ngIf="isStarted()">
-        <app-bar-chart-swiper class="bar-chart" *ngIf="isEnded" [data]="barCharts" ></app-bar-chart-swiper>
+        <app-bar-chart-swiper class="bar-chart" *ngIf="isEnded" [data]="barCharts"></app-bar-chart-swiper>
         <app-bar-chart class="bar-chart" *ngIf="!isEnded" [data]="barChart"></app-bar-chart>
     </div>
     <app-chat-room class="chat-room"></app-chat-room>
-
 
     <button class="lock-button" mat-raised-button (click)="toggleLock()">
         <mat-icon class="lock-icon" *ngIf="!isLocked()" fontIcon="lock_open"></mat-icon>

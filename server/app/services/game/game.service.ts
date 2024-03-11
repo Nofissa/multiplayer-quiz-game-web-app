@@ -218,6 +218,11 @@ export class GameService {
         return { toCancel, toAbandon };
     }
 
+    getOrganizerId(pin: string): string {
+        const game = this.getGame(pin);
+        return game.organizer.id;
+    }
+
     private isOrganizer(game: Game, clientId: string): boolean {
         return game.organizer.id === clientId;
     }
