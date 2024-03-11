@@ -19,9 +19,9 @@ export class HostGamePageComponent implements OnInit, OnDestroy {
     pin: string;
     isEnded: boolean = false;
     gameState: GameState = GameState.Opened;
-    question: Question;
+    question: Question | undefined;
     nextAvailable: boolean = false;
-    // nextEndGame: boolean = false;
+    // nextEndGame: boolean = false; to use later when we have a way to know if it's the last question
     getCurrentQuestionSubscription: Subscription;
 
     private barChartService: BarChartService = new BarChartService();

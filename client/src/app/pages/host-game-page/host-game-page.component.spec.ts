@@ -1,6 +1,6 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Question } from '@app/interfaces/question';
 import { BarChartService } from '@app/services/game/bar-chart-service/bar-chart.service';
@@ -24,30 +24,17 @@ const mockQuestion: Question = {
     lastModification: new Date('2024-01-20 18:43:27'),
 };
 
-// const submissions: Submission[] = [];
-// submissions[0] = {
-//     choices: [
-//         { index: 0, isSelected: true },
-//         { index: 1, isSelected: false },
-//         { index: 2, isSelected: false },
-//         { index: 3, isSelected: true },
-//     ],
-//     isFinal: true,
-// };
-// const barChartData: BarChartData = { question, submissions };
-// submissions[0].choices[1].isSelected = true;
-// const secondBarChartData: BarChartData = { question, submissions };
-// const barChartArray: BarChartData[] = [barChartData, secondBarChartData];
-
 describe('HostGamePageComponent', () => {
     let component: HostGamePageComponent;
     let fixture: ComponentFixture<HostGamePageComponent>;
     let gameService: GameService;
     let timerService: TimerService;
+    let router: Router;
     beforeEach(() => {
         TestBed.configureTestingModule({
             declarations: [HostGamePageComponent],
             providers: [
+                Router,
                 GameService,
                 TimerService,
                 MatSnackBar,
@@ -68,6 +55,7 @@ describe('HostGamePageComponent', () => {
         fixture = TestBed.createComponent(HostGamePageComponent);
         gameService = TestBed.inject(GameService);
         timerService = TestBed.inject(TimerService);
+        router = TestBed.inject(Router);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });
@@ -159,6 +147,49 @@ describe('HostGamePageComponent', () => {
         component.nextAvailable = false;
         component.onTimerExpired();
 
+        expect(component.nextAvailable).toBeTruthy();
+    });
+
+    it('should end game when last question is over', fakeAsync(() => {
+        spyOn(gameService, 'nextQuestion');
+        spyOn(gameService, 'onNextQuestion');
+        spyOn(timerService, 'startTimer');
+        component.question = undefined;
+
+        component.nextQuestion();
+        const THREE_SECOND_IN_MS = 3000;
+        tick(THREE_SECOND_IN_MS);
+
+        expect(gameService.nextQuestion).toHaveBeenCalledWith('1234');
+        expect(gameService.onNextQuestion).toHaveBeenCalledWith('1234', jasmine.any(Function));
+        expect(timerService.startTimer).not.toHaveBeenCalled();
+        expect(component.nextAvailable).toBeFalsy();
+    }));
+
+    it('should go to next question when there are questions left', fakeAsync(() => {
+        const fakeSubscription = new Subscription();
+        spyOn(gameService, 'nextQuestion');
+        spyOn(gameService, 'onNextQuestion').and.callFake((pin, callback) => {
+            callback(mockQuestion);
+            return fakeSubscription;
+        });
+        spyOn(timerService, 'startTimer');
+        spyOn(router, 'navigateByUrl');
+
+        component.nextQuestion();
+        const THREE_SECOND_IN_MS = 3000;
+        tick(THREE_SECOND_IN_MS);
+
+        expect(router.navigateByUrl).not.toHaveBeenCalled();
+        expect(component.nextAvailable).toBeFalsy();
+        expect(component.question).toBe(mockQuestion);
+        expect(gameService.nextQuestion).toHaveBeenCalledWith('1234');
+        expect(gameService.onNextQuestion).toHaveBeenCalledWith('1234', jasmine.any(Function));
+        expect(timerService.startTimer).toHaveBeenCalledWith('1234');
+    }));
+
+    it('should set nextAvailable to true when timer expires', () => {
+        component.onTimerExpired();
         expect(component.nextAvailable).toBeTruthy();
     });
 });
