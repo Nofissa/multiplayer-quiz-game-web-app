@@ -86,7 +86,6 @@ export class CreateGamePageComponent implements OnInit {
 
     private testGame(quiz: Quiz) {
         this.gameService.onCreateGame((pin: string) => {
-            this.gameService.getCurrentQuestion(pin);
             this.gameService.joinGame(pin, 'Testeur');
             this.router.navigate(['/game'], { queryParams: { pin, isTest: true } });
         });

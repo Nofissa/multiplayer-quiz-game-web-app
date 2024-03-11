@@ -6,7 +6,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { UpsertQuestionDialogComponent } from '@app/components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
-import { Question } from '@app/interfaces/question';
+import { Question } from '@common/question';
 import { Quiz } from '@app/interfaces/quiz';
 import { MaterialServicesProvider } from '@app/providers/material-services.provider';
 import { QuestionInteractionService } from '@app/services/question-interaction/question-interaction.service';

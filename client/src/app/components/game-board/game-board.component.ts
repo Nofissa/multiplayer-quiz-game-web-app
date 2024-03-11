@@ -2,9 +2,8 @@ import { Component, Input, HostListener, OnDestroy, OnInit } from '@angular/core
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
-import { Question } from '@app/interfaces/question';
+import { Question } from '@common/question';
 import { GameServicesProvider } from '@app/providers/game-services.provider';
-import { GameCacheService } from '@app/services/game-cache/game-cache.service';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { KeyBindingService } from '@app/services/key-binding/key-binding.service';
 import { TimerService } from '@app/services/timer/timer.service';
@@ -32,7 +31,6 @@ export class GameBoardComponent implements OnInit, OnDestroy {
     hasSubmited: boolean = false;
     selectedChoiceIndexes: number[] = [];
 
-    readonly gameCacheService: GameCacheService;
     readonly gameService: GameService;
     readonly timerService: TimerService;
     readonly keyBindingService: KeyBindingService;
@@ -46,7 +44,6 @@ export class GameBoardComponent implements OnInit, OnDestroy {
         private readonly dialog: MatDialog,
         private readonly router: Router,
     ) {
-        this.gameCacheService = gameServicesProvider.gameCacheService;
         this.gameService = gameServicesProvider.gameService;
         this.timerService = gameServicesProvider.timerService;
         this.keyBindingService = gameServicesProvider.keyBindingService;

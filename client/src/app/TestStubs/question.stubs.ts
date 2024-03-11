@@ -1,4 +1,4 @@
-import { Question } from '@app/interfaces/question';
+import { Question } from '@common/question';
 import { firstChoiceStub, secondChoiceStub } from './choices.stubs';
 
 export const questionStub = (): Question[] => {

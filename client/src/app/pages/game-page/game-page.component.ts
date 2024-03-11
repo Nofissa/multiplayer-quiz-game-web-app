@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Question } from '@app/interfaces/question';
-import { GameCacheService } from '@app/services/game-cache/game-cache.service';
+import { Question } from '@common/question';
 import { Player } from '@common/player';
 
 @Component({
@@ -15,15 +14,10 @@ export class GamePageComponent implements OnInit {
     player: Player | null;
     isTest: boolean;
 
-    constructor(
-        private readonly activatedRoute: ActivatedRoute,
-        private readonly gameCacheService: GameCacheService,
-    ) {}
+    constructor(private readonly activatedRoute: ActivatedRoute) {}
 
     ngOnInit() {
         this.pin = this.activatedRoute.snapshot.queryParams['pin'];
         this.isTest = this.activatedRoute.snapshot.queryParams['isTest'] === 'true';
-        this.question = this.gameCacheService.getCurrentQuestion(this.pin);
-        this.player = this.gameCacheService.getSelfPlayer(this.pin);
     }
 }

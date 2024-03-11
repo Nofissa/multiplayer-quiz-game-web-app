@@ -1,5 +1,5 @@
-import { QuestionType } from '@common/question-type';
-import { Choice } from '@common/choice';
+import { QuestionType } from './question-type';
+import { Choice } from './choice';
 
 export interface Question {
     type: QuestionType;

@@ -7,7 +7,7 @@ import { QCMCreationPageComponent } from './qcmcreation-page.component';
 import { ActivatedRoute } from '@angular/router';
 import { Subject, of, throwError } from 'rxjs';
 import { Quiz } from '@app/interfaces/quiz';
-import { Question } from '@app/interfaces/question';
+import { Question } from '@common/question';
 import { UpsertQuestionDialogComponent } from '@app/components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
 import { QuizHttpService } from '@app/services/quiz-http/quiz-http.service';
 import { QuestionInteractionService } from '@app/services/question-interaction/question-interaction.service';

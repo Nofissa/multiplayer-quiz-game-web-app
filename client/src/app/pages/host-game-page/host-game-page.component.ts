@@ -21,9 +21,9 @@ export class HostGamePageComponent implements OnInit {
         private readonly gameService: GameService,
         private readonly activatedRoute: ActivatedRoute,
     ) {
-        this.gameService.onToggleSelectChoice(this.barChartService.updateBarChartData);
-        this.gameService.onNextQuestion(this.barChartService.addQuestion);
-        this.gameService.onToggleGameLock((gameState: GameState) => (this.gameState = gameState));
+        this.gameService.onToggleSelectChoice(this.pin, this.barChartService.updateBarChartData);
+        this.gameService.onNextQuestion(this.pin, this.barChartService.addQuestion);
+        this.gameService.onToggleGameLock(this.pin, (gameState: GameState) => (this.gameState = gameState));
     }
 
     get barCharts(): BarChartData[] {

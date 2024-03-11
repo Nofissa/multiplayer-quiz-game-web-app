@@ -18,7 +18,6 @@ export class WaitingRoomPageComponent implements OnInit {
 
     ngOnInit() {
         this.pin = this.activatedRoute.snapshot.queryParams['pin'];
-        this.gameService.getCurrentQuestion(this.pin);
     }
 
     leaveGame() {

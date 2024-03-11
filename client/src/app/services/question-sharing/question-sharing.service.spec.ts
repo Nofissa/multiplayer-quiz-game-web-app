@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { QuestionSharingService } from './question-sharing.service';
-import { Question } from '@app/interfaces/question';
+import { Question } from '@common/question';
 
 describe('QuestionSharingService', () => {
     let service: QuestionSharingService;

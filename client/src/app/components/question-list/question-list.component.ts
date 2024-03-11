@@ -1,6 +1,7 @@
+// Disabled for mongodb _id fields
 /* eslint-disable no-underscore-dangle */
 import { Component, Input } from '@angular/core';
-import { Question } from '@app/interfaces/question';
+import { Question } from '@common/question';
 import { QuestionListOptions } from '@app/interfaces/question-list-options';
 import { QuestionInteractionService } from '@app/services/question-interaction/question-interaction.service';
 import { QuestionSharingService } from '@app/services/question-sharing/question-sharing.service';

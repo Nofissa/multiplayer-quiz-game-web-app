@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Question } from '@app/interfaces/question';
+import { Question } from '@common/question';
 import { Subject, Subscription } from 'rxjs';
 
 @Injectable({
