@@ -5,13 +5,28 @@ import { Subscription } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class MessageService {
+    private gameChatlogsMap: Map<string, Chatlog[]> = new Map();
+
     constructor(private readonly webSocketService: WebSocketService) {}
 
     sendMessage(pin: string, message: string) {
         this.webSocketService.emit('sendMessage', { pin, message });
     }
 
-    onSendMessage(callback: (chatlogs: Chatlog) => void): Subscription {
-        return this.webSocketService.on('sendMessage', callback);
+    onSendMessage(pin: string, callback: (chatlog: Chatlog) => void): Subscription {
+        const callbackWrapper = (chatlog: Chatlog) => {
+            if (!this.gameChatlogsMap.has(pin)) {
+                this.gameChatlogsMap.set(pin, []);
+            }
+
+            this.gameChatlogsMap.get(pin)?.push(chatlog);
+            callback(chatlog);
+        };
+
+        return this.webSocketService.on('sendMessage', callbackWrapper);
+    }
+
+    getGameChatlogs(pin: string): Chatlog[] {
+        return this.gameChatlogsMap.get(pin) || [];
     }
 }

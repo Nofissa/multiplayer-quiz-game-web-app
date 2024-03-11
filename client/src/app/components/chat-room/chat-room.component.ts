@@ -11,30 +11,33 @@ import { Subscription } from 'rxjs';
     styleUrls: ['./chat-room.component.scss'],
 })
 export class ChatRoomComponent implements OnInit, OnDestroy {
+    pin: string;
     chatMessage = '';
-    chatlogsArray: Chatlog[] = [];
-    private messageSubscription: Subscription;
+    chatlogs: Chatlog[] = [];
+    private messageSubscription: Subscription = new Subscription();
 
     constructor(
-        private messageService: MessageService,
+        private readonly messageService: MessageService,
         private readonly activatedRoute: ActivatedRoute,
-        private userService: UserService,
+        private readonly userService: UserService,
     ) {}
 
     ngOnInit() {
-        this.messageSubscription = this.messageService.onSendMessage((chatlog: Chatlog) => {
-            this.chatlogsArray.push(chatlog);
+        this.pin = this.pin || this.activatedRoute.snapshot.queryParams['pin'];
+        this.chatlogs = this.messageService.getGameChatlogs(this.pin);
+        this.messageSubscription = this.messageService.onSendMessage(this.pin, (chatlog: Chatlog) => {
+            this.chatlogs.push(chatlog);
         });
     }
+
     ngOnDestroy() {
-        if (this.messageSubscription) {
+        if (!this.messageSubscription.closed) {
             this.messageSubscription.unsubscribe();
         }
     }
 
     sendMessage() {
-        const pin = this.activatedRoute.snapshot.queryParams['pin'];
-        this.messageService.sendMessage(pin, this.chatMessage);
+        this.messageService.sendMessage(this.pin, this.chatMessage);
         this.chatMessage = '';
     }
 

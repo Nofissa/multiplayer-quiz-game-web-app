@@ -2,7 +2,7 @@
     <div class="messages-zone font-color text-centered">
         <h3>Salon de clavardage</h3>
         <ul id="message-list">
-            <li *ngFor="let chatlog of chatlogsArray" [ngClass]="{ sender: isCurrentUser(chatlog.author), receiver: !isCurrentUser(chatlog.author) }">
+            <li *ngFor="let chatlog of chatlogs" [ngClass]="{ sender: isCurrentUser(chatlog.author), receiver: !isCurrentUser(chatlog.author) }">
                 <div class="message-content">
                     <div class="message-info">
                         <div class="author-name">{{ chatlog.author }}</div>
