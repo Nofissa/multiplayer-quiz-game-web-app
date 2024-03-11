@@ -11,14 +11,12 @@ export class MessageService {
 
     sendMessage(client: Socket, pin: string, message: string): Chatlog {
         const game = this.gameService.getGame(pin);
-        const organizerId = this.gameService.getOrganizerId(pin);
+        const clientPlayer = game.clientPlayers.get(client.id);
 
-        const author = client.id === organizerId ? 'Organisateur' : game.clientPlayers.get(client.id)?.player.username || 'Unknown';
+        const author = client.id === game.organizer.id ? 'Organisateur' : clientPlayer.player.username;
+        const chatlog = { message: message.substring(0, MAX_MESSAGE_LENGTH), author, date: new Date() };
+        game.chatlogs.push(chatlog);
 
-        return {
-            message: message.substring(0, MAX_MESSAGE_LENGTH),
-            author,
-            date: new Date(),
-        };
+        return chatlog;
     }
 }
