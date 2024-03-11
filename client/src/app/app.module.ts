@@ -4,10 +4,12 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatDividerModule } from '@angular/material/divider';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatListModule } from '@angular/material/list';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSliderModule } from '@angular/material/slider';
@@ -30,6 +32,7 @@ import { UpsertQuestionDialogComponent } from './components/dialogs/upsert-quest
 import { GameComponent } from './components/game/game.component';
 import { BarChartComponent } from './components/histogramme/bar-chart/bar-chart.component';
 import { NavHeaderComponent } from './components/nav-header/nav-header.component';
+import { PlayerListComponent } from './components/player-list/player-list.component';
 import { QuestionBankComponent } from './components/question-bank/question-bank.component';
 import { QuestionListComponent } from './components/question-list/question-list.component';
 import { QuizListComponent } from './components/quiz-list/quiz-list.component';
@@ -42,7 +45,6 @@ import { HostGamePageComponent } from './pages/host-game-page/host-game-page.com
 import { PlayerResultsPageComponent } from './pages/player-results-page/player-results-page.component';
 import { QCMCreationPageComponent } from './pages/qcmcreation-page/qcmcreation-page.component';
 import { WaitingRoomPageComponent } from './pages/waiting-room-page/waiting-room-page.component';
-
 /**
  * Main module that is used in main.ts.
  * All automatically generated components will appear in this module.
@@ -75,6 +77,7 @@ import { WaitingRoomPageComponent } from './pages/waiting-room-page/waiting-room
         TimerComponent,
         HostGamePageComponent,
         JoinGameDialogComponent,
+        PlayerListComponent,
         BarChartComponent,
         PlayerResultsPageComponent,
         BarChartSwiperComponent,
@@ -105,6 +108,8 @@ import { WaitingRoomPageComponent } from './pages/waiting-room-page/waiting-room
         CdkDropList,
         MatSliderModule,
         MatSnackBarModule,
+        MatDividerModule,
+        MatListModule,
         MatProgressBarModule,
     ],
 
