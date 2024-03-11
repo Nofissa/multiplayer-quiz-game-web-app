@@ -123,6 +123,9 @@ export class GameService {
             isFirstGoodEvaluation: isGoodAnswer && isFirstEvaluation,
             isLastEvaluation,
         };
+        const player = game.clientPlayers.get(client.id).player;
+        player.score += payload.score;
+        player.speedAwardCount += payload.isFirstGoodEvaluation ? 1 : 0;
 
         return payload;
     }
