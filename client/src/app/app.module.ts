@@ -42,7 +42,6 @@ import { HostGamePageComponent } from './pages/host-game-page/host-game-page.com
 import { PlayerResultsPageComponent } from './pages/player-results-page/player-results-page.component';
 import { QCMCreationPageComponent } from './pages/qcmcreation-page/qcmcreation-page.component';
 import { WaitingRoomPageComponent } from './pages/waiting-room-page/waiting-room-page.component';
-import { GameCacheService } from './services/game-cache/game-cache.service';
 import { WebSocketService } from './services/web-socket/web-socket.service';
 
 /**
@@ -113,7 +112,7 @@ import { WebSocketService } from './services/web-socket/web-socket.service';
     bootstrap: [AppComponent],
 })
 export class AppModule {
-    // This is done so these services will be instantiated no matter what
+    // This is done so the services will be instantiated no matter what
     // eslint-disable-next-line @typescript-eslint/no-useless-constructor, @typescript-eslint/no-empty-function, no-unused-vars
-    constructor(gameCacheService: GameCacheService, webSocketService: WebSocketService) {}
+    constructor(webSocketService: WebSocketService) {}
 }

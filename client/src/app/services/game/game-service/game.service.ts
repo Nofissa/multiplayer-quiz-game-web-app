@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
-import { Question } from '@app/interfaces/question';
+import { Question } from '@common/question';
 import { Evaluation } from '@common/evaluation';
 import { GameEventPayload } from '@common/game-event-payload';
 import { Player } from '@common/player';
 import { Submission } from '@common/submission';
 import { JoinGamePayload } from '@common/join-game-payload';
 import { GameState } from '@common/game-state';
+import { GameSnapshot } from '@common/game-snapshot';
 import { Subscription } from 'rxjs';
 import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
 
@@ -76,14 +77,6 @@ export class GameService {
         return this.webSocketService.on('submitChoices', applyIfPinMatches(pin, callback));
     }
 
-    getCurrentQuestion(pin: string) {
-        this.webSocketService.emit('getCurrentQuestion', { pin });
-    }
-
-    onGetCurrentQuestion(pin: string, callback: (question: Question) => void): Subscription {
-        return this.webSocketService.on('getCurrentQuestion', applyIfPinMatches(pin, callback));
-    }
-
     nextQuestion(pin: string) {
         this.webSocketService.emit('nextQuestion', { pin });
     }
@@ -98,5 +91,13 @@ export class GameService {
 
     onToggleGameLock(pin: string, callback: (gameState: GameState) => void): Subscription {
         return this.webSocketService.on('toggleGameLock', applyIfPinMatches(pin, callback));
+    }
+
+    getGameSnapshot(pin: string) {
+        this.webSocketService.emit('getGameSnapshot', { pin });
+    }
+
+    onGetGameSnapshot(callback: (gameSnapshot: GameEventPayload<GameSnapshot>) => void): Subscription {
+        return this.webSocketService.on('getGameSnapshot', callback);
     }
 }
