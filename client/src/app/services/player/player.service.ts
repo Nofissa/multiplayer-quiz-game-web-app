@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Player } from '@common/player';
+import { GameHttpService } from '@app/services/game-http/game-http.service';
+import { PlayerState } from '@common/player-state';
 
 @Injectable({
     providedIn: 'root',
@@ -7,11 +9,31 @@ import { Player } from '@common/player';
 export class PlayerService {
     private players: Map<string, Player> = new Map();
 
-    setPlayer(pin: string, player: Player) {
+    constructor(private readonly gameHttpService: GameHttpService) {}
+
+    setPlayer(pin: string, player: Player): void {
         this.players.set(pin, player);
     }
 
-    getPlayer(pin: string) {
-        return this.players.get(pin);
+    getPlayer(pin: string): Player | null {
+        return this.players.get(pin) || null;
+    }
+
+    syncPlayer(pin: string): void {
+        const player = this.getPlayer(pin);
+
+        if (!player) {
+            return;
+        }
+
+        this.gameHttpService.getGameSnapshotByPin(pin).subscribe((snapshot) => {
+            const syncedPlayer = snapshot.players.find((x) => {
+                return x.username === player.username && x.state === PlayerState.Playing;
+            });
+
+            if (syncedPlayer) {
+                this.setPlayer(pin, syncedPlayer);
+            }
+        });
     }
 }
