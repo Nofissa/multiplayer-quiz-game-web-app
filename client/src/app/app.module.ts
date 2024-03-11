@@ -107,7 +107,6 @@ import { WaitingRoomPageComponent } from './pages/waiting-room-page/waiting-room
         MatSnackBarModule,
         MatProgressBarModule,
     ],
-
     providers: [],
     bootstrap: [AppComponent],
 })
