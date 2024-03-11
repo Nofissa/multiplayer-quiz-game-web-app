@@ -7,7 +7,6 @@ import { Player } from '@common/player';
 import { Submission } from '@common/submission';
 import { JoinGamePayload } from '@common/join-game-payload';
 import { GameState } from '@common/game-state';
-import { GameSnapshot } from '@common/game-snapshot';
 import { Subscription } from 'rxjs';
 import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
 
@@ -91,13 +90,5 @@ export class GameService {
 
     onToggleGameLock(pin: string, callback: (gameState: GameState) => void): Subscription {
         return this.webSocketService.on('toggleGameLock', applyIfPinMatches(pin, callback));
-    }
-
-    getGameSnapshot(pin: string) {
-        this.webSocketService.emit('getGameSnapshot', { pin });
-    }
-
-    onGetGameSnapshot(callback: (gameSnapshot: GameEventPayload<GameSnapshot>) => void): Subscription {
-        return this.webSocketService.on('getGameSnapshot', callback);
     }
 }
