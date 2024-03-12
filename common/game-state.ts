@@ -3,4 +3,5 @@ export enum GameState {
     Closed,
     Started,
     Paused,
+    Ended,
 }
