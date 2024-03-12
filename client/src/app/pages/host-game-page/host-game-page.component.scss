@@ -47,3 +47,34 @@
     grid-area: button;
     background-color: white;
 }
+
+// .timer-wrapper {
+//     position: absolute;
+//     top: 50%;
+//     left: 50%;
+//     transform: translate(-50%, -50%);
+//     z-index: 1;
+// }
+
+.question-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    height: 100px;
+    border: 1px solid black;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 25px;
+    background-color: aliceblue;
+    overflow-wrap: break-word;
+    overflow-y: auto;
+}
+
+.text-centered {
+    text-align: center;
+}
+
+.font-color {
+    font-weight: bold;
+    color: black;
+}

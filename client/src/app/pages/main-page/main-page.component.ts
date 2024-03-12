@@ -10,10 +10,10 @@ import { AuthService } from '@app/services/auth/auth.service';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { SessionService } from '@app/services/session/session.service';
 import { AuthPayload } from '@common/auth-payload';
-import { JoinGamePayload } from '@common/join-game-payload';
-import { Subscription } from 'rxjs';
-import { GameInitBundle } from '@common/game-init-bundle';
+// import { JoinGamePayload } from '@common/join-game-payload';
 import { GameEventPayload } from '@common/game-event-payload';
+import { GameInitBundle } from '@common/game-init-bundle';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-main-page',

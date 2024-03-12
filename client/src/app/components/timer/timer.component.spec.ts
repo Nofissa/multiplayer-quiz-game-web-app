@@ -47,6 +47,7 @@ describe('TimerComponent', () => {
     beforeEach(() => {
         fixture = TestBed.createComponent(TimerComponent);
         component = fixture.componentInstance;
+        // timerServiceSpy = TestBed.inject(TimerService) as jasmine.SpyObj<TimerService>;
         fixture.detectChanges();
     });
 

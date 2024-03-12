@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { TimerService } from '@app/services/timer/timer.service';
 import { Subscription } from 'rxjs';
 
@@ -12,6 +12,7 @@ const WHEEL_COLOR_COUNT = 4;
 export class TimerComponent implements OnInit, OnDestroy {
     @Input()
     pin: string;
+    @Output() timerExpired: EventEmitter<void> = new EventEmitter<void>();
     maxDuration: number;
     remainingTime: number;
     strokeDashoffset: number = 0;
@@ -69,5 +70,8 @@ export class TimerComponent implements OnInit, OnDestroy {
         }
 
         this.strokeDashoffset = normalizedTime;
+        if (this.remainingTime === 0) {
+            this.timerExpired.emit();
+        }
     }
 }
