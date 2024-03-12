@@ -26,7 +26,7 @@ export class GameService {
         const quiz = await this.quizService.getQuizById(quizId);
 
         if (!quiz) {
-            Promise.reject(`Aucun quiz ne correspond a l'identifiant ${quizId}`);
+            throw new Error(`Aucun quiz ne correspond a l'identifiant ${quizId}`);
         }
 
         let pin = generateRandomPin();

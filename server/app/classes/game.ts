@@ -1,9 +1,9 @@
-import { GameState } from '@common/game-state';
-import { Chatlog } from '@common/chatlog';
-import { Submission } from '@common/submission';
 import { Quiz } from '@app/model/database/quiz';
-import { ClientPlayer } from './client-player';
+import { Chatlog } from '@common/chatlog';
+import { GameState } from '@common/game-state';
+import { Submission } from '@common/submission';
 import { Socket } from 'socket.io';
+import { ClientPlayer } from './client-player';
 
 export class Game {
     pin: string;
