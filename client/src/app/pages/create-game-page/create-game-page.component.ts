@@ -33,6 +33,7 @@ export class CreateGamePageComponent implements OnInit {
         private readonly router: Router,
         private readonly quizHttpService: QuizHttpService,
         private readonly gameService: GameService,
+        private userService: UserService,
     ) {
         this.dialogService = materialServicesProvider.dialog;
         this.snackBarService = materialServicesProvider.snackBar;
@@ -82,6 +83,7 @@ export class CreateGamePageComponent implements OnInit {
             }
         });
         this.gameService.createGame(quiz._id);
+        this.userService.setUsername('Organisateur');
     }
 
     private testGame(quiz: Quiz) {
