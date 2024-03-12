@@ -127,7 +127,7 @@ export class GameGateway implements OnGatewayDisconnect {
             const evaluation = this.gameService.evaluateChoices(client, pin);
             const payload: GameEventPayload<Evaluation> = { pin, data: evaluation };
 
-            client.emit('submitChoices', payload);
+            this.server.to(pin).emit('submitChoices', payload);
         } catch (error) {
             client.emit('error', error.message);
         }
@@ -159,13 +159,14 @@ export class GameGateway implements OnGatewayDisconnect {
     }
 
     @SubscribeMessage('startTimer')
-    startTimer(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
+    startTimer(@ConnectedSocket() client: Socket, @MessageBody() { pin, duration }: { pin: string; duration?: number }) {
         try {
-            const duration = this.timerService.startTimer(client, pin, (remainingTime) => {
-                const timerTickPayload: GameEventPayload<number> = { pin, data: remainingTime };
+            duration = duration ?? this.gameService.getGame(pin).quiz.duration;
+            const startRemainingTime = this.timerService.startTimer(client, pin, duration, (tickRemainingTime) => {
+                const timerTickPayload: GameEventPayload<number> = { pin, data: tickRemainingTime };
                 this.server.to(pin).emit('timerTick', timerTickPayload);
             });
-            const startTimerPayload: GameEventPayload<number> = { pin, data: duration };
+            const startTimerPayload: GameEventPayload<number> = { pin, data: startRemainingTime };
 
             this.server.to(pin).emit('startTimer', startTimerPayload);
         } catch (error) {
