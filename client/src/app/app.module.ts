@@ -116,7 +116,6 @@ import { WaitingRoomPageComponent } from './pages/waiting-room-page/waiting-room
         MatBadgeModule,
         MatCardModule,
     ],
-
     providers: [],
     bootstrap: [AppComponent],
 })

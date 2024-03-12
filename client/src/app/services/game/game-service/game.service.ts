@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BarChartData } from '@app/interfaces/bar-chart-data';
 import { Question } from '@app/interfaces/question';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
-import { applyIfPinMatches } from '@app/utils/condition-applications/conditional-applications';
+import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
 import { Evaluation } from '@common/evaluation';
 import { GameEventPayload } from '@common/game-event-payload';
 import { GameInitBundle } from '@common/game-init-bundle';
