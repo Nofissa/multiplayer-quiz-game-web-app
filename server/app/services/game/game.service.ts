@@ -117,17 +117,37 @@ export class GameService {
 
         let score = isGoodAnswer ? question.points : NO_POINTS;
         score *= isFirstEvaluation ? BONUS_MULTIPLIER : NO_BONUS_MULTIPLIER;
-        const payload = {
+
+        const player = game.clientPlayers.get(client.id).player;
+        player.score += score;
+        player.speedAwardCount += isGoodAnswer && isFirstEvaluation ? 1 : 0;
+
+        const evaluation: Evaluation = {
+            player,
             correctAnswers: question.choices.filter((x) => x.isCorrect),
             score,
             isFirstGoodEvaluation: isGoodAnswer && isFirstEvaluation,
             isLastEvaluation,
         };
-        const player = game.clientPlayers.get(client.id).player;
-        player.score += payload.score;
-        player.speedAwardCount += payload.isFirstGoodEvaluation ? 1 : 0;
 
-        return payload;
+        return evaluation;
+    }
+
+    startGame(client: Socket, pin: string): Question {
+        const game = this.getGame(pin);
+
+        if (!this.isOrganizer(game, client.id)) {
+            throw new Error(`Vous n'êtes pas organisateur de la partie ${pin}`);
+        }
+
+        if (!game.clientPlayers.size) {
+            throw new Error('Vous ne pouvez pas débuter une partie sans joueurs');
+        }
+
+        game.state = GameState.Started;
+        game.chatlogs = [];
+
+        return game.currentQuestion;
     }
 
     cancelGame(client: Socket, pin: string): string {
@@ -216,11 +236,6 @@ export class GameService {
         return { toCancel, toAbandon };
     }
 
-    getOrganizerId(pin: string): string {
-        const game = this.getGame(pin);
-        return game.organizer.id;
-    }
-
     private isOrganizer(game: Game, clientId: string): boolean {
         return game.organizer.id === clientId;
     }
@@ -231,7 +246,7 @@ export class GameService {
 
         return (
             correctAnswersIndices.size === selectedAnswersIndices.size &&
-            Array.from(selectedAnswersIndices).every((x) => selectedAnswersIndices.has(x))
+            Array.from(correctAnswersIndices).every((x) => selectedAnswersIndices.has(x))
         );
     }
 
