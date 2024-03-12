@@ -31,16 +31,16 @@ export class PlayerListComponent implements OnInit {
 
     ngOnInit() {
         if (!this.isStatic) {
-            this.playerJoinSub = this.gameService.onJoinGame((payload) => {
+            this.playerJoinSub = this.gameService.onJoinGame(this.pin, (payload) => {
                 this.players = payload.players;
             });
-            this.playerBanSub = this.gameService.onPlayerBan((player) => {
+            this.playerBanSub = this.gameService.onPlayerBan(this.pin, (player) => {
                 const index = this.players.findIndex((p) => p.username === player.username);
                 if (index !== NOT_FOUND_INDEX) {
                     this.players[index] = player;
                 }
             });
-            this.playerAbandonSub = this.gameService.onPlayerAbandon((player) => {
+            this.playerAbandonSub = this.gameService.onPlayerAbandon(this.pin, (player) => {
                 const index = this.players.findIndex((p) => p.username === player.username);
                 if (index !== NOT_FOUND_INDEX) {
                     this.players[index] = player;
