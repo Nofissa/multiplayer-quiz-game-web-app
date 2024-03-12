@@ -1,40 +1,28 @@
 <div class="list-container">
-    <h1>Liste des joueurs</h1>
-    <mat-list *ngIf="!isStatic">
-        <mat-list-item
-            *ngFor="let player of players"
-            [ngClass]="{
+    <h4>Liste des joueurs</h4>
+    <mat-list>
+        <mat-list-item *ngFor="let player of players" [ngClass]="{
                 banned: player.state === playerStates.Banned,
                 playing: player.state === playerStates.Playing,
-                abandoned: player.state === playerStates.Abandonned
-            }"
-        >
-            <div class="player-container">
-                <div class="player-name">
-                    {{ player.username }}
+                abandoned: player.state === playerStates.Abandonned,
+                hidden: player.state === playerStates.Abandonned && !displayOptions.quitters,
+            }">
+            <div class="row-container">
+                <div class="player-info-wrapper">
+                    <div class="player-name">
+                        {{ player.username }}
+                    </div>
+                    <div class="player-score" *ngIf="displayOptions.score">{{ player.score }} points</div>
+                    <div class="player-speedAwardCount" *ngIf="displayOptions.speedAwardCount">{{ player.speedAwardCount
+                        }}
+                        bonus</div>
                 </div>
-                <div class="player-score" *ngIf="isHost">{{ player.score }} pts</div>
-                <button *ngIf="isHost && player.state === playerStates.Playing" mat-raised-button color="warn" (click)="banPlayer(player)">
-                    Kick
+                <button mat-flat-button color="warn" (click)="banPlayer(player)" [ngClass]="{
+                        invisible: player.state !== playerStates.Playing,
+                        hidden: !displayOptions.ban
+                    }">
+                    Bannir
                 </button>
-            </div>
-        </mat-list-item>
-    </mat-list>
-    <mat-list *ngIf="isStatic">
-        <mat-list-item
-            *ngFor="let player of players"
-            [ngClass]="{
-                banned: player.state === playerStates.Banned,
-                playing: player.state === playerStates.Playing,
-                abandoned: player.state === playerStates.Abandonned
-            }"
-        >
-            <div class="player-container">
-                <div class="player-name">
-                    {{ player.username }}
-                </div>
-                <div class="player-score">{{ player.score }} pts</div>
-                <div class="player-speedAwardCount">{{ player.speedAwardCount }} bonus</div>
             </div>
         </mat-list-item>
     </mat-list>

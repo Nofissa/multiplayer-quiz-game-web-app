@@ -19,6 +19,10 @@ export class PlayerService {
         return this.players.get(pin) || null;
     }
 
+    isSelf(pin: string, player: Player): boolean {
+        return this.players.get(pin)?.username.toLowerCase() === player.username.toLowerCase();
+    }
+
     syncPlayer(pin: string): void {
         const player = this.getPlayer(pin);
 
@@ -28,7 +32,7 @@ export class PlayerService {
 
         this.gameHttpService.getGameSnapshotByPin(pin).subscribe((snapshot) => {
             const syncedPlayer = snapshot.players.find((x) => {
-                return x.username === player.username && x.state === PlayerState.Playing;
+                return x.username.toLowerCase() === player.username.toLowerCase() && x.state === PlayerState.Playing;
             });
 
             if (syncedPlayer) {

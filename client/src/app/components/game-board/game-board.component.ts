@@ -41,6 +41,8 @@ export class GameBoardComponent implements OnInit, OnDestroy {
     private submitChoicesSubscription: Subscription = new Subscription();
     private timerTickSubscription: Subscription = new Subscription();
 
+    // Depends on many services
+    // eslint-disable-next-line max-params
     constructor(
         gameServicesProvider: GameServicesProvider,
         private readonly playerService: PlayerService,

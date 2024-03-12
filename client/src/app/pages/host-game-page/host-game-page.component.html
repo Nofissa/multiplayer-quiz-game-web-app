@@ -1,17 +1,17 @@
-
 <div class="grid-container">
     <app-nav-header class="nav-header" [backArrow]="false"></app-nav-header>
     <div *ngIf="isStarted()">
-        <app-bar-chart-swiper class="bar-chart" *ngIf="isEnded" [data]="barCharts" ></app-bar-chart-swiper>
+        <app-bar-chart-swiper class="bar-chart" *ngIf="isEnded" [data]="barCharts"></app-bar-chart-swiper>
         <app-bar-chart class="bar-chart" *ngIf="!isEnded" [data]="barChart"></app-bar-chart>
     </div>
+    <app-player-list [pin]="pin" [displayOptions]="{ score:true, ban:true, quitters: true }"></app-player-list>
     <app-chat-room class="chat-room"></app-chat-room>
-
-
     <button class="lock-button" mat-raised-button (click)="toggleLock()">
         <mat-icon class="lock-icon" *ngIf="!isLocked()" fontIcon="lock_open"></mat-icon>
         <mat-icon class="lock-icon" *ngIf="isLocked()" fontIcon="lock"></mat-icon>
     </button>
-    <button class="start-button" mat-raised-button *ngIf="isLocked() && !isStarted()" (click)="startGame()">START</button>
-    <button class="next-button" mat-raised-button *ngIf="isLocked() && isStarted()" (click)="nextQuestion()">NEXT</button>
+    <button class="start-button" mat-raised-button *ngIf="isLocked() && !isStarted()"
+        (click)="startGame()">Commencer</button>
+    <button class="next-button" mat-raised-button *ngIf="isLocked() && isStarted()"
+        (click)="nextQuestion()">Suivant</button>
 </div>

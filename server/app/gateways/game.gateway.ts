@@ -87,10 +87,10 @@ export class GameGateway implements OnGatewayDisconnect {
     playerAbandon(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
         try {
             const clientPlayer = this.gameService.playerAbandon(client, pin);
-            clientPlayer.socket.leave(pin);
             const payload: GameEventPayload<Player> = { pin, data: clientPlayer.player };
 
             this.server.to(pin).emit('playerAbandon', payload);
+            clientPlayer.socket.leave(pin);
         } catch (error) {
             client.emit('error', error.message);
         }
@@ -100,10 +100,10 @@ export class GameGateway implements OnGatewayDisconnect {
     playerBan(@ConnectedSocket() client: Socket, @MessageBody() { pin, username }: { pin: string; username: string }) {
         try {
             const clientPlayer = this.gameService.playerBan(client, pin, username);
-            clientPlayer.socket.leave(pin);
             const payload: GameEventPayload<Player> = { pin, data: clientPlayer.player };
 
             this.server.to(pin).emit('playerBan', payload);
+            clientPlayer.socket.leave(pin);
         } catch (error) {
             client.emit('error', error.message);
         }
