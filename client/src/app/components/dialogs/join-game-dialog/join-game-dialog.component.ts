@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
+import { UserService } from '@app/services/user/user-service';
 
 const PIN_LENGTH = 4;
 
@@ -17,6 +18,7 @@ export class JoinGameDialogComponent {
     constructor(
         private readonly formBuilder: FormBuilder,
         private readonly dialogRef: MatDialogRef<JoinGameDialogComponent>,
+        private userService: UserService,
     ) {
         this.formGroup = this.formBuilder.group({
             pin: [this.pin, [Validators.required, this.pinValidator()]],
@@ -30,6 +32,7 @@ export class JoinGameDialogComponent {
 
     submit() {
         if (this.formGroup.valid) {
+            this.userService.setUsername(this.formGroup.value.username);
             this.dialogRef.close(this.formGroup.value);
         }
     }

@@ -1,10 +1,10 @@
-<app-nav-header [backArrow]="false"></app-nav-header>
-<div class="grid-container">
-    <div class="waiting-text">
-        <h3>En attente de l'organisateur</h3>
+<app-nav-header></app-nav-header>
+<div class="container">
+    <div class="waiting-area">
+        <h3>En attente des autres joueurs...</h3>
         <app-loader-animation></app-loader-animation>
-        <button mat-raised-button id="leave-button" (click)="leaveGame()">Quitter</button>
     </div>
-    <app-chat-room></app-chat-room>
+    <div class="right-panel">
+        <app-chat-room></app-chat-room>
+    </div>
 </div>
-

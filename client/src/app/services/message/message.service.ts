@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
-import { applyIfPinMatches } from '@app/utils/condition-applications/conditional-applications';
 import { Chatlog } from '@common/chatlog';
 import { Subscription } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class MessageService {
+    private gameChatlogsMap: Map<string, Chatlog[]> = new Map();
+
     constructor(private readonly webSocketService: WebSocketService) {}
 
     sendMessage(pin: string, message: string) {
@@ -13,6 +14,19 @@ export class MessageService {
     }
 
     onSendMessage(pin: string, callback: (chatlog: Chatlog) => void): Subscription {
-        return this.webSocketService.on('sendMessage', applyIfPinMatches(pin, callback));
+        const callbackWrapper = (chatlog: Chatlog) => {
+            if (!this.gameChatlogsMap.has(pin)) {
+                this.gameChatlogsMap.set(pin, []);
+            }
+
+            this.gameChatlogsMap.get(pin)?.push(chatlog);
+            callback(chatlog);
+        };
+
+        return this.webSocketService.on('sendMessage', callbackWrapper);
+    }
+
+    getGameChatlogs(pin: string): Chatlog[] {
+        return this.gameChatlogsMap.get(pin) || [];
     }
 }
