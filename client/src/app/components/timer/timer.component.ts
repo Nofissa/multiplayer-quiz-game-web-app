@@ -23,8 +23,8 @@ export class TimerComponent implements OnInit, OnDestroy {
         [3 / WHEEL_COLOR_COUNT, '#e69d2e'],
         [WHEEL_COLOR_COUNT / WHEEL_COLOR_COUNT, '#dc4d66'],
     ];
-    private timerTickSubscription: Subscription;
-    private startTimerSubscription: Subscription;
+    private startTimerSubscription: Subscription = new Subscription();
+    private timerTickSubscription: Subscription = new Subscription();
 
     constructor(private timerService: TimerService) {}
 
@@ -39,11 +39,11 @@ export class TimerComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
-        if (!this.timerTickSubscription.closed) {
-            this.timerTickSubscription.unsubscribe();
-        }
-        if (!this.startTimerSubscription.closed) {
+        if (this.startTimerSubscription && !this.startTimerSubscription.closed) {
             this.startTimerSubscription.unsubscribe();
+        }
+        if (this.timerTickSubscription && !this.timerTickSubscription.closed) {
+            this.timerTickSubscription.unsubscribe();
         }
     }
 
