@@ -23,7 +23,7 @@ export class PlayerResultsPageComponent implements OnInit {
         },
     ];
 
-    private pin: string;
+    pin: string;
 
     constructor(
         private readonly webSocketService: WebSocketService,

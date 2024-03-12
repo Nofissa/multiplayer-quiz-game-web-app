@@ -8,7 +8,10 @@ import { QuizDetailsDialogComponent } from '@app/components/dialogs/quiz-details
 import { Quiz } from '@app/interfaces/quiz';
 import { MaterialServicesProvider } from '@app/providers/material-services.provider';
 import { GameService } from '@app/services/game/game-service/game.service';
+import { PlayerService } from '@app/services/player/player.service';
 import { QuizHttpService } from '@app/services/quiz-http/quiz-http.service';
+import { Player } from '@common/player';
+import { PlayerState } from '@common/player-state';
 import SwiperCore, { EffectCoverflow, Navigation, Pagination } from 'swiper';
 
 SwiperCore.use([Navigation, Pagination, EffectCoverflow]);
@@ -33,7 +36,7 @@ export class CreateGamePageComponent implements OnInit {
         private readonly router: Router,
         private readonly quizHttpService: QuizHttpService,
         private readonly gameService: GameService,
-        private userService: UserService,
+        private readonly playerService: PlayerService,
     ) {
         this.dialogService = materialServicesProvider.dialog;
         this.snackBarService = materialServicesProvider.snackBar;
@@ -80,10 +83,11 @@ export class CreateGamePageComponent implements OnInit {
         this.gameService.onCreateGame((pin: string) => {
             if (pin) {
                 this.router.navigate(['/host-game'], { queryParams: { pin } });
+                const player: Player = { username: 'Organisateur', score: 0, speedAwardCount: 0, state: PlayerState.Playing };
+                this.playerService.setPlayer(pin, player);
             }
         });
         this.gameService.createGame(quiz._id);
-        this.userService.setUsername('Organisateur');
     }
 
     private testGame(quiz: Quiz) {

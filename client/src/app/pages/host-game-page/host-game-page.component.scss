@@ -1,14 +1,20 @@
-.grid-container {
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.main-container {
     display: grid;
-    grid-template-columns: 75% 25%;
-    grid-template-rows: 15% 35% 40% 10%;
-    grid-template-areas:
-        'nav-header nav-header'
-        'bar-chart chat-room'
-        'question-list chat-room'
-        'lock-button button';
-    height: 90vh;
+    grid-template-columns: 66% 34%;
+    flex-grow: 1;
     justify-content: center;
+}
+
+.buttons-wrapper {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
 }
 
 .lock-button {
@@ -46,4 +52,14 @@
 .next-button {
     grid-area: button;
     background-color: white;
+}
+
+app-player-list {
+    display: flex;
+    justify-content: center;
+}
+
+app-chat-room {
+    display: flex;
+    justify-content: center;
 }

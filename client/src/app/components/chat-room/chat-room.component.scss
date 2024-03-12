@@ -1,20 +1,21 @@
 .chat-room {
     display: flex;
     flex-direction: column;
-    height: 75%;
-    border-radius: 25px;
+    justify-content: space-between;
+    border-radius: 15px;
     border: 1px solid black;
-    padding: 10px;
-    background-color: aliceblue;
-    max-width: 321px;
+    height: 100%;
+    background-color: var(--secondary-bg-color);
+    max-width: 400px;
+    width: 100%;
+    padding: 0px 10px;
 }
 
 .messages-zone {
     flex-grow: 1;
     padding: 10px;
     overflow-y: auto;
-    max-height: 700px;
-    max-width: 321px;
+    max-height: 100%;
     display: flex;
     flex-direction: column;
 }
@@ -27,9 +28,10 @@
     color: black;
 }
 
-h3 {
-    color: black;
+h4 {
+    color: var(--secondary-fg-color);
     text-align: center;
+    margin: 0px;
 }
 
 #message-list {
@@ -89,4 +91,12 @@ h3 {
     font-size: 0.55em;
     color: #302d2d;
     white-space: nowrap;
+}
+
+form {
+    width: 100%;
+}
+
+mat-form-field {
+    width: 100%;
 }
