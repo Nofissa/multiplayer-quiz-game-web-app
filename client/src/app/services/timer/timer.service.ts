@@ -9,8 +9,8 @@ import { applyIfPinMatches } from '@app/utils/conditional-applications/condition
 export class TimerService {
     constructor(private readonly webSocketService: WebSocketService) {}
 
-    startTimer(pin: string) {
-        this.webSocketService.emit('startTimer', { pin });
+    startTimer(pin: string, duration?: number) {
+        this.webSocketService.emit('startTimer', { pin, duration });
     }
 
     onStartTimer(pin: string, callback: (startTime: number) => void): Subscription {
