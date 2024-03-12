@@ -6,10 +6,12 @@ import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatDividerModule } from '@angular/material/divider';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatListModule } from '@angular/material/list';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSliderModule } from '@angular/material/slider';
@@ -19,6 +21,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppComponent } from '@app/pages/app/app.component';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
+import { HostGamePageComponent } from '@app/pages/host-game-page/host-game-page.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { SwiperModule } from 'swiper/angular';
 import { LoaderAnimationComponent } from './components/animations/loader-animation/loader-animation.component';
@@ -32,6 +35,7 @@ import { UpsertQuestionDialogComponent } from './components/dialogs/upsert-quest
 import { GameComponent } from './components/game/game.component';
 import { BarChartComponent } from './components/histogramme/bar-chart/bar-chart.component';
 import { NavHeaderComponent } from './components/nav-header/nav-header.component';
+import { PlayerListComponent } from './components/player-list/player-list.component';
 import { QuestionBankComponent } from './components/question-bank/question-bank.component';
 import { QuestionListComponent } from './components/question-list/question-list.component';
 import { QuizListComponent } from './components/quiz-list/quiz-list.component';
@@ -40,7 +44,6 @@ import { TimerComponent } from './components/timer/timer.component';
 import { AppRoutingModule } from './modules/app-routing.module';
 import { AdminPageComponent } from './pages/admin-page/admin-page.component';
 import { CreateGamePageComponent } from './pages/create-game-page/create-game-page.component';
-import { HostGamePageComponent } from './pages/host-game-page/host-game-page.component';
 import { PlayerResultsPageComponent } from './pages/player-results-page/player-results-page.component';
 import { QCMCreationPageComponent } from './pages/qcmcreation-page/qcmcreation-page.component';
 import { WaitingRoomPageComponent } from './pages/waiting-room-page/waiting-room-page.component';
@@ -76,6 +79,7 @@ import { WaitingRoomPageComponent } from './pages/waiting-room-page/waiting-room
         TimerComponent,
         HostGamePageComponent,
         JoinGameDialogComponent,
+        PlayerListComponent,
         BarChartComponent,
         PlayerResultsPageComponent,
         BarChartSwiperComponent,
@@ -106,6 +110,8 @@ import { WaitingRoomPageComponent } from './pages/waiting-room-page/waiting-room
         CdkDropList,
         MatSliderModule,
         MatSnackBarModule,
+        MatDividerModule,
+        MatListModule,
         MatProgressBarModule,
         MatBadgeModule,
         MatCardModule,

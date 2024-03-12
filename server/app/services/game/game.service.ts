@@ -4,9 +4,9 @@ import { generateRandomPin } from '@app/helpers/pin';
 import { DisconnectPayload } from '@app/interfaces/disconnect-payload';
 import { Question } from '@app/model/database/question';
 import { QuizService } from '@app/services/quiz/quiz.service';
-import { EvaluationPayload } from '@common/evaluation-payload';
+import { Evaluation } from '@common/evaluation';
 import { GameState } from '@common/game-state';
-import { JoinGamePayload } from '@common/join-game-payload';
+import { GameInitBundle } from '@common/game-init-bundle';
 import { PlayerState } from '@common/player-state';
 import { Submission } from '@common/submission';
 import { Injectable } from '@nestjs/common';
@@ -41,7 +41,7 @@ export class GameService {
         return game.pin;
     }
 
-    joinGame(client: Socket, pin: string, username: string): JoinGamePayload {
+    joinGame(client: Socket, pin: string, username: string): GameInitBundle {
         const game = this.getGame(pin);
         const player = new ClientPlayer(client, username);
         const clientPlayers = Array.from(game.clientPlayers.values());
@@ -50,8 +50,16 @@ export class GameService {
             throw new Error(`La partie ${pin} n'est pas ouverte`);
         }
 
+        if (game.clientPlayers.has(client.id)) {
+            throw new Error('Vous êtes déjà dans cette partie');
+        }
+
         if (username.toLowerCase() === 'organisateur') {
             throw new Error('Le nom "Organisateur" est réservé');
+        }
+
+        if (clientPlayers.some((x) => x.player.username.toLowerCase() === username.toLowerCase() && x.player.state === PlayerState.Banned)) {
+            throw new Error(`Le nom d'utilisateur "${username}" banni`);
         }
 
         if (clientPlayers.some((x) => x.player.username.toLowerCase() === username.toLowerCase() && x.player.state === PlayerState.Playing)) {
@@ -60,7 +68,7 @@ export class GameService {
 
         game.clientPlayers.set(client.id, player);
 
-        const players = clientPlayers.map((x) => x.player);
+        const players = Array.from(game.clientPlayers.values()).map((x) => x.player);
         const payload = { pin, players, chatlogs: game.chatlogs };
 
         return payload;
@@ -93,19 +101,19 @@ export class GameService {
         return clientPlayer;
     }
 
-    evaluateChoices(client: Socket, pin: string): EvaluationPayload {
+    evaluateChoices(client: Socket, pin: string): Evaluation {
         const game = this.getGame(pin);
+        const submission = this.getOrCreateSubmission(client, game);
 
-        if (game.submissions.get(client.id).isFinal) {
+        if (submission.isFinal) {
             throw new Error('Vous avez déjà soumis vos choix pour cette question');
         }
 
-        game.submissions.get(client.id).isFinal = true;
+        submission.isFinal = true;
 
-        const question = game.quiz.questions[game.currentQuestionIndex];
-        const submission = game.submissions.get(client.id);
+        const question = game.currentQuestion;
 
-        const gameSubmissions = Array.from(game.submissions.values());
+        const gameSubmissions = Array.from(game.currentQuestionSubmissions.values());
         const isGoodAnswer = this.isGoodAnswer(question, submission);
         const isFirstEvaluation = gameSubmissions.filter((x) => x.isFinal).length === 1;
         const isLastEvaluation = gameSubmissions.filter((x) => x.isFinal).length === game.clientPlayers.size;
@@ -165,27 +173,17 @@ export class GameService {
             throw new Error(`Vous n'êtes pas organisateur de la partie ${pin}`);
         }
 
-        game.submissions.clear();
-        game.currentQuestionIndex++;
+        game.loadNextQuestion();
 
-        return game.quiz.questions[game.currentQuestionIndex];
+        return game.currentQuestion;
     }
 
     toggleSelectChoice(client: Socket, pin: string, choiceIndex: number): Submission {
         const game = this.getGame(pin);
-        let playerSubmission = game.submissions.get(client.id);
+        const submission = this.getOrCreateSubmission(client, game);
+        submission.choices[choiceIndex].isSelected = !submission.choices[choiceIndex].isSelected;
 
-        if (!playerSubmission) {
-            playerSubmission = {
-                choices: game.quiz.questions[game.currentQuestionIndex].choices.map((_, index) => {
-                    return { index, isSelected: false };
-                }),
-                isFinal: false,
-            };
-        }
-        playerSubmission.choices[choiceIndex].isSelected = !playerSubmission.choices[choiceIndex].isSelected;
-
-        return playerSubmission;
+        return submission;
     }
 
     getGame(pin: string): Game {
@@ -255,6 +253,11 @@ export class GameService {
         return { toCancel, toAbandon };
     }
 
+    getOrganizerId(pin: string): string {
+        const game = this.getGame(pin);
+        return game.organizer.id;
+    }
+
     private isOrganizer(game: Game, clientId: string): boolean {
         return game.organizer.id === clientId;
     }
@@ -267,5 +270,18 @@ export class GameService {
             correctAnswersIndices.size === selectedAnswersIndices.size &&
             Array.from(selectedAnswersIndices).every((x) => selectedAnswersIndices.has(x))
         );
+    }
+
+    private getOrCreateSubmission(client: Socket, game: Game) {
+        if (!game.currentQuestionSubmissions.has(client.id)) {
+            game.currentQuestionSubmissions.set(client.id, {
+                choices: game.currentQuestion.choices.map((_, index) => {
+                    return { index, isSelected: false };
+                }),
+                isFinal: false,
+            });
+        }
+
+        return game.currentQuestionSubmissions.get(client.id);
     }
 }

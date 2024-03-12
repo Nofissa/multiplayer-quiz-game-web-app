@@ -1,11 +1,19 @@
 <div class="grid-container">
     <app-nav-header class="nav-header" [backArrow]="false"></app-nav-header>
-    <app-bar-chart-swiper class="bar-chart" *ngIf="isEnded()" [data]="barCharts"></app-bar-chart-swiper>
-    <app-bar-chart class="bar-chart" *ngIf="isStarted()" [data]="barChart"></app-bar-chart>
-
+    <div *ngIf="isStarted()">
+        <div *ngIf="question" class="question-box font-color">
+            <span id="questionText" class="text-centered">{{ question.text }}</span>
+            <span id="value" class="text-centered"
+                ><strong>{{ question.points }} points</strong></span
+            >
+        </div>
+        <app-timer-component [pin]="pin" (timerExpired)="onTimerExpired()"></app-timer-component>
+        <app-bar-chart-swiper class="bar-chart" *ngIf="isEnded" [data]="barCharts"></app-bar-chart-swiper>
+        <!-- <app-bar-chart class="bar-chart" *ngIf="!isEnded" [data]="barChart"></app-bar-chart> -->
+    </div>
     <app-chat-room class="chat-room"></app-chat-room>
 
-    <button class="lock-button" mat-raised-button (click)="toggleLock()">
+    <button *ngIf="!isStarted()" class="lock-button" mat-raised-button (click)="toggleLock()">
         <mat-icon class="lock-icon" *ngIf="!isLocked()" fontIcon="lock_open"></mat-icon>
         <mat-icon class="lock-icon" *ngIf="isLocked()" fontIcon="lock"></mat-icon>
     </button>

@@ -8,6 +8,7 @@ import { Quiz } from '@app/interfaces/quiz';
 import { MaterialServicesProvider } from '@app/providers/material-services.provider';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { QuizHttpService } from '@app/services/quiz-http/quiz-http.service';
+import { UserService } from '@app/services/user/user-service';
 import { Subscription } from 'rxjs';
 import SwiperCore, { EffectCoverflow, Navigation, Pagination } from 'swiper';
 
@@ -34,6 +35,7 @@ export class CreateGamePageComponent implements OnInit, OnDestroy {
         private readonly router: Router,
         private readonly quizHttpService: QuizHttpService,
         private readonly gameService: GameService,
+        private userService: UserService,
     ) {
         this.dialogService = materialServicesProvider.dialog;
         this.snackBarService = materialServicesProvider.snackBar;
@@ -89,6 +91,7 @@ export class CreateGamePageComponent implements OnInit, OnDestroy {
 
     private createGame(quiz: Quiz) {
         this.gameService.createGame(quiz._id);
+        this.userService.setUsername('Organisateur');
     }
 
     private testGame(quiz: Quiz) {
