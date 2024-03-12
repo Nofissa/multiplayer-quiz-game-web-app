@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { Chatlog } from '@common/chatlog';
+import { Subscription } from 'rxjs';
 import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
 
 @Injectable({ providedIn: 'root' })
