@@ -44,6 +44,14 @@ export class GameService {
         return this.webSocketService.on('cancelGame', applyIfPinMatches(pin, callback));
     }
 
+    startGame(pin: string) {
+        this.webSocketService.emit('startGame', { pin });
+    }
+
+    onStartGame(pin: string, callback: (question: Question) => void): Subscription {
+        return this.webSocketService.on('startGame', applyIfPinMatches(pin, callback));
+    }
+
     playerAbandon(pin: string) {
         this.webSocketService.emit('playerAbandon', { pin });
     }
