@@ -10,7 +10,9 @@ import { AuthService } from '@app/services/auth/auth.service';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { SessionService } from '@app/services/session/session.service';
 import { AuthPayload } from '@common/auth-payload';
-import { JoinGamePayload } from '@common/join-game-payload';
+// import { JoinGamePayload } from '@common/join-game-payload';
+import { GameEventPayload } from '@common/game-event-payload';
+import { GameInitBundle } from '@common/game-init-bundle';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -40,7 +42,7 @@ export class MainPageComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
-        this.joinGameSubscription = this.gameService.onJoinGame((payload: JoinGamePayload) => {
+        this.joinGameSubscription = this.gameService.onJoinGameNoPin((payload: GameEventPayload<GameInitBundle>) => {
             this.router.navigate(['waiting-room'], { queryParams: { pin: payload.pin } });
         });
     }
