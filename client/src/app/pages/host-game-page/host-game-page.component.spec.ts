@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testin
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
+import { questionStub } from '@app/TestStubs/question.stubs';
 import { Question } from '@app/interfaces/question';
 import { BarChartService } from '@app/services/game/bar-chart-service/bar-chart.service';
 import { GameService } from '@app/services/game/game-service/game.service';
@@ -10,19 +11,7 @@ import { GameState } from '@common/game-state';
 import { Subscription } from 'rxjs';
 import { HostGamePageComponent } from './host-game-page.component';
 
-const mockQuestion: Question = {
-    _id: '123456789',
-    text: 'Quelle est la valeur de la constante R dans la formule pV = nRT',
-    type: 'QCM',
-    choices: [
-        { text: '3.14 V/m^2', isCorrect: false },
-        { text: '2.72 C/s', isCorrect: false },
-        { text: '6.022x10^23 mol/N', isCorrect: false },
-        { text: '8.31 J/mol/K', isCorrect: true },
-    ],
-    points: 100,
-    lastModification: new Date('2024-01-20 18:43:27'),
-};
+const mockQuestion: Question = questionStub()[0];
 
 describe('HostGamePageComponent', () => {
     let component: HostGamePageComponent;
