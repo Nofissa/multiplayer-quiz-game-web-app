@@ -18,8 +18,8 @@
                         bonus</div>
                 </div>
                 <button mat-flat-button color="warn" (click)="banPlayer(player)" [ngClass]="{
-                        invisible: player.state !== playerStates.Playing,
-                        hidden: !displayOptions.ban
+                        hidden: !displayOptions.ban,
+                        invisible: player.state !== playerStates.Playing || !displayOptions.ban
                     }">
                     Bannir
                 </button>

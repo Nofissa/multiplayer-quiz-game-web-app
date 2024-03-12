@@ -18,7 +18,7 @@ const routes: Routes = [
     { path: 'qcm-creation', component: QCMCreationPageComponent },
     { path: 'waiting-room', component: WaitingRoomPageComponent },
     { path: 'host-game', component: HostGamePageComponent },
-    { path: 'results-page', component: PlayerResultsPageComponent },
+    { path: 'results', component: PlayerResultsPageComponent },
     { path: '**', redirectTo: '/home' },
 ];
 

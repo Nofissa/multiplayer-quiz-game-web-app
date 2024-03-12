@@ -19,13 +19,15 @@ export class PlayerListComponent implements OnInit, OnDestroy {
     @Input()
     pin: string;
     @Input()
-    displayOptions: PlayerListDisplayOptions;
+    displayOptions: PlayerListDisplayOptions = {};
     playerStates = PlayerState;
     players: Player[] = [];
 
-    private playerJoinSub: Subscription = new Subscription();
-    private playerBanSub: Subscription = new Subscription();
-    private playerAbandonSub: Subscription = new Subscription();
+    private submitChoicesSubscription: Subscription = new Subscription();
+    private playerJoinSubscription: Subscription = new Subscription();
+    private playerBanSubscription: Subscription = new Subscription();
+    private playerAbandonSubscription: Subscription = new Subscription();
+    private startGameSubscription: Subscription = new Subscription();
 
     // Depends on many services
     // eslint-disable-next-line max-params
@@ -42,34 +44,24 @@ export class PlayerListComponent implements OnInit, OnDestroy {
             this.trySort();
         });
 
-        this.playerJoinSub = this.gameService.onJoinGame(this.pin, (payload) => {
-            this.upsertPlayer(payload.player);
-        });
-        this.playerBanSub = this.gameService.onPlayerBan(this.pin, (player) => {
-            if (this.playerService.isSelf(this.pin, player)) {
-                this.router.navigateByUrl('/home');
-            }
-
-            this.upsertPlayer(player);
-        });
-        this.playerAbandonSub = this.gameService.onPlayerAbandon(this.pin, (player) => {
-            if (this.playerService.isSelf(this.pin, player)) {
-                this.router.navigateByUrl('/home');
-            }
-
-            this.upsertPlayer(player);
-        });
+        this.setupSubscription(this.pin);
     }
 
     ngOnDestroy() {
-        if (!this.playerJoinSub.closed) {
-            this.playerJoinSub.unsubscribe();
+        if (!this.submitChoicesSubscription.closed) {
+            this.submitChoicesSubscription.unsubscribe();
         }
-        if (!this.playerBanSub.closed) {
-            this.playerBanSub.unsubscribe();
+        if (!this.playerJoinSubscription.closed) {
+            this.playerJoinSubscription.unsubscribe();
         }
-        if (!this.playerAbandonSub.closed) {
-            this.playerAbandonSub.unsubscribe();
+        if (!this.playerBanSubscription.closed) {
+            this.playerBanSubscription.unsubscribe();
+        }
+        if (!this.playerAbandonSubscription.closed) {
+            this.playerAbandonSubscription.unsubscribe();
+        }
+        if (!this.startGameSubscription.closed) {
+            this.startGameSubscription.unsubscribe();
         }
     }
 
@@ -99,5 +91,43 @@ export class PlayerListComponent implements OnInit, OnDestroy {
                 }
             });
         }
+    }
+
+    private setupSubscription(pin: string) {
+        this.submitChoicesSubscription = this.gameService.onSubmitChoices(this.pin, (evaluation) => {
+            this.upsertPlayer(evaluation.player);
+        });
+
+        this.playerJoinSubscription = this.gameService.onJoinGame(this.pin, (payload) => {
+            this.upsertPlayer(payload.player);
+        });
+
+        this.playerBanSubscription = this.gameService.onPlayerBan(this.pin, (player) => {
+            if (this.playerService.isSelf(this.pin, player)) {
+                this.router.navigateByUrl('/home');
+            }
+
+            this.upsertPlayer(player);
+        });
+
+        this.playerAbandonSubscription = this.gameService.onPlayerAbandon(this.pin, (player) => {
+            if (this.playerService.isSelf(this.pin, player)) {
+                this.router.navigateByUrl('/home');
+            }
+
+            this.upsertPlayer(player);
+        });
+
+        this.playerAbandonSubscription = this.gameService.onPlayerAbandon(this.pin, (player) => {
+            if (this.playerService.isSelf(this.pin, player)) {
+                this.router.navigateByUrl('/home');
+            }
+
+            this.upsertPlayer(player);
+        });
+
+        this.startGameSubscription = this.gameService.onStartGame(this.pin, () => {
+            this.displayOptions.ban = false;
+        });
     }
 }
