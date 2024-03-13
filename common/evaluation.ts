@@ -5,6 +5,6 @@ export interface Evaluation {
     player: Player,
     correctAnswers: Choice[];
     score: number;
-    isFirstGoodEvaluation: boolean;
-    isLastEvaluation: boolean;
+    isFirstCorrect: boolean;
+    isLast: boolean;
 }

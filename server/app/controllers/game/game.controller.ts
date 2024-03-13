@@ -22,19 +22,31 @@ export class GameController {
             const snapshot: GameSnapshot = {
                 chatlogs: game.chatlogs,
                 players: Array.from(game.clientPlayers.values()).map((x) => x.player),
+                state: game.state,
                 currentQuestionIndex: game.currentQuestionIndex,
-                questions: game.quiz.questions.map((x) => {
-                    return {
-                        // Disabled because it comes from mongodb
-                        // eslint-disable-next-line no-underscore-dangle
-                        _id: x._id,
-                        type: x.type,
-                        text: x.text,
-                        points: x.points,
-                        choices: x.choices,
-                        lastModification: x.lastModification,
-                    };
-                }),
+                quiz: {
+                    // Disabled because it comes from mongodb
+                    // eslint-disable-next-line no-underscore-dangle
+                    _id: game.quiz._id,
+                    id: game.quiz.id,
+                    title: game.quiz.title,
+                    description: game.quiz.description,
+                    isHidden: game.quiz.isHidden,
+                    duration: game.quiz.duration,
+                    lastModification: game.quiz.lastModification,
+                    questions: game.quiz.questions.map((x) => {
+                        return {
+                            // Disabled because it comes from mongodb
+                            // eslint-disable-next-line no-underscore-dangle
+                            _id: x._id,
+                            type: x.type,
+                            text: x.text,
+                            points: x.points,
+                            choices: x.choices,
+                            lastModification: x.lastModification,
+                        };
+                    }),
+                },
                 questionSubmissions: game.questionSubmissions.map((x) => Array.from(x.values())),
             };
 

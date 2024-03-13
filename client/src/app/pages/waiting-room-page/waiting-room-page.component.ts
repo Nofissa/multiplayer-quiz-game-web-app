@@ -1,9 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GameServicesProvider } from '@app/providers/game-services.provider';
 import { GameService } from '@app/services/game/game-service/game.service';
-import { TimerService } from '@app/services/timer/timer.service';
 import { Subscription } from 'rxjs';
+
+const CANCEL_GAME_NOTICE_DURATION_MS = 5000;
 
 @Component({
     selector: 'app-waiting-room-page',
@@ -14,45 +16,52 @@ export class WaitingRoomPageComponent implements OnInit, OnDestroy {
     pin: string;
     isStarting: boolean = false;
 
-    private startTimerSubscription: Subscription = new Subscription();
-    private timerTickSubscription: Subscription = new Subscription();
+    private eventSubscriptions: Subscription[] = [];
 
     private readonly gameService: GameService;
-    private readonly timerService: TimerService;
 
     constructor(
         private readonly activatedRoute: ActivatedRoute,
         private readonly router: Router,
+        private readonly snackBarService: MatSnackBar,
         gameServicesProvider: GameServicesProvider,
     ) {
         this.gameService = gameServicesProvider.gameService;
-        this.timerService = gameServicesProvider.timerService;
     }
 
     ngOnInit() {
         this.pin = this.activatedRoute.snapshot.queryParams['pin'];
-
-        this.startTimerSubscription = this.timerService.onStartTimer(this.pin, () => {
-            this.isStarting = true;
-        });
-        this.timerTickSubscription = this.timerService.onTimerTick(this.pin, (remainingTime) => {
-            if (remainingTime === 0) {
-                this.router.navigate(['/game'], { queryParams: { pin: this.pin } });
-            }
-        });
+        this.setupSubscriptions(this.pin);
     }
 
     ngOnDestroy() {
-        if (!this.startTimerSubscription.closed) {
-            this.startTimerSubscription.unsubscribe();
-        }
-        if (!this.timerTickSubscription.closed) {
-            this.timerTickSubscription.unsubscribe();
-        }
+        this.eventSubscriptions.forEach((sub) => {
+            if (!sub.closed) {
+                sub.unsubscribe();
+            }
+        });
     }
 
     leaveGame() {
         this.gameService.playerAbandon(this.pin);
         this.router.navigate(['/home']);
+    }
+
+    private setupSubscriptions(pin: string) {
+        this.eventSubscriptions.push(
+            this.gameService.onCancelGame(pin, (message) => {
+                this.snackBarService.open(message, '', {
+                    duration: CANCEL_GAME_NOTICE_DURATION_MS,
+                    verticalPosition: 'top',
+                    panelClass: ['base-snackbar'],
+                });
+
+                this.router.navigateByUrl('/home');
+            }),
+
+            this.gameService.onStartGame(pin, () => {
+                this.router.navigate(['/game'], { queryParams: { pin } });
+            }),
+        );
     }
 }

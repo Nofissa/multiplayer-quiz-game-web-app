@@ -111,23 +111,23 @@ export class GameService {
         const question = game.currentQuestion;
 
         const gameSubmissions = Array.from(game.currentQuestionSubmissions.values());
-        const isGoodAnswer = this.isGoodAnswer(question, submission);
-        const isFirstEvaluation = gameSubmissions.filter((x) => x.isFinal).length === 1;
-        const isLastEvaluation = gameSubmissions.filter((x) => x.isFinal).length === game.clientPlayers.size;
+        const isCorrect = this.isGoodAnswer(question, submission);
+        const isFirst = gameSubmissions.filter((x) => x.isFinal).length === 1;
+        const isLast = gameSubmissions.filter((x) => x.isFinal).length === game.clientPlayers.size;
 
-        let score = isGoodAnswer ? question.points : NO_POINTS;
-        score *= isFirstEvaluation ? BONUS_MULTIPLIER : NO_BONUS_MULTIPLIER;
+        let score = isCorrect ? question.points : NO_POINTS;
+        score *= isFirst ? BONUS_MULTIPLIER : NO_BONUS_MULTIPLIER;
 
         const player = game.clientPlayers.get(client.id).player;
         player.score += score;
-        player.speedAwardCount += isGoodAnswer && isFirstEvaluation ? 1 : 0;
+        player.speedAwardCount += isCorrect && isFirst ? 1 : 0;
 
         const evaluation: Evaluation = {
             player,
             correctAnswers: question.choices.filter((x) => x.isCorrect),
             score,
-            isFirstGoodEvaluation: isGoodAnswer && isFirstEvaluation,
-            isLastEvaluation,
+            isFirstCorrect: isFirst && isCorrect,
+            isLast,
         };
 
         return evaluation;
@@ -144,7 +144,7 @@ export class GameService {
             throw new Error('Vous ne pouvez pas débuter une partie sans joueurs');
         }
 
-        game.state = GameState.Started;
+        game.state = GameState.Running;
         game.chatlogs = [];
 
         return game.currentQuestion;
@@ -161,15 +161,13 @@ export class GameService {
             throw new Error(`Vous n'êtes pas organisateur de la partie ${pin}`);
         }
 
-        return gameHasPlayersLeft ? 'Organizor canceled the game' : 'All the player left. Game has been canceled';
+        return gameHasPlayersLeft ? "L'organisateur a quitté la partie" : 'Touts les joueurs ont quitté la partie';
     }
 
     toggleGameLock(client: Socket, pin: string): GameState {
         const game = this.getGame(pin);
 
-        const isOrganizer = this.isOrganizer(game, client.id);
-
-        if (!isOrganizer) {
+        if (!this.isOrganizer(game, client.id)) {
             throw new Error(`Vous n'êtes pas organisateur de la partie ${pin}`);
         }
 

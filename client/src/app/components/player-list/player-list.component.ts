@@ -1,6 +1,7 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { PlayerListDisplayOptions } from '@app/interfaces/player-list-display-options';
+import { GameServicesProvider } from '@app/providers/game-services.provider';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { PlayerService } from '@app/services/player/player.service';
@@ -23,20 +24,19 @@ export class PlayerListComponent implements OnInit, OnDestroy {
     playerStates = PlayerState;
     players: Player[] = [];
 
-    private submitChoicesSubscription: Subscription = new Subscription();
-    private playerJoinSubscription: Subscription = new Subscription();
-    private playerBanSubscription: Subscription = new Subscription();
-    private playerAbandonSubscription: Subscription = new Subscription();
-    private startGameSubscription: Subscription = new Subscription();
+    private eventSubscriptions: Subscription[] = [];
 
-    // Depends on many services
-    // eslint-disable-next-line max-params
+    private readonly gameHttpService: GameHttpService;
+    private readonly gameService: GameService;
+
     constructor(
-        private readonly gameHttpService: GameHttpService,
-        private readonly gameService: GameService,
+        gameServicesProvider: GameServicesProvider,
         private readonly playerService: PlayerService,
         private readonly router: Router,
-    ) {}
+    ) {
+        this.gameHttpService = gameServicesProvider.gameHttpService;
+        this.gameService = gameServicesProvider.gameService;
+    }
 
     ngOnInit() {
         this.gameHttpService.getGameSnapshotByPin(this.pin).subscribe((snapshot) => {
@@ -48,21 +48,11 @@ export class PlayerListComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
-        if (!this.submitChoicesSubscription.closed) {
-            this.submitChoicesSubscription.unsubscribe();
-        }
-        if (!this.playerJoinSubscription.closed) {
-            this.playerJoinSubscription.unsubscribe();
-        }
-        if (!this.playerBanSubscription.closed) {
-            this.playerBanSubscription.unsubscribe();
-        }
-        if (!this.playerAbandonSubscription.closed) {
-            this.playerAbandonSubscription.unsubscribe();
-        }
-        if (!this.startGameSubscription.closed) {
-            this.startGameSubscription.unsubscribe();
-        }
+        this.eventSubscriptions.forEach((sub) => {
+            if (!sub.closed) {
+                sub.unsubscribe();
+            }
+        });
     }
 
     banPlayer(player: Player) {
@@ -70,7 +60,7 @@ export class PlayerListComponent implements OnInit, OnDestroy {
     }
 
     private upsertPlayer(player: Player) {
-        const index = this.players.findIndex((p) => p.username === player.username && p.state === PlayerState.Playing);
+        const index = this.players.findIndex((x) => x.socketId === player.socketId);
 
         if (index !== NOT_FOUND_INDEX) {
             this.players[index] = player;
@@ -94,40 +84,34 @@ export class PlayerListComponent implements OnInit, OnDestroy {
     }
 
     private setupSubscription(pin: string) {
-        this.submitChoicesSubscription = this.gameService.onSubmitChoices(this.pin, (evaluation) => {
-            this.upsertPlayer(evaluation.player);
-        });
+        this.eventSubscriptions.push(
+            this.gameService.onSubmitChoices(pin, (evaluation) => {
+                this.upsertPlayer(evaluation.player);
+            }),
 
-        this.playerJoinSubscription = this.gameService.onJoinGame(this.pin, (payload) => {
-            this.upsertPlayer(payload.player);
-        });
+            this.gameService.onJoinGame(pin, (player) => {
+                this.upsertPlayer(player);
+            }),
 
-        this.playerBanSubscription = this.gameService.onPlayerBan(this.pin, (player) => {
-            if (this.playerService.isSelf(this.pin, player)) {
-                this.router.navigateByUrl('/home');
-            }
+            this.gameService.onPlayerBan(pin, (player) => {
+                if (this.playerService.isInGame(this.pin, player)) {
+                    this.router.navigateByUrl('/home');
+                }
 
-            this.upsertPlayer(player);
-        });
+                this.upsertPlayer(player);
+            }),
 
-        this.playerAbandonSubscription = this.gameService.onPlayerAbandon(this.pin, (player) => {
-            if (this.playerService.isSelf(this.pin, player)) {
-                this.router.navigateByUrl('/home');
-            }
+            this.gameService.onPlayerAbandon(pin, (player) => {
+                if (this.playerService.isInGame(this.pin, player)) {
+                    this.router.navigateByUrl('/home');
+                }
 
-            this.upsertPlayer(player);
-        });
+                this.upsertPlayer(player);
+            }),
 
-        this.playerAbandonSubscription = this.gameService.onPlayerAbandon(this.pin, (player) => {
-            if (this.playerService.isSelf(this.pin, player)) {
-                this.router.navigateByUrl('/home');
-            }
-
-            this.upsertPlayer(player);
-        });
-
-        this.startGameSubscription = this.gameService.onStartGame(this.pin, () => {
-            this.displayOptions.ban = false;
-        });
+            this.gameService.onStartGame(pin, () => {
+                this.displayOptions.ban = false;
+            }),
+        );
     }
 }

@@ -10,6 +10,7 @@ import { MaterialServicesProvider } from '@app/providers/material-services.provi
 import { GameService } from '@app/services/game/game-service/game.service';
 import { PlayerService } from '@app/services/player/player.service';
 import { QuizHttpService } from '@app/services/quiz-http/quiz-http.service';
+import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { Player } from '@common/player';
 import { PlayerState } from '@common/player-state';
 import SwiperCore, { EffectCoverflow, Navigation, Pagination } from 'swiper';
@@ -37,6 +38,7 @@ export class CreateGamePageComponent implements OnInit {
         private readonly quizHttpService: QuizHttpService,
         private readonly gameService: GameService,
         private readonly playerService: PlayerService,
+        private readonly webSockerService: WebSocketService,
     ) {
         this.dialogService = materialServicesProvider.dialog;
         this.snackBarService = materialServicesProvider.snackBar;
@@ -83,8 +85,14 @@ export class CreateGamePageComponent implements OnInit {
         this.gameService.onCreateGame((pin: string) => {
             if (pin) {
                 this.router.navigate(['/host-game'], { queryParams: { pin } });
-                const player: Player = { username: 'Organisateur', score: 0, speedAwardCount: 0, state: PlayerState.Playing };
-                this.playerService.setPlayer(pin, player);
+                const player: Player = {
+                    socketId: this.webSockerService.getSocketId(),
+                    username: 'Organisateur',
+                    score: 0,
+                    speedAwardCount: 0,
+                    state: PlayerState.Playing,
+                };
+                this.playerService.addPlayerInGame(pin, player);
             }
         });
         this.gameService.createGame(quiz._id);

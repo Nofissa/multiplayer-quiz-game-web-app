@@ -3,6 +3,8 @@ import { Injectable } from '@angular/core';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { KeyBindingService } from '@app/services/key-binding/key-binding.service';
+import { MessageService } from '@app/services/message/message.service';
+import { PlayerService } from '@app/services/player/player.service';
 import { TimerService } from '@app/services/timer/timer.service';
 
 @Injectable({
@@ -15,6 +17,8 @@ export class GameServicesProvider {
         private readonly gameHttp: GameHttpService,
         private readonly game: GameService,
         private readonly timer: TimerService,
+        private readonly message: MessageService,
+        private readonly player: PlayerService,
         private readonly keyBinding: KeyBindingService,
     ) {}
 
@@ -28,6 +32,14 @@ export class GameServicesProvider {
 
     get timerService(): TimerService {
         return this.timer;
+    }
+
+    get messageService(): MessageService {
+        return this.message;
+    }
+
+    get playerService(): PlayerService {
+        return this.player;
     }
 
     get keyBindingService(): KeyBindingService {

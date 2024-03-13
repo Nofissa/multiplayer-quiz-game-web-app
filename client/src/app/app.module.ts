@@ -46,6 +46,7 @@ import { PlayerResultsPageComponent } from './pages/player-results-page/player-r
 import { QCMCreationPageComponent } from './pages/qcmcreation-page/qcmcreation-page.component';
 import { WaitingRoomPageComponent } from './pages/waiting-room-page/waiting-room-page.component';
 import { WebSocketService } from './services/web-socket/web-socket.service';
+import { GameTransitionComponent } from './components/game-transition/game-transition.component';
 
 /**
  * Main module that is used in main.ts.
@@ -84,6 +85,7 @@ import { WebSocketService } from './services/web-socket/web-socket.service';
         PlayerResultsPageComponent,
         BarChartSwiperComponent,
         ChatRoomComponent,
+        GameTransitionComponent,
     ],
     imports: [
         AppRoutingModule,

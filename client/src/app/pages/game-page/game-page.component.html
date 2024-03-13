@@ -1,13 +1,20 @@
 <head>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
 </head>
-<app-nav-header></app-nav-header>
-<span *ngIf="isTest" class="testMode">MODE TEST</span>
 <div class="container">
-    <div class="game-area">
-        <app-game-board [pin]="pin" [isTest]="isTest"></app-game-board>
+    <app-nav-header></app-nav-header>
+    <div
+        [ngClass]="{'game-container': !isStarting && !isLoadingNextQuestion, 'hidden':isStarting || isLoadingNextQuestion}">
+        <span *ngIf="isTest" class="testMode">MODE TEST</span>
+        <div class="game-area">
+            <app-game-board [pin]="pin" [isTest]="isTest"></app-game-board>
+        </div>
+        <div class="right-panel">
+            <app-chat-room [pin]="pin"></app-chat-room>
+        </div>
     </div>
-    <div class="right-panel">
-        <app-chat-room [pin]="pin"></app-chat-room>
+    <div [ngClass]="{hidden:!isStarting && !isLoadingNextQuestion}">
+        <app-game-transition [pin]="pin" [isStarting]="isStarting" [isLoadingNextQuestion]="isLoadingNextQuestion">
+        </app-game-transition>
     </div>
 </div>

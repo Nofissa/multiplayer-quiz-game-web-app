@@ -26,20 +26,19 @@ export class GameBoardComponent implements OnInit, OnDestroy {
     @Input()
     isTest: boolean;
 
-    question: Question;
     player: Player | null;
 
-    hasSubmited: boolean = false;
-    selectedChoiceIndexes: number[] = [];
+    question: Question;
+    questionIsOver: boolean;
+    hasSubmited: boolean;
+    selectedChoiceIndexes: number[];
 
     readonly gameHttpService: GameHttpService;
     readonly gameService: GameService;
     readonly timerService: TimerService;
     readonly keyBindingService: KeyBindingService;
 
-    private toggleSelectChoiceSubscription: Subscription = new Subscription();
-    private submitChoicesSubscription: Subscription = new Subscription();
-    private timerTickSubscription: Subscription = new Subscription();
+    private eventSubscriptions: Subscription[] = [];
 
     // Depends on many services
     // eslint-disable-next-line max-params
@@ -72,45 +71,23 @@ export class GameBoardComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
-        this.player = this.playerService.getPlayer(this.pin);
+        const player = this.playerService.getCurrentPlayerFromGame(this.pin);
+        if (player) {
+            this.player = player;
+        }
         this.gameHttpService.getGameSnapshotByPin(this.pin).subscribe((snapshot) => {
-            this.question = snapshot.questions[snapshot.currentQuestionIndex];
+            this.loadNextQuestion(snapshot.quiz.questions[snapshot.currentQuestionIndex]);
         });
-        this.submitChoicesSubscription = this.gameService.onSubmitChoices(this.pin, (evaluation) => {
-            if (evaluation.isLastEvaluation) {
-                this.playerService.syncPlayer(this.pin);
-                // result view;
-            }
-        });
-        this.timerTickSubscription = this.timerService.onTimerTick(this.pin, (remainingTime) => {
-            if (remainingTime === 0) {
-                this.submitChoices();
-            }
-        });
+        this.setupSubscriptions(this.pin);
         this.setupKeyBindings();
     }
 
     ngOnDestroy() {
-        if (!this.toggleSelectChoiceSubscription.closed) {
-            this.toggleSelectChoiceSubscription.unsubscribe();
-        }
-        if (!this.submitChoicesSubscription.closed) {
-            this.submitChoicesSubscription.unsubscribe();
-        }
-        if (!this.timerTickSubscription.closed) {
-            this.timerTickSubscription.unsubscribe();
-        }
-    }
-
-    setupKeyBindings() {
-        ['1', '2', '3', '4'].forEach((x) => {
-            this.keyBindingService.registerKeyBinding(x, () => {
-                const choiceIndex = parseInt(x, 10) - 1;
-                this.toggleSelectChoice(choiceIndex);
-            });
+        this.eventSubscriptions.forEach((sub) => {
+            if (!sub.closed) {
+                sub.unsubscribe();
+            }
         });
-
-        this.keyBindingService.registerKeyBinding('Enter', this.submitChoices.bind(this));
     }
 
     submitChoices() {
@@ -143,5 +120,41 @@ export class GameBoardComponent implements OnInit, OnDestroy {
                 this.router.navigateByUrl(redirect);
             }
         });
+    }
+
+    private loadNextQuestion(question: Question) {
+        this.questionIsOver = false;
+        this.hasSubmited = false;
+        this.selectedChoiceIndexes = [];
+        this.question = question;
+    }
+
+    private setupSubscriptions(pin: string) {
+        this.eventSubscriptions.push(
+            this.gameService.onNextQuestion(pin, (question) => {
+                this.loadNextQuestion(question);
+            }),
+            this.gameService.onSubmitChoices(pin, (evaluation) => {
+                if (evaluation.isLast) {
+                    this.questionIsOver = true;
+                }
+            }),
+            this.timerService.onTimerTick(pin, (remainingTime) => {
+                if (!remainingTime) {
+                    this.submitChoices(); // so that every player is forced to submit
+                }
+            }),
+        );
+    }
+
+    private setupKeyBindings() {
+        ['1', '2', '3', '4'].forEach((x) => {
+            this.keyBindingService.registerKeyBinding(x, () => {
+                const choiceIndex = parseInt(x, 10) - 1;
+                this.toggleSelectChoice(choiceIndex);
+            });
+        });
+
+        this.keyBindingService.registerKeyBinding('Enter', this.submitChoices.bind(this));
     }
 }

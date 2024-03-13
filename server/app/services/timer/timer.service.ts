@@ -25,7 +25,7 @@ export class TimerService {
         }
 
         if (this.intervals.get(pin)) {
-            throw new Error(`La partie ${pin} a déjà une minuterie lancée`);
+            this.stopTimer(pin); // to reset the timer
         }
 
         if (this.counters.get(pin) === undefined) {

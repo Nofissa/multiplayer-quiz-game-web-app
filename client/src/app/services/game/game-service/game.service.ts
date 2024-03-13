@@ -2,10 +2,8 @@ import { Injectable } from '@angular/core';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { Question } from '@common/question';
 import { Evaluation } from '@common/evaluation';
-import { GameEventPayload } from '@common/game-event-payload';
 import { Player } from '@common/player';
 import { Submission } from '@common/submission';
-import { JoinGamePayload } from '@common/join-game-payload';
 import { GameState } from '@common/game-state';
 import { Subscription } from 'rxjs';
 import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
@@ -28,12 +26,8 @@ export class GameService {
         this.webSocketService.emit('joinGame', { pin, username });
     }
 
-    onJoinGame(pin: string, callback: (payload: JoinGamePayload) => void): Subscription {
+    onJoinGame(pin: string, callback: (player: Player) => void): Subscription {
         return this.webSocketService.on('joinGame', applyIfPinMatches(pin, callback));
-    }
-
-    onJoinGameNoPin(callback: (payload: GameEventPayload<JoinGamePayload>) => void): Subscription {
-        return this.webSocketService.on('joinGame', callback);
     }
 
     cancelGame(pin: string) {

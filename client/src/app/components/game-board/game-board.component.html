@@ -3,7 +3,7 @@
         <span id="questionText" class="text-centered">{{ question.text }}</span>
         <span id="value" class="text-centered"><strong>{{ question.points }} points</strong></span>
     </div>
-    <div class="answers-grid font-color">
+    <div class="answers-grid">
         <div *ngFor="let choice of question.choices; index as i" [ngClass]="{
                 'highlight-selected': selectedChoiceIndexes.includes(i),
                 'answer-box': true,
@@ -13,11 +13,16 @@
                 'answer-box4': (i + 1) % 4 === 0
             }" [class.highlight-validated]="hasSubmited && selectedChoiceIndexes.includes(i)"
             (click)="toggleSelectChoice(i)" [class.disable-click]="hasSubmited">
-            {{ i + 1 }}. {{ choice.text }}
-            <!-- <span *ngIf="questionValidated && choice.isCorrect && isTest" class="correct-answer-mark">✔</span> -->
+            <div class="box-content-wrapper">
+                <span>{{ i + 1 }}. {{ choice.text }}</span>
+                <div class="icon-wrapper">
+                    <mat-icon [ngClass]="{invisible: !questionIsOver}">{{ choice.isCorrect ? 'check' : 'clear'
+                        }}</mat-icon>
+                </div>
+            </div>
         </div>
         <div class="timer-wrapper">
-            <app-timer-component></app-timer-component>
+            <app-timer [pin]="pin"></app-timer>
         </div>
     </div>
     <div class="buttons-wrapper">

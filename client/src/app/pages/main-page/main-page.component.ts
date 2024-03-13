@@ -10,7 +10,6 @@ import { AuthService } from '@app/services/auth/auth.service';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { SessionService } from '@app/services/session/session.service';
 import { AuthPayload } from '@common/auth-payload';
-import { JoinGamePayload } from '@common/join-game-payload';
 import { PlayerService } from '@app/services/player/player.service';
 
 @Component({
@@ -61,8 +60,8 @@ export class MainPageComponent {
         });
 
         dialogRef.afterClosed().subscribe(({ pin, username }: { pin: string; username: string }) => {
-            this.gameService.onJoinGame(pin, (payload: JoinGamePayload) => {
-                this.playerService.setPlayer(pin, payload.player);
+            this.gameService.onJoinGame(pin, (player) => {
+                this.playerService.addPlayerInGame(pin, player);
                 this.router.navigate(['waiting-room'], { queryParams: { pin } });
             });
             this.gameService.joinGame(pin, username);

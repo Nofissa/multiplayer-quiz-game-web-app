@@ -1,43 +1,30 @@
 import { Injectable } from '@angular/core';
 import { Player } from '@common/player';
-import { GameHttpService } from '@app/services/game-http/game-http.service';
-import { PlayerState } from '@common/player-state';
+import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class PlayerService {
-    private players: Map<string, Player> = new Map();
+    private playersMap: Map<string, Player[]> = new Map();
 
-    constructor(private readonly gameHttpService: GameHttpService) {}
+    constructor(private readonly webSocketService: WebSocketService) {}
 
-    setPlayer(pin: string, player: Player): void {
-        this.players.set(pin, player);
+    addPlayerInGame(pin: string, player: Player) {
+        const players = this.getPlayersInGame(pin);
+        players.push(player);
+        this.playersMap.set(pin, players);
     }
 
-    getPlayer(pin: string): Player | null {
-        return this.players.get(pin) || null;
+    getCurrentPlayerFromGame(pin: string): Player | null {
+        return this.getPlayersInGame(pin).find((x) => x.socketId === this.webSocketService.getSocketId()) || null;
     }
 
-    isSelf(pin: string, player: Player): boolean {
-        return this.players.get(pin)?.username.toLowerCase() === player.username.toLowerCase();
+    isInGame(pin: string, player: Player): boolean {
+        return this.getPlayersInGame(pin).some((x) => x.socketId === player.socketId);
     }
 
-    syncPlayer(pin: string): void {
-        const player = this.getPlayer(pin);
-
-        if (!player) {
-            return;
-        }
-
-        this.gameHttpService.getGameSnapshotByPin(pin).subscribe((snapshot) => {
-            const syncedPlayer = snapshot.players.find((x) => {
-                return x.username.toLowerCase() === player.username.toLowerCase() && x.state === PlayerState.Playing;
-            });
-
-            if (syncedPlayer) {
-                this.setPlayer(pin, syncedPlayer);
-            }
-        });
+    private getPlayersInGame(pin: string): Player[] {
+        return this.playersMap.get(pin) || [];
     }
 }
