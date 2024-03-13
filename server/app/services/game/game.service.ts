@@ -161,7 +161,7 @@ export class GameService {
             throw new Error(`Vous n'êtes pas organisateur de la partie ${pin}`);
         }
 
-        return gameHasPlayersLeft ? "L'organisateur a quitté la partie" : 'Touts les joueurs ont quitté la partie';
+        return gameHasPlayersLeft ? "L'organisateur a quitté la partie" : 'Tous les joueurs ont quitté la partie';
     }
 
     toggleGameLock(client: Socket, pin: string): GameState {
