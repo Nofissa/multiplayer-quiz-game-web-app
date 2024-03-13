@@ -19,7 +19,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     @Input()
     pin: string;
     input: string = '';
-    inputCount: number = MAX_MESSAGE_LENGTH;
+    remainigInputCount: number = MAX_MESSAGE_LENGTH;
     chatlogs: Chatlog[] = [];
 
     formGroup: FormGroup;
@@ -67,15 +67,15 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
         return this.playerService.getCurrentPlayerFromGame(this.pin)?.username?.toLowerCase() === author.toLowerCase();
     }
 
-    updateInputCount() {
-        this.inputCount = MAX_MESSAGE_LENGTH - this.input.length;
+    updateRemainingInputCount() {
+        this.remainigInputCount = MAX_MESSAGE_LENGTH - this.input.length;
     }
 
     sendMessage() {
-        if (this.inputCount >= 0) {
+        if (this.remainigInputCount >= 0 && this.remainigInputCount < MAX_MESSAGE_LENGTH) {
             this.messageService.sendMessage(this.pin, this.input);
             this.input = '';
-            this.inputCount = MAX_MESSAGE_LENGTH;
+            this.remainigInputCount = MAX_MESSAGE_LENGTH;
         }
     }
 
@@ -84,13 +84,13 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
             event.preventDefault();
             this.sendMessage();
         } else {
-            this.updateInputCount();
+            this.updateRemainingInputCount();
         }
     }
 
     private messageValidator(): ValidatorFn {
         return (): ValidationErrors | null => {
-            return this.input.length === 0 && this.inputCount > 0 ? null : { ok: true };
+            return this.remainigInputCount >= 0 ? null : { ok: true };
         };
     }
 }

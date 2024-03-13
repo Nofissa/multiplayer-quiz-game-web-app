@@ -18,10 +18,10 @@
     </div>
     <form [formGroup]="formGroup">
         <mat-form-field appearance="outline">
-            <mat-label *ngIf="inputCount < 200">{{ inputCount }}</mat-label>
-            <mat-label *ngIf="inputCount === 200">Message</mat-label>
+            <mat-label *ngIf="remainigInputCount < 200">{{ remainigInputCount }}</mat-label>
+            <mat-label *ngIf="remainigInputCount === 200">Message</mat-label>
             <textarea matInput id="chattingArea" [(ngModel)]="input" (keydown)="handleKeyDown($event)"
-                (ngModelChange)="updateInputCount()" formControlName="message" class="write-message"
+                (ngModelChange)="updateRemainingInputCount()" formControlName="message" class="write-message"
                 placeholder="Envoyer un message">
             </textarea>
             <button matSuffix mat-icon-button class="send-button" (click)="sendMessage()">
