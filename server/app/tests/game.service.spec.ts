@@ -237,4 +237,6 @@ describe('GameService', () => {
             expect(result).toEqual(game.quiz.questions[1]);
         });
     });
+
+    describe('toggleSelectChoice', () => {});
 });

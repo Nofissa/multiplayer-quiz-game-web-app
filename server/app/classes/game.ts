@@ -11,14 +11,27 @@ export class Game {
     organizer: Socket;
     state: GameState;
     chatlogs: Chatlog[] = [];
-    currentQuestionIndex: number = 0;
     clientPlayers: Map<string, ClientPlayer> = new Map();
-    submissions: Map<string, Submission> = new Map();
+    private questionSubmissions: Map<string, Submission>[] = [new Map()];
+    private currentQuestionIndex: number = 0;
 
     constructor(pin: string, quiz: Quiz, organizer: Socket) {
         this.pin = pin;
         this.quiz = quiz;
         this.organizer = organizer;
         this.state = GameState.Opened;
+    }
+
+    get currentQuestion() {
+        return this.quiz.questions[this.currentQuestionIndex];
+    }
+
+    get currentQuestionSubmissions() {
+        return this.questionSubmissions[this.currentQuestionIndex];
+    }
+
+    loadNextQuestion() {
+        this.questionSubmissions.push(new Map());
+        this.currentQuestionIndex++;
     }
 }

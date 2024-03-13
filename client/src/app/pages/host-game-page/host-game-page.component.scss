@@ -1,0 +1,80 @@
+.grid-container {
+    display: grid;
+    grid-template-columns: 75% 25%;
+    grid-template-rows: 15% 35% 40% 10%;
+    grid-template-areas:
+        'nav-header nav-header'
+        'bar-chart chat-room'
+        'question-list chat-room'
+        'lock-button button';
+    height: 90vh;
+    justify-content: center;
+}
+
+.lock-button {
+    height: 100px;
+    width: 100px;
+    grid-area: lock-button;
+    justify-self: center;
+}
+
+.lock-icon {
+    font-size: 100px;
+}
+
+.nav-header {
+    grid-area: nav-header;
+}
+
+.bar-chart {
+    margin: 10px;
+    grid-area: bar-chart;
+    justify-self: center;
+}
+
+.chat-room {
+    margin: 10px;
+    grid-area: chat-room;
+    justify-self: center;
+}
+
+.start-button {
+    grid-area: button;
+    background-color: white;
+}
+
+.next-button {
+    grid-area: button;
+    background-color: white;
+}
+
+// .timer-wrapper {
+//     position: absolute;
+//     top: 50%;
+//     left: 50%;
+//     transform: translate(-50%, -50%);
+//     z-index: 1;
+// }
+
+.question-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    height: 100px;
+    border: 1px solid black;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 25px;
+    background-color: aliceblue;
+    overflow-wrap: break-word;
+    overflow-y: auto;
+}
+
+.text-centered {
+    text-align: center;
+}
+
+.font-color {
+    font-weight: bold;
+    color: black;
+}

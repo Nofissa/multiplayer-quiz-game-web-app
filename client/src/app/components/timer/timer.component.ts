@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { TimerService } from '@app/services/timer/timer.service';
 import { Subscription } from 'rxjs';
 
@@ -10,6 +10,9 @@ const WHEEL_COLOR_COUNT = 4;
     styleUrls: ['./timer.component.scss'],
 })
 export class TimerComponent implements OnInit, OnDestroy {
+    @Input()
+    pin: string;
+    @Output() timerExpired: EventEmitter<void> = new EventEmitter<void>();
     maxDuration: number;
     remainingTime: number;
     strokeDashoffset: number = 0;
@@ -20,27 +23,27 @@ export class TimerComponent implements OnInit, OnDestroy {
         [3 / WHEEL_COLOR_COUNT, '#e69d2e'],
         [WHEEL_COLOR_COUNT / WHEEL_COLOR_COUNT, '#dc4d66'],
     ];
-    private timerTickSubscription: Subscription;
-    private startTimerSubscription: Subscription;
+    private startTimerSubscription: Subscription = new Subscription();
+    private timerTickSubscription: Subscription = new Subscription();
 
     constructor(private timerService: TimerService) {}
 
     ngOnInit() {
-        this.startTimerSubscription = this.timerService.onStartTimer((duration: number) => {
+        this.startTimerSubscription = this.timerService.onStartTimer(this.pin, (duration: number) => {
             this.maxDuration = duration;
             this.update(duration);
         });
-        this.timerTickSubscription = this.timerService.onTimerTick((remainingTime: number) => {
+        this.timerTickSubscription = this.timerService.onTimerTick(this.pin, (remainingTime: number) => {
             this.update(Math.max(0, remainingTime));
         });
     }
 
     ngOnDestroy() {
-        if (!this.timerTickSubscription.closed) {
-            this.timerTickSubscription.unsubscribe();
-        }
-        if (!this.startTimerSubscription.closed) {
+        if (this.startTimerSubscription && !this.startTimerSubscription.closed) {
             this.startTimerSubscription.unsubscribe();
+        }
+        if (this.timerTickSubscription && !this.timerTickSubscription.closed) {
+            this.timerTickSubscription.unsubscribe();
         }
     }
 
@@ -67,5 +70,8 @@ export class TimerComponent implements OnInit, OnDestroy {
         }
 
         this.strokeDashoffset = normalizedTime;
+        if (this.remainingTime === 0) {
+            this.timerExpired.emit();
+        }
     }
 }

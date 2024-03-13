@@ -71,7 +71,7 @@ describe('CreateGamePageComponent', () => {
     });
 
     it('should navigate to waiting room page on startGame', () => {
-        component['startGame'](mockQuiz);
+        component['createGame'](mockQuiz);
         expect(routerMock.navigate).toHaveBeenCalledWith(['/waiting-room'], { queryParams: { quizId: 'testId' } });
     });
 

@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Socket, io } from 'socket.io-client';
 import { Observable, Subscription } from 'rxjs';
-import { environment } from 'src/environments/environment';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { environment } from 'src/environments/environment';
 
 const ERROR_NOTICE_DURATION_MS = 5000;
 

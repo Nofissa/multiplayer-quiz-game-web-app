@@ -6,8 +6,9 @@ import { Router } from '@angular/router';
 import { QuizDetailsDialogComponent } from '@app/components/dialogs/quiz-details-dialog/quiz-details-dialog.component';
 import { Quiz } from '@app/interfaces/quiz';
 import { MaterialServicesProvider } from '@app/providers/material-services.provider';
-import { GameService } from '@app/services/game/game.service';
+import { GameService } from '@app/services/game/game-service/game.service';
 import { QuizHttpService } from '@app/services/quiz-http/quiz-http.service';
+import { UserService } from '@app/services/user/user-service';
 import { Subscription } from 'rxjs';
 import SwiperCore, { EffectCoverflow, Navigation, Pagination } from 'swiper';
 
@@ -28,11 +29,13 @@ export class CreateGamePageComponent implements OnInit, OnDestroy {
     private readonly snackBarService: MatSnackBar;
     private createGameSubscription: Subscription;
 
+    // eslint-disable-next-line max-params
     constructor(
         materialServicesProvider: MaterialServicesProvider,
         private readonly router: Router,
         private readonly quizHttpService: QuizHttpService,
         private readonly gameService: GameService,
+        private userService: UserService,
     ) {
         this.dialogService = materialServicesProvider.dialog;
         this.snackBarService = materialServicesProvider.snackBar;
@@ -42,7 +45,7 @@ export class CreateGamePageComponent implements OnInit, OnDestroy {
         this.loadQuizzes();
         this.createGameSubscription = this.gameService.onCreateGame((pin: string) => {
             if (pin) {
-                this.router.navigate(['/waiting-room'], { queryParams: { pin } });
+                this.router.navigate(['/host-game'], { queryParams: { pin } });
             }
         });
     }
@@ -88,6 +91,7 @@ export class CreateGamePageComponent implements OnInit, OnDestroy {
 
     private createGame(quiz: Quiz) {
         this.gameService.createGame(quiz._id);
+        this.userService.setUsername('Organisateur');
     }
 
     private testGame(quiz: Quiz) {
