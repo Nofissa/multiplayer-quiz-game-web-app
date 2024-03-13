@@ -218,7 +218,7 @@ export class GameService {
         return { toCancel, toAbandon };
     }
 
-    private isOrganizer(game: Game, clientId: string): boolean {
+    isOrganizer(game: Game, clientId: string): boolean {
         return game.organizer.id === clientId;
     }
 

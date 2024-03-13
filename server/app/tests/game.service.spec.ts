@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { ClientPlayer } from '@app/classes/client-player';
 import * as PinHelper from '@app/helpers/pin';
 import { GameService } from '@app/services/game/game.service';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { GameState } from '@common/game-state';
 import { JoinGamePayload } from '@common/join-game-payload';
 import { PlayerState } from '@common/player-state';
-import { Test, TestingModule } from '@nestjs/testing';
+import 'reflect-metadata';
 import { Socket } from 'socket.io';
 import { gameStub } from './stubs/game.stub';
 import { playerstub } from './stubs/player.stub';
@@ -21,11 +22,14 @@ describe('GameService', () => {
             getQuizById: jest.fn(),
         } as any;
         socketMock = { id: 'gameId' } as jest.Mocked<Socket>;
-        const module: TestingModule = await Test.createTestingModule({
-            providers: [GameService, { provide: QuizService, useValue: quizServiceMock }],
-        }).compile();
 
-        gameService = module.get<GameService>(GameService);
+        gameService = new GameService(quizServiceMock);
+    });
+
+    afterEach(() => {
+        jest.clearAllMocks();
+        Reflect.deleteMetadata('design:paramtypes', Reflect);
+        Reflect.deleteMetadata('design:returntype', Reflect);
     });
 
     it('should be defined', async () => {
@@ -100,14 +104,137 @@ describe('GameService', () => {
         const player = playerstub();
         player.state = PlayerState.Abandonned;
         socketMock = { id: 'playerId' } as jest.Mocked<Socket>;
-        it('should return the player who has abandoned', () => {
+        it('should return the clientPlayer of the player who has abandoned', () => {
             const clientPlayerTest = {
                 socket: { id: playerId } as any,
                 player,
             };
             jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
+            jest.spyOn(Map.prototype, 'get').mockReturnValue(clientPlayerTest);
             const result = gameService.playerAbandon(socketMock, game.pin);
             expect(result).toEqual(clientPlayerTest);
+        });
+    });
+
+    describe('playerBan', () => {
+        const game = gameStub();
+        socketMock = { id: 'OrganizerId' } as jest.Mocked<Socket>;
+        const player = playerstub();
+        it('should throw an error if the client is not the organizer', () => {
+            jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
+            jest.spyOn(GameService.prototype, 'isOrganizer').mockReturnValue(false);
+            expect(() => gameService.playerBan(socketMock, game.pin, player.username)).toThrowError(
+                `Vous n'êtes pas organisateur de la partie ${game.pin}`,
+            );
+        });
+
+        it('should return undefined if no player matched in the clientPlayer', () => {
+            jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
+            jest.spyOn(GameService.prototype, 'isOrganizer').mockReturnValue(true);
+            jest.spyOn(Array.prototype, 'find').mockReturnValue(undefined);
+
+            const result = gameService.playerBan(socketMock, game.pin, player.username);
+            expect(result).toEqual(undefined);
+        });
+
+        it('should return the client player with playerState set on Banned', () => {
+            const playerBanned = playerstub();
+            playerBanned.state = PlayerState.Banned;
+            const clientPLayerTest: ClientPlayer = {
+                socket: socketMock,
+                player: playerBanned,
+            };
+            jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
+            jest.spyOn(GameService.prototype, 'isOrganizer').mockReturnValue(true);
+            jest.spyOn(Array.prototype, 'find').mockReturnValue(clientPLayerTest);
+            const result = gameService.playerBan(socketMock, game.pin, player.username);
+            expect(result).toEqual(clientPLayerTest);
+        });
+    });
+
+    describe('getGame', () => {
+        const game = gameStub();
+        jest.spyOn(Map.prototype, 'get').mockReturnValue(game);
+        it('should return the game if it exists', () => {
+            const result = gameService.getGame(game.pin);
+            expect(result).toEqual(game);
+        });
+    });
+
+    describe('evaluateChoices', () => {
+        // TODO
+    });
+
+    describe('cancelGame', () => {
+        const game = gameStub();
+        socketMock = { id: 'OrganizerId' } as jest.Mocked<Socket>;
+        it('should throw an error if the client is not the organizer', () => {
+            jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
+            jest.spyOn(GameService.prototype, 'isOrganizer').mockReturnValue(false);
+            expect(() => gameService.cancelGame(socketMock, game.pin)).toThrowError(`Vous n'êtes pas organisateur de la partie ${game.pin}`);
+        });
+
+        it('should return the right string if organizer canceled the game', () => {
+            jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
+            jest.spyOn(GameService.prototype, 'isOrganizer').mockReturnValue(true);
+            jest.spyOn(Array.prototype, 'some').mockReturnValue(true);
+            const result = gameService.cancelGame(socketMock, game.pin);
+            expect(result).toEqual('Organizor canceled the game');
+        });
+
+        it('should return the right string if no player left in the game', () => {
+            jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
+            jest.spyOn(GameService.prototype, 'isOrganizer').mockReturnValue(true);
+            jest.spyOn(Array.prototype, 'some').mockReturnValue(false);
+            const result = gameService.cancelGame(socketMock, game.pin);
+            expect(result).toEqual('All the player left. Game has been canceled');
+        });
+    });
+
+    describe('toggleGameLock', () => {
+        const game = gameStub();
+        socketMock = { id: 'OrganizerId' } as jest.Mocked<Socket>;
+        it('should throw an error if the client is not the organizer ', () => {
+            jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
+            jest.spyOn(GameService.prototype, 'isOrganizer').mockReturnValue(false);
+            expect(() => gameService.toggleGameLock(socketMock, game.pin)).toThrowError(`Vous n'êtes pas organisateur de la partie ${game.pin}`);
+        });
+        it('game should switch to closed state if current state is opened', () => {
+            game.state = GameState.Opened;
+            jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
+            jest.spyOn(GameService.prototype, 'isOrganizer').mockReturnValue(true);
+            expect(gameService.toggleGameLock(socketMock, game.pin)).toEqual(GameState.Closed);
+        });
+
+        it('game should switch to opened state if current state is closed', () => {
+            game.state = GameState.Closed;
+            jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
+            jest.spyOn(GameService.prototype, 'isOrganizer').mockReturnValue(true);
+            expect(gameService.toggleGameLock(socketMock, game.pin)).toEqual(GameState.Opened);
+        });
+
+        it('game should throw an error if game.state cannot be changed', () => {
+            game.state = GameState.Started;
+            jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
+            jest.spyOn(GameService.prototype, 'isOrganizer').mockReturnValue(true);
+            expect(() => gameService.toggleGameLock(socketMock, game.pin)).toThrowError('La partie ne peut pas être verouillée/déverouillée');
+        });
+    });
+
+    describe('nextQuestion', () => {
+        const game = gameStub();
+        socketMock = { id: 'OrganizerId' } as jest.Mocked<Socket>;
+        it('should throw an error if the client is not the organizer', () => {
+            jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
+            jest.spyOn(GameService.prototype, 'isOrganizer').mockReturnValue(false);
+            expect(() => gameService.nextQuestion(socketMock, game.pin)).toThrowError(`Vous n'êtes pas organisateur de la partie ${game.pin}`);
+        });
+
+        it('should return the question associated to the next index', () => {
+            jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
+            jest.spyOn(GameService.prototype, 'isOrganizer').mockReturnValue(true);
+            const result = gameService.nextQuestion(socketMock, game.pin);
+            expect(result).toEqual(game.quiz.questions[1]);
         });
     });
 });
