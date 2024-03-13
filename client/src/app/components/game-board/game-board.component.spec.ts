@@ -1,6 +1,6 @@
 /* eslint-disable max-lines */
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick, flush } from '@angular/core/testing';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { By } from '@angular/platform-browser';
 import { Router } from '@angular/router';
@@ -334,6 +334,35 @@ describe('GameBoardComponent', () => {
             expect(component.keyBindingService.getExecutor).not.toHaveBeenCalled();
         });
 
+        it('should call validateChoices when the timer reaches 0', fakeAsync(() => {
+            component.quiz.duration = 10;
+            const QUESTION_DURATION_MS = 10000;
+            spyOn(component, 'validateChoices');
+
+            component.startTimer();
+            tick(QUESTION_DURATION_MS);
+
+            expect(component.time).toBe(0);
+            expect(component.validateChoices).toHaveBeenCalled();
+        }));
+
+        it('should update time correctly during the countdown', fakeAsync(() => {
+            component.quiz.duration = 5;
+            const TIMER_MOCK_COUNTDOWN = 1000;
+            spyOn(component, 'validateChoices');
+            component.startTimer();
+            tick();
+            expect(component.time).toBe(component.quiz.duration);
+
+            tick(TIMER_MOCK_COUNTDOWN);
+            expect(component.time).toBe(component.quiz.duration - 1);
+
+            tick(TIMER_MOCK_COUNTDOWN);
+            expect(component.time).toBe(component.quiz.duration - 2);
+
+            expect(component.validateChoices).not.toHaveBeenCalled();
+        }));
+
         it('isSelected() should return true if the choice is selected', () => {
             const choice = component.quiz.questions[component.currentQuestionIndex].choices[0];
             component.selectedChoiceIndexes = [choice];
@@ -384,6 +413,43 @@ describe('GameBoardComponent', () => {
             expect(component.score).toBe(initialScore);
             expect(component.selectedChoiceIndexes).toEqual([]);
         });
+
+        it('should go to the next question for non-last questions', fakeAsync(() => {
+            const NEXT_QUESTION_DELAY_MS = 3000;
+            component.quiz.questions.push({
+                type: 'QCM',
+                text: 'Sample Question Text 2',
+                points: 10,
+                choices: [
+                    { text: 'Choice 1', isCorrect: true },
+                    { text: 'Choice 2', isCorrect: false },
+                ],
+                lastModification: new Date(),
+                _id: 'jedwi320nsxw',
+            });
+            component.currentQuestionIndex = 0;
+
+            component.nextQuestion();
+            tick(NEXT_QUESTION_DELAY_MS);
+            fixture.detectChanges();
+            flush();
+            expect(component.feedbackMessage).toBe('');
+            expect(component.currentQuestionIndex).toBe(1);
+            expect(component.questionValidated).toBe(false);
+            expect(component.selectedChoices).toEqual([]);
+        }));
+
+        it('validateChoices() should validate answers, allocate points and call nextQuestion()', fakeAsync(() => {
+            const mockResponse = { correctAnswers: [component.quiz.questions[component.currentQuestionIndex].choices[0]], score: 10 };
+            spyOn(component, 'nextQuestion');
+            spyOn(component, 'allocatePoints');
+            component.validateChoices();
+            tick();
+
+            expect(component.questionValidated).toBe(true);
+            expect(component.allocatePoints).toHaveBeenCalledWith(mockResponse.score);
+            expect(component.nextQuestion).toHaveBeenCalled();
+        }));
 
         it('should open confirmation dialog and navigate on result true', () => {
             const dialogRefSpyObj = jasmine.createSpyObj({ afterClosed: of(true) });

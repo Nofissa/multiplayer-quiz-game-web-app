@@ -2,7 +2,7 @@
     <app-nav-header class="nav-header" [backArrow]="false"></app-nav-header>
     <div *ngIf="isRunning()">
         <app-bar-chart-swiper class="bar-chart" *ngIf="isEnded" [data]="barCharts"></app-bar-chart-swiper>
-        <app-bar-chart class="bar-chart" *ngIf="!isEnded" [data]="barChart"></app-bar-chart>
+        <!-- <app-bar-chart class="bar-chart" *ngIf="!isEnded" [data]="barChart"></app-bar-chart> -->
     </div>
     <div class="main-container">
         <app-player-list [pin]="pin" [displayOptions]="{ score:true, ban: true, quitters: true }"></app-player-list>

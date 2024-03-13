@@ -6,7 +6,6 @@ import { Player } from '@common/player';
 import { Submission } from '@common/submission';
 import { GameState } from '@common/game-state';
 import { Subscription } from 'rxjs';
-import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
 
 @Injectable({
     providedIn: 'root',

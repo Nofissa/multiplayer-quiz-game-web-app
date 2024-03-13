@@ -3,7 +3,6 @@ import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { TimerEventType } from '@common/timer-event-type';
 import { TimerPayload } from '@common/timer-payload';
 import { Subscription } from 'rxjs';
-import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
 
 @Injectable({
     providedIn: 'root',
