@@ -3,6 +3,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BarChartData } from '@app/interfaces/bar-chart-data';
 import { GameServicesProvider } from '@app/providers/game-services.provider';
+import { RoutingDependenciesProvider } from '@app/providers/routing-dependencies.provider';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { BarChartService } from '@app/services/game/bar-chart-service/bar-chart.service';
 import { GameService } from '@app/services/game/game-service/game.service';
@@ -29,17 +30,22 @@ export class HostGamePageComponent implements OnInit, OnDestroy {
 
     private eventSubscriptions: Subscription[] = [];
 
+    private readonly activatedRoute: ActivatedRoute;
+    private readonly router: Router;
     private readonly gameHttpService: GameHttpService;
     private readonly gameService: GameService;
     private readonly timerService: TimerService;
 
+    // Disabled because this page is rich in interaction an depends on many services as a consequence
+    // eslint-disable-next-line max-params
     constructor(
-        private readonly activatedRoute: ActivatedRoute,
-        private readonly router: Router,
         private readonly barChartService: BarChartService,
         private readonly snackBarService: MatSnackBar,
         gameServicesProvider: GameServicesProvider,
+        routingDependenciesProvider: RoutingDependenciesProvider,
     ) {
+        this.activatedRoute = routingDependenciesProvider.activatedRoute;
+        this.router = routingDependenciesProvider.router;
         this.gameHttpService = gameServicesProvider.gameHttpService;
         this.gameService = gameServicesProvider.gameService;
         this.timerService = gameServicesProvider.timerService;

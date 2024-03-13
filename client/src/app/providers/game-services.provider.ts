@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 import { Injectable } from '@angular/core';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';

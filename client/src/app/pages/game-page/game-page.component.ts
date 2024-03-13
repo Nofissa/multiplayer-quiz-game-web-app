@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GameServicesProvider } from '@app/providers/game-services.provider';
+import { RoutingDependenciesProvider } from '@app/providers/routing-dependencies.provider';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { GameState } from '@common/game-state';
@@ -25,15 +26,18 @@ export class GamePageComponent implements OnInit, OnDestroy {
     private gameState: GameState;
     private eventSubscriptions: Subscription[] = [];
 
+    private readonly activatedRoute: ActivatedRoute;
+    private readonly router: Router;
     private readonly gameService: GameService;
     private readonly timerService: TimerService;
 
     constructor(
-        private readonly router: Router,
-        private readonly activatedRoute: ActivatedRoute,
         private readonly snackBarService: MatSnackBar,
         gameServicesProvider: GameServicesProvider,
+        routingDependenciesProvider: RoutingDependenciesProvider,
     ) {
+        this.activatedRoute = routingDependenciesProvider.activatedRoute;
+        this.router = routingDependenciesProvider.router;
         this.gameService = gameServicesProvider.gameService;
         this.timerService = gameServicesProvider.timerService;
     }

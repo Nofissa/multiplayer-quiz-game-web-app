@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GameServicesProvider } from '@app/providers/game-services.provider';
+import { RoutingDependenciesProvider } from '@app/providers/routing-dependencies.provider';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { Subscription } from 'rxjs';
 
@@ -18,14 +19,17 @@ export class WaitingRoomPageComponent implements OnInit, OnDestroy {
 
     private eventSubscriptions: Subscription[] = [];
 
+    private readonly activatedRoute: ActivatedRoute;
+    private readonly router: Router;
     private readonly gameService: GameService;
 
     constructor(
-        private readonly activatedRoute: ActivatedRoute,
-        private readonly router: Router,
         private readonly snackBarService: MatSnackBar,
+        routingDependenciesProvider: RoutingDependenciesProvider,
         gameServicesProvider: GameServicesProvider,
     ) {
+        this.activatedRoute = routingDependenciesProvider.activatedRoute;
+        this.router = routingDependenciesProvider.router;
         this.gameService = gameServicesProvider.gameService;
     }
 

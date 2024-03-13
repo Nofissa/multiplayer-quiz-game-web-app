@@ -6,6 +6,7 @@ import { BarChartData } from '@app/interfaces/bar-chart-data';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { Subscription } from 'rxjs';
 import { GameService } from '@app/services/game/game-service/game.service';
+import { RoutingDependenciesProvider } from '@app/providers/routing-dependencies.provider';
 
 @Component({
     selector: 'app-player-results-page',
@@ -28,12 +29,17 @@ export class PlayerResultsPageComponent implements OnInit, OnDestroy {
 
     private eventSubscriptions: Subscription[] = [];
 
+    private readonly activatedRoute: ActivatedRoute;
+    private readonly router: Router;
+
     constructor(
         private readonly gameService: GameService,
         private readonly webSocketService: WebSocketService,
-        private readonly router: Router,
-        private readonly activatedRoute: ActivatedRoute,
-    ) {}
+        routingDependenciesProvider: RoutingDependenciesProvider,
+    ) {
+        this.activatedRoute = routingDependenciesProvider.activatedRoute;
+        this.router = routingDependenciesProvider.router;
+    }
 
     ngOnInit() {
         this.pin = this.activatedRoute.snapshot.queryParams['pin'];
