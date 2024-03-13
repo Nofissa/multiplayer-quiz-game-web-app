@@ -1,4 +1,4 @@
-import { applyIfPinMatches } from '@app/utils/condition-applications/conditional-applications';
+import { applyIfPinMatches } from './conditional-applications';
 import { GameEventPayload } from '@common/game-event-payload';
 
 describe('applyIfPinMatches', () => {
