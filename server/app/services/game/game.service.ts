@@ -178,12 +178,12 @@ export class GameService {
         return game.currentQuestion;
     }
 
-    toggleSelectChoice(client: Socket, pin: string, choiceIndex: number): Map<string, Submission> {
+    toggleSelectChoice(client: Socket, pin: string, choiceIndex: number): { clientId: string; submission: Submission } {
         const game = this.getGame(pin);
         const submission = this.getOrCreateSubmission(client, game);
         submission.choices[choiceIndex].isSelected = !submission.choices[choiceIndex].isSelected;
 
-        return game.currentQuestionSubmissions;
+        return { clientId: client.id, submission };
     }
 
     getGame(pin: string): Game {

@@ -145,7 +145,7 @@ export class GameGateway implements OnGatewayDisconnect {
         try {
             const submission = this.gameService.toggleSelectChoice(client, pin, choiceIndex);
             const organizer = this.gameService.getOrganizer(pin);
-            const payload: GameEventPayload<Map<string, Submission>> = { pin, data: submission };
+            const payload: GameEventPayload<{ clientId: string; submission: Submission }> = { pin, data: submission };
 
             organizer.emit('toggleSelectChoice', payload);
         } catch (error) {
