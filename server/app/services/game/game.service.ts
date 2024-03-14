@@ -6,11 +6,11 @@ import { Question } from '@app/model/database/question';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { Evaluation } from '@common/evaluation';
 import { GameState } from '@common/game-state';
+import { Player } from '@common/player';
 import { PlayerState } from '@common/player-state';
 import { Submission } from '@common/submission';
 import { Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
-import { Player } from '@common/player';
 
 const NO_POINTS = 0;
 const NO_BONUS_MULTIPLIER = 1;
@@ -196,12 +196,12 @@ export class GameService {
         return game.currentQuestion;
     }
 
-    toggleSelectChoice(client: Socket, pin: string, choiceIndex: number): Submission[] {
+    toggleSelectChoice(client: Socket, pin: string, choiceIndex: number): { clientId: string; submission: Submission } {
         const game = this.getGame(pin);
         const submission = this.getOrCreateSubmission(client, game);
         submission.choices[choiceIndex].isSelected = !submission.choices[choiceIndex].isSelected;
 
-        return Array.from(game.currentQuestionSubmissions.values());
+        return { clientId: client.id, submission };
     }
 
     getGame(pin: string): Game {
@@ -212,6 +212,34 @@ export class GameService {
         }
 
         return game;
+    }
+
+    getOrganizer(pin: string): Socket {
+        const game = this.games.get(pin);
+
+        if (!game) {
+            throw new Error(`Aucune partie ne correspond au pin ${pin}`);
+        }
+
+        return game.organizer;
+    }
+
+    getGameResults(pin: string): Map<string, Submission>[] {
+        const game = this.getGame(pin);
+        if (!game) {
+            throw new Error(`Aucune partie ne correspond au pin ${pin}`);
+        }
+        return game.allSubmissions;
+    }
+
+    endGame(pin: string, client: Socket): void {
+        const game = this.getGame(pin);
+
+        if (!this.isOrganizer(game, client.id)) {
+            throw new Error(`Vous n'êtes pas organisateur de la partie ${pin}`);
+        }
+
+        game.state = GameState.Ended;
     }
 
     disconnect(client: Socket): DisconnectPayload {
