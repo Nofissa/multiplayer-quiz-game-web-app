@@ -4,7 +4,7 @@ import { AbstractControl, FormArray, FormBuilder, FormGroup, ValidationErrors, V
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Choice } from '@common/choice';
-import { Question } from '@app/interfaces/question';
+import { Question } from '@common/question';
 import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog-data';
 import { MAX_CHOICE_COUNT, MIN_CHOICE_COUNT, SNACK_MESSAGE_DURATION, POINT_VALUE_BASE_MULTIPLE } from '@app/constants';
 

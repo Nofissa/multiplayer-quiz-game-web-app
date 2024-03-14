@@ -32,7 +32,7 @@ import { JoinGameDialogComponent } from './components/dialogs/join-game-dialog/j
 import { PromptDialogComponent } from './components/dialogs/prompt-dialog/prompt-dialog.component';
 import { QuizDetailsDialogComponent } from './components/dialogs/quiz-details-dialog/quiz-details-dialog.component';
 import { UpsertQuestionDialogComponent } from './components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
-import { GameComponent } from './components/game/game.component';
+import { GameBoardComponent } from './components/game-board/game-board.component';
 import { BarChartComponent } from './components/histogramme/bar-chart/bar-chart.component';
 import { NavHeaderComponent } from './components/nav-header/nav-header.component';
 import { PlayerListComponent } from './components/player-list/player-list.component';
@@ -47,6 +47,9 @@ import { CreateGamePageComponent } from './pages/create-game-page/create-game-pa
 import { PlayerResultsPageComponent } from './pages/player-results-page/player-results-page.component';
 import { QCMCreationPageComponent } from './pages/qcmcreation-page/qcmcreation-page.component';
 import { WaitingRoomPageComponent } from './pages/waiting-room-page/waiting-room-page.component';
+import { WebSocketService } from './services/web-socket/web-socket.service';
+import { GameTransitionComponent } from './components/game-transition/game-transition.component';
+
 /**
  * Main module that is used in main.ts.
  * All automatically generated components will appear in this module.
@@ -71,7 +74,7 @@ import { WaitingRoomPageComponent } from './pages/waiting-room-page/waiting-room
         ConfirmationDialogComponent,
         QuestionBankComponent,
         QuestionBankComponent,
-        GameComponent,
+        GameBoardComponent,
         WaitingRoomPageComponent,
         LoaderAnimationComponent,
         PromptDialogComponent,
@@ -84,6 +87,7 @@ import { WaitingRoomPageComponent } from './pages/waiting-room-page/waiting-room
         PlayerResultsPageComponent,
         BarChartSwiperComponent,
         ChatRoomComponent,
+        GameTransitionComponent,
     ],
     imports: [
         AppRoutingModule,
@@ -119,4 +123,8 @@ import { WaitingRoomPageComponent } from './pages/waiting-room-page/waiting-room
     providers: [],
     bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule {
+    // This is done so the services will be instantiated no matter what
+    // eslint-disable-next-line @typescript-eslint/no-useless-constructor, @typescript-eslint/no-empty-function, no-unused-vars
+    constructor(webSocketService: WebSocketService) {}
+}

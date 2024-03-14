@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BarChartData } from '@app/interfaces/bar-chart-data';
-import { Question } from '@app/interfaces/question';
+import { Question } from '@common/question';
 import { Submission } from '@common/submission';
 
 @Injectable({

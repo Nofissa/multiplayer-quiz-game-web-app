@@ -1,7 +1,7 @@
 export enum GameState {
     Opened,
     Closed,
-    Started,
+    Running,
     Paused,
     Ended,
 }

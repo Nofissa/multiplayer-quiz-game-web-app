@@ -1,11 +1,12 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { TimerService } from '@app/services/timer/timer.service';
+import { TimerPayload } from '@common/timer-payload';
 import { Subscription } from 'rxjs';
 
 const WHEEL_COLOR_COUNT = 4;
 
 @Component({
-    selector: 'app-timer-component',
+    selector: 'app-timer',
     templateUrl: './timer.component.html',
     styleUrls: ['./timer.component.scss'],
 })
@@ -16,7 +17,7 @@ export class TimerComponent implements OnInit, OnDestroy {
     maxDuration: number;
     remainingTime: number;
     strokeDashoffset: number = 0;
-    strokeColor: string = '#ffffff';
+    strokeColor: string = '#63c5ea';
     private colors: [number, string][] = [
         [1 / WHEEL_COLOR_COUNT, '#63c5ea'],
         [2 / WHEEL_COLOR_COUNT, '#9cd172'],
@@ -29,12 +30,12 @@ export class TimerComponent implements OnInit, OnDestroy {
     constructor(private timerService: TimerService) {}
 
     ngOnInit() {
-        this.startTimerSubscription = this.timerService.onStartTimer(this.pin, (duration: number) => {
-            this.maxDuration = duration;
-            this.update(duration);
+        this.startTimerSubscription = this.timerService.onStartTimer(this.pin, (payload: TimerPayload) => {
+            this.maxDuration = payload.remainingTime;
+            this.update(payload.remainingTime);
         });
-        this.timerTickSubscription = this.timerService.onTimerTick(this.pin, (remainingTime: number) => {
-            this.update(Math.max(0, remainingTime));
+        this.timerTickSubscription = this.timerService.onTimerTick(this.pin, (payload: TimerPayload) => {
+            this.update(Math.max(0, payload.remainingTime));
         });
     }
 
@@ -50,7 +51,7 @@ export class TimerComponent implements OnInit, OnDestroy {
     private update(remainingTime: number) {
         this.remainingTime = +remainingTime.toFixed(0);
 
-        const normalizedTime = (this.maxDuration - remainingTime) / this.maxDuration;
+        const normalizedTime = this.maxDuration === 0 ? 1 : (this.maxDuration - remainingTime) / this.maxDuration;
 
         let nextRatio = 0;
         let minDifference = Infinity;

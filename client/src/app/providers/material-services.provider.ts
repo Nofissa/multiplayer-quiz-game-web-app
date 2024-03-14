@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
