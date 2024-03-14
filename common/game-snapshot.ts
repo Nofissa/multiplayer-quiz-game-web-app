@@ -10,5 +10,5 @@ export interface GameSnapshot {
     quiz: Quiz;
     state: GameState;
     currentQuestionIndex: number;
-    questionSubmissions: Submission[][];
+    questionSubmissions: Map<string, Submission>[];
 }

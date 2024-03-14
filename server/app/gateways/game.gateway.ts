@@ -59,8 +59,8 @@ export class GameGateway implements OnGatewayDisconnect {
     @SubscribeMessage('startGame')
     startGame(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
         try {
-            const question = this.gameService.startGame(client, pin);
-            const payload: GameEventPayload<Question> = { pin, data: question };
+            const data = this.gameService.startGame(client, pin);
+            const payload: GameEventPayload<{ question: Question; isLast: boolean }> = { pin, data };
 
             this.server.to(pin).emit('startGame', payload);
         } catch (error) {
@@ -134,9 +134,8 @@ export class GameGateway implements OnGatewayDisconnect {
     @SubscribeMessage('nextQuestion')
     nextQuestion(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
         try {
-            const question = this.gameService.nextQuestion(client, pin);
-
-            const payload: GameEventPayload<Question> = { pin, data: question };
+            const data = this.gameService.nextQuestion(client, pin);
+            const payload: GameEventPayload<{ question: Question; isLast: boolean }> = { pin, data };
             this.server.to(pin).emit('nextQuestion', payload);
         } catch (error) {
             client.emit('error', error.message);

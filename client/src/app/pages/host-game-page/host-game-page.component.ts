@@ -27,6 +27,7 @@ export class HostGamePageComponent implements OnInit {
     pin: string;
     gameState: GameState = GameState.Opened;
     currentQuestionHasEnded: boolean = false;
+    isLastQuestion: boolean = false;
     question: Question | undefined;
     nextAvailable: boolean = false;
     // nextEndGame: boolean = false; to use later when we have a way to know if it's the last question
@@ -64,7 +65,6 @@ export class HostGamePageComponent implements OnInit {
     ngOnInit() {
         this.pin = this.activatedRoute.snapshot.queryParams['pin'];
         this.barChartService = new BarChartService();
-
         this.setupSubscriptions(this.pin);
     }
 
@@ -94,7 +94,6 @@ export class HostGamePageComponent implements OnInit {
         this.gameState = GameState.Running;
         this.currentQuestionHasEnded = false;
         this.gameService.nextQuestion(this.pin);
-        this.timerService.startTimer(this.pin, TimerEventType.NextQuestion, NEXT_QUESTION_DELAY_SECONDS);
     }
 
     endGame() {
@@ -131,12 +130,15 @@ export class HostGamePageComponent implements OnInit {
                 }
             }),
 
-            this.gameService.onStartGame(pin, (question) => {
-                this.barChartService.addQuestion(question);
+            this.gameService.onStartGame(pin, (data) => {
+                this.isLastQuestion = data.isLast;
+                this.barChartService.addQuestion(data.question);
             }),
 
-            this.gameService.onNextQuestion(pin, (question) => {
-                this.barChartService.addQuestion(question);
+            this.gameService.onNextQuestion(pin, (data) => {
+                this.isLastQuestion = data.isLast;
+                this.barChartService.addQuestion(data.question);
+                this.timerService.startTimer(this.pin, TimerEventType.NextQuestion, NEXT_QUESTION_DELAY_SECONDS);
             }),
 
             this.gameService.onPlayerAbandon(pin, () => {

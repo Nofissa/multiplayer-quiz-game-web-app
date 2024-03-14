@@ -42,7 +42,7 @@ export class GameService {
         this.webSocketService.emit('startGame', { pin });
     }
 
-    onStartGame(pin: string, callback: (question: Question) => void): Subscription {
+    onStartGame(pin: string, callback: (data: { question: Question; isLast: boolean }) => void): Subscription {
         return this.webSocketService.on('startGame', applyIfPinMatches(pin, callback));
     }
 
@@ -82,7 +82,7 @@ export class GameService {
         this.webSocketService.emit('nextQuestion', { pin });
     }
 
-    onNextQuestion(pin: string, callback: (question: Question) => void): Subscription {
+    onNextQuestion(pin: string, callback: (data: { question: Question; isLast: boolean }) => void): Subscription {
         return this.webSocketService.on('nextQuestion', applyIfPinMatches(pin, callback));
     }
 

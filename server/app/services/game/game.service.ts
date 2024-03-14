@@ -133,7 +133,7 @@ export class GameService {
         return evaluation;
     }
 
-    startGame(client: Socket, pin: string): Question {
+    startGame(client: Socket, pin: string): { question: Question; isLast: boolean } {
         const game = this.getGame(pin);
 
         if (!this.isOrganizer(game, client.id)) {
@@ -147,7 +147,10 @@ export class GameService {
         game.state = GameState.Running;
         game.chatlogs = [];
 
-        return game.currentQuestion;
+        return {
+            question: game.currentQuestion,
+            isLast: game.currentQuestionIndex === game.quiz.questions.length - 1,
+        };
     }
 
     cancelGame(client: Socket, pin: string): string {
@@ -185,7 +188,7 @@ export class GameService {
         return game.state;
     }
 
-    nextQuestion(client: Socket, pin: string): Question {
+    nextQuestion(client: Socket, pin: string): { question: Question; isLast: boolean } {
         const game = this.getGame(pin);
         if (!this.isOrganizer(game, client.id)) {
             throw new Error(`Vous n'êtes pas organisateur de la partie ${pin}`);
@@ -193,7 +196,10 @@ export class GameService {
 
         game.loadNextQuestion();
 
-        return game.currentQuestion;
+        return {
+            question: game.currentQuestion,
+            isLast: game.currentQuestionIndex === game.quiz.questions.length - 1,
+        };
     }
 
     toggleSelectChoice(client: Socket, pin: string, choiceIndex: number): { clientId: string; submission: Submission } {
