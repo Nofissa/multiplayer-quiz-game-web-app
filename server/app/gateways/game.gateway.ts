@@ -15,7 +15,7 @@ import { Evaluation } from '@common/evaluation';
 
 @WebSocketGateway({
     cors: {
-        origin: 'http://localhost:4200',
+        origin: ['http:localhost:4200', 'https://polytechnique-montr-al.gitlab.io', 'http://polytechnique-montr-al.gitlab.io'],
         methods: ['GET', 'POST'],
         transports: ['websocket', 'polling'],
         credentials: false,
