@@ -16,6 +16,16 @@ export const gameStub = (): Game => {
         chatlogs: [],
         currentQuestionIndex: 0,
         clientPlayers: new Map<string, ClientPlayer>([['playerId', clientPlayerStub()]]),
-        submissions: new Map<string, Submission>([['choice', submissionStub()]]),
+        questionSubmissions: [new Map<string, Submission>([['playerId', submissionStub()]])],
+        loadNextQuestion() {
+            this.questionSubmissions.push(new Map());
+            this.currentQuestionIndex++;
+        },
+        get currentQuestion() {
+            return this.quiz.questions[this.currentQuestionIndex];
+        },
+        get currentQuestionSubmissions() {
+            return this.questionSubmissions[this.currentQuestionIndex];
+        },
     };
 };

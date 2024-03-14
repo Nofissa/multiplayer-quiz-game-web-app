@@ -18,7 +18,7 @@ const BONUS_MULTIPLIER = 1.2;
 
 @Injectable()
 export class GameService {
-    private games: Map<string, Game> = new Map();
+    games: Map<string, Game> = new Map();
 
     constructor(private readonly quizService: QuizService) {}
 
@@ -221,11 +221,11 @@ export class GameService {
         return game.organizer.id;
     }
 
-    private isOrganizer(game: Game, clientId: string): boolean {
+    isOrganizer(game: Game, clientId: string): boolean {
         return game.organizer.id === clientId;
     }
 
-    private isGoodAnswer(question: Question, submission: Submission): boolean {
+    isGoodAnswer(question: Question, submission: Submission): boolean {
         const correctAnswersIndices = new Set(question.choices.filter((x) => x.isCorrect).map((_, index) => index));
         const selectedAnswersIndices = new Set(submission.choices.filter((x) => x.isSelected).map((x) => x.index));
 
@@ -235,7 +235,7 @@ export class GameService {
         );
     }
 
-    private getOrCreateSubmission(client: Socket, game: Game) {
+    getOrCreateSubmission(client: Socket, game: Game) {
         if (!game.currentQuestionSubmissions.has(client.id)) {
             game.currentQuestionSubmissions.set(client.id, {
                 choices: game.currentQuestion.choices.map((_, index) => {
