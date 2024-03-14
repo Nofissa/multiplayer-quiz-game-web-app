@@ -5,6 +5,7 @@ import { GameEventPayload } from '@common/game-event-payload';
 import { SocketServerMock } from '@app/mocks/socket-server-mock';
 import { io } from 'socket.io-client';
 import { Observable } from 'rxjs';
+import { TimerEventType } from '@common/timer-event-type';
 
 describe('TimerService', () => {
     let timerService: TimerService;
@@ -50,8 +51,9 @@ describe('TimerService', () => {
 
     it('should raise startTimer event', () => {
         const pin = '1234';
-        timerService.startTimer(pin);
-        expect(webSocketServiceSpy.emit).toHaveBeenCalledWith('startTimer', { pin });
+        const eventType: TimerEventType = TimerEventType.Question;
+        timerService.startTimer(pin, eventType);
+        expect(webSocketServiceSpy.emit).toHaveBeenCalledWith('startTimer', { pin, eventType });
     });
 
     it('should subscribe to startTimer event and call the callback on server emit if pin matches', () => {
