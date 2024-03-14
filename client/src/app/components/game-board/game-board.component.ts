@@ -11,6 +11,7 @@ import { Player } from '@common/player';
 import { Subscription } from 'rxjs';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { PlayerService } from '@app/services/player/player.service';
+import { Evaluation } from '@common/evaluation';
 
 const NOT_FOUND_INDEX = -1;
 
@@ -32,6 +33,7 @@ export class GameBoardComponent implements OnInit, OnDestroy {
     questionIsOver: boolean;
     hasSubmited: boolean;
     selectedChoiceIndexes: number[];
+    cachedEvaluation: Evaluation | null = null;
 
     readonly gameHttpService: GameHttpService;
     readonly gameService: GameService;
@@ -126,6 +128,7 @@ export class GameBoardComponent implements OnInit, OnDestroy {
         this.questionIsOver = false;
         this.hasSubmited = false;
         this.selectedChoiceIndexes = [];
+        this.cachedEvaluation = null;
         this.question = question;
     }
 
@@ -135,8 +138,14 @@ export class GameBoardComponent implements OnInit, OnDestroy {
                 this.loadNextQuestion(question);
             }),
             this.gameService.onSubmitChoices(pin, (evaluation) => {
+                if (this.playerService.getCurrentPlayerFromGame(pin)?.socketId === evaluation.player.socketId) {
+                    this.cachedEvaluation = evaluation;
+                }
                 if (evaluation.isLast) {
                     this.questionIsOver = true;
+                    if (this.player) {
+                        this.player.score += this.cachedEvaluation !== null ? this.cachedEvaluation.score : 0;
+                    }
                 }
             }),
             this.timerService.onTimerTick(pin, (remainingTime) => {
