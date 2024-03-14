@@ -232,18 +232,14 @@ export class GameService {
         return game.allSubmissions;
     }
 
-    endGame(pin: string, client: Socket): GameState {
+    endGame(pin: string, client: Socket): void {
         const game = this.getGame(pin);
-        if (this.isOrganizer(game, client.id)) {
-            game.state = GameState.Ended;
-            return game.state;
-            // if (game.state === GameState.Started) {
 
-            // }
-
-            // throw new Error('La partie ne peut pas être terminée');
+        if (!this.isOrganizer(game, client.id)) {
+            throw new Error(`Vous n'êtes pas organisateur de la partie ${pin}`);
         }
-        throw new Error("Seul l'organisateur peut terminer une partie");
+
+        game.state = GameState.Ended;
     }
 
     disconnect(client: Socket): DisconnectPayload {
