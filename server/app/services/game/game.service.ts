@@ -5,8 +5,8 @@ import { DisconnectPayload } from '@app/interfaces/disconnect-payload';
 import { Question } from '@app/model/database/question';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { Evaluation } from '@common/evaluation';
-import { GameInitBundle } from '@common/game-init-bundle';
 import { GameState } from '@common/game-state';
+import { Player } from '@common/player';
 import { PlayerState } from '@common/player-state';
 import { Submission } from '@common/submission';
 import { Injectable } from '@nestjs/common';
@@ -41,16 +41,16 @@ export class GameService {
         return game.pin;
     }
 
-    joinGame(client: Socket, pin: string, username: string): GameInitBundle {
+    joinGame(client: Socket, pin: string, username: string): Player {
         const game = this.getGame(pin);
-        const player = new ClientPlayer(client, username);
+        const clientPlayer = new ClientPlayer(client, username);
         const clientPlayers = Array.from(game.clientPlayers.values());
 
         if (game.state !== GameState.Opened) {
             throw new Error(`La partie ${pin} n'est pas ouverte`);
         }
 
-        if (game.clientPlayers.has(client.id)) {
+        if (game.clientPlayers.has(client.id) && game.clientPlayers.get(client.id)?.player.state === PlayerState.Playing) {
             throw new Error('Vous êtes déjà dans cette partie');
         }
 
@@ -66,12 +66,9 @@ export class GameService {
             throw new Error(`Le nom d'utilisateur "${username}" est déjà pris`);
         }
 
-        game.clientPlayers.set(client.id, player);
+        game.clientPlayers.set(client.id, clientPlayer);
 
-        const players = Array.from(game.clientPlayers.values()).map((x) => x.player);
-        const payload = { pin, players, chatlogs: game.chatlogs };
-
-        return payload;
+        return clientPlayer.player;
     }
 
     playerAbandon(client: Socket, pin: string): ClientPlayer {
@@ -114,20 +111,43 @@ export class GameService {
         const question = game.currentQuestion;
 
         const gameSubmissions = Array.from(game.currentQuestionSubmissions.values());
-        const isGoodAnswer = this.isGoodAnswer(question, submission);
-        const isFirstEvaluation = gameSubmissions.filter((x) => x.isFinal).length === 1;
-        const isLastEvaluation = gameSubmissions.filter((x) => x.isFinal).length === game.clientPlayers.size;
+        const isCorrect = this.isGoodAnswer(question, submission);
+        const isFirst = gameSubmissions.filter((x) => x.isFinal).length === 1;
+        const isLast = gameSubmissions.filter((x) => x.isFinal).length === game.clientPlayers.size;
 
-        let score = isGoodAnswer ? question.points : NO_POINTS;
-        score *= isFirstEvaluation ? BONUS_MULTIPLIER : NO_BONUS_MULTIPLIER;
-        const payload = {
+        let score = isCorrect ? question.points : NO_POINTS;
+        score *= isFirst ? BONUS_MULTIPLIER : NO_BONUS_MULTIPLIER;
+
+        const player = game.clientPlayers.get(client.id).player;
+        player.score += score;
+        player.speedAwardCount += isCorrect && isFirst ? 1 : 0;
+
+        const evaluation: Evaluation = {
+            player,
             correctAnswers: question.choices.filter((x) => x.isCorrect),
             score,
-            isFirstGoodEvaluation: isGoodAnswer && isFirstEvaluation,
-            isLastEvaluation,
+            isFirstCorrect: isFirst && isCorrect,
+            isLast,
         };
 
-        return payload;
+        return evaluation;
+    }
+
+    startGame(client: Socket, pin: string): Question {
+        const game = this.getGame(pin);
+
+        if (!this.isOrganizer(game, client.id)) {
+            throw new Error(`Vous n'êtes pas organisateur de la partie ${pin}`);
+        }
+
+        if (!game.clientPlayers.size) {
+            throw new Error('Vous ne pouvez pas débuter une partie sans joueurs');
+        }
+
+        game.state = GameState.Running;
+        game.chatlogs = [];
+
+        return game.currentQuestion;
     }
 
     cancelGame(client: Socket, pin: string): string {
@@ -141,15 +161,13 @@ export class GameService {
             throw new Error(`Vous n'êtes pas organisateur de la partie ${pin}`);
         }
 
-        return gameHasPlayersLeft ? 'Organizor canceled the game' : 'All the player left. Game has been canceled';
+        return gameHasPlayersLeft ? "L'organisateur a quitté la partie" : 'Tous les joueurs ont quitté la partie';
     }
 
     toggleGameLock(client: Socket, pin: string): GameState {
         const game = this.getGame(pin);
 
-        const isOrganizer = this.isOrganizer(game, client.id);
-
-        if (!isOrganizer) {
+        if (!this.isOrganizer(game, client.id)) {
             throw new Error(`Vous n'êtes pas organisateur de la partie ${pin}`);
         }
 
@@ -178,12 +196,12 @@ export class GameService {
         return game.currentQuestion;
     }
 
-    toggleSelectChoice(client: Socket, pin: string, choiceIndex: number): Submission {
+    toggleSelectChoice(client: Socket, pin: string, choiceIndex: number): { clientId: string; submission: Submission } {
         const game = this.getGame(pin);
         const submission = this.getOrCreateSubmission(client, game);
         submission.choices[choiceIndex].isSelected = !submission.choices[choiceIndex].isSelected;
 
-        return submission;
+        return { clientId: client.id, submission };
     }
 
     getGame(pin: string): Game {
@@ -194,6 +212,34 @@ export class GameService {
         }
 
         return game;
+    }
+
+    getOrganizer(pin: string): Socket {
+        const game = this.games.get(pin);
+
+        if (!game) {
+            throw new Error(`Aucune partie ne correspond au pin ${pin}`);
+        }
+
+        return game.organizer;
+    }
+
+    getGameResults(pin: string): Map<string, Submission>[] {
+        const game = this.getGame(pin);
+        if (!game) {
+            throw new Error(`Aucune partie ne correspond au pin ${pin}`);
+        }
+        return game.allSubmissions;
+    }
+
+    endGame(pin: string, client: Socket): void {
+        const game = this.getGame(pin);
+
+        if (!this.isOrganizer(game, client.id)) {
+            throw new Error(`Vous n'êtes pas organisateur de la partie ${pin}`);
+        }
+
+        game.state = GameState.Ended;
     }
 
     disconnect(client: Socket): DisconnectPayload {
@@ -231,11 +277,11 @@ export class GameService {
 
         return (
             correctAnswersIndices.size === selectedAnswersIndices.size &&
-            Array.from(selectedAnswersIndices).every((x) => selectedAnswersIndices.has(x))
+            Array.from(correctAnswersIndices).every((x) => selectedAnswersIndices.has(x))
         );
     }
 
-    getOrCreateSubmission(client: Socket, game: Game) {
+    private getOrCreateSubmission(client: Socket, game: Game) {
         if (!game.currentQuestionSubmissions.has(client.id)) {
             game.currentQuestionSubmissions.set(client.id, {
                 choices: game.currentQuestion.choices.map((_, index) => {

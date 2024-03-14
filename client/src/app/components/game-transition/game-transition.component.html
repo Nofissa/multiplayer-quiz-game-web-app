@@ -1,0 +1,15 @@
+<div class="container">
+    <div class="content-wrapper">
+        <div class="timer-wrapper">
+            <app-timer [pin]=" pin"></app-timer>
+        </div>
+        <div class="text-wrapper">
+            <h2 *ngIf="isStarting && snapshot">
+                {{ snapshot.quiz.title }}
+            </h2>
+            <h2 *ngIf="isLoadingNextQuestion && snapshot">
+                {{ snapshot.quiz.questions[snapshot.currentQuestionIndex].text }}
+            </h2>
+        </div>
+    </div>
+</div>

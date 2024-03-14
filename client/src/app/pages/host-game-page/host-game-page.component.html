@@ -1,22 +1,22 @@
-<div class="grid-container">
+<div class="container">
     <app-nav-header class="nav-header" [backArrow]="false"></app-nav-header>
-    <div *ngIf="isStarted()">
-        <div *ngIf="question" class="question-box font-color">
-            <span id="questionText" class="text-centered">{{ question.text }}</span>
-            <span id="value" class="text-centered"
-                ><strong>{{ question.points }} points</strong></span
-            >
-        </div>
-        <app-timer-component [pin]="pin" (timerExpired)="onTimerExpired()"></app-timer-component>
+    <div *ngIf="isRunning()">
         <app-bar-chart-swiper class="bar-chart" *ngIf="isEnded" [data]="barCharts"></app-bar-chart-swiper>
-        <!-- <app-bar-chart class="bar-chart" *ngIf="!isEnded" [data]="barChart"></app-bar-chart> -->
+        <app-bar-chart class="bar-chart" *ngIf="!isEnded && barChart" [data]="barChart"></app-bar-chart>
     </div>
-    <app-chat-room class="chat-room"></app-chat-room>
-
-    <button *ngIf="!isStarted()" class="lock-button" mat-raised-button (click)="toggleLock()">
-        <mat-icon class="lock-icon" *ngIf="!isLocked()" fontIcon="lock_open"></mat-icon>
-        <mat-icon class="lock-icon" *ngIf="isLocked()" fontIcon="lock"></mat-icon>
-    </button>
-    <button class="start-button" mat-raised-button *ngIf="isLocked() && !isStarted()" (click)="startGame()">COMMENCER</button>
-    <button class="next-button" mat-raised-button *ngIf="nextAvailable" (click)="nextQuestion()">SUIVANT</button>
+    <div class="main-container">
+        <app-player-list [pin]="pin" [displayOptions]="{ score: true, ban: true, quitters: true }"></app-player-list>
+        <app-chat-room [pin]="pin"></app-chat-room>
+    </div>
+    <div class="buttons-wrapper">
+        <button *ngIf="!isRunning()" class="lock-button" mat-raised-button (click)="toggleLock()">
+            <mat-icon class="lock-icon" *ngIf="!isLocked()" fontIcon="lock_open"></mat-icon>
+            <mat-icon class="lock-icon" *ngIf="isLocked()" fontIcon="lock"></mat-icon>
+        </button>
+        <div class="flex-column">
+            <button class="start-button" mat-raised-button *ngIf="isLocked()" (click)="startGame()">Commencer</button>
+            <button class="next-button" mat-raised-button *ngIf="isRunning()" (click)="endGame()">Décalisse</button>
+            <button class="next-button" mat-raised-button *ngIf="currentQuestionHasEnded" (click)="nextQuestion()">Question Suivante</button>
+        </div>
+    </div>
 </div>

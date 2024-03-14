@@ -42,8 +42,37 @@
     padding: 10px;
     border: 2px solid black;
     box-sizing: border-box;
-    background-color: #cccccc;
+    background-color: #999;
     overflow-wrap: break-word;
+}
+
+.answer-box * {
+    color: var(--main-fg-color);
+    font-weight: bolder;
+}
+
+mat-icon {
+    position: absolute;
+    height: fit-content;
+    width: fit-content;
+    color: var(--main-fg-color);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2rem;
+}
+
+.icon-wrapper {
+    position: relative;
+    height: 32px;
+    width: 32px;
+}
+
+.box-content-wrapper {
+    width: 75%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .answer-box:hover {
@@ -191,4 +220,16 @@
     background-color: green;
     border-radius: 50%;
     padding: 0.2em 0.4em;
+}
+
+.correct {
+    color: green;
+}
+
+.incorrect {
+    color: red;
+}
+
+.invisible {
+    visibility: hidden;
 }

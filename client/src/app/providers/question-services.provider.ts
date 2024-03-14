@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 import { Injectable } from '@angular/core';
 import { QuestionHttpService } from '@app/services/question-http/question-http.service';
 import { QuestionSharingService } from '@app/services/question-sharing/question-sharing.service';

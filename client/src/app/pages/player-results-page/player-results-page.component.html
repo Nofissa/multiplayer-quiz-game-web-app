@@ -1,5 +1,7 @@
 <app-nav-header></app-nav-header>
 <div class="grid-container">
-    <app-bar-chart-swiper [data]="data"></app-bar-chart-swiper>
-    <app-chat-room></app-chat-room>
+    <app-bar-chart *ngIf="chartData" [data]="chartData"></app-bar-chart>
+    <app-player-list [pin]="pin"
+        [displayOptions]="{score: true, speedAwardCount: true, sorted: true}"></app-player-list>
+    <app-chat-room [pin]="pin"></app-chat-room>
 </div>

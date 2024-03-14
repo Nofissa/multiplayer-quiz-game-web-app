@@ -3,7 +3,7 @@ import { QuestionBankComponent } from './question-bank.component';
 import { MaterialServicesProvider } from '@app/providers/material-services.provider';
 import { QuestionServicesProvider } from '@app/providers/question-services.provider';
 import { QuestionSharingService } from '@app/services/question-sharing/question-sharing.service';
-import { Question } from '@app/interfaces/question';
+import { Question } from '@common/question';
 import { Subject, of, throwError } from 'rxjs';
 import SpyObj = jasmine.SpyObj;
 import { QuestionHttpService } from '@app/services/question-http/question-http.service';
