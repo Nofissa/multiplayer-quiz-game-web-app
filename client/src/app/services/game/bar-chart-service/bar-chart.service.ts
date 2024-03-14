@@ -10,6 +10,9 @@ export class BarChartService {
     private barChartData: BarChartData[] = [];
 
     addQuestion(question: Question): void {
+        if (!question) {
+            return;
+        }
         const newBarchartData: BarChartData = {
             question,
             submissions: new Map(),
@@ -19,7 +22,7 @@ export class BarChartService {
 
     updateBarChartData(data: { clientId: string; submission: Submission }): void {
         const chartData: BarChartData | undefined = this.getCurrentQuestionData();
-        if (chartData) {
+        if (chartData && data.submission && data.clientId) {
             chartData.submissions.set(data.clientId, data.submission);
         }
     }
