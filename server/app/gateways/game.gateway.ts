@@ -145,7 +145,7 @@ export class GameGateway implements OnGatewayDisconnect {
         try {
             const submission = this.gameService.toggleSelectChoice(client, pin, choiceIndex);
             const organizer = this.gameService.getOrganizer(pin);
-            const payload: GameEventPayload<Submission> = { pin, data: submission };
+            const payload: GameEventPayload<Map<string, Submission>> = { pin, data: submission };
 
             organizer.emit('toggleSelectChoice', payload);
         } catch (error) {
@@ -181,12 +181,14 @@ export class GameGateway implements OnGatewayDisconnect {
     }
 
     @SubscribeMessage('sendPlayerResults')
-    getBarChartData(
-        @ConnectedSocket() client: Socket,
-        @MessageBody() { pin, results }: { pin: string; results: { question: Question; submissions: Submission[] }[] },
-    ) {
+    getBarChartData(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
         try {
-            this.server.to(pin).emit('sendPlayerResults', results);
+            const game = this.gameService.getGame(pin);
+            const payload: GameEventPayload<{ submissions: Map<string, Submission>[]; questions: Question[] }> = {
+                pin,
+                data: { submissions: this.gameService.getGameResults(pin), questions: game.quiz.questions },
+            };
+            this.server.to(pin).emit('sendPlayerResults', payload);
         } catch (error) {
             client.emit('error', error.message);
         }

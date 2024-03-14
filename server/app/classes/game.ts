@@ -30,6 +30,10 @@ export class Game {
         return this.questionSubmissions[this.currentQuestionIndex];
     }
 
+    get allSubmissions() {
+        return this.questionSubmissions;
+    }
+
     loadNextQuestion() {
         this.questionSubmissions.push(new Map());
         this.currentQuestionIndex++;

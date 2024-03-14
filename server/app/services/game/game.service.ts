@@ -5,8 +5,8 @@ import { DisconnectPayload } from '@app/interfaces/disconnect-payload';
 import { Question } from '@app/model/database/question';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { Evaluation } from '@common/evaluation';
-import { GameState } from '@common/game-state';
 import { GameInitBundle } from '@common/game-init-bundle';
+import { GameState } from '@common/game-state';
 import { PlayerState } from '@common/player-state';
 import { Submission } from '@common/submission';
 import { Injectable } from '@nestjs/common';
@@ -178,12 +178,12 @@ export class GameService {
         return game.currentQuestion;
     }
 
-    toggleSelectChoice(client: Socket, pin: string, choiceIndex: number): Submission {
+    toggleSelectChoice(client: Socket, pin: string, choiceIndex: number): Map<string, Submission> {
         const game = this.getGame(pin);
         const submission = this.getOrCreateSubmission(client, game);
         submission.choices[choiceIndex].isSelected = !submission.choices[choiceIndex].isSelected;
 
-        return submission;
+        return game.currentQuestionSubmissions;
     }
 
     getGame(pin: string): Game {
@@ -204,6 +204,14 @@ export class GameService {
         }
 
         return game.organizer;
+    }
+
+    getGameResults(pin: string): Map<string, Submission>[] {
+        const game = this.getGame(pin);
+        if (!game) {
+            throw new Error(`Aucune partie ne correspond au pin ${pin}`);
+        }
+        return game.allSubmissions;
     }
 
     startGame(pin: string, client: Socket): Question {
