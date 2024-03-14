@@ -20,6 +20,5 @@
     <div class="flex-column">
         <button class="start-button" mat-raised-button *ngIf="isLocked() && !isStarted()" (click)="startGame()">COMMENCER</button>
         <button class="next-button" mat-raised-button *ngIf="nextAvailable" (click)="nextQuestion()">SUIVANT</button>
-        <button class="next-button" mat-raised-button (click)="endGame()">ENDME</button>
     </div>
 </div>

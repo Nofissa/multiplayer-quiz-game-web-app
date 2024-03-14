@@ -122,4 +122,5 @@ export class HostGamePageComponent implements OnInit, OnDestroy {
         this.gameState = gameState;
         this.router.navigate(['results-page'], { queryParams: { pin: this.pin } });
     }
+
 }
