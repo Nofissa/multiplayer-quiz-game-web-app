@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
 import { Evaluation } from '@common/evaluation';
-import { GameEventPayload } from '@common/game-event-payload';
 import { GameState } from '@common/game-state';
 import { Player } from '@common/player';
 import { Question } from '@common/question';
@@ -95,16 +94,6 @@ export class GameService {
         return this.webSocketService.on('toggleGameLock', applyIfPinMatches(pin, callback));
     }
 
-    sendPlayerResults(pin: string) {
-        this.webSocketService.emit('sendPlayerResults', { pin });
-    }
-
-    onSendPlayerResults(
-        callback: (chartData: GameEventPayload<{ submissions: Map<string, Submission>[]; questions: Question[] }>) => void,
-    ): Subscription {
-        return this.webSocketService.on('sendPlayerResults', callback);
-    }
-
     playerLeaveGameEnd(pin: string) {
         this.webSocketService.emit('playerLeaveGame', { pin });
     }
@@ -113,7 +102,7 @@ export class GameService {
         this.webSocketService.emit('endGame', { pin });
     }
 
-    onEndGame(callback: (gameState: GameState) => void): Subscription {
-        return this.webSocketService.on('endGame', callback);
+    onEndGame(pin: string, callback: () => void): Subscription {
+        return this.webSocketService.on('endGame', applyIfPinMatches(pin, callback));
     }
 }

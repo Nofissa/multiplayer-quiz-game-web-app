@@ -64,10 +64,6 @@ export class WaitingRoomPageComponent implements OnInit, OnDestroy {
                     panelClass: ['base-snackbar'],
                 });
 
-                this.gameService.onEndGame(() => {
-                    this.handleEndGame();
-                });
-
                 this.router.navigateByUrl('/home');
             }),
 

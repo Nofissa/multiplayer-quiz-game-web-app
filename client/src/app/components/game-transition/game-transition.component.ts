@@ -47,7 +47,6 @@ export class GameTransitionComponent implements OnInit, OnDestroy {
             this.timerService.onStartTimer(pin, () => {
                 this.gameHttpService.getGameSnapshotByPin(pin).subscribe((snapshot) => {
                     this.snapshot = snapshot;
-                    console.log(this.snapshot);
                 });
             }),
         );

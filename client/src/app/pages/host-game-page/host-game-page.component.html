@@ -5,7 +5,7 @@
         <app-bar-chart class="bar-chart" *ngIf="!isEnded && barChart" [data]="barChart"></app-bar-chart>
     </div>
     <div class="main-container">
-        <app-player-list [pin]="pin" [displayOptions]="{ score:true, ban: true, quitters: true }"></app-player-list>
+        <app-player-list [pin]="pin" [displayOptions]="{ score: true, ban: true, quitters: true }"></app-player-list>
         <app-chat-room [pin]="pin"></app-chat-room>
     </div>
     <div class="buttons-wrapper">
@@ -14,9 +14,9 @@
             <mat-icon class="lock-icon" *ngIf="isLocked()" fontIcon="lock"></mat-icon>
         </button>
         <div class="flex-column">
-        <button class="start-button" mat-raised-button *ngIf="isLocked()" (click)="startGame()">Commencer</button>
-            <button class="next-button" mat-raised-button *ngIf="currentQuestionHasEnded" (click)="nextQuestion()">Question
-            Suivante</button>
-    </div>
+            <button class="start-button" mat-raised-button *ngIf="isLocked()" (click)="startGame()">Commencer</button>
+            <button class="next-button" mat-raised-button *ngIf="isRunning()" (click)="endGame()">Décalisse</button>
+            <button class="next-button" mat-raised-button *ngIf="currentQuestionHasEnded" (click)="nextQuestion()">Question Suivante</button>
+        </div>
     </div>
 </div>

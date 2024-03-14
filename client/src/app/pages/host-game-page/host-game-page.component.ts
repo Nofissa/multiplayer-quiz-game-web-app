@@ -101,9 +101,8 @@ export class HostGamePageComponent implements OnInit {
         this.gameService.endGame(this.pin);
     }
 
-    handleEndGame(gameState: GameState) {
-        this.gameState = gameState;
-        this.router.navigate(['results-page'], { queryParams: { pin: this.pin } });
+    handleEndGame() {
+        this.router.navigate(['results'], { queryParams: { pin: this.pin } });
     }
 
     private setupSubscriptions(pin: string) {
@@ -158,8 +157,8 @@ export class HostGamePageComponent implements OnInit {
                 }
             }),
 
-            this.gameService.onEndGame((gameState: GameState) => {
-                this.handleEndGame(gameState);
+            this.gameService.onEndGame(pin, () => {
+                this.handleEndGame();
             }),
         );
     }
