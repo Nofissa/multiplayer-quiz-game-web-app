@@ -1,31 +1,32 @@
 <div class="chat-room">
-    <div class="messages-zone font-color text-centered">
-        <h3>Salon de clavardage</h3>
-        <ul id="message-list">
-            <li *ngFor="let chatlog of chatlogs" [ngClass]="{ sender: isCurrentUser(chatlog.author), receiver: !isCurrentUser(chatlog.author) }">
-                <div class="message-content">
-                    <div class="message-info">
-                        <div class="author-name">{{ chatlog.author }}</div>
-                        <div class="message-text">{{ chatlog.message }}</div>
+    <h4>Salon de clavardage</h4>
+    <div class="messages-wrapper">
+        <div class="messages-zone font-color text-centered">
+            <ul id="message-list">
+                <li *ngFor="let chatlog of chatlogs"
+                    [ngClass]="{ sender: isCurrentUser(chatlog.author), receiver: !isCurrentUser(chatlog.author) }">
+                    <div class="message-content">
+                        <div class="message-info">
+                            <div class="author-name">{{ chatlog.author }}</div>
+                            <div class="message-text">{{ chatlog.message }}</div>
+                        </div>
+                        <div class="message-date">{{ chatlog.date | date: 'shortTime' }}</div>
                     </div>
-                    <div class="message-date">{{ chatlog.date | date: 'shortTime' }}</div>
-                </div>
-            </li>
-        </ul>
+                </li>
+            </ul>
+        </div>
     </div>
-    <mat-form-field appearance="outline">
-        <mat-label>Message</mat-label>
-        <textarea
-            matInput
-            id="chattingArea"
-            [(ngModel)]="chatMessage"
-            (keydown.enter)="sendMessage()"
-            class="write-message"
-            placeholder="Envoyer un message"
-        >
-        </textarea>
-        <button matSuffix mat-icon-button class="send-button" (click)="sendMessage()">
-            <mat-icon>send</mat-icon>
-        </button>
-    </mat-form-field>
+    <form [formGroup]="formGroup">
+        <mat-form-field appearance="outline">
+            <mat-label *ngIf="remainigInputCount < 200">{{ remainigInputCount }}</mat-label>
+            <mat-label *ngIf="remainigInputCount === 200">Message</mat-label>
+            <textarea matInput id="chattingArea" [(ngModel)]="input" (keydown)="handleKeyDown($event)"
+                (ngModelChange)="updateRemainingInputCount()" formControlName="message" class="write-message"
+                placeholder="Envoyer un message">
+            </textarea>
+            <button matSuffix mat-icon-button class="send-button" (click)="sendMessage()">
+                <mat-icon>send</mat-icon>
+            </button>
+        </mat-form-field>
+    </form>
 </div>

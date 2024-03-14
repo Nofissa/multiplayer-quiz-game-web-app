@@ -2,7 +2,7 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { QuestionHttpService } from './question-http.service';
-import { Question } from '@app/interfaces/question';
+import { Question } from '@common/question';
 
 describe('QuestionHttpService', () => {
     let service: QuestionHttpService;

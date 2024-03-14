@@ -1,22 +1,24 @@
 .chat-room {
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
-    height: 75%;
-    border-radius: 25px;
+    justify-content: space-between;
+    border-radius: 15px;
     border: 1px solid black;
-    padding: 10px;
-    background-color: aliceblue;
-    max-width: 321px;
+    background-color: var(--secondary-bg-color);
+    max-width: 400px;
 }
 
 .messages-zone {
-    flex-grow: 1;
-    padding: 10px;
     overflow-y: auto;
-    max-height: 700px;
-    max-width: 321px;
+    max-height: 66vh;
     display: flex;
     flex-direction: column;
+}
+
+.messages-wrapper {
+    flex-grow: 1;
 }
 
 .write-message {
@@ -27,15 +29,18 @@
     color: black;
 }
 
-h3 {
-    color: black;
+h4 {
+    color: var(--secondary-fg-color);
     text-align: center;
+    margin: 5px 0px;
 }
 
 #message-list {
     list-style: none;
     padding: 0;
     width: 100%;
+    padding: 0px 10px;
+    box-sizing: border-box;
 }
 
 #message-list li {
@@ -49,25 +54,33 @@ h3 {
 }
 
 .message-content {
-    max-width: 60%;
+    width: 60%;
     padding: 8px 12px;
-    border-radius: 18px;
     word-wrap: break-word;
     position: relative;
     min-width: 50px;
 }
+
 .message-info {
     padding-bottom: 15px;
 }
 
-.sender .message-content {
-    background-color: #0079fa;
+.sender * {
     color: white;
 }
 
-.receiver .message-content {
-    background-color: #e5e5ea;
+.receiver * {
     color: black;
+}
+
+.sender .message-content {
+    border-radius: 15px 15px 5px 15px;
+    background-color: #0079fa;
+}
+
+.receiver .message-content {
+    border-radius: 5px 15px 15px 15px;
+    background-color: #e5e5ea;
 }
 
 .author-name {
@@ -89,4 +102,14 @@ h3 {
     font-size: 0.55em;
     color: #302d2d;
     white-space: nowrap;
+}
+
+form {
+    width: 100%;
+    padding: 0px 10px;
+    box-sizing: border-box;
+}
+
+mat-form-field {
+    width: 100%;
 }

@@ -15,7 +15,9 @@ export class TimerService {
 
     constructor(private readonly gameService: GameService) {}
 
-    startTimer(client: Socket, pin: string, callback: (remainingTime: number) => void): number {
+    // We need 4 parameters for this method
+    // eslint-disable-next-line max-params
+    startTimer(client: Socket, pin: string, duration: number, callback: (remainingTime: number) => void): number {
         const game = this.gameService.getGame(pin);
 
         if (game.organizer.id !== client.id) {
@@ -23,11 +25,11 @@ export class TimerService {
         }
 
         if (this.intervals.get(pin)) {
-            throw new Error(`La partie ${pin} a déjà une minuterie lancée`);
+            this.stopTimer(pin); // to reset the timer
         }
 
         if (this.counters.get(pin) === undefined) {
-            this.counters.set(pin, game.quiz.duration);
+            this.counters.set(pin, duration);
         }
 
         this.tickSubjects.set(pin, new Subject());

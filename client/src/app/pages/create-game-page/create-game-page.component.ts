@@ -1,5 +1,6 @@
+// for moongodb _id fields
 /* eslint-disable no-underscore-dangle */
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
@@ -7,9 +8,11 @@ import { QuizDetailsDialogComponent } from '@app/components/dialogs/quiz-details
 import { Quiz } from '@app/interfaces/quiz';
 import { MaterialServicesProvider } from '@app/providers/material-services.provider';
 import { GameService } from '@app/services/game/game-service/game.service';
+import { PlayerService } from '@app/services/player/player.service';
 import { QuizHttpService } from '@app/services/quiz-http/quiz-http.service';
-import { UserService } from '@app/services/user/user-service';
-import { Subscription } from 'rxjs';
+import { WebSocketService } from '@app/services/web-socket/web-socket.service';
+import { Player } from '@common/player';
+import { PlayerState } from '@common/player-state';
 import SwiperCore, { EffectCoverflow, Navigation, Pagination } from 'swiper';
 
 SwiperCore.use([Navigation, Pagination, EffectCoverflow]);
@@ -22,12 +25,11 @@ const SNACK_BAR_DURATION_MS = 3000;
     styleUrls: ['./create-game-page.component.scss'],
     encapsulation: ViewEncapsulation.None,
 })
-export class CreateGamePageComponent implements OnInit, OnDestroy {
+export class CreateGamePageComponent implements OnInit {
     quizzArray: Quiz[];
 
     private readonly dialogService: MatDialog;
     private readonly snackBarService: MatSnackBar;
-    private createGameSubscription: Subscription;
 
     // eslint-disable-next-line max-params
     constructor(
@@ -35,7 +37,8 @@ export class CreateGamePageComponent implements OnInit, OnDestroy {
         private readonly router: Router,
         private readonly quizHttpService: QuizHttpService,
         private readonly gameService: GameService,
-        private userService: UserService,
+        private readonly playerService: PlayerService,
+        private readonly webSockerService: WebSocketService,
     ) {
         this.dialogService = materialServicesProvider.dialog;
         this.snackBarService = materialServicesProvider.snackBar;
@@ -43,17 +46,6 @@ export class CreateGamePageComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.loadQuizzes();
-        this.createGameSubscription = this.gameService.onCreateGame((pin: string) => {
-            if (pin) {
-                this.router.navigate(['/host-game'], { queryParams: { pin } });
-            }
-        });
-    }
-
-    ngOnDestroy(): void {
-        if (!this.createGameSubscription.closed) {
-            this.createGameSubscription.unsubscribe();
-        }
     }
 
     loadQuizzes(): void {
@@ -90,11 +82,27 @@ export class CreateGamePageComponent implements OnInit, OnDestroy {
     }
 
     private createGame(quiz: Quiz) {
+        this.gameService.onCreateGame((pin: string) => {
+            if (pin) {
+                this.router.navigate(['/host-game'], { queryParams: { pin } });
+                const player: Player = {
+                    socketId: this.webSockerService.getSocketId(),
+                    username: 'Organisateur',
+                    score: 0,
+                    speedAwardCount: 0,
+                    state: PlayerState.Playing,
+                };
+                this.playerService.addPlayerInGame(pin, player);
+            }
+        });
         this.gameService.createGame(quiz._id);
-        this.userService.setUsername('Organisateur');
     }
 
     private testGame(quiz: Quiz) {
-        this.router.navigate(['/game'], { queryParams: { quizId: quiz._id, isTest: true } });
+        this.gameService.onCreateGame((pin: string) => {
+            this.gameService.joinGame(pin, 'Testeur');
+            this.router.navigate(['/game'], { queryParams: { pin, isTest: true } });
+        });
+        this.gameService.createGame(quiz._id);
     }
 }

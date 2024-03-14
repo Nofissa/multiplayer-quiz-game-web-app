@@ -4,7 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
 import { UpsertQuestionDialogComponent } from '@app/components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
-import { Question } from '@app/interfaces/question';
+import { Question } from '@common/question';
 import { QuestionListOptions } from '@app/interfaces/question-list-options';
 import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog-data';
 import { MaterialServicesProvider } from '@app/providers/material-services.provider';

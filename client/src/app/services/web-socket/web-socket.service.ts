@@ -37,4 +37,8 @@ export class WebSocketService {
             };
         }).subscribe(callback);
     }
+
+    getSocketId(): string {
+        return this.socketInstance.id;
+    }
 }

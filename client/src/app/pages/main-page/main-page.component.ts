@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
@@ -10,26 +10,22 @@ import { AuthService } from '@app/services/auth/auth.service';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { SessionService } from '@app/services/session/session.service';
 import { AuthPayload } from '@common/auth-payload';
-// import { JoinGamePayload } from '@common/join-game-payload';
-import { GameEventPayload } from '@common/game-event-payload';
-import { GameInitBundle } from '@common/game-init-bundle';
-import { Subscription } from 'rxjs';
+import { PlayerService } from '@app/services/player/player.service';
 
 @Component({
     selector: 'app-main-page',
     templateUrl: './main-page.component.html',
     styleUrls: ['./main-page.component.scss'],
 })
-export class MainPageComponent implements OnInit, OnDestroy {
+export class MainPageComponent {
     private readonly authService: AuthService;
     private readonly sessionService: SessionService;
     private readonly dialogService: MatDialog;
     private readonly snackBarService: MatSnackBar;
 
-    private joinGameSubscription: Subscription;
-
     // eslint-disable-next-line max-params
     constructor(
+        private readonly playerService: PlayerService,
         private readonly gameService: GameService,
         securityServicesProvider: SecurityServicesProvider,
         materialServicesProvider: MaterialServicesProvider,
@@ -39,18 +35,6 @@ export class MainPageComponent implements OnInit, OnDestroy {
         this.sessionService = securityServicesProvider.session;
         this.dialogService = materialServicesProvider.dialog;
         this.snackBarService = materialServicesProvider.snackBar;
-    }
-
-    ngOnInit() {
-        this.joinGameSubscription = this.gameService.onJoinGameNoPin((payload: GameEventPayload<GameInitBundle>) => {
-            this.router.navigate(['waiting-room'], { queryParams: { pin: payload.pin } });
-        });
-    }
-
-    ngOnDestroy() {
-        if (!this.joinGameSubscription.closed) {
-            this.joinGameSubscription.unsubscribe();
-        }
     }
 
     validateAdmin() {
@@ -76,6 +60,10 @@ export class MainPageComponent implements OnInit, OnDestroy {
         });
 
         dialogRef.afterClosed().subscribe(({ pin, username }: { pin: string; username: string }) => {
+            this.gameService.onJoinGame(pin, (player) => {
+                this.playerService.addPlayerInGame(pin, player);
+                this.router.navigate(['waiting-room'], { queryParams: { pin } });
+            });
             this.gameService.joinGame(pin, username);
         });
     }
