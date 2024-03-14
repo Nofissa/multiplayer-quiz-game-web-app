@@ -9,27 +9,40 @@ import { Submission } from '@common/submission';
 export class BarChartService {
     private barChartData: BarChartData[] = [];
 
-    addQuestion(question: Question) {
+    addQuestion(question: Question): void {
         const newBarchartData: BarChartData = {
             question,
-            submissions: [],
+            submissions: new Map(),
         };
         this.barChartData.push(newBarchartData);
     }
 
-    updateBarChartData(submission: Submission[]) {
-        this.barChartData[this.barChartData.length - 1].submissions = submission;
+    updateBarChartData(data: { clientId: string; submission: Submission }): void {
+        const chartData: BarChartData | undefined = this.getCurrentQuestionData();
+        if (chartData) {
+            chartData.submissions.set(data.clientId, data.submission);
+        }
     }
 
-    getLatestBarChart() {
-        return this.barChartData[this.barChartData.length - 1];
+    getCurrentQuestionData(): BarChartData | undefined {
+        if (this.barChartData.length > 0) {
+            return this.barChartData[this.barChartData.length - 1];
+        }
+        return undefined;
     }
 
-    getAllBarChart() {
+    getAllBarChart(): BarChartData[] {
         return this.barChartData;
     }
 
-    setData(chartData: BarChartData[]) {
-        this.barChartData = chartData;
+    setData(chartData: { submissions: Map<string, Submission>[]; questions: Question[] }): void {
+        this.barChartData = [];
+        for (let i = 0; i < chartData.questions.length; i++) {
+            const newBarChart: BarChartData = {
+                question: chartData.questions[i],
+                submissions: chartData.submissions[i],
+            };
+            this.barChartData.push(newBarChart);
+        }
     }
 }

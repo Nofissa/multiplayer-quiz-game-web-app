@@ -3,5 +3,5 @@ import { Question } from './question';
 
 export interface BarChartData {
     question: Question;
-    submissions: Submission[];
+    submissions: Map<string, Submission>;
 }

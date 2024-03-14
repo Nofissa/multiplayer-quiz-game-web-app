@@ -1,13 +1,12 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { questionStub } from '@app/TestStubs/question.stubs';
-import { submissionStub } from '@app/TestStubs/submission.stubs';
 import { BarChartData } from '@app/interfaces/bar-chart-data';
 import { Question } from '@app/interfaces/question';
 import { BarChartService } from '@app/services/game/bar-chart-service/bar-chart.service';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { GameState } from '@common/game-state';
+import { Submission } from '@common/submission';
 import { Subscription } from 'rxjs';
 
 const THREE_SECOND_IN_MS = 3000;
@@ -40,16 +39,15 @@ export class HostGamePageComponent implements OnInit, OnDestroy {
         return this.barChartService.getAllBarChart();
     }
 
-    get barChart(): BarChartData {
-        return this.barChartService.getLatestBarChart();
+    get barChart(): BarChartData | undefined {
+        return this.barChartService.getCurrentQuestionData();
     }
 
     ngOnInit() {
         this.pin = this.activatedRoute.snapshot.queryParams['pin'];
         this.barChartService = new BarChartService();
-        // submission:Submission
-        this.gameService.onToggleSelectChoice(this.pin, () => {
-            // this.barChartService.updateBarChartData(submission);
+        this.gameService.onToggleSelectChoice(this.pin, (data: { clientId: string; submission: Submission }) => {
+            this.barChartService.updateBarChartData(data);
             return;
         });
         this.gameService.onNextQuestion(this.pin, (question: Question) => {
@@ -102,7 +100,7 @@ export class HostGamePageComponent implements OnInit, OnDestroy {
             this.gameService.onNextQuestion(this.pin, (question: Question) => {
                 this.question = question;
                 if (!this.question) {
-                    this.router.navigateByUrl('/results-page');
+                    this.endGame();
                 }
             });
             if (this.question) {
@@ -122,25 +120,6 @@ export class HostGamePageComponent implements OnInit, OnDestroy {
 
     handleEndGame(gameState: GameState) {
         this.gameState = gameState;
-        this.barChartService.setData([
-            {
-                question: questionStub()[0],
-                submissions: submissionStub(),
-            },
-            {
-                question: questionStub()[1],
-                submissions: submissionStub(),
-            },
-        ]);
-        this.gameService.sendPlayerResults(this.pin, [
-            {
-                question: questionStub()[0],
-                submissions: submissionStub(),
-            },
-            {
-                question: questionStub()[1],
-                submissions: submissionStub(),
-            },
-        ]);
+        this.router.navigate(['results-page'], { queryParams: { pin: this.pin } });
     }
 }

@@ -2,11 +2,8 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
-import { questionStub } from '@app/TestStubs/question.stubs';
-import { submissionStub } from '@app/TestStubs/submission.stubs';
 import { JoinGameDialogComponent } from '@app/components/dialogs/join-game-dialog/join-game-dialog.component';
 import { PromptDialogComponent } from '@app/components/dialogs/prompt-dialog/prompt-dialog.component';
-import { BarChartData } from '@app/interfaces/bar-chart-data';
 import { MaterialServicesProvider } from '@app/providers/material-services.provider';
 import { SecurityServicesProvider } from '@app/providers/security-services.provider';
 import { AuthService } from '@app/services/auth/auth.service';
@@ -24,11 +21,6 @@ import { Subscription } from 'rxjs';
     styleUrls: ['./main-page.component.scss'],
 })
 export class MainPageComponent implements OnInit, OnDestroy {
-    data: BarChartData = {
-        question: questionStub()[0],
-        submissions: submissionStub(),
-    };
-
     private readonly authService: AuthService;
     private readonly sessionService: SessionService;
     private readonly dialogService: MatDialog;

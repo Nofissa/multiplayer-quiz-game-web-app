@@ -34,6 +34,6 @@ export class WaitingRoomPageComponent implements OnInit {
     }
 
     handleEndGame() {
-        this.router.navigate(['results-page']);
+        this.router.navigate(['results-page'], { queryParams: { pin: this.pin } });
     }
 }

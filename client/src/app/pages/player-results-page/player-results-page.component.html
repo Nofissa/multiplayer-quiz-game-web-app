@@ -1,5 +1,5 @@
 <app-nav-header></app-nav-header>
 <div class="grid-container">
-    <app-bar-chart-swiper [data]="chartData"></app-bar-chart-swiper>
+    <app-bar-chart *ngIf="chartData" [data]="chartData"></app-bar-chart>
     <app-chat-room></app-chat-room>
 </div>

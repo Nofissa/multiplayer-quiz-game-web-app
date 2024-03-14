@@ -9,7 +9,7 @@
         </div>
         <app-timer-component [pin]="pin" (timerExpired)="onTimerExpired()"></app-timer-component>
         <app-bar-chart-swiper class="bar-chart" *ngIf="isEnded" [data]="barCharts"></app-bar-chart-swiper>
-        <!-- <app-bar-chart class="bar-chart" *ngIf="!isEnded" [data]="barChart"></app-bar-chart> -->
+        <app-bar-chart class="bar-chart" *ngIf="!isEnded && barChart" [data]="barChart"></app-bar-chart>
     </div>
     <app-chat-room class="chat-room"></app-chat-room>
 
@@ -20,6 +20,6 @@
     <div class="flex-column">
         <button class="start-button" mat-raised-button *ngIf="isLocked() && !isStarted()" (click)="startGame()">COMMENCER</button>
         <button class="next-button" mat-raised-button *ngIf="nextAvailable" (click)="nextQuestion()">SUIVANT</button>
-        <button class="end-button" mat-raised-button (mouseup)="endGame()" *ngIf="!isEnded()">END ME</button>
+        <button class="next-button" mat-raised-button (click)="endGame()">ENDME</button>
     </div>
 </div>

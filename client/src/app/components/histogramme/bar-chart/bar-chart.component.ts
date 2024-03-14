@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { BarChartData } from '@app/interfaces/bar-chart-data';
+import { Submission } from '@common/submission';
 
 const PERCENT_MULTPLIER = 100;
 
@@ -18,11 +19,15 @@ export class BarChartComponent {
     }
 
     numberOfPlayers() {
-        return this.data.submissions.length;
+        return this.data.submissions ? this.data.submissions.size : 0;
     }
 
     playersSelected(index: number) {
-        const playersSelected = this.data.submissions.reduce((totalSelections, submission) => {
+        if (!this.data.submissions) {
+            return 0;
+        }
+        const submissionArray: Submission[] = Array.from(this.data.submissions.values());
+        const playersSelected = submissionArray.reduce((totalSelections, submission) => {
             submission.choices.forEach((choice) => {
                 if (choice.index === index && choice.isSelected) {
                     totalSelections++;
