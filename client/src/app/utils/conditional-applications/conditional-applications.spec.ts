@@ -1,4 +1,3 @@
-
 import { GameEventPayload } from '@common/game-event-payload';
 import { applyIfPinMatches } from './conditional-applications';
 

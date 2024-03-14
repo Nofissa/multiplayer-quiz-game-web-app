@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { Player } from '@common/player';
 import { PlayerState } from '@common/player-state';
-//import { Subscription } from 'rxjs';
+// import { Subscription } from 'rxjs';
 import { PlayerListComponent } from './player-list.component';
 
 describe('PlayerListComponent', () => {

@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { questionStub } from '@app/TestStubs/question.stubs';
 import { submissionStub } from '@app/TestStubs/submission.stubs';
 import { BarChartData } from '@app/interfaces/bar-chart-data';
-import { Question } from '@app/interfaces/question';
+import { Question } from '@common/question';
 import { Submission } from '@common/submission';
 import { BarChartService } from './bar-chart.service';
 
