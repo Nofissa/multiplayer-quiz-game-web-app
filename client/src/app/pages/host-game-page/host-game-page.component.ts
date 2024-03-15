@@ -25,7 +25,6 @@ const CANCEL_GAME_NOTICE_DURATION_MS = 5000;
 export class HostGamePageComponent implements OnInit, OnDestroy {
     pin: string;
     gameState: GameState = GameState.Opened;
-    isEnded: boolean = false;
     currentQuestionHasEnded: boolean = false;
 
     private eventSubscriptions: Subscription[] = [];
@@ -120,6 +119,7 @@ export class HostGamePageComponent implements OnInit, OnDestroy {
             this.gameService.onSubmitChoices(pin, (evaluation) => {
                 if (evaluation.isLast) {
                     this.currentQuestionHasEnded = true;
+                    this.timerService.stopTimer(pin);
                 }
             }),
 
@@ -141,9 +141,7 @@ export class HostGamePageComponent implements OnInit, OnDestroy {
 
             this.timerService.onTimerTick(pin, (payload) => {
                 if (!payload.remainingTime) {
-                    if (payload.eventType === TimerEventType.StartGame) {
-                        this.timerService.startTimer(pin, TimerEventType.Question);
-                    } else if (payload.eventType === TimerEventType.NextQuestion) {
+                    if (payload.eventType === TimerEventType.StartGame || payload.eventType === TimerEventType.NextQuestion) {
                         this.timerService.startTimer(pin, TimerEventType.Question);
                     }
                 }
