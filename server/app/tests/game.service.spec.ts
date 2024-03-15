@@ -32,7 +32,6 @@ describe('GameService', () => {
     });
 
     afterEach(() => {
-        // jest.clearAllMocks();
         jest.restoreAllMocks();
     });
 
@@ -82,11 +81,6 @@ describe('GameService', () => {
         gameTest.clientPlayers.clear();
         const player = playerstub();
         player.socketId = 'gameId';
-        // const payloadComparison: GameInitBundle = {
-        //     pin: gameTest.pin,
-        //     players: [player],
-        //     chatlogs: gameTest.chatlogs,
-        // } as any;
 
         socketMock = { id: 'gameId' } as jest.Mocked<Socket>;
         it('should return the right payload if succesfull', () => {
