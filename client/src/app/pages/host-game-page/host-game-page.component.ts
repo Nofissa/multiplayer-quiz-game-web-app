@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BarChartData } from '@app/interfaces/bar-chart-data';
@@ -10,6 +10,7 @@ import { GameService } from '@app/services/game/game-service/game.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { GameState } from '@common/game-state';
 import { PlayerState } from '@common/player-state';
+import { Question } from '@common/question';
 import { TimerEventType } from '@common/timer-event-type';
 import { Subscription } from 'rxjs';
 
@@ -22,13 +23,15 @@ const CANCEL_GAME_NOTICE_DURATION_MS = 5000;
     templateUrl: './host-game-page.component.html',
     styleUrls: ['./host-game-page.component.scss'],
 })
-export class HostGamePageComponent implements OnInit, OnDestroy {
+export class HostGamePageComponent implements OnInit {
     pin: string;
     gameState: GameState = GameState.Opened;
     currentQuestionHasEnded: boolean = false;
+    question: Question | undefined;
+    nextAvailable: boolean = false;
+    // nextEndGame: boolean = false; to use later when we have a way to know if it's the last question
 
     private eventSubscriptions: Subscription[] = [];
-
     private readonly activatedRoute: ActivatedRoute;
     private readonly router: Router;
     private readonly gameHttpService: GameHttpService;
@@ -38,7 +41,7 @@ export class HostGamePageComponent implements OnInit, OnDestroy {
     // Disabled because this page is rich in interaction an depends on many services as a consequence
     // eslint-disable-next-line max-params
     constructor(
-        private readonly barChartService: BarChartService,
+        private barChartService: BarChartService,
         private readonly snackBarService: MatSnackBar,
         gameServicesProvider: GameServicesProvider,
         routingDependenciesProvider: RoutingDependenciesProvider,
@@ -54,21 +57,15 @@ export class HostGamePageComponent implements OnInit, OnDestroy {
         return this.barChartService.getAllBarChart();
     }
 
-    get barChart(): BarChartData {
-        return this.barChartService.getLatestBarChart();
+    get barChart(): BarChartData | undefined {
+        return this.barChartService.getCurrentQuestionData();
     }
 
     ngOnInit() {
         this.pin = this.activatedRoute.snapshot.queryParams['pin'];
-        this.setupSubscriptions(this.pin);
-    }
+        this.barChartService = new BarChartService();
 
-    ngOnDestroy() {
-        this.eventSubscriptions.forEach((sub) => {
-            if (!sub.closed) {
-                sub.unsubscribe();
-            }
-        });
+        this.setupSubscriptions(this.pin);
     }
 
     isLocked() {
@@ -77,6 +74,10 @@ export class HostGamePageComponent implements OnInit, OnDestroy {
 
     isRunning() {
         return this.gameState === GameState.Running;
+    }
+
+    isEnded() {
+        return this.gameState === GameState.Ended;
     }
 
     toggleLock() {
@@ -94,6 +95,14 @@ export class HostGamePageComponent implements OnInit, OnDestroy {
         this.currentQuestionHasEnded = false;
         this.gameService.nextQuestion(this.pin);
         this.timerService.startTimer(this.pin, TimerEventType.NextQuestion, NEXT_QUESTION_DELAY_SECONDS);
+    }
+
+    endGame() {
+        this.gameService.endGame(this.pin);
+    }
+
+    handleEndGame() {
+        this.router.navigate(['results'], { queryParams: { pin: this.pin } });
     }
 
     private setupSubscriptions(pin: string) {
@@ -145,6 +154,10 @@ export class HostGamePageComponent implements OnInit, OnDestroy {
                         this.timerService.startTimer(pin, TimerEventType.Question);
                     }
                 }
+            }),
+
+            this.gameService.onEndGame(pin, () => {
+                this.handleEndGame();
             }),
         );
     }

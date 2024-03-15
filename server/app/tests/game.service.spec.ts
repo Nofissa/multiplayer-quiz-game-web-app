@@ -17,7 +17,6 @@ describe('GameService', () => {
                 },
             ],
         }).compile();
-
         gameServiceTest = module.get<GameService>(GameService);
     });
 

@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
-import { Question } from '@common/question';
-import { Evaluation } from '@common/evaluation';
-import { Player } from '@common/player';
-import { Submission } from '@common/submission';
-import { GameState } from '@common/game-state';
-import { Subscription } from 'rxjs';
 import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
+import { Evaluation } from '@common/evaluation';
+import { GameState } from '@common/game-state';
+import { Player } from '@common/player';
+import { Question } from '@common/question';
+import { Submission } from '@common/submission';
+import { Subscription } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
@@ -66,7 +66,7 @@ export class GameService {
         this.webSocketService.emit('toggleSelectChoice', { pin, choiceIndex });
     }
 
-    onToggleSelectChoice(pin: string, callback: (submissions: Submission[]) => void): Subscription {
+    onToggleSelectChoice(pin: string, callback: (payload: { clientId: string; submission: Submission }) => void): Subscription {
         return this.webSocketService.on('toggleSelectChoice', applyIfPinMatches(pin, callback));
     }
 
@@ -92,5 +92,17 @@ export class GameService {
 
     onToggleGameLock(pin: string, callback: (gameState: GameState) => void): Subscription {
         return this.webSocketService.on('toggleGameLock', applyIfPinMatches(pin, callback));
+    }
+
+    playerLeaveGameEnd(pin: string) {
+        this.webSocketService.emit('playerLeaveGame', { pin });
+    }
+
+    endGame(pin: string) {
+        this.webSocketService.emit('endGame', { pin });
+    }
+
+    onEndGame(pin: string, callback: () => void): Subscription {
+        return this.webSocketService.on('endGame', applyIfPinMatches(pin, callback));
     }
 }

@@ -51,6 +51,10 @@ export class WaitingRoomPageComponent implements OnInit, OnDestroy {
         this.router.navigate(['/home']);
     }
 
+    handleEndGame() {
+        this.router.navigate(['results-page'], { queryParams: { pin: this.pin } });
+    }
+
     private setupSubscriptions(pin: string) {
         this.eventSubscriptions.push(
             this.gameService.onCancelGame(pin, (message) => {

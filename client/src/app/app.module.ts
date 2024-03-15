@@ -2,7 +2,9 @@ import { CdkDrag, CdkDropList, CdkDropListGroup } from '@angular/cdk/drag-drop';
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatExpansionModule } from '@angular/material/expansion';
@@ -115,6 +117,8 @@ import { GameTransitionComponent } from './components/game-transition/game-trans
         MatDividerModule,
         MatListModule,
         MatProgressBarModule,
+        MatBadgeModule,
+        MatCardModule,
     ],
     providers: [],
     bootstrap: [AppComponent],

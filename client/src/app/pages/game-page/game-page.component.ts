@@ -73,6 +73,10 @@ export class GamePageComponent implements OnInit, OnDestroy {
                 this.router.navigateByUrl('/home');
             }),
 
+            this.gameService.onEndGame(pin, () => {
+                this.router.navigate(['results'], { queryParams: { pin: this.pin } });
+            }),
+
             this.timerService.onStartTimer(pin, (payload) => {
                 if (payload.eventType === TimerEventType.StartGame) {
                     this.isStarting = true;
