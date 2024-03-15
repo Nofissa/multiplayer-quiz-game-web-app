@@ -12,7 +12,7 @@ export const gameStub = (): Game => {
         pin: '1234',
         quiz: quizStub(),
         organizer: { id: 'organizerId' } as any,
-        state: GameState.Started,
+        state: GameState.Running,
         chatlogs: [],
         currentQuestionIndex: 0,
         clientPlayers: new Map<string, ClientPlayer>([['playerId', clientPlayerStub()]]),
@@ -23,6 +23,9 @@ export const gameStub = (): Game => {
         },
         get currentQuestion() {
             return this.quiz.questions[this.currentQuestionIndex];
+        },
+        get allSubmissions() {
+            return this.questionSubmissions;
         },
         get currentQuestionSubmissions() {
             return this.questionSubmissions[this.currentQuestionIndex];

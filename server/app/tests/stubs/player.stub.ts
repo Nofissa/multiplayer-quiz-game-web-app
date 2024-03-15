@@ -3,6 +3,7 @@ import { PlayerState } from '@common/player-state';
 
 export const playerstub = (): Player => {
     return {
+        socketId: 'playerId',
         username: 'playerTest',
         state: PlayerState.Playing,
         score: 0,

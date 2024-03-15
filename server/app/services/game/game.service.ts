@@ -281,7 +281,7 @@ export class GameService {
         );
     }
 
-    private getOrCreateSubmission(client: Socket, game: Game) {
+    getOrCreateSubmission(client: Socket, game: Game) {
         if (!game.currentQuestionSubmissions.has(client.id)) {
             game.currentQuestionSubmissions.set(client.id, {
                 choices: game.currentQuestion.choices.map((_, index) => {
