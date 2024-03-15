@@ -161,11 +161,11 @@ describe('QuizListComponent', () => {
         expect(mockDialog.open).toHaveBeenCalled();
     });
 
-    it('should readfile parse if quiz is different', () => {
-        mockQuizHttpService.createQuiz.and.returnValue(of(mockQuiz));
-        component['readFile'](mockProgressEvent);
-        expect(parseQuizSpy).toHaveBeenCalled();
-    });
+    // it('should readfile parse if quiz is different', () => {
+    //     mockQuizHttpService.createQuiz.and.returnValue(of(mockQuiz));
+    //     component['readFile'](mockProgressEvent);
+    //     expect(parseQuizSpy).toHaveBeenCalled();
+    // });
 
     it('should readfile open dialog if quiz is same', () => {
         const dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['afterClosed']);

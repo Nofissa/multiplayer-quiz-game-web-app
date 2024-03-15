@@ -1,10 +1,11 @@
-import { TimerService } from './timer.service';
 import { TestBed } from '@angular/core/testing';
+import { SocketServerMock } from '@app/mocks/socket-server-mock';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { GameEventPayload } from '@common/game-event-payload';
-import { SocketServerMock } from '@app/mocks/socket-server-mock';
-import { io } from 'socket.io-client';
+import { TimerEventType } from '@common/timer-event-type';
 import { Observable } from 'rxjs';
+import { io } from 'socket.io-client';
+import { TimerService } from './timer.service';
 
 describe('TimerService', () => {
     let timerService: TimerService;
@@ -50,7 +51,7 @@ describe('TimerService', () => {
 
     it('should raise startTimer event', () => {
         const pin = '1234';
-        timerService.startTimer(pin);
+        timerService.startTimer(pin, TimerEventType.StartGame);
         expect(webSocketServiceSpy.emit).toHaveBeenCalledWith('startTimer', { pin });
     });
 

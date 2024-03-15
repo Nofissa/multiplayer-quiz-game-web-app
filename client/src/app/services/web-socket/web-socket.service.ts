@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
-import { Socket, io } from 'socket.io-client';
-import { Observable, Subscription } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Observable, Subscription } from 'rxjs';
+import { Socket, io } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
 
 const ERROR_NOTICE_DURATION_MS = 5000;
 
 @Injectable({ providedIn: 'root' })
 export class WebSocketService {
-    private socketInstance: Socket;
+    socketInstance: Socket;
 
     constructor(private readonly snackBarService: MatSnackBar) {
         this.socketInstance = io(environment.serverUrl);
