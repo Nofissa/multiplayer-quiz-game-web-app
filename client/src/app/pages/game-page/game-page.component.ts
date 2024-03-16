@@ -1,8 +1,10 @@
+import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GameServicesProvider } from '@app/providers/game-services.provider';
 import { RoutingDependenciesProvider } from '@app/providers/routing-dependencies.provider';
+import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { GameState } from '@common/game-state';
@@ -28,6 +30,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
     private readonly activatedRoute: ActivatedRoute;
     private readonly router: Router;
+    private readonly gameHttpService: GameHttpService;
     private readonly gameService: GameService;
     private readonly timerService: TimerService;
 
@@ -36,15 +39,24 @@ export class GamePageComponent implements OnInit, OnDestroy {
         gameServicesProvider: GameServicesProvider,
         routingDependenciesProvider: RoutingDependenciesProvider,
     ) {
-        this.gameService = gameServicesProvider.gameService;
-        this.timerService = gameServicesProvider.timerService;
         this.activatedRoute = routingDependenciesProvider.activatedRoute;
         this.router = routingDependenciesProvider.router;
+        this.gameHttpService = gameServicesProvider.gameHttpService;
+        this.gameService = gameServicesProvider.gameService;
+        this.timerService = gameServicesProvider.timerService;
     }
 
     ngOnInit() {
         this.pin = this.activatedRoute.snapshot.queryParams['pin'];
         this.isTest = this.activatedRoute.snapshot.queryParams['isTest'] === 'true';
+
+        this.gameHttpService.getGameSnapshotByPin(this.pin).subscribe({
+            error: (error: HttpErrorResponse) => {
+                if (error.status === HttpStatusCode.NotFound) {
+                    this.router.navigateByUrl('/home');
+                }
+            },
+        });
 
         this.setupSubscriptions(this.pin);
     }
@@ -76,6 +88,13 @@ export class GamePageComponent implements OnInit, OnDestroy {
             this.gameService.onEndGame(pin, () => {
                 this.router.navigate(['results'], { queryParams: { pin: this.pin } });
             }),
+
+            // this.gameService.onPlayerAbandon(pin, (player) => {
+            //     if (this.playerService.getCurrentPlayer(pin)?.socketId === player.socketId) {
+            //         this.playerService.removeCurrentPlayerFromGame(pin);
+            //         this.router.navigateByUrl('/home');
+            //     }
+            // }),
 
             this.timerService.onStartTimer(pin, (payload) => {
                 if (payload.eventType === TimerEventType.StartGame) {

@@ -92,7 +92,7 @@ export class CreateGamePageComponent implements OnInit {
                     speedAwardCount: 0,
                     state: PlayerState.Playing,
                 };
-                this.playerService.addPlayerInGame(pin, player);
+                this.playerService.setPlayer(pin, player);
             }
         });
         this.gameService.createGame(quiz._id);
