@@ -4,7 +4,7 @@ import { applyIfPinMatches } from '@app/utils/conditional-applications/condition
 import { Evaluation } from '@common/evaluation';
 import { GameState } from '@common/game-state';
 import { Player } from '@common/player';
-import { Question } from '@common/question';
+import { QuestionPayload } from '@common/question-payload';
 import { Submission } from '@common/submission';
 import { Subscription } from 'rxjs';
 
@@ -42,7 +42,7 @@ export class GameService {
         this.webSocketService.emit('startGame', { pin });
     }
 
-    onStartGame(pin: string, callback: (data: { question: Question; isLast: boolean }) => void): Subscription {
+    onStartGame(pin: string, callback: (data: QuestionPayload) => void): Subscription {
         return this.webSocketService.on('startGame', applyIfPinMatches(pin, callback));
     }
 
@@ -82,7 +82,7 @@ export class GameService {
         this.webSocketService.emit('nextQuestion', { pin });
     }
 
-    onNextQuestion(pin: string, callback: (data: { question: Question; isLast: boolean }) => void): Subscription {
+    onNextQuestion(pin: string, callback: (data: QuestionPayload) => void): Subscription {
         return this.webSocketService.on('nextQuestion', applyIfPinMatches(pin, callback));
     }
 
