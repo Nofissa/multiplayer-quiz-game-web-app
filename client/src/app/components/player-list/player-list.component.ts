@@ -1,10 +1,8 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
 import { PlayerListDisplayOptions } from '@app/interfaces/player-list-display-options';
 import { GameServicesProvider } from '@app/providers/game-services.provider';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
-import { PlayerService } from '@app/services/player/player.service';
 import { Player } from '@common/player';
 import { PlayerState } from '@common/player-state';
 import { Subscription } from 'rxjs';
@@ -29,11 +27,7 @@ export class PlayerListComponent implements OnInit, OnDestroy {
     private readonly gameHttpService: GameHttpService;
     private readonly gameService: GameService;
 
-    constructor(
-        gameServicesProvider: GameServicesProvider,
-        private readonly playerService: PlayerService,
-        private readonly router: Router,
-    ) {
+    constructor(gameServicesProvider: GameServicesProvider) {
         this.gameHttpService = gameServicesProvider.gameHttpService;
         this.gameService = gameServicesProvider.gameService;
     }
@@ -94,18 +88,10 @@ export class PlayerListComponent implements OnInit, OnDestroy {
             }),
 
             this.gameService.onPlayerBan(pin, (player) => {
-                if (this.playerService.getCurrentPlayerFromGame(this.pin)?.socketId === player.socketId) {
-                    this.router.navigateByUrl('/home');
-                }
-
                 this.upsertPlayer(player);
             }),
 
             this.gameService.onPlayerAbandon(pin, (player) => {
-                if (this.playerService.getCurrentPlayerFromGame(this.pin)?.socketId === player.socketId) {
-                    this.router.navigateByUrl('/home');
-                }
-
                 this.upsertPlayer(player);
             }),
 
