@@ -1,6 +1,7 @@
 import { Quiz } from '@app/model/database/quiz';
 import { Chatlog } from '@common/chatlog';
 import { GameState } from '@common/game-state';
+import { Question } from '@app/model/database/question';
 import { Submission } from '@common/submission';
 import { Socket } from 'socket.io';
 import { ClientPlayer } from './client-player';
@@ -22,7 +23,10 @@ export class Game {
         this.state = GameState.Opened;
     }
 
-    get currentQuestion() {
+    get currentQuestion(): Question | null {
+        if (this.currentQuestionIndex >= this.quiz.questions.length) {
+            return null;
+        }
         return this.quiz.questions[this.currentQuestionIndex];
     }
 

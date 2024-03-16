@@ -19,9 +19,10 @@
         </button>
         <div class="flex-column">
             <button class="start-button" mat-raised-button *ngIf="isLocked()" (click)="startGame()">Commencer</button>
-            <button class="next-button" mat-raised-button *ngIf="isRunning()" (click)="endGame()">Décalisse</button>
-            <button class="next-button" mat-raised-button *ngIf="currentQuestionHasEnded"
-                (click)="nextQuestion()">Question Suivante</button>
+            <button class="next-button" mat-raised-button *ngIf="currentQuestionHasEnded && isLastQuestion" (click)="endGame()">Décalisse</button>
+            <button class="next-button" mat-raised-button *ngIf="currentQuestionHasEnded && !isLastQuestion" (click)="nextQuestion()">
+                Question Suivante
+            </button>
         </div>
     </div>
 </div>
