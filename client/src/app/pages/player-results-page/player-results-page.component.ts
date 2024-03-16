@@ -13,6 +13,8 @@ import { GameService } from '@app/services/game/game-service/game.service';
 export class PlayerResultsPageComponent implements OnInit {
     pin: string;
 
+    // Depends on many services
+    // eslint-disable-next-line max-params
     constructor(
         private readonly activatedRoute: ActivatedRoute,
         private readonly gameHttpService: GameHttpService,

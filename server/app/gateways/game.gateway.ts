@@ -1,4 +1,3 @@
-import { Question } from '@app/model/database/question';
 import { GameService } from '@app/services/game/game.service';
 import { MessageService } from '@app/services/message/message.service';
 import { TimerService } from '@app/services/timer/timer.service';
