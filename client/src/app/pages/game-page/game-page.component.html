@@ -13,8 +13,7 @@
             <app-chat-room [pin]="pin"></app-chat-room>
         </div>
     </div>
-    <div [ngClass]="{hidden:!isStarting && !isLoadingNextQuestion}">
-        <app-game-transition [pin]="pin" [isStarting]="isStarting" [isLoadingNextQuestion]="isLoadingNextQuestion">
-        </app-game-transition>
+    <div class="transition-container">
+        <app-game-transition [pin]="pin" [displayOptions]="{transitionalOnly: true}"></app-game-transition>
     </div>
 </div>

@@ -36,10 +36,10 @@ export class GamePageComponent implements OnInit, OnDestroy {
         gameServicesProvider: GameServicesProvider,
         routingDependenciesProvider: RoutingDependenciesProvider,
     ) {
-        this.activatedRoute = routingDependenciesProvider.activatedRoute;
-        this.router = routingDependenciesProvider.router;
         this.gameService = gameServicesProvider.gameService;
         this.timerService = gameServicesProvider.timerService;
+        this.activatedRoute = routingDependenciesProvider.activatedRoute;
+        this.router = routingDependenciesProvider.router;
     }
 
     ngOnInit() {

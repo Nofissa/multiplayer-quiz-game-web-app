@@ -18,4 +18,8 @@ describe('GameTransitionComponent', () => {
     it('should create', () => {
         expect(component).toBeTruthy();
     });
+
+    it('should call setupSubscriptions', () => {
+
+    });
 });

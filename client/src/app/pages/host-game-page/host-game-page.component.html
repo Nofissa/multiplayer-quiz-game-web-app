@@ -4,6 +4,10 @@
         <app-bar-chart-swiper class="bar-chart" *ngIf="isEnded" [data]="barCharts"></app-bar-chart-swiper>
         <app-bar-chart class="bar-chart" *ngIf="!isEnded && barChart" [data]="barChart"></app-bar-chart>
     </div>
+    <div [ngClass]="{hidden:!isRunning()}">
+        <app-game-transition [pin]="pin"
+            [displayOptions]="{hideTimerOnStartingGame: true, hideTimerOnLoadingNextQuestion:true, keepDisplayingCurrentQuestion:true}"></app-game-transition>
+    </div>
     <div class="main-container">
         <app-player-list [pin]="pin" [displayOptions]="{ score: true, ban: true, quitters: true }"></app-player-list>
         <app-chat-room [pin]="pin"></app-chat-room>

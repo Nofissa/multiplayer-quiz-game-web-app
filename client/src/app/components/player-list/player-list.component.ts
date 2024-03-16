@@ -94,7 +94,7 @@ export class PlayerListComponent implements OnInit, OnDestroy {
             }),
 
             this.gameService.onPlayerBan(pin, (player) => {
-                if (this.playerService.isInGame(this.pin, player)) {
+                if (this.playerService.getCurrentPlayerFromGame(this.pin)?.socketId === player.socketId) {
                     this.router.navigateByUrl('/home');
                 }
 
@@ -102,7 +102,7 @@ export class PlayerListComponent implements OnInit, OnDestroy {
             }),
 
             this.gameService.onPlayerAbandon(pin, (player) => {
-                if (this.playerService.isInGame(this.pin, player)) {
+                if (this.playerService.getCurrentPlayerFromGame(this.pin)?.socketId === player.socketId) {
                     this.router.navigateByUrl('/home');
                 }
 
