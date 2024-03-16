@@ -7,6 +7,7 @@ import { Evaluation } from '@common/evaluation';
 import { GameEventPayload } from '@common/game-event-payload';
 import { GameState } from '@common/game-state';
 import { Player } from '@common/player';
+import { QuestionPayload } from '@common/question-payload';
 import { Submission } from '@common/submission';
 import { TimerEventType } from '@common/timer-event-type';
 import { TimerPayload } from '@common/timer-payload';
@@ -60,7 +61,7 @@ export class GameGateway implements OnGatewayDisconnect {
     startGame(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
         try {
             const data = this.gameService.startGame(client, pin);
-            const payload: GameEventPayload<{ question: Question; isLast: boolean }> = { pin, data };
+            const payload: GameEventPayload<QuestionPayload> = { pin, data };
 
             this.server.to(pin).emit('startGame', payload);
         } catch (error) {
@@ -135,7 +136,7 @@ export class GameGateway implements OnGatewayDisconnect {
     nextQuestion(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
         try {
             const data = this.gameService.nextQuestion(client, pin);
-            const payload: GameEventPayload<{ question: Question; isLast: boolean }> = { pin, data };
+            const payload: GameEventPayload<QuestionPayload> = { pin, data };
             this.server.to(pin).emit('nextQuestion', payload);
         } catch (error) {
             client.emit('error', error.message);

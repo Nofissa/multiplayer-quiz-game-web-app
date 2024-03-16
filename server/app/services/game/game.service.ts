@@ -8,6 +8,8 @@ import { Evaluation } from '@common/evaluation';
 import { GameState } from '@common/game-state';
 import { Player } from '@common/player';
 import { PlayerState } from '@common/player-state';
+import { Question as CommonQuestion } from '@common/question';
+import { QuestionPayload } from '@common/question-payload';
 import { Submission } from '@common/submission';
 import { Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
@@ -133,7 +135,7 @@ export class GameService {
         return evaluation;
     }
 
-    startGame(client: Socket, pin: string): { question: Question; isLast: boolean } {
+    startGame(client: Socket, pin: string): QuestionPayload {
         const game = this.getGame(pin);
 
         if (!this.isOrganizer(game, client.id)) {
@@ -148,7 +150,7 @@ export class GameService {
         game.chatlogs = [];
 
         return {
-            question: game.currentQuestion,
+            question: game.currentQuestion as CommonQuestion,
             isLast: game.currentQuestionIndex === game.quiz.questions.length - 1,
         };
     }
@@ -188,7 +190,7 @@ export class GameService {
         return game.state;
     }
 
-    nextQuestion(client: Socket, pin: string): { question: Question; isLast: boolean } {
+    nextQuestion(client: Socket, pin: string): QuestionPayload {
         const game = this.getGame(pin);
         if (!this.isOrganizer(game, client.id)) {
             throw new Error(`Vous n'êtes pas organisateur de la partie ${pin}`);
@@ -197,7 +199,7 @@ export class GameService {
         game.loadNextQuestion();
 
         return {
-            question: game.currentQuestion,
+            question: game.currentQuestion as CommonQuestion,
             isLast: game.currentQuestionIndex === game.quiz.questions.length - 1,
         };
     }
@@ -228,14 +230,6 @@ export class GameService {
         }
 
         return game.organizer;
-    }
-
-    getGameResults(pin: string): Map<string, Submission>[] {
-        const game = this.getGame(pin);
-        if (!game) {
-            throw new Error(`Aucune partie ne correspond au pin ${pin}`);
-        }
-        return game.allSubmissions;
     }
 
     endGame(pin: string, client: Socket): void {
