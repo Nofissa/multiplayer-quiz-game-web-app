@@ -1,11 +1,10 @@
-/* eslint-disable max-lines */
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable max-lines */ // to many lines because of many mocks that i had to clear and recreate.
+/* eslint-disable @typescript-eslint/no-explicit-any */ // used for mocking the socket for instance.
 import { ClientPlayer } from '@app/classes/client-player';
 import * as PinHelper from '@app/helpers/pin';
 import { DisconnectPayload } from '@app/interfaces/disconnect-payload';
 import { GameService } from '@app/services/game/game.service';
 import { QuizService } from '@app/services/quiz/quiz.service';
-// import { GameInitBundle } from '@common/game-init-bundle';
 import { GameState } from '@common/game-state';
 import { PlayerState } from '@common/player-state';
 import { Socket } from 'socket.io';
