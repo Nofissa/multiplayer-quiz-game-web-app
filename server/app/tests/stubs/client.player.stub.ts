@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-explicit-any */ // used for the socket (i only want the id here)
 import { ClientPlayer } from '@app/classes/client-player';
 import { playerstub } from './player.stub';
 
