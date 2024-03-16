@@ -18,7 +18,7 @@ const BONUS_MULTIPLIER = 1.2;
 
 @Injectable()
 export class GameService {
-    private games: Map<string, Game> = new Map();
+    games: Map<string, Game> = new Map();
 
     constructor(private readonly quizService: QuizService) {}
 
@@ -26,7 +26,7 @@ export class GameService {
         const quiz = await this.quizService.getQuizById(quizId);
 
         if (!quiz) {
-            Promise.reject(`Aucun quiz ne correspond a l'identifiant ${quizId}`);
+            throw new Error(`Aucun quiz ne correspond a l'identifiant ${quizId}`);
         }
 
         let pin = generateRandomPin();
@@ -262,11 +262,16 @@ export class GameService {
         return { toCancel, toAbandon };
     }
 
-    private isOrganizer(game: Game, clientId: string): boolean {
+    getOrganizerId(pin: string): string {
+        const game = this.getGame(pin);
+        return game.organizer.id;
+    }
+
+    isOrganizer(game: Game, clientId: string): boolean {
         return game.organizer.id === clientId;
     }
 
-    private isGoodAnswer(question: Question, submission: Submission): boolean {
+    isGoodAnswer(question: Question, submission: Submission): boolean {
         const correctAnswersIndices = new Set(question.choices.filter((x) => x.isCorrect).map((_, index) => index));
         const selectedAnswersIndices = new Set(submission.choices.filter((x) => x.isSelected).map((x) => x.index));
 
@@ -276,7 +281,7 @@ export class GameService {
         );
     }
 
-    private getOrCreateSubmission(client: Socket, game: Game) {
+    getOrCreateSubmission(client: Socket, game: Game) {
         if (!game.currentQuestionSubmissions.has(client.id)) {
             game.currentQuestionSubmissions.set(client.id, {
                 choices: game.currentQuestion.choices.map((_, index) => {
