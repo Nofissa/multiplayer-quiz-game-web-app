@@ -21,8 +21,10 @@ export class PlayerListComponent implements OnInit, OnDestroy {
     pin: string;
     @Input()
     displayOptions: PlayerListDisplayOptions = {};
-    playerStates = PlayerState;
+    @Input()
     players: Player[] = [];
+
+    playerStates = PlayerState;
 
     private eventSubscriptions: Subscription[] = [];
 

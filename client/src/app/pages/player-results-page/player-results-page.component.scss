@@ -1,5 +1,35 @@
-.grid-container {
+.container {
     display: grid;
-    grid-template-columns: 75% 25%;
-    margin: 30px;
+    grid-template-columns: 55% 45%;
+    grid-template-rows: 100px auto 50px;
+    grid-template-areas:
+        'nav-bar nav-bar'
+        'game-information chat-room';
+    flex-grow: 1;
+    justify-content: center;
+    height: 100vh;
+}
+
+.game-information {
+    grid-area: game-information;
+    align-items: center;
+    margin-right: 20px;
+}
+
+.chat-room {
+    grid-area: chat-room;
+}
+
+.nav-bar {
+    grid-area: nav-bar;
+    padding-bottom: 20px;
+}
+
+.leave-button {
+    margin-top: 20px;
+    font-weight: bold;
+}
+
+.leave-button:hover {
+    transform: scale(0.96);
 }
