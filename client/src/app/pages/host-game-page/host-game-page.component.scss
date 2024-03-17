@@ -6,30 +6,74 @@
 
 .main-container {
     display: grid;
-    grid-template-columns: 66% 34%;
+    grid-template-columns: 55% 45%;
+    grid-template-areas: 'game-information chat-room';
     flex-grow: 1;
     justify-content: center;
 }
 
 .buttons-wrapper {
-    display: flex;
-    justify-content: space-around;
+    width: 100%;
+    height: 100px;
+    display: grid;
     align-items: center;
+    grid-template-columns: 20px 100px 100px auto;
+    grid-template-areas: 'end-button end-button lock-button action-button';
 }
 
 .lock-button {
-    height: 100px;
-    width: 100px;
-    grid-area: lock-button;
+    height: 75px;
+    width: 75px;
     justify-self: center;
+    grid-area: lock-button;
 }
 
-.lock-icon {
-    font-size: 100px;
+.lock-button.mat-mdc-raised-button.mat-unthemed {
+    background-color: var(--main-bg-color);
+    --mdc-protected-button-label-text-color: white;
+}
+
+.start-button {
+    background-color: white;
+    justify-self: right;
+    margin: 20px;
+}
+
+.next-button {
+    background-color: white;
+    justify-self: right;
+    margin: 20px;
+}
+
+.action-button {
+    display: grid;
+    grid-area: action-button;
+}
+
+.end-button {
+    width: 75px;
+    height: 75px;
+    grid-area: end-button;
+    margin-left: 20px;
+}
+
+.end-button.mat-mdc-raised-button.mat-unthemed {
+    background-color: var(--main-bg-color);
+    --mdc-protected-button-label-text-color: white;
+}
+
+.end-button.mat-mdc-raised-button.mat-unthemed:hover {
+    background-color: red;
+}
+
+.icon {
+    font-size: 150px;
+    left: 5px;
 }
 
 .nav-header {
     grid-area: nav-header;
+    padding-bottom: 20px;
 }
 
 .bar-chart {
@@ -40,26 +84,11 @@
 
 .chat-room {
     margin: 10px;
+    margin-right: 20px;
     grid-area: chat-room;
-    justify-self: center;
 }
 
-.start-button {
-    grid-area: button;
-    background-color: white;
-}
-
-.next-button {
-    grid-area: button;
-    background-color: white;
-}
-
-app-player-list {
-    display: flex;
-    justify-content: center;
-}
-
-app-chat-room {
+.app-component {
     display: flex;
     justify-content: center;
 }
