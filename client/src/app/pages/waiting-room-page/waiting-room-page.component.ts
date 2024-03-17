@@ -9,7 +9,7 @@ import { GameService } from '@app/services/game/game-service/game.service';
 import { PlayerService } from '@app/services/player/player.service';
 import { Subscription } from 'rxjs';
 
-const CANCEL_GAME_NOTICE_DURATION_MS = 5000;
+const NOTICE_DURATION_MS = 5000;
 
 @Component({
     selector: 'app-waiting-room-page',
@@ -76,7 +76,7 @@ export class WaitingRoomPageComponent implements OnInit, OnDestroy {
         this.eventSubscriptions.push(
             this.gameService.onCancelGame(pin, (message) => {
                 this.snackBarService.open(message, '', {
-                    duration: CANCEL_GAME_NOTICE_DURATION_MS,
+                    duration: NOTICE_DURATION_MS,
                     verticalPosition: 'top',
                     panelClass: ['base-snackbar'],
                 });
@@ -86,6 +86,11 @@ export class WaitingRoomPageComponent implements OnInit, OnDestroy {
 
             this.gameService.onPlayerBan(pin, (player) => {
                 if (this.playerService.getCurrentPlayer(pin)?.socketId === player.socketId) {
+                    this.snackBarService.open(`Vous avez été banni de la partie ${pin}`, '', {
+                        duration: NOTICE_DURATION_MS,
+                        verticalPosition: 'top',
+                        panelClass: ['base-snackbar'],
+                    });
                     this.router.navigateByUrl('/home');
                 }
             }),
