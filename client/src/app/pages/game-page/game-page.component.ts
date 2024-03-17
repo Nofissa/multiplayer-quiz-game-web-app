@@ -7,10 +7,11 @@ import { RoutingDependenciesProvider } from '@app/providers/routing-dependencies
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { TimerService } from '@app/services/timer/timer.service';
-import { GameState } from '@common/game-state';
 import { TimerEventType } from '@common/timer-event-type';
 import { Subscription } from 'rxjs';
 
+const START_GAME_COUNTDOWN_DURATION_SECONDS = 5;
+const NEXT_QUESTION_DELAY_SECONDS = 3;
 const CANCEL_GAME_NOTICE_DURATION_MS = 5000;
 
 @Component({
@@ -22,10 +23,12 @@ export class GamePageComponent implements OnInit, OnDestroy {
     pin: string;
     isTest: boolean;
 
-    isStarting: boolean;
-    isLoadingNextQuestion: boolean;
+    isStarting: boolean = false;
+    isLoadingNextQuestion: boolean = false;
+    hasStarted: boolean = false;
+    currentQuestionHasEnded: boolean = false;
+    isLastQuestion: boolean = false;
 
-    private gameState: GameState;
     private eventSubscriptions: Subscription[] = [];
 
     private readonly activatedRoute: ActivatedRoute;
@@ -69,8 +72,16 @@ export class GamePageComponent implements OnInit, OnDestroy {
         });
     }
 
-    isPaused(): boolean {
-        return this.gameState === GameState.Paused;
+    startGame() {
+        this.gameService.startGame(this.pin);
+    }
+
+    nextQuestion() {
+        this.gameService.nextQuestion(this.pin);
+    }
+
+    endGame() {
+        this.gameService.endGame(this.pin);
     }
 
     private setupSubscriptions(pin: string) {
@@ -91,9 +102,42 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
             this.timerService.onStartTimer(pin, (payload) => {
                 if (payload.eventType === TimerEventType.StartGame) {
+                    this.hasStarted = true;
                     this.isStarting = true;
                 } else if (payload.eventType === TimerEventType.NextQuestion) {
+                    this.currentQuestionHasEnded = false;
                     this.isLoadingNextQuestion = true;
+                }
+            }),
+
+            this.gameService.onStartGame(pin, (payload) => {
+                if (!this.isTest) {
+                    return;
+                }
+
+                if (payload.isLast) {
+                    this.isLastQuestion = true;
+                }
+
+                this.timerService.startTimer(this.pin, TimerEventType.StartGame, START_GAME_COUNTDOWN_DURATION_SECONDS);
+            }),
+
+            this.gameService.onNextQuestion(pin, (payload) => {
+                if (!this.isTest) {
+                    return;
+                }
+
+                if (payload.isLast) {
+                    this.isLastQuestion = true;
+                }
+
+                this.timerService.startTimer(this.pin, TimerEventType.NextQuestion, NEXT_QUESTION_DELAY_SECONDS);
+            }),
+
+            this.gameService.onSubmitChoices(pin, (evaluation) => {
+                if (this.isTest && evaluation.isLast) {
+                    this.currentQuestionHasEnded = true;
+                    this.timerService.stopTimer(pin);
                 }
             }),
 
@@ -101,8 +145,14 @@ export class GamePageComponent implements OnInit, OnDestroy {
                 if (!payload.remainingTime) {
                     if (payload.eventType === TimerEventType.StartGame) {
                         this.isStarting = false;
+                        if (this.isTest) {
+                            this.timerService.startTimer(pin, TimerEventType.Question);
+                        }
                     } else if (payload.eventType === TimerEventType.NextQuestion) {
                         this.isLoadingNextQuestion = false;
+                        if (this.isTest) {
+                            this.timerService.startTimer(pin, TimerEventType.Question);
+                        }
                     }
                 }
             }),
