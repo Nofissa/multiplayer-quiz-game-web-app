@@ -147,7 +147,6 @@ export class GameService {
         }
 
         game.state = GameState.Running;
-        game.chatlogs = [];
 
         return {
             question: game.currentQuestion as CommonQuestion,
