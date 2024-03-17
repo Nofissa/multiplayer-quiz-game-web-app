@@ -75,5 +75,23 @@ describe('TimerService', () => {
             expect(setIntervalSpy).toHaveBeenCalledTimes(2);
             timerService.stopTimer('somePin');
         });
+
+        it('should', () => {
+            const TIME = 10;
+            socketMock = { id: 'organizerId' } as jest.Mocked<Socket>;
+            jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(gameStub());
+            const setIntervalSpy = jest.spyOn(global, 'setInterval');
+            const clearIntervalSpy = jest.spyOn(global, 'clearInterval');
+
+            // Call startTimer twice to simulate timer reset
+            timerService.startTimer(socketMock, 'somePin', TIME, jest.fn());
+            const remainingTime = timerService.startTimer(socketMock, 'somePin', TIME, jest.fn());
+
+            // Verify that the timer is reset and remaining time is returned
+            expect(remainingTime).toEqual(TIME);
+            expect(clearIntervalSpy).toHaveBeenCalledTimes(1);
+            expect(setIntervalSpy).toHaveBeenCalledTimes(2);
+            timerService.stopTimer('somePin');
+        });
     });
 });
