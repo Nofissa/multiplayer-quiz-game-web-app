@@ -7,7 +7,7 @@ import { GameEventPayload } from '@common/game-event-payload';
 import { GameState } from '@common/game-state';
 import { Player } from '@common/player';
 import { QuestionPayload } from '@common/question-payload';
-import { Submission } from '@common/submission';
+import { SubmissionPayload } from '@common/submission-payload';
 import { TimerEventType } from '@common/timer-event-type';
 import { TimerPayload } from '@common/timer-payload';
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
@@ -148,7 +148,7 @@ export class GameGateway implements OnGatewayDisconnect {
         try {
             const submission = this.gameService.toggleSelectChoice(client, pin, choiceIndex);
             const organizer = this.gameService.getOrganizer(pin);
-            const payload: GameEventPayload<{ clientId: string; submission: Submission }> = { pin, data: submission };
+            const payload: GameEventPayload<SubmissionPayload> = { pin, data: submission };
 
             organizer.emit('toggleSelectChoice', payload);
         } catch (error) {
@@ -205,15 +205,6 @@ export class GameGateway implements OnGatewayDisconnect {
             this.gameService.endGame(pin, client);
             const payload: GameEventPayload<null> = { pin, data: null };
             this.server.to(pin).emit('endGame', payload);
-        } catch (error) {
-            client.emit('error', error.message);
-        }
-    }
-
-    @SubscribeMessage('playerLeaveGameEnd')
-    playerLeaveGameEnd(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
-        try {
-            client.leave(pin);
         } catch (error) {
             client.emit('error', error.message);
         }
