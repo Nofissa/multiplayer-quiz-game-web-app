@@ -218,27 +218,25 @@ export class GameService {
             throw new Error(`Vous n'êtes pas organisateur de la partie ${pin}`);
         }
 
-        game.state = GameState.Ended;
+        this.games.delete(pin);
     }
 
     disconnect(client: Socket): DisconnectPayload {
-        const toCancel = [];
-        const toAbandon = [];
-        const gameEntries = Array.from(this.games.entries());
+        const games = Array.from(this.games.values());
 
-        gameEntries
-            .filter(([, game]) => game.organizer.id === client.id)
-            .forEach(([pin]) => {
-                toCancel.push(pin);
-            });
+        const toCancel = games
+            .filter((game) => game.organizer.id === client.id && (game.state === GameState.Opened || game.state === GameState.Closed))
+            .map((game) => game.pin);
 
-        gameEntries
-            .filter(([, game]) => Array.from(game.clientPlayers.values()).some((x) => x.socket.id === client.id))
-            .forEach(([pin]) => {
-                toAbandon.push(pin);
-            });
+        const toAbandon = games
+            .filter((game) => Array.from(game.clientPlayers.values()).some((x) => x.socket.id === client.id))
+            .map((game) => game.pin);
 
-        return { toCancel, toAbandon };
+        const toEnd = games
+            .filter((game) => game.organizer.id === client.id && (game.state === GameState.Paused || game.state === GameState.Running))
+            .map((game) => game.pin);
+
+        return { toCancel, toAbandon, toEnd };
     }
 
     getGame(pin: string): Game {
