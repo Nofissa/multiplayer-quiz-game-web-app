@@ -1,54 +1,58 @@
 h3 {
     font-size: 20px;
-    text-align: center; /* Center text inside h3 */
+    text-align: center;
 }
 
 .container {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 55% 45%;
+    grid-template-rows: 100px auto 50px;
+    grid-template-areas:
+        'nav-bar nav-bar'
+        'game-information chat-room';
+    flex-grow: 1;
+    justify-content: center;
     height: 100vh;
 }
 
-.waiting-area {
-    display: flex;
-    flex-direction: column;
+.game-information {
+    grid-area: game-information;
+    height: max-content;
     align-items: center;
-    justify-content: center;
-    flex-grow: 3;
+    padding: 20px;
+}
+
+.chat-room-container {
+    grid-area: chat-room;
+    align-items: center;
     height: 100%;
 }
 
-.grid-container {
-    display: grid;
-    grid-template-columns: 66% 34%;
-    flex-grow: 1;
+.chat-room-container > * {
+    height: 100%;
 }
 
-.grid-container > * {
-    margin: 15px;
+.nav-bar {
+    grid-area: nav-bar;
 }
 
-.player-list-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
+.waiting-area {
+    margin: 30px;
 }
 
-app-player-list {
-    width: 100%;
-    display: flex;
-    justify-content: center;
+.players {
+    width: 90%;
 }
 
-app-chat-room {
-    display: flex;
-    justify-content: center;
-}
-
-.abandon-button {
-    margin-top: 15px;
+.leave-button {
+    position: absolute;
+    bottom: 50px;
+    font-weight: bold;
     width: fit-content;
+}
+
+.leave-button:hover {
+    transform: scale(0.96);
 }
 
 .loader-wrapper {
