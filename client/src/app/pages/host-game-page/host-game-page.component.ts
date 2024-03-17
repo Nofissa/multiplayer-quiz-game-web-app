@@ -95,9 +95,7 @@ export class HostGamePageComponent implements OnInit {
     }
 
     startGame() {
-        this.gameState = GameState.Running;
         this.gameService.startGame(this.pin);
-        this.timerService.startTimer(this.pin, TimerEventType.StartGame, START_GAME_COUNTDOWN_DURATION_SECONDS);
     }
 
     nextQuestion() {
@@ -143,7 +141,9 @@ export class HostGamePageComponent implements OnInit {
 
             this.gameService.onStartGame(pin, (data) => {
                 this.isLastQuestion = data.isLast;
+                this.gameState = GameState.Running;
                 this.barChartService.addQuestion(data.question);
+                this.timerService.startTimer(this.pin, TimerEventType.StartGame, START_GAME_COUNTDOWN_DURATION_SECONDS);
             }),
 
             this.gameService.onNextQuestion(pin, (data) => {
