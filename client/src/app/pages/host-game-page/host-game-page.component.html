@@ -1,18 +1,18 @@
 <div class="container">
     <app-nav-header class="nav-header" [backArrow]="false" [pin]="pin"></app-nav-header>
-    <div *ngIf="isRunning()">
-        <app-bar-chart-swiper class="bar-chart" *ngIf="isEnded" [data]="barCharts"></app-bar-chart-swiper>
-    </div>
-
     <div class="main-container">
-        <div [ngClass]="{ hidden: !isRunning() }">
-            <app-game-transition
-                [pin]="pin"
-                [displayOptions]="{ hideTimerOnStartingGame: true, hideTimerOnLoadingNextQuestion: true, keepDisplayingCurrentQuestion: true }"
-            ></app-game-transition>
+        <div class="game-information flex-column">
+            <div [ngClass]="{ hidden: !isRunning() }">
+                <app-game-transition
+                    [pin]="pin"
+                    [displayOptions]="{ hideTimerOnStartingGame: true, hideTimerOnLoadingNextQuestion: true, keepDisplayingCurrentQuestion: true }"
+                ></app-game-transition>
+            </div>
+            <div *ngIf="isRunning()">
+                <app-bar-chart-swiper class="bar-chart" *ngIf="isEnded" [data]="barCharts"></app-bar-chart-swiper>
+            </div>
+            <app-player-list class="app-component" [pin]="pin" [displayOptions]="{ score: true, ban: true, quitters: true }"></app-player-list>
         </div>
-
-        <app-player-list class="app-component" [pin]="pin" [displayOptions]="{ score: true, ban: true, quitters: true }"></app-player-list>
         <app-chat-room class="app-component" [pin]="pin"></app-chat-room>
     </div>
     <div class="buttons-wrapper">
@@ -28,9 +28,7 @@
             <button class="next-button" mat-raised-button *ngIf="currentQuestionHasEnded && !isLastQuestion" (click)="nextQuestion()">
                 Question Suivante
             </button>
-            <button class="next-button" mat-raised-button *ngIf="currentQuestionHasEnded && isLastQuestion" (click)="endGame()">
-                Résultats
-            </button>
+            <button class="next-button" mat-raised-button *ngIf="currentQuestionHasEnded && isLastQuestion" (click)="endGame()">Résultats</button>
         </div>
     </div>
 </div>
