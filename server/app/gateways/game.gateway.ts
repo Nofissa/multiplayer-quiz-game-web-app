@@ -200,7 +200,7 @@ export class GameGateway implements OnGatewayDisconnect {
     }
 
     @SubscribeMessage('endGame')
-    handleEndGame(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
+    endGame(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
         try {
             this.gameService.endGame(pin, client);
             const payload: GameEventPayload<null> = { pin, data: null };
@@ -225,8 +225,13 @@ export class GameGateway implements OnGatewayDisconnect {
         payload.toCancel.forEach((pin) => {
             this.cancelGame(client, { pin });
         });
+
         payload.toAbandon.forEach((pin) => {
             this.playerAbandon(client, { pin });
+        });
+
+        payload.toEnd.forEach((pin) => {
+            this.endGame(client, { pin });
         });
     }
 }
