@@ -71,6 +71,7 @@ export class GameGateway implements OnGatewayDisconnect {
     @SubscribeMessage('cancelGame')
     cancelGame(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
         try {
+            this.timerService.stopTimer(client, pin);
             const message = this.gameService.cancelGame(client, pin);
             const payload: GameEventPayload<string> = { pin, data: message };
 
@@ -155,6 +156,18 @@ export class GameGateway implements OnGatewayDisconnect {
         }
     }
 
+    @SubscribeMessage('endGame')
+    handleEndGame(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
+        try {
+            this.timerService.stopTimer(client, pin);
+            this.gameService.endGame(client, pin);
+            const payload: GameEventPayload<null> = { pin, data: null };
+            this.server.to(pin).emit('endGame', payload);
+        } catch (error) {
+            client.emit('error', error.message);
+        }
+    }
+
     @SubscribeMessage('startTimer')
     startTimer(
         @ConnectedSocket() client: Socket,
@@ -193,26 +206,6 @@ export class GameGateway implements OnGatewayDisconnect {
             const payload: GameEventPayload<Chatlog> = { pin, data: chatlog };
 
             this.server.to(pin).emit('sendMessage', payload);
-        } catch (error) {
-            client.emit('error', error.message);
-        }
-    }
-
-    @SubscribeMessage('endGame')
-    handleEndGame(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
-        try {
-            this.gameService.endGame(pin, client);
-            const payload: GameEventPayload<null> = { pin, data: null };
-            this.server.to(pin).emit('endGame', payload);
-        } catch (error) {
-            client.emit('error', error.message);
-        }
-    }
-
-    @SubscribeMessage('playerLeaveGameEnd')
-    playerLeaveGameEnd(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
-        try {
-            client.leave(pin);
         } catch (error) {
             client.emit('error', error.message);
         }

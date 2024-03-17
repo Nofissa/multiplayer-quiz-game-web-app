@@ -211,27 +211,8 @@ export class GameService {
         return { clientId: client.id, submission };
     }
 
-    getGame(pin: string): Game {
-        const game = this.games.get(pin);
+    endGame(client: Socket, pin: string): void {
 
-        if (!game) {
-            throw new Error(`Aucune partie ne correspond au pin ${pin}`);
-        }
-
-        return game;
-    }
-
-    getOrganizer(pin: string): Socket {
-        const game = this.games.get(pin);
-
-        if (!game) {
-            throw new Error(`Aucune partie ne correspond au pin ${pin}`);
-        }
-
-        return game.organizer;
-    }
-
-    endGame(pin: string, client: Socket): void {
         const game = this.getGame(pin);
 
         if (!this.isOrganizer(game, client.id)) {
@@ -261,9 +242,24 @@ export class GameService {
         return { toCancel, toAbandon };
     }
 
-    getOrganizerId(pin: string): string {
-        const game = this.getGame(pin);
-        return game.organizer.id;
+    getGame(pin: string): Game {
+        const game = this.games.get(pin);
+
+        if (!game) {
+            throw new Error(` ucune partie ne correspond au pin ${pin}`);
+        }
+
+        return game;
+    }
+
+    getOrganizer(pin: string): Socket {
+        const game = this.games.get(pin);
+
+        if (!game) {
+            throw new Error(`Aucune partie ne correspond au pin ${pin}`);
+        }
+
+        return game.organizer;
     }
 
     isOrganizer(game: Game, clientId: string): boolean {
