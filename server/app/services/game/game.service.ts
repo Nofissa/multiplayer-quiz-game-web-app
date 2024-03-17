@@ -212,7 +212,6 @@ export class GameService {
     }
 
     endGame(client: Socket, pin: string): void {
-
         const game = this.getGame(pin);
 
         if (!this.isOrganizer(game, client.id)) {
@@ -267,7 +266,15 @@ export class GameService {
     }
 
     isGoodAnswer(question: Question, submission: Submission): boolean {
-        const correctAnswersIndices = new Set(question.choices.filter((x) => x.isCorrect).map((_, index) => index));
+        const correctAnswersIndices = new Set(
+            question.choices.reduce((indices, choice, index) => {
+                if (choice.isCorrect) {
+                    indices.push(index);
+                }
+
+                return indices;
+            }, []),
+        );
         const selectedAnswersIndices = new Set(submission.choices.filter((x) => x.isSelected).map((x) => x.index));
 
         return (
