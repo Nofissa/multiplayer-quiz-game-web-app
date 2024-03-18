@@ -23,7 +23,7 @@ import { Server, Socket } from 'socket.io';
 })
 export class GameGateway implements OnGatewayDisconnect {
     @WebSocketServer()
-    private server: Server;
+    server: Server;
 
     constructor(
         private readonly gameService: GameService,

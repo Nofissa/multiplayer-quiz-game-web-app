@@ -63,6 +63,7 @@ describe('GameService', () => {
 
             expect(result).toBeTruthy();
             expect(result).toEqual('mockedPinValue');
+            expect(PinHelper.generateRandomPin).toHaveBeenCalled();
             expect(gameService.getGame(result)).toBeDefined();
         });
 
