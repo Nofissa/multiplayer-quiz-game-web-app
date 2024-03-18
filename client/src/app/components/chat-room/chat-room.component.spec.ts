@@ -108,23 +108,27 @@ describe('ChatRoomComponent', () => {
     it('should create', () => {
         expect(component).toBeTruthy();
     });
+
     it('should initialize and fetch initial chatlogs', () => {
         mockGameHttpService.getGameSnapshotByPin.and.returnValue(of(mockGameSnapshot));
         component.ngOnInit();
         expect(mockGameHttpService.getGameSnapshotByPin).toHaveBeenCalledWith('1234');
         expect(component.chatlogs).toEqual(mockGameSnapshot.chatlogs);
     });
+
     it('should send a message and clear input when valid', () => {
         component.input = 'Test message';
         component.sendMessage();
         expect(mockMessageService.sendMessage).toHaveBeenCalledWith('1234', 'Test message');
         expect(component.input).toBe('');
     });
+
     it('should not send a message if input is only whitespace', () => {
         component.input = '   ';
         component.sendMessage();
         expect(mockMessageService.sendMessage).not.toHaveBeenCalled();
     });
+
     it('should validate message as invalid if it contains only whitespace', () => {
         const messageControl = component.formGroup.get('message');
         if (messageControl) {
@@ -136,39 +140,46 @@ describe('ChatRoomComponent', () => {
             fail('Message control does not exist');
         }
     });
+
     it('should identify if the message author is the current user', () => {
         mockPlayerService.getCurrentPlayer.and.returnValue(mockPlayers[0]);
         expect(component.isCurrentUser('TestUser')).toBeTrue();
         expect(component.isCurrentUser('otherUser')).toBeFalse();
     });
+
     it('should call sendMessage on Enter key', () => {
         spyOn(component, 'sendMessage');
         const event = new KeyboardEvent('keydown', { key: 'Enter' });
         component.handleKeyDown(event);
         expect(component.sendMessage).toHaveBeenCalled();
     });
+
     it('should update remaining input count on other keys', () => {
         component.input = 'Test';
         const event = new KeyboardEvent('keydown', { key: 'a' });
         component.handleKeyDown(event);
         expect(component.remainigInputCount).toBe(MAX_MESSAGE_LENGTH - component.input.length);
     });
+
     it('should update the remaining input count correctly', () => {
         component.input = 'Test';
         component.updateRemainingInputCount();
         expect(component.remainigInputCount).toBe(MAX_MESSAGE_LENGTH - component.input.length);
     });
+
     it('should add new chatlog message to chatlogs', () => {
         const testChatlog: Chatlog = { author: 'Test', message: 'New message', date: new Date() };
         component.ngOnInit();
         mockMessageService.onSendMessage.calls.mostRecent().args[1](testChatlog);
         expect(component.chatlogs).toContain(testChatlog);
     });
+
     it('should clear chatlogs when game starts', () => {
         component.ngOnInit();
         mockGameService.onStartGame.calls.mostRecent().args[1](mockQuestionPayload);
         expect(component.chatlogs).toEqual([]);
     });
+
     it('should unsubscribe from all subscriptions on destroy', () => {
         const mockSub1 = new Subscription();
         const mockSub2 = new Subscription();
