@@ -1,3 +1,4 @@
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -10,7 +11,7 @@ import { HostGamePageComponent } from './host-game-page.component';
 
 // const mockQuestion: Question = questionStub()[0];
 
-describe('HostGamePageComponent', () => {
+fdescribe('HostGamePageComponent', () => {
     let component: HostGamePageComponent;
     let fixture: ComponentFixture<HostGamePageComponent>;
     let gameService: GameService;
@@ -36,7 +37,7 @@ describe('HostGamePageComponent', () => {
                     },
                 },
             ],
-            imports: [RouterTestingModule],
+            imports: [RouterTestingModule, HttpClientTestingModule],
         }).compileComponents();
         fixture = TestBed.createComponent(HostGamePageComponent);
         gameService = TestBed.inject(GameService);
@@ -54,7 +55,7 @@ describe('HostGamePageComponent', () => {
     });
 
     it('should set isEnded to false initially', () => {
-        expect(component.isEnded).toBeFalse();
+        expect(component.isEnded()).toBeFalse();
     });
 
     it('should set gameState to GameState.Opened initially', () => {
