@@ -138,13 +138,14 @@ describe('PlayerListComponent', () => {
     });
 
     it('should handle setting up subscriptions', () => {
-        const dummyPin = '123';
+        component.pin = '123';
+
         spyOn(gameService, 'onSubmitChoices').and.returnValue(new Subscription());
         spyOn(gameService, 'onJoinGame').and.returnValue(new Subscription());
         spyOn(gameService, 'onPlayerBan').and.returnValue(new Subscription());
         spyOn(gameService, 'onPlayerAbandon').and.returnValue(new Subscription());
         spyOn(gameService, 'onStartGame').and.returnValue(new Subscription());
-        component['setupSubscription'](dummyPin);
+        component.ngOnInit();
         expect(gameService.onSubmitChoices).toHaveBeenCalled();
         expect(gameService.onJoinGame).toHaveBeenCalled();
         expect(gameService.onPlayerBan).toHaveBeenCalled();
