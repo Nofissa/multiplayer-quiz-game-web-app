@@ -4,6 +4,8 @@ import { TimerService } from '@app/services/timer/timer.service';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { io } from 'socket.io-client';
 import { Observable, Observer, of } from 'rxjs';
+import { TimerPayload } from '@common/timer-payload';
+import { TimerEventType } from '@common/timer-event-type';
 
 describe('TimerComponent', () => {
     let component: TimerComponent;
@@ -47,7 +49,6 @@ describe('TimerComponent', () => {
     beforeEach(() => {
         fixture = TestBed.createComponent(TimerComponent);
         component = fixture.componentInstance;
-        // timerServiceSpy = TestBed.inject(TimerService) as jasmine.SpyObj<TimerService>;
         fixture.detectChanges();
     });
 
@@ -72,9 +73,10 @@ describe('TimerComponent', () => {
     it('should update remaining time and maxDuration on onStartTimer', () => {
         component.pin = stubData.pin;
 
-        timerServiceSpy.onStartTimer.and.callFake((_pin: string, callback: (remainingTime: number) => void) => {
-            callback(stubData.maxDuration);
-            return of(stubData.maxDuration).subscribe(callback);
+        timerServiceSpy.onStartTimer.and.callFake((_pin: string, callback: (payload: TimerPayload) => void) => {
+            const payload = { remainingTime: stubData.maxDuration, eventType: TimerEventType.Question };
+            callback(payload);
+            return of(payload).subscribe(callback);
         });
         component.ngOnInit();
 
@@ -85,9 +87,10 @@ describe('TimerComponent', () => {
     it('should update remaining time on onTimerTick', () => {
         component.pin = stubData.pin;
 
-        timerServiceSpy.onTimerTick.and.callFake((_pin: string, callback: (remainingTime: number) => void) => {
-            callback(stubData.remainingTime);
-            return of(stubData.remainingTime).subscribe(callback);
+        timerServiceSpy.onTimerTick.and.callFake((_pin: string, callback: (payload: TimerPayload) => void) => {
+            const payload = { remainingTime: stubData.remainingTime, eventType: TimerEventType.Question };
+            callback(payload);
+            return of(payload).subscribe(callback);
         });
         component.ngOnInit();
 
@@ -95,8 +98,17 @@ describe('TimerComponent', () => {
     });
 
     it('should close subscriptions on ngOnDestroy', () => {
-        timerServiceSpy.onStartTimer.and.returnValue(of(stubData.maxDuration).subscribe());
-        timerServiceSpy.onTimerTick.and.returnValue(of(stubData.remainingTime).subscribe());
+        const payload = { remainingTime: stubData.remainingTime, eventType: TimerEventType.Question };
+        timerServiceSpy.onStartTimer.and.callFake(() => {
+            const sub = of(payload).subscribe();
+            sub.closed = false;
+            return sub;
+        });
+        timerServiceSpy.onTimerTick.and.callFake(() => {
+            const sub = of(payload).subscribe();
+            sub.closed = false;
+            return sub;
+        });
 
         component.pin = stubData.pin;
         component.ngOnInit();
