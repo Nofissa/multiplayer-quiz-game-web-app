@@ -1,3 +1,4 @@
+import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -62,6 +63,15 @@ export class HostGamePageComponent implements OnInit {
 
     ngOnInit() {
         this.pin = this.activatedRoute.snapshot.queryParams['pin'];
+
+        this.gameHttpService.getGameSnapshotByPin(this.pin).subscribe({
+            error: (error: HttpErrorResponse) => {
+                if (error.status === HttpStatusCode.NotFound) {
+                    this.router.navigateByUrl('/home');
+                }
+            },
+        });
+
         this.barChartService = new BarChartService();
         this.setupSubscriptions(this.pin);
     }
@@ -83,9 +93,7 @@ export class HostGamePageComponent implements OnInit {
     }
 
     startGame() {
-        this.gameState = GameState.Running;
         this.gameService.startGame(this.pin);
-        this.timerService.startTimer(this.pin, TimerEventType.StartGame, START_GAME_COUNTDOWN_DURATION_SECONDS);
     }
 
     nextQuestion() {
@@ -139,7 +147,9 @@ export class HostGamePageComponent implements OnInit {
 
             this.gameService.onStartGame(pin, (data) => {
                 this.isLastQuestion = data.isLast;
+                this.gameState = GameState.Running;
                 this.barChartService.addQuestion(data.question);
+                this.timerService.startTimer(this.pin, TimerEventType.StartGame, START_GAME_COUNTDOWN_DURATION_SECONDS);
             }),
 
             this.gameService.onNextQuestion(pin, (data) => {

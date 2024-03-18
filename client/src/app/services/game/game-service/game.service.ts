@@ -5,7 +5,7 @@ import { Evaluation } from '@common/evaluation';
 import { GameState } from '@common/game-state';
 import { Player } from '@common/player';
 import { QuestionPayload } from '@common/question-payload';
-import { Submission } from '@common/submission';
+import { SubmissionPayload } from '@common/submission-payload';
 import { Subscription } from 'rxjs';
 
 @Injectable({
@@ -66,7 +66,7 @@ export class GameService {
         this.webSocketService.emit('toggleSelectChoice', { pin, choiceIndex });
     }
 
-    onToggleSelectChoice(pin: string, callback: (payload: { clientId: string; submission: Submission }) => void): Subscription {
+    onToggleSelectChoice(pin: string, callback: (payload: SubmissionPayload) => void): Subscription {
         return this.webSocketService.on('toggleSelectChoice', applyIfPinMatches(pin, callback));
     }
 

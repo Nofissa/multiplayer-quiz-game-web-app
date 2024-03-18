@@ -1,6 +1,9 @@
+import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BarChartData } from '@app/interfaces/bar-chart-data';
+import { GameServicesProvider } from '@app/providers/game-services.provider';
+import { RoutingDependenciesProvider } from '@app/providers/routing-dependencies.provider';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { BarChartService } from '@app/services/game/bar-chart-service/bar-chart.service';
 import { Player } from '@common/player';
@@ -12,6 +15,13 @@ import { Player } from '@common/player';
 })
 export class PlayerResultsPageComponent implements OnInit {
     pin: string;
+<<<<<<< client/src/app/pages/player-results-page/player-results-page.component.ts
+
+    private readonly activatedRoute: ActivatedRoute;
+    private readonly router: Router;
+    private readonly gameHttpService: GameHttpService;
+    private readonly gameService: GameService;
+
     players: Player[] = [];
     // Depends on many services
     // eslint-disable-next-line max-params
@@ -20,7 +30,14 @@ export class PlayerResultsPageComponent implements OnInit {
         private readonly gameHttpService: GameHttpService,
         private readonly router: Router,
         private readonly barChartService: BarChartService,
-    ) {}
+        routingDependenciesProvider: RoutingDependenciesProvider,
+        gameServicesProvider: GameServicesProvider,
+    ) {
+        this.activatedRoute = routingDependenciesProvider.activatedRoute;
+        this.router = routingDependenciesProvider.router;
+        this.gameHttpService = gameServicesProvider.gameHttpService;
+        this.gameService = gameServicesProvider.gameService;
+    }
 
     get chartData(): BarChartData[] | undefined {
         return this.barChartService.getAllBarChart();
@@ -28,9 +45,17 @@ export class PlayerResultsPageComponent implements OnInit {
 
     ngOnInit() {
         this.pin = this.activatedRoute.snapshot.queryParams['pin'];
-        this.gameHttpService.getGameSnapshotByPin(this.pin).subscribe((snapshot) => {
-            this.barChartService.setData({ submissions: snapshot.questionSubmissions, questions: snapshot.quiz.questions });
-            this.players = snapshot.players;
+
+        this.gameHttpService.getGameSnapshotByPin(this.pin).subscribe({
+            next: (snapshot) => {
+                this.barChartService.setData({ submissions: snapshot.questionSubmissions, questions: snapshot.quiz.questions });
+                this.players = snapshot.players;
+            },
+            error: (error: HttpErrorResponse) => {
+                if (error.status === HttpStatusCode.NotFound) {
+                    this.router.navigateByUrl('/home');
+                }
+            },
         });
     }
 
