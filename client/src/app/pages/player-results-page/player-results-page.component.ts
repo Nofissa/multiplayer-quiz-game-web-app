@@ -15,20 +15,15 @@ import { Player } from '@common/player';
 })
 export class PlayerResultsPageComponent implements OnInit {
     pin: string;
-<<<<<<< client/src/app/pages/player-results-page/player-results-page.component.ts
+    players: Player[] = [];
 
     private readonly activatedRoute: ActivatedRoute;
     private readonly router: Router;
     private readonly gameHttpService: GameHttpService;
-    private readonly gameService: GameService;
 
-    players: Player[] = [];
     // Depends on many services
     // eslint-disable-next-line max-params
     constructor(
-        private readonly activatedRoute: ActivatedRoute,
-        private readonly gameHttpService: GameHttpService,
-        private readonly router: Router,
         private readonly barChartService: BarChartService,
         routingDependenciesProvider: RoutingDependenciesProvider,
         gameServicesProvider: GameServicesProvider,
@@ -36,7 +31,6 @@ export class PlayerResultsPageComponent implements OnInit {
         this.activatedRoute = routingDependenciesProvider.activatedRoute;
         this.router = routingDependenciesProvider.router;
         this.gameHttpService = gameServicesProvider.gameHttpService;
-        this.gameService = gameServicesProvider.gameService;
     }
 
     get chartData(): BarChartData[] | undefined {
