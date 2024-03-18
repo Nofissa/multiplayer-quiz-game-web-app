@@ -11,6 +11,7 @@ import { GameSnapshot } from '@common/game-snapshot';
 import { GameState } from '@common/game-state';
 import { Player } from '@common/player';
 import { PlayerState } from '@common/player-state';
+import { QuestionPayload } from '@common/question-payload';
 import { Quiz } from '@common/quiz';
 import { Submission } from '@common/submission';
 import { Subscription, of } from 'rxjs';
@@ -57,7 +58,13 @@ describe('ChatRoomComponent', () => {
 
     const mockState: GameState = GameState.Opened;
 
-    const mockQuestionSubmissions: Submission[][] = [[{ choices: [{ index: 0, isSelected: true }], isFinal: false }]];
+    const mockQuestionSubmissions: Map<string, Submission>[] = [
+        new Map([['questionId1', { choices: [{ index: 0, isSelected: true }], isFinal: false }]]),
+    ];
+    const mockQuestionPayload: QuestionPayload = {
+        question: questionStub()[0],
+        isLast: false,
+    };
 
     const mockGameSnapshot: GameSnapshot = {
         players: mockPlayers,
@@ -72,7 +79,7 @@ describe('ChatRoomComponent', () => {
         mockGameHttpService = jasmine.createSpyObj('GameHttpService', ['getGameSnapshotByPin']);
         mockMessageService = jasmine.createSpyObj('MessageService', ['onSendMessage']);
         mockGameService = jasmine.createSpyObj('GameService', ['onStartGame']);
-        mockPlayerService = jasmine.createSpyObj('PlayerService', ['getCurrentPlayerFromGame']);
+        mockPlayerService = jasmine.createSpyObj('PlayerService', ['getCurrentPlayer']);
 
         TestBed.configureTestingModule({
             imports: [MatSnackBarModule],
@@ -130,7 +137,7 @@ describe('ChatRoomComponent', () => {
         }
     });
     it('should identify if the message author is the current user', () => {
-        mockPlayerService.getCurrentPlayerFromGame.and.returnValue(mockPlayers[0]);
+        mockPlayerService.getCurrentPlayer.and.returnValue(mockPlayers[0]);
         expect(component.isCurrentUser('TestUser')).toBeTrue();
         expect(component.isCurrentUser('otherUser')).toBeFalse();
     });
@@ -159,9 +166,7 @@ describe('ChatRoomComponent', () => {
     });
     it('should clear chatlogs when game starts', () => {
         component.ngOnInit();
-        const mockQuestions = questionStub();
-        const firstQuestion = mockQuestions[0];
-        mockGameService.onStartGame.calls.mostRecent().args[1](firstQuestion);
+        mockGameService.onStartGame.calls.mostRecent().args[1](mockQuestionPayload);
         expect(component.chatlogs).toEqual([]);
     });
     it('should unsubscribe from all subscriptions on destroy', () => {
