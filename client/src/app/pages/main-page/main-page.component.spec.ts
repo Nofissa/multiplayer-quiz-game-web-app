@@ -4,7 +4,6 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { AuthService } from '@app/services/auth/auth.service';
 import { GameService } from '@app/services/game/game-service/game.service';
-import { PlayerService } from '@app/services/player/player.service';
 import { SessionService } from '@app/services/session/session.service';
 import { firstPlayerStub } from '@app/TestStubs/player.stubs';
 import { of, Subscription, throwError } from 'rxjs';
@@ -19,7 +18,6 @@ describe('MainPage', () => {
     let authServiceSpy: jasmine.SpyObj<AuthService>;
     let sessionServiceSpy: jasmine.SpyObj<SessionService>;
     let gameServiceSpy: jasmine.SpyObj<GameService>;
-    let playerServiceSpy: jasmine.SpyObj<PlayerService>;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
@@ -31,7 +29,6 @@ describe('MainPage', () => {
                 { provide: AuthService, useValue: jasmine.createSpyObj('AuthService', ['verify', 'login']) },
                 { provide: SessionService, useValue: jasmine.createSpyObj('SessionService', ['getSession', 'setSession']) },
                 { provide: GameService, useValue: jasmine.createSpyObj('GameService', ['joinGame', 'onJoinGame']) },
-                { provide: PlayerService, useValue: jasmine.createSpyObj('PlayerService', ['addPlayerInGame']) },
             ],
         }).compileComponents();
 
@@ -41,7 +38,6 @@ describe('MainPage', () => {
         authServiceSpy = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
         sessionServiceSpy = TestBed.inject(SessionService) as jasmine.SpyObj<SessionService>;
         gameServiceSpy = TestBed.inject(GameService) as jasmine.SpyObj<GameService>;
-        playerServiceSpy = TestBed.inject(PlayerService) as jasmine.SpyObj<PlayerService>;
     });
 
     beforeEach(() => {
@@ -193,7 +189,6 @@ describe('MainPage', () => {
 
             expect(dialogServiceSpy.open).toHaveBeenCalled();
             expect(gameServiceSpy.joinGame).toHaveBeenCalledWith(pin, username);
-            expect(playerServiceSpy.addPlayerInGame).toHaveBeenCalledWith(pin, firstPlayerStub());
             expect(routerSpy.navigate).toHaveBeenCalledWith(['waiting-room'], { queryParams: { pin } });
         }));
     });

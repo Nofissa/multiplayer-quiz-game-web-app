@@ -16,13 +16,13 @@ describe('PlayerService', () => {
         speedAwardCount: 12,
     };
 
-    const playerMock2: Player = {
-        socketId: '1234',
-        username: 'Bob',
-        state: PlayerState.Abandonned,
-        score: 20,
-        speedAwardCount: 12,
-    };
+    // const playerMock2: Player = {
+    //     socketId: '1234',
+    //     username: 'Bob',
+    //     state: PlayerState.Abandonned,
+    //     score: 20,
+    //     speedAwardCount: 12,
+    // };
 
     beforeEach(() => {
         webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', ['emit', 'on', 'getSocketId'], {
@@ -44,7 +44,7 @@ describe('PlayerService', () => {
     it('should add a player to the game', () => {
         const pin = '1234';
 
-        playerService.addPlayerInGame(pin, playerMock);
+        playerService.setPlayer(pin, playerMock);
 
         const playersInGame = playerService['playersMap'].get(pin);
         expect(playersInGame).toContain(playerMock);
@@ -55,21 +55,9 @@ describe('PlayerService', () => {
         const socketId = 'socket1';
         webSocketServiceSpy.getSocketId.and.returnValue(socketId);
 
-        playerService.addPlayerInGame(pin, playerMock);
+        playerService.setPlayer(pin, playerMock);
 
-        const currentPlayer = playerService.getCurrentPlayerFromGame(pin);
+        const currentPlayer = playerService.getCurrentPlayer(pin);
         expect(currentPlayer).toEqual(playerMock);
-    });
-
-    it('should check if a player is in the game', () => {
-        const pin = '1234';
-
-        playerService.addPlayerInGame(pin, playerMock);
-
-        const isInGame = playerService.isInGame(pin, playerMock);
-        const isNotInGame = playerService.isInGame(pin, playerMock2);
-
-        expect(isInGame).toBeTrue();
-        expect(isNotInGame).toBeFalse();
     });
 });
