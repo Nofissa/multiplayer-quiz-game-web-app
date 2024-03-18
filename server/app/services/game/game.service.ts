@@ -11,6 +11,7 @@ import { PlayerState } from '@common/player-state';
 import { Question as CommonQuestion } from '@common/question';
 import { QuestionPayload } from '@common/question-payload';
 import { Submission } from '@common/submission';
+import { SubmissionPayload } from '@common/submission-payload';
 import { Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
 
@@ -204,7 +205,7 @@ export class GameService {
         };
     }
 
-    toggleSelectChoice(client: Socket, pin: string, choiceIndex: number): { clientId: string; submission: Submission } {
+    toggleSelectChoice(client: Socket, pin: string, choiceIndex: number): SubmissionPayload {
         const game = this.getGame(pin);
         const submission = this.getOrCreateSubmission(client, game);
         submission.choices[choiceIndex].isSelected = !submission.choices[choiceIndex].isSelected;
