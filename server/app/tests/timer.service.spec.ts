@@ -55,7 +55,7 @@ describe('TimerService', () => {
             // Verify that the timer started and remaining time is returned
             expect(remainingTime).toEqual(duration);
             expect(setIntervalSpy).toHaveBeenCalledTimes(1);
-            timerService.stopTimer('somePin');
+            timerService.stopTimer(socketMock, 'somePin');
         });
 
         it('should reset the timer if it is already running', () => {
@@ -73,25 +73,28 @@ describe('TimerService', () => {
             expect(remainingTime).toEqual(TIME);
             expect(clearIntervalSpy).toHaveBeenCalledTimes(1);
             expect(setIntervalSpy).toHaveBeenCalledTimes(2);
-            timerService.stopTimer('somePin');
+            timerService.stopTimer(socketMock, 'somePin');
         });
 
-        it('should', () => {
+        it('should call decrement the number of seconds', () => {
+            jest.useFakeTimers();
+            const decrementSpy = jest.spyOn(timerService as any, 'decrement');
             const TIME = 10;
+            const ONE_SECOND_IN_MS = 1000;
             socketMock = { id: 'organizerId' } as jest.Mocked<Socket>;
-            jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(gameStub());
-            const setIntervalSpy = jest.spyOn(global, 'setInterval');
-            const clearIntervalSpy = jest.spyOn(global, 'clearInterval');
-
-            // Call startTimer twice to simulate timer reset
             timerService.startTimer(socketMock, 'somePin', TIME, jest.fn());
-            const remainingTime = timerService.startTimer(socketMock, 'somePin', TIME, jest.fn());
+            jest.advanceTimersByTime(TIME * ONE_SECOND_IN_MS);
 
-            // Verify that the timer is reset and remaining time is returned
-            expect(remainingTime).toEqual(TIME);
-            expect(clearIntervalSpy).toHaveBeenCalledTimes(1);
-            expect(setIntervalSpy).toHaveBeenCalledTimes(2);
-            timerService.stopTimer('somePin');
+            expect(decrementSpy).toHaveBeenCalledTimes(TIME);
+        });
+    });
+
+    describe('stopTimer', () => {
+        it('should throw an error if the client is not the organizer', () => {
+            const pin = 'somePin';
+            socketMock = { id: 'differentId' } as jest.Mocked<Socket>;
+            jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(gameStub());
+            expect(() => timerService.stopTimer(socketMock, pin)).toThrow(`Seul l'organisateur de la partie ${pin} peut arrêter la minuterie`);
         });
     });
 });
