@@ -2,6 +2,7 @@
     position: relative;
     height: 100px;
     width: 100vw;
+    align-items: center;
 }
 
 .back-button {
@@ -30,4 +31,21 @@
 
 .logo:hover {
     cursor: pointer;
+}
+
+.mat-mdc-card {
+    --mdc-elevated-card-container-color: var(--answer-color-green);
+}
+
+.pin-container {
+    width: 105px;
+    position: absolute;
+    top: 25%;
+    right: 20px;
+}
+
+.mat-mdc-card-content {
+    text-align: center;
+    color: black;
+    font-weight: bold;
 }

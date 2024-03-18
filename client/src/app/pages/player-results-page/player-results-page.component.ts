@@ -6,7 +6,7 @@ import { GameServicesProvider } from '@app/providers/game-services.provider';
 import { RoutingDependenciesProvider } from '@app/providers/routing-dependencies.provider';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { BarChartService } from '@app/services/game/bar-chart-service/bar-chart.service';
-import { GameService } from '@app/services/game/game-service/game.service';
+import { Player } from '@common/player';
 
 @Component({
     selector: 'app-player-results-page',
@@ -15,13 +15,20 @@ import { GameService } from '@app/services/game/game-service/game.service';
 })
 export class PlayerResultsPageComponent implements OnInit {
     pin: string;
+<<<<<<< client/src/app/pages/player-results-page/player-results-page.component.ts
 
     private readonly activatedRoute: ActivatedRoute;
     private readonly router: Router;
     private readonly gameHttpService: GameHttpService;
     private readonly gameService: GameService;
 
+    players: Player[] = [];
+    // Depends on many services
+    // eslint-disable-next-line max-params
     constructor(
+        private readonly activatedRoute: ActivatedRoute,
+        private readonly gameHttpService: GameHttpService,
+        private readonly router: Router,
         private readonly barChartService: BarChartService,
         routingDependenciesProvider: RoutingDependenciesProvider,
         gameServicesProvider: GameServicesProvider,
@@ -32,15 +39,17 @@ export class PlayerResultsPageComponent implements OnInit {
         this.gameService = gameServicesProvider.gameService;
     }
 
-    get chartData(): BarChartData | undefined {
-        return this.barChartService.getCurrentQuestionData();
+    get chartData(): BarChartData[] | undefined {
+        return this.barChartService.getAllBarChart();
     }
 
     ngOnInit() {
         this.pin = this.activatedRoute.snapshot.queryParams['pin'];
+
         this.gameHttpService.getGameSnapshotByPin(this.pin).subscribe({
             next: (snapshot) => {
                 this.barChartService.setData({ submissions: snapshot.questionSubmissions, questions: snapshot.quiz.questions });
+                this.players = snapshot.players;
             },
             error: (error: HttpErrorResponse) => {
                 if (error.status === HttpStatusCode.NotFound) {
@@ -51,6 +60,6 @@ export class PlayerResultsPageComponent implements OnInit {
     }
 
     leaveGame() {
-        this.gameService.playerLeaveGameEnd(this.pin);
+        this.router.navigateByUrl('/home');
     }
 }

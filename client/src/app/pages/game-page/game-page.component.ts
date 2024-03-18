@@ -84,6 +84,10 @@ export class GamePageComponent implements OnInit, OnDestroy {
         this.gameService.endGame(this.pin);
     }
 
+    handleCancelGame() {
+        this.router.navigate(['home'], { queryParams: { pin: this.pin } });
+    }
+
     private setupSubscriptions(pin: string) {
         this.eventSubscriptions.push(
             this.gameService.onCancelGame(pin, (message) => {
@@ -155,6 +159,9 @@ export class GamePageComponent implements OnInit, OnDestroy {
                         }
                     }
                 }
+            }),
+            this.gameService.onCancelGame(pin, () => {
+                this.handleCancelGame();
             }),
         );
     }
