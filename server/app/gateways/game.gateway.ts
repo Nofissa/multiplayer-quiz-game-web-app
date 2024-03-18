@@ -156,6 +156,18 @@ export class GameGateway implements OnGatewayDisconnect {
         }
     }
 
+    @SubscribeMessage('endGame')
+    handleEndGame(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
+        try {
+            this.timerService.stopTimer(client, pin);
+            this.gameService.endGame(client, pin);
+            const payload: GameEventPayload<null> = { pin, data: null };
+            this.server.to(pin).emit('endGame', payload);
+        } catch (error) {
+            client.emit('error', error.message);
+        }
+    }
+
     @SubscribeMessage('startTimer')
     startTimer(
         @ConnectedSocket() client: Socket,

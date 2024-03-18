@@ -60,9 +60,10 @@
     margin-bottom: 0;
 }
 
-.testMode {
+.test-mode {
     color: #ff0e00;
     font-size: xx-large;
+    text-align: center;
 }
 
 .transition-container {
@@ -73,3 +74,7 @@
     width: 100%;
 }
 
+.buttons-wrapper {
+    display: flex;
+    justify-content: center;
+}

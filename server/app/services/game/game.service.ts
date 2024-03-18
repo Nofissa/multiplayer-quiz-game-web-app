@@ -148,7 +148,6 @@ export class GameService {
         }
 
         game.state = GameState.Running;
-        game.chatlogs = [];
 
         return {
             question: game.currentQuestion as CommonQuestion,
@@ -213,27 +212,7 @@ export class GameService {
         return { clientId: client.id, submission };
     }
 
-    getGame(pin: string): Game {
-        const game = this.games.get(pin);
-
-        if (!game) {
-            throw new Error(`Aucune partie ne correspond au pin ${pin}`);
-        }
-
-        return game;
-    }
-
-    getOrganizer(pin: string): Socket {
-        const game = this.games.get(pin);
-
-        if (!game) {
-            throw new Error(`Aucune partie ne correspond au pin ${pin}`);
-        }
-
-        return game.organizer;
-    }
-
-    endGame(pin: string, client: Socket): void {
+    endGame(client: Socket, pin: string): void {
         const game = this.getGame(pin);
 
         if (!this.isOrganizer(game, client.id)) {
@@ -261,9 +240,24 @@ export class GameService {
         return { toCancel, toAbandon, toEnd };
     }
 
-    getOrganizerId(pin: string): string {
-        const game = this.getGame(pin);
-        return game.organizer.id;
+    getGame(pin: string): Game {
+        const game = this.games.get(pin);
+
+        if (!game) {
+            throw new Error(` ucune partie ne correspond au pin ${pin}`);
+        }
+
+        return game;
+    }
+
+    getOrganizer(pin: string): Socket {
+        const game = this.games.get(pin);
+
+        if (!game) {
+            throw new Error(`Aucune partie ne correspond au pin ${pin}`);
+        }
+
+        return game.organizer;
     }
 
     isOrganizer(game: Game, clientId: string): boolean {
@@ -271,7 +265,15 @@ export class GameService {
     }
 
     isGoodAnswer(question: Question, submission: Submission): boolean {
-        const correctAnswersIndices = new Set(question.choices.filter((x) => x.isCorrect).map((_, index) => index));
+        const correctAnswersIndices = new Set(
+            question.choices.reduce((indices, choice, index) => {
+                if (choice.isCorrect) {
+                    indices.push(index);
+                }
+
+                return indices;
+            }, []),
+        );
         const selectedAnswersIndices = new Set(submission.choices.filter((x) => x.isSelected).map((x) => x.index));
 
         return (

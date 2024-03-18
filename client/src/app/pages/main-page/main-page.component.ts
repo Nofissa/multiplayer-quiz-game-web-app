@@ -61,7 +61,7 @@ export class MainPageComponent {
 
         dialogRef.afterClosed().subscribe(({ pin, username }: { pin: string; username: string }) => {
             this.gameService.onJoinGame(pin, (player) => {
-                this.playerService.addPlayerInGame(pin, player);
+                this.playerService.setPlayer(pin, player);
                 this.router.navigate(['waiting-room'], { queryParams: { pin } });
             });
             this.gameService.joinGame(pin, username);

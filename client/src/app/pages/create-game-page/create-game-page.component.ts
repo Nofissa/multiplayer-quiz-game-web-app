@@ -83,23 +83,29 @@ export class CreateGamePageComponent implements OnInit {
 
     private createGame(quiz: Quiz) {
         this.gameService.onCreateGame((pin: string) => {
-            if (pin) {
-                this.router.navigate(['/host-game'], { queryParams: { pin } });
-                const player: Player = {
-                    socketId: this.webSockerService.getSocketId(),
-                    username: 'Organisateur',
-                    score: 0,
-                    speedAwardCount: 0,
-                    state: PlayerState.Playing,
-                };
-                this.playerService.addPlayerInGame(pin, player);
-            }
+            this.router.navigate(['/host-game'], { queryParams: { pin } });
+            const player: Player = {
+                socketId: this.webSockerService.getSocketId(),
+                username: 'Organisateur',
+                score: 0,
+                speedAwardCount: 0,
+                state: PlayerState.Playing,
+            };
+            this.playerService.setPlayer(pin, player);
         });
         this.gameService.createGame(quiz._id);
     }
 
     private testGame(quiz: Quiz) {
         this.gameService.onCreateGame((pin: string) => {
+            const player: Player = {
+                socketId: this.webSockerService.getSocketId(),
+                username: 'Testeur',
+                score: 0,
+                speedAwardCount: 0,
+                state: PlayerState.Playing,
+            };
+            this.playerService.setPlayer(pin, player);
             this.gameService.joinGame(pin, 'Testeur');
             this.router.navigate(['/game'], { queryParams: { pin, isTest: true } });
         });
