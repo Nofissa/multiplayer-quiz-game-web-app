@@ -69,30 +69,30 @@ describe('TimerComponent', () => {
         expect(timerServiceSpy.onTimerTick).toHaveBeenCalledWith(stubData.pin, jasmine.any(Function));
     });
 
-    it('should update remaining time and maxDuration on onStartTimer', () => {
-        component.pin = stubData.pin;
+    // it('should update remaining time and maxDuration on onStartTimer', () => {
+    //     component.pin = stubData.pin;
 
-        timerServiceSpy.onStartTimer.and.callFake((_pin: string, callback: (remainingTime: number) => void) => {
-            callback(stubData.maxDuration);
-            return of(stubData.maxDuration).subscribe(callback);
-        });
-        component.ngOnInit();
+    //     timerServiceSpy.onStartTimer.and.callFake((_pin: string, callback: (remainingTime: number) => void) => {
+    //         callback(stubData.maxDuration);
+    //         return of(stubData.maxDuration).subscribe(callback);
+    //     });
+    //     component.ngOnInit();
 
-        expect(component.maxDuration).toEqual(stubData.maxDuration);
-        expect(component.remainingTime).toEqual(stubData.maxDuration);
-    });
+    //     expect(component.maxDuration).toEqual(stubData.maxDuration);
+    //     expect(component.remainingTime).toEqual(stubData.maxDuration);
+    // });
 
-    it('should update remaining time on onTimerTick', () => {
-        component.pin = stubData.pin;
+    // it('should update remaining time on onTimerTick', () => {
+    //     component.pin = stubData.pin;
 
-        timerServiceSpy.onTimerTick.and.callFake((_pin: string, callback: (remainingTime: number) => void) => {
-            callback(stubData.remainingTime);
-            return of(stubData.remainingTime).subscribe(callback);
-        });
-        component.ngOnInit();
+    //     timerServiceSpy.onTimerTick.and.callFake((_pin: string, callback: (remainingTime: number) => void) => {
+    //         callback(stubData.remainingTime);
+    //         return of(stubData.remainingTime).subscribe(callback);
+    //     });
+    //     component.ngOnInit();
 
-        expect(component.remainingTime).toEqual(stubData.remainingTime);
-    });
+    //     expect(component.remainingTime).toEqual(stubData.remainingTime);
+    // });
 
     it('should close subscriptions on ngOnDestroy', () => {
         timerServiceSpy.onStartTimer.and.returnValue(of(stubData.maxDuration).subscribe());

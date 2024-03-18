@@ -106,10 +106,6 @@ export class HostGamePageComponent implements OnInit {
         this.router.navigate(['results'], { queryParams: { pin: this.pin } });
     }
 
-    handleCancelGame() {
-        this.router.navigate(['home'], { queryParams: { pin: this.pin } });
-    }
-
     private setupSubscriptions(pin: string) {
         this.eventSubscriptions.push(
             this.gameService.onCancelGame(pin, (message) => {
@@ -166,10 +162,6 @@ export class HostGamePageComponent implements OnInit {
 
             this.gameService.onEndGame(pin, () => {
                 this.handleEndGame();
-            }),
-
-            this.gameService.onCancelGame(pin, () => {
-                this.handleCancelGame();
             }),
         );
     }

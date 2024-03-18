@@ -5,7 +5,7 @@ import { submissionStub } from '@app/TestStubs/submission.stubs';
 import { Submission } from '@common/submission';
 import { BarChartComponent } from './bar-chart.component';
 
-fdescribe('HistogrammeComponent', () => {
+describe('HistogrammeComponent', () => {
     let component: BarChartComponent;
     let fixture: ComponentFixture<BarChartComponent>;
 
