@@ -7,12 +7,16 @@ import { MessageService } from '@app/services/message/message.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { Chatlog } from '@common/chatlog';
 import { Evaluation } from '@common/evaluation';
+import { GameEventPayload } from '@common/game-event-payload';
 import { GameState } from '@common/game-state';
+import { Player } from '@common/player';
+import { Submission } from '@common/submission';
 import { TimerEventType } from '@common/timer-event-type';
-import { Server, Socket } from 'socket.io';
+import { BroadcastOperator, Server, Socket } from 'socket.io';
 import { gameStub } from './stubs/game.stub';
 import { playerstub } from './stubs/player.stub';
 import { questionStub } from './stubs/question.stubs';
+import { submissionStub } from './stubs/submission.stub';
 
 describe('GameGateway', () => {
     let gameGateway: GameGateway;
@@ -21,10 +25,11 @@ describe('GameGateway', () => {
     let timerServiceMock: jest.Mocked<TimerService>;
     let messageService: jest.Mocked<MessageService>;
     let serverMock: jest.Mocked<Server>;
+    let broadcastMock: any;
 
     beforeEach(() => {
         gameServiceMock = {
-            createGame: jest.fn(), // Mock createGame method to return a pin
+            createGame: jest.fn(),
             joinGame: jest.fn(),
             startGame: jest.fn(),
             cancelGame: jest.fn(),
@@ -36,6 +41,8 @@ describe('GameGateway', () => {
             evaluateChoices: jest.fn(),
             nextQuestion: jest.fn(),
             disconnect: jest.fn(),
+            toggleSelectChoice: jest.fn(),
+            getOrganizer: jest.fn(),
         } as any;
         messageService = {
             sendMessage: jest.fn(),
@@ -54,8 +61,11 @@ describe('GameGateway', () => {
         timerServiceMock = {
             startTimer: jest.fn(),
         } as any;
-        gameGateway = new GameGateway(gameServiceMock, timerServiceMock, messageService); // Pass mock dependencies
-        gameGateway.server = serverMock; // Set server mock
+        broadcastMock = {
+            emit: jest.fn(),
+        } as any as BroadcastOperator<any, any>;
+        gameGateway = new GameGateway(gameServiceMock, timerServiceMock, messageService);
+        gameGateway.server = serverMock;
     });
 
     afterEach(() => {
@@ -89,10 +99,11 @@ describe('GameGateway', () => {
             const username = playerstub().username;
             const player = playerstub();
             gameServiceMock.joinGame.mockReturnValue(player);
+            serverMock.to.mockReturnValue(broadcastMock);
             gameGateway.joinGame(socketMock, { pin, username });
-            expect(socketMock.join).toHaveBeenCalledWith(pin); // Ensure client joins the room
-            expect(serverMock.to).toHaveBeenCalledWith(pin); // Ensure the server sends message to the room
-            // expect(serverMock.emit).toHaveBeenCalledWith('joinGame', { pin, data: { id: 'mockPlayerId', username } });
+            expect(socketMock.join).toHaveBeenCalledWith(pin);
+            expect(serverMock.to).toHaveBeenCalledWith(pin);
+            expect(broadcastMock.emit).toHaveBeenCalledWith('joinGame', { pin, data: player });
         });
 
         it('should emit "error" event if an error occurs during joining the game', () => {
@@ -112,7 +123,6 @@ describe('GameGateway', () => {
             gameServiceMock.startGame.mockReturnValue(questionStub[0]);
             gameGateway.startGame(socketMock, { pin });
             expect(serverMock.to).toHaveBeenCalledWith(pin);
-            // expect(serverMock.emit).toHaveBeenCalledWith('startGame', { pin, data: questionStub()[0] });
         });
 
         it('should emit "error" event if an error occurs during starting the game', () => {
@@ -130,13 +140,14 @@ describe('GameGateway', () => {
             const pin = 'mockPin';
             const cancelMessage = 'Game canceled';
             gameServiceMock.cancelGame.mockReturnValue(cancelMessage);
-            gameGateway.cancelGame(socketMock, { pin });
             serverMock.to.mockImplementation(() => {
                 return gameGateway.server as any;
             });
+            serverMock.to.mockReturnValue(broadcastMock);
+            gameGateway.cancelGame(socketMock, { pin });
             expect(serverMock.to).toHaveBeenCalledWith(pin);
-            // expect(serverMock.emit).toHaveBeenCalledWith('cancelGame', { pin, data: cancelMessage });
-            // expect(serverMock.socketsLeave).toHaveBeenCalledWith(pin);
+            expect(broadcastMock.emit).toHaveBeenCalledWith('cancelGame', { pin, data: cancelMessage });
+            expect(serverMock.socketsLeave).toHaveBeenCalledWith(pin);
         });
 
         it('should emit "error" event if an error occurs during canceling the game', () => {
@@ -156,7 +167,6 @@ describe('GameGateway', () => {
             gameServiceMock.toggleGameLock.mockReturnValue(gameState);
             gameGateway.toggleGameLock(socketMock, { pin });
             expect(serverMock.to).toHaveBeenCalledWith(pin);
-            // expect(serverMock.emit).toHaveBeenCalledWith('toggleGameLock', { pin, data: gameState });
         });
 
         it('should emit "error" event if an error occurs during toggling the game lock', () => {
@@ -173,15 +183,16 @@ describe('GameGateway', () => {
         it('should handle player abandoning the game and emit the "playerAbandon" event with the correct payload', () => {
             const pin = 'mockPin';
             const clientPlayer = {
-                socket: socketMock,
+                socket: { leave: jest.fn() } as any,
                 player: playerstub(),
             };
             gameServiceMock.playerAbandon.mockReturnValue(clientPlayer);
-            // const payload: GameEventPayload<Player> = { pin, data: clientPlayer.player };
+            serverMock.to.mockReturnValue(broadcastMock);
+            const payload: GameEventPayload<Player> = { pin, data: clientPlayer.player };
             gameGateway.playerAbandon(socketMock, { pin });
             expect(serverMock.to).toHaveBeenCalledWith(pin);
-            // expect(serverMock.emit).toHaveBeenCalledWith('playerAbandon', payload);
-            // expect(socketMock.leave).toHaveBeenCalledWith(pin);
+            expect(broadcastMock.emit).toHaveBeenCalledWith('playerAbandon', payload);
+            expect(clientPlayer.socket.leave).toHaveBeenCalledWith(pin);
         });
 
         it('should emit "error" event if an error occurs during handling player abandoning the game', () => {
@@ -199,15 +210,16 @@ describe('GameGateway', () => {
             const pin = 'mockPin';
             const username = 'mockUsername';
             const clientPlayer = {
-                socket: socketMock,
+                socket: { leave: jest.fn() } as any,
                 player: playerstub(),
             };
             gameServiceMock.playerBan.mockReturnValue(clientPlayer);
-            // const payload: GameEventPayload<Player> = { pin, data: clientPlayer.player };
+            const payload: GameEventPayload<Player> = { pin, data: clientPlayer.player };
+            serverMock.to.mockReturnValue(broadcastMock);
             gameGateway.playerBan(socketMock, { pin, username });
             expect(serverMock.to).toHaveBeenCalledWith(pin);
-            // expect(serverMock.emit).toHaveBeenCalledWith('playerBan', payload);
-            // expect(socketMock.leave).toHaveBeenCalledWith(pin);
+            expect(broadcastMock.emit).toHaveBeenCalledWith('playerBan', payload);
+            expect(clientPlayer.socket.leave).toHaveBeenCalledWith(pin);
         });
 
         it('should emit "error" event if an error occurs during handling player ban', () => {
@@ -226,10 +238,8 @@ describe('GameGateway', () => {
             const pin = 'mockPin';
             const evaluation: Evaluation = {} as any;
             gameServiceMock.evaluateChoices.mockReturnValue(evaluation);
-            // const payload: GameEventPayload<Evaluation> = { pin, data: evaluation };
             gameGateway.submitChoices(socketMock, { pin });
             expect(serverMock.to).toHaveBeenCalledWith(pin);
-            // expect(serverMock.emit).toHaveBeenCalledWith('submitChoices', payload);
         });
 
         it('should emit "error" event if an error occurs during handling submit choices', () => {
@@ -247,12 +257,8 @@ describe('GameGateway', () => {
             const pin = 'mockPin';
             const question: Question = questionStub()[0];
             gameServiceMock.nextQuestion.mockReturnValue(question);
-            // const payload: GameEventPayload<Question> = { pin, data: question };
-
             gameGateway.nextQuestion(socketMock, { pin });
-
             expect(serverMock.to).toHaveBeenCalledWith(pin);
-            // expect(serverMock.emit).toHaveBeenCalledWith('nextQuestion', payload);
         });
 
         it('should emit "error" event if an error occurs during handling the next question request', () => {
@@ -264,31 +270,58 @@ describe('GameGateway', () => {
             expect(socketMock.emit).toHaveBeenCalledWith('error', 'Mock error');
         });
     });
+    describe('toggleSelectChoice', () => {
+        it('should toggle the selected choice for the provided pin and emit the "toggleSelectChoice" event to the organizer', () => {
+            const pin = 'mockPin';
+            const choiceIndex = 0;
+            const submission: Submission = submissionStub();
+            gameServiceMock.toggleSelectChoice.mockReturnValue({ clientId: '1234', submission });
+            gameServiceMock.getOrganizer.mockReturnValue(socketMock);
+            gameGateway.toggleSelectChoice(socketMock, { pin, choiceIndex });
+            expect(socketMock.emit).toHaveBeenCalledWith('toggleSelectChoice', {
+                pin,
+                data: {
+                    clientId: '1234',
+                    submission,
+                },
+            });
+        });
+
+        it('should emit "error" event if an error occurs during toggling the selected choice', () => {
+            const pin = 'mockPin';
+            const choiceIndex = 0;
+            gameServiceMock.toggleSelectChoice.mockImplementation(() => {
+                throw new Error('Mock error');
+            });
+            gameGateway.toggleSelectChoice(socketMock, { pin, choiceIndex });
+            expect(socketMock.emit).toHaveBeenCalledWith('error', 'Mock error');
+        });
+    });
 
     describe('startTimer', () => {
         it('should start the timer and emit the "startTimer" event with the correct payload', () => {
             const pin = 'mockPin';
             const eventType = TimerEventType.Question;
-            const duration = 60; // in seconds
-            const remainingTime = 60; // in seconds
+            const duration = 60;
+            const remainingTime = 60;
             gameServiceMock.getGame.mockReturnValue(gameStub());
             timerServiceMock.startTimer.mockReturnValue(remainingTime);
+            serverMock.to.mockReturnValue(broadcastMock);
             gameGateway.startTimer(socketMock, { pin, eventType, duration });
             expect(timerServiceMock.startTimer).toHaveBeenCalledWith(socketMock, pin, duration, expect.any(Function));
             expect(serverMock.to).toHaveBeenCalledWith(pin);
-            // expect(serverMock.emit).toHaveBeenCalledWith('startTimer', { pin, data: { remainingTime, eventType } });
+            expect(broadcastMock.emit).toHaveBeenCalledWith('startTimer', { pin, data: { remainingTime, eventType } });
         });
 
         it('should start the timer with the provided duration and emit the "startTimer" event with the correct payload', () => {
             const pin = 'mockPin';
             const eventType = TimerEventType.Question;
-            const duration = 30; // in seconds
-            const remainingTime = 30; // in seconds
+            const duration = 30;
+            const remainingTime = 30;
             timerServiceMock.startTimer.mockReturnValue(remainingTime);
             gameGateway.startTimer(socketMock, { pin, eventType, duration });
             expect(timerServiceMock.startTimer).toHaveBeenCalledWith(socketMock, pin, duration, expect.any(Function));
             expect(serverMock.to).toHaveBeenCalledWith(pin);
-            // expect(serverMock.emit).toHaveBeenCalledWith('startTimer', { pin, data: { remainingTime, eventType } });
         });
 
         it('should emit "error" event if an error occurs during starting the timer', () => {

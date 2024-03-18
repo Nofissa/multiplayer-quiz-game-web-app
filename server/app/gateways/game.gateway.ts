@@ -100,6 +100,7 @@ export class GameGateway implements OnGatewayDisconnect {
             const payload: GameEventPayload<Player> = { pin, data: clientPlayer.player };
 
             this.server.to(pin).emit('playerAbandon', payload);
+
             clientPlayer.socket.leave(pin);
         } catch (error) {
             client.emit('error', error.message);
