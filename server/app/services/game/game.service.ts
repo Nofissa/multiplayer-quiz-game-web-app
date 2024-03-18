@@ -244,7 +244,7 @@ export class GameService {
         const game = this.games.get(pin);
 
         if (!game) {
-            throw new Error(` ucune partie ne correspond au pin ${pin}`);
+            throw new Error(`Aucune partie ne correspond au pin ${pin}`);
         }
 
         return game;

@@ -1,63 +1,54 @@
 import { TestBed } from '@angular/core/testing';
-import { PlayerService } from '@app/services/player/player.service';
-import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { Player } from '@common/player';
-import { PlayerState } from '@common/player-state';
-import { io } from 'socket.io-client';
+import { WebSocketService } from '@app/services/web-socket/web-socket.service';
+import { PlayerService } from './player.service';
 
 describe('PlayerService', () => {
-    let playerService: PlayerService;
+    let service: PlayerService;
     let webSocketServiceSpy: jasmine.SpyObj<WebSocketService>;
-    const playerMock: Player = {
-        socketId: '1234',
-        username: 'Bob',
-        state: PlayerState.Playing,
-        score: 20,
-        speedAwardCount: 12,
-    };
-
-    // const playerMock2: Player = {
-    //     socketId: '1234',
-    //     username: 'Bob',
-    //     state: PlayerState.Abandonned,
-    //     score: 20,
-    //     speedAwardCount: 12,
-    // };
 
     beforeEach(() => {
-        webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', ['emit', 'on', 'getSocketId'], {
-            socketInstance: io(),
-        });
+        const spy = jasmine.createSpyObj('WebSocketService', ['getSocketId']);
 
         TestBed.configureTestingModule({
-            providers: [PlayerService, { provide: WebSocketService, useValue: webSocketServiceSpy }],
+            providers: [{ provide: WebSocketService, useValue: spy }],
         });
-
-        playerService = TestBed.inject(PlayerService);
+        service = TestBed.inject(PlayerService);
         webSocketServiceSpy = TestBed.inject(WebSocketService) as jasmine.SpyObj<WebSocketService>;
     });
 
+    afterEach(() => {
+        service['playersMap'].clear();
+    });
+
     it('should be created', () => {
-        expect(playerService).toBeTruthy();
+        expect(service).toBeTruthy();
     });
 
-    it('should add a player to the game', () => {
-        const pin = '1234';
+    it('should set player', () => {
+        const pin = '123';
+        const player: Player = {} as Player;
 
-        playerService.setPlayer(pin, playerMock);
+        service.setPlayer(pin, player);
 
-        const playersInGame = playerService['playersMap'].get(pin);
-        expect(playersInGame).toContain(playerMock);
+        expect(service.getCurrentPlayer(pin)).toEqual(player);
     });
 
-    it('should get current player from the game', () => {
-        const pin = '1234';
-        const socketId = 'socket1';
-        webSocketServiceSpy.getSocketId.and.returnValue(socketId);
+    it('should return null if no player has been set', () => {
+        const pin = '123';
 
-        playerService.setPlayer(pin, playerMock);
+        webSocketServiceSpy.getSocketId.and.returnValue('someSocketId');
 
-        const currentPlayer = playerService.getCurrentPlayer(pin);
-        expect(currentPlayer).toEqual(playerMock);
+        expect(service.getCurrentPlayer(pin)).toBeNull();
+    });
+
+    it('should return player if found', () => {
+        const pin = '123';
+        const player: Player = {} as Player;
+
+        service.setPlayer(pin, player);
+        webSocketServiceSpy.getSocketId.and.returnValue('someSocketId');
+
+        expect(service.getCurrentPlayer(pin)).toEqual(player);
     });
 });
