@@ -1,17 +1,18 @@
-import { Component, Input, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostListener, Input, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
-import { Question } from '@common/question';
 import { GameServicesProvider } from '@app/providers/game-services.provider';
+import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { KeyBindingService } from '@app/services/key-binding/key-binding.service';
-import { TimerService } from '@app/services/timer/timer.service';
-import { Player } from '@common/player';
-import { Subscription } from 'rxjs';
-import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { PlayerService } from '@app/services/player/player.service';
+import { TimerService } from '@app/services/timer/timer.service';
 import { Evaluation } from '@common/evaluation';
+import { Player } from '@common/player';
+import { Question } from '@common/question';
+import { Subscription } from 'rxjs';
+import { TimerEventType } from '@common/timer-event-type';
 
 const NOT_FOUND_INDEX = -1;
 
@@ -73,7 +74,7 @@ export class GameBoardComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
-        const player = this.playerService.getCurrentPlayerFromGame(this.pin);
+        const player = this.playerService.getCurrentPlayer(this.pin);
         if (player) {
             this.player = player;
         }
@@ -134,11 +135,11 @@ export class GameBoardComponent implements OnInit, OnDestroy {
 
     private setupSubscriptions(pin: string) {
         this.eventSubscriptions.push(
-            this.gameService.onNextQuestion(pin, (question) => {
-                this.loadNextQuestion(question);
+            this.gameService.onNextQuestion(pin, (data) => {
+                this.loadNextQuestion(data.question);
             }),
             this.gameService.onSubmitChoices(pin, (evaluation) => {
-                if (this.playerService.getCurrentPlayerFromGame(pin)?.socketId === evaluation.player.socketId) {
+                if (this.playerService.getCurrentPlayer(pin)?.socketId === evaluation.player.socketId) {
                     this.cachedEvaluation = evaluation;
                 }
                 if (evaluation.isLast) {
@@ -148,9 +149,9 @@ export class GameBoardComponent implements OnInit, OnDestroy {
                     }
                 }
             }),
-            this.timerService.onTimerTick(pin, (remainingTime) => {
-                if (!remainingTime) {
-                    this.submitChoices(); // so that every player is forced to submit
+            this.timerService.onTimerTick(pin, (payload) => {
+                if (!payload.remainingTime && payload.eventType === TimerEventType.Question) {
+                    this.submitChoices();
                 }
             }),
         );

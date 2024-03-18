@@ -2,10 +2,9 @@
     <h4>Liste des joueurs</h4>
     <mat-list>
         <mat-list-item *ngFor="let player of players" [ngClass]="{
-                banned: player.state === playerStates.Banned,
-                playing: player.state === playerStates.Playing,
-                abandoned: player.state === playerStates.Abandonned,
-                hidden: player.state === playerStates.Abandonned && !displayOptions.quitters,
+                'hidden': player.state === playerStates.Banned || player.state === playerStates.Abandonned && !displayOptions.quitters,
+                'playing': player.state === playerStates.Playing,
+                'abandoned': player.state === playerStates.Abandonned,
             }">
             <div class="row-container">
                 <div class="player-info-wrapper">

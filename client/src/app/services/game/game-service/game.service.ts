@@ -4,8 +4,8 @@ import { applyIfPinMatches } from '@app/utils/conditional-applications/condition
 import { Evaluation } from '@common/evaluation';
 import { GameState } from '@common/game-state';
 import { Player } from '@common/player';
-import { Question } from '@common/question';
-import { Submission } from '@common/submission';
+import { QuestionPayload } from '@common/question-payload';
+import { SubmissionPayload } from '@common/submission-payload';
 import { Subscription } from 'rxjs';
 
 @Injectable({
@@ -42,7 +42,7 @@ export class GameService {
         this.webSocketService.emit('startGame', { pin });
     }
 
-    onStartGame(pin: string, callback: (question: Question) => void): Subscription {
+    onStartGame(pin: string, callback: (data: QuestionPayload) => void): Subscription {
         return this.webSocketService.on('startGame', applyIfPinMatches(pin, callback));
     }
 
@@ -66,7 +66,7 @@ export class GameService {
         this.webSocketService.emit('toggleSelectChoice', { pin, choiceIndex });
     }
 
-    onToggleSelectChoice(pin: string, callback: (payload: { clientId: string; submission: Submission }) => void): Subscription {
+    onToggleSelectChoice(pin: string, callback: (payload: SubmissionPayload) => void): Subscription {
         return this.webSocketService.on('toggleSelectChoice', applyIfPinMatches(pin, callback));
     }
 
@@ -82,7 +82,7 @@ export class GameService {
         this.webSocketService.emit('nextQuestion', { pin });
     }
 
-    onNextQuestion(pin: string, callback: (question: Question) => void): Subscription {
+    onNextQuestion(pin: string, callback: (data: QuestionPayload) => void): Subscription {
         return this.webSocketService.on('nextQuestion', applyIfPinMatches(pin, callback));
     }
 

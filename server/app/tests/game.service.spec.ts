@@ -313,15 +313,6 @@ describe('GameService', () => {
         });
     });
 
-    describe('getOrganizerId', () => {
-        it('should return the id of the organizer', () => {
-            const game = gameStub();
-            jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
-            const result = gameService.getOrganizerId(game.pin);
-            expect(result).toEqual(game.organizer.id);
-        });
-    });
-
     describe('getOrganizer', () => {
         const game = gameStub();
         it('should return the organizer', () => {

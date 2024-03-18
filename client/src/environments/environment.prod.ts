@@ -1,5 +1,8 @@
+const serveurUrl = 'http://ec2-15-157-59-57.ca-central-1.compute.amazonaws.com';
+const serverPort = 3000;
+
 export const environment = {
     production: true,
-    serverUrl: 'http://localhost:3000',
-    apiUrl: 'http://localhost:3000/api',
+    serverUrl: `${serveurUrl}:${serverPort}`,
+    apiUrl: `${serveurUrl}:${serverPort}/api`,
 };
