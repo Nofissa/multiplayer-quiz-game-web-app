@@ -41,4 +41,12 @@ describe('WebSocketService', () => {
 
         expect(callback).toHaveBeenCalledWith(testData);
     });
+
+    it('shoudl return the socket ID on getSocketId', () => {
+        const socketId = 'some socket id';
+        webSocketService['socketInstance'].id = socketId;
+        const returnedSocketId = webSocketService.getSocketId();
+
+        expect(returnedSocketId).toEqual(socketId);
+    });
 });

@@ -1,16 +1,16 @@
 <div class="container">
-    <app-nav-header [backArrow]="false"></app-nav-header>
-    <div class="waiting-text">
-        <h3>En attente de l'organisateur</h3>
-        <div class="loader-wrapper">
-            <app-loader-animation></app-loader-animation>
+    <app-nav-header class="nav-bar" [backArrow]="false"></app-nav-header>
+    <div ngClass="game-information flex-column">
+        <div class="waiting-area">
+            <h3>En attente de l'organisateur</h3>
+            <div class="loader-wrapper">
+                <app-loader-animation></app-loader-animation>
+            </div>
         </div>
+        <app-player-list class="players" [pin]="pin"></app-player-list>
+        <button class="leave-button" mat-raised-button color="warn" (click)="leaveGame()">Quitter</button>
     </div>
-    <div class="grid-container">
-        <div class="player-list-wrapper">
-            <app-player-list [pin]="pin"></app-player-list>
-            <button class="abandon-button" mat-raised-button color="warn" (click)="leaveGame()">Quitter</button>
-        </div>
+    <div class="chat-room-container flex-column">
         <app-chat-room [pin]="pin"></app-chat-room>
     </div>
 </div>

@@ -1,7 +1,15 @@
-<app-nav-header></app-nav-header>
-<div class="grid-container">
-    <app-bar-chart-swiper [data]="data"></app-bar-chart-swiper>
-    <app-player-list [pin]="pin"
-        [displayOptions]="{score: true, speedAwardCount: true, sorted: true}"></app-player-list>
-    <app-chat-room [pin]="pin"></app-chat-room>
+<div class="container flex-column">
+    <app-nav-header class="nav-bar" [backArrow]="false"></app-nav-header>
+    <div class="game-information flex-column">
+        <app-bar-chart-swiper class="chart-swiper" *ngIf="chartData" [data]="chartData"></app-bar-chart-swiper>
+        <app-player-list
+            class="players"
+            [pin]="pin"
+            [displayOptions]="{ score: true, speedAwardCount: true, sorted: true }"
+        ></app-player-list>
+        <button class="leave-button" mat-raised-button color="warn" (click)="leaveGame()">Quitter</button>
+    </div>
+    <div class="chat-room-container flex-column">
+        <app-chat-room [pin]="pin"></app-chat-room>
+    </div>
 </div>

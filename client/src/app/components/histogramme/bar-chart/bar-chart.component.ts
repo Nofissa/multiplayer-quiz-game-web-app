@@ -12,21 +12,27 @@ export class BarChartComponent {
     @Input()
     data: BarChartData;
 
-    adjust(index: number) {
-        const playersSelected = this.data.submissions.reduce((totalSelections, submission) => {
-            submission.choices.forEach((choice) => {
-                if (choice.index === index && choice.isSelected) {
-                    totalSelections++;
-                }
-            });
-
-            return totalSelections;
-        }, 0);
-
+    adjust(index: number): number {
+        const playersSelected = this.playersSelected(index);
+        if (playersSelected === 0) return 0;
         return Math.round((playersSelected / this.numberOfPlayers()) * PERCENT_MULTPLIER);
     }
 
-    numberOfPlayers() {
-        return this.data.submissions.length;
+    numberOfPlayers(): number {
+        return this.data.submissions ? this.data.submissions.size : 0;
+    }
+
+    playersSelected(index: number): number {
+        if (!this.data.submissions) {
+            return 0;
+        }
+        let playersSelected = 0;
+        this.data.submissions.forEach((submission) => {
+            if (submission.choices.some((choice) => choice.index === index && choice.isSelected)) {
+                playersSelected++;
+            }
+        });
+
+        return playersSelected;
     }
 }
