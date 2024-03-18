@@ -7,7 +7,7 @@ import { PlayerService } from '@app/services/player/player.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { GameServicesProvider } from './game-services.provider';
 
-fdescribe('GameServicesProvider', () => {
+describe('GameServicesProvider', () => {
     let provider: GameServicesProvider;
 
     beforeEach(() => {
