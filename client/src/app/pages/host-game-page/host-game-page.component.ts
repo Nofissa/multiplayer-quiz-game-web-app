@@ -30,8 +30,6 @@ export class HostGamePageComponent implements OnInit {
     isLastQuestion: boolean = false;
     question: Question | undefined;
     nextAvailable: boolean = false;
-    // nextEndGame: boolean = false; to use later when we have a way to know if it's the last question
-
     private eventSubscriptions: Subscription[] = [];
     private readonly activatedRoute: ActivatedRoute;
     private readonly router: Router;
@@ -96,12 +94,20 @@ export class HostGamePageComponent implements OnInit {
         this.gameService.nextQuestion(this.pin);
     }
 
+    cancelGame() {
+        this.gameService.cancelGame(this.pin);
+    }
+
     endGame() {
         this.gameService.endGame(this.pin);
     }
 
     handleEndGame() {
         this.router.navigate(['results'], { queryParams: { pin: this.pin } });
+    }
+
+    handleCancelGame() {
+        this.router.navigate(['home'], { queryParams: { pin: this.pin } });
     }
 
     private setupSubscriptions(pin: string) {
@@ -160,6 +166,10 @@ export class HostGamePageComponent implements OnInit {
 
             this.gameService.onEndGame(pin, () => {
                 this.handleEndGame();
+            }),
+
+            this.gameService.onCancelGame(pin, () => {
+                this.handleCancelGame();
             }),
         );
     }
