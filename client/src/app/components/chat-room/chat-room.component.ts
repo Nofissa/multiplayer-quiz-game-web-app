@@ -64,7 +64,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     }
 
     isCurrentUser(author: string): boolean {
-        return this.playerService.getCurrentPlayerFromGame(this.pin)?.username?.toLowerCase() === author.toLowerCase();
+        return this.playerService.getCurrentPlayer(this.pin)?.username?.toLowerCase() === author.toLowerCase();
     }
 
     updateRemainingInputCount() {

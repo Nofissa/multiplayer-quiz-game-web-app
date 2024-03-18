@@ -1,37 +1,110 @@
 .mat-mdc-progress-bar {
     --mdc-linear-progress-active-indicator-height: 20px;
     --mdc-linear-progress-track-height: 20px !important;
-    width: 70%;
+    --mdc-linear-progress-track-color: none;
+    width: 100%;
+    transform: rotate(-90deg); /* Rotate the container to make the progress bar vertical */
 }
 
-::ng-deep .mat-mdc-progress-bar.correct {
-    --mdc-linear-progress-active-indicator-color: green;
-    background: lightgreen;
+::ng-deep .mat-mdc-progress-bar.progress-bar-0 {
+    --mdc-linear-progress-active-indicator-color: var(--answer-color-red);
+    background: none;
+    transform-origin: top left;
 }
 
-::ng-deep .mat-mdc-progress-bar.incorrect {
-    --mdc-linear-progress-active-indicator-color: red;
-    background: lightcoral;
+::ng-deep .mat-mdc-progress-bar.progress-bar-1 {
+    --mdc-linear-progress-active-indicator-color: var(--answer-color-blue);
+    background: none;
+    transform-origin: top left;
 }
 
-.choice-container {
+::ng-deep .mat-mdc-progress-bar.progress-bar-2 {
+    --mdc-linear-progress-active-indicator-color: var(--answer-color-green);
+    background: none;
+    transform-origin: top left;
+}
+
+::ng-deep .mat-mdc-progress-bar.progress-bar-3 {
+    --mdc-linear-progress-active-indicator-color: var(--answer-color-yellow);
+    background: none;
+    transform-origin: top left;
+}
+
+.question-container {
+    background-color: var(--answer-color-blue);
+    grid-area: question;
+    text-align: center;
+    font-size: 100%;
+}
+
+.bar-chart-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin: 10%;
+}
+
+.bar-container {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+}
+
+.choice-container {
+    align-content: space-between;
+    width: 90%;
+    grid-area: choices;
+    display: grid;
+    grid-template-areas:
+        'choice-0 choice-1'
+        'choice-2 choice-3';
+}
+
+.choice {
+    margin: 8px;
+}
+
+.mat-mdc-card.choice-0 {
+    --mdc-elevated-card-container-color: var(--answer-color-red);
+}
+
+.mat-mdc-card.choice-1 {
+    --mdc-elevated-card-container-color: var(--answer-color-blue);
+}
+
+.mat-mdc-card.choice-2 {
+    --mdc-elevated-card-container-color: var(--answer-color-green);
+}
+
+.mat-mdc-card.choice-3 {
+    --mdc-elevated-card-container-color: var(--answer-color-yellow);
+}
+
+.progress-bar-container {
+    margin-left: 5%;
     width: 100%;
 }
 
 .progress-container {
     width: 100%;
-    display: flex;
-    flex-direction: row;
+
     align-items: center;
+    justify-content: center;
+    transform: rotate(-90deg); /* Rotate the container to make the progress bar vertical */
+    transform-origin: top left;
+}
+
+.id-number {
+    display: grid;
+    background-color: lightgray;
+    height: 20px;
+    width: 20px;
+    align-content: center;
     justify-content: center;
 }
 
-.histogramme {
-    display: flex;
-    flex-direction: column;
+.bar-chart {
     height: auto;
     color: black;
     background-color: white;
@@ -40,8 +113,18 @@
     overflow: hidden;
     justify-content: center;
     align-items: center;
+    width: 45vw;
+    max-width: 500px;
+
+    display: grid;
+    grid-template-rows: auto auto auto;
+    grid-template-areas:
+        'question'
+        'bar-chart'
+        'choices';
 }
 
-.question-container {
-    text-align: center;
+.choice-container legend {
+    font-size: 90%;
+    text-align: left;
 }

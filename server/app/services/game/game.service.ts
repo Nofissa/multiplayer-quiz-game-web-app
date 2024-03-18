@@ -6,11 +6,14 @@ import { Question } from '@app/model/database/question';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { Evaluation } from '@common/evaluation';
 import { GameState } from '@common/game-state';
+import { Player } from '@common/player';
 import { PlayerState } from '@common/player-state';
+import { Question as CommonQuestion } from '@common/question';
+import { QuestionPayload } from '@common/question-payload';
 import { Submission } from '@common/submission';
+import { SubmissionPayload } from '@common/submission-payload';
 import { Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
-import { Player } from '@common/player';
 
 const NO_POINTS = 0;
 const NO_BONUS_MULTIPLIER = 1;
@@ -18,7 +21,7 @@ const BONUS_MULTIPLIER = 1.2;
 
 @Injectable()
 export class GameService {
-    private games: Map<string, Game> = new Map();
+    games: Map<string, Game> = new Map();
 
     constructor(private readonly quizService: QuizService) {}
 
@@ -26,7 +29,7 @@ export class GameService {
         const quiz = await this.quizService.getQuizById(quizId);
 
         if (!quiz) {
-            Promise.reject(`Aucun quiz ne correspond a l'identifiant ${quizId}`);
+            throw new Error(`Aucun quiz ne correspond a l'identifiant ${quizId}`);
         }
 
         let pin = generateRandomPin();
@@ -133,7 +136,7 @@ export class GameService {
         return evaluation;
     }
 
-    startGame(client: Socket, pin: string): Question {
+    startGame(client: Socket, pin: string): QuestionPayload {
         const game = this.getGame(pin);
 
         if (!this.isOrganizer(game, client.id)) {
@@ -145,9 +148,11 @@ export class GameService {
         }
 
         game.state = GameState.Running;
-        game.chatlogs = [];
 
-        return game.currentQuestion;
+        return {
+            question: game.currentQuestion as CommonQuestion,
+            isLast: game.currentQuestionIndex === game.quiz.questions.length - 1,
+        };
     }
 
     cancelGame(client: Socket, pin: string): string {
@@ -185,7 +190,7 @@ export class GameService {
         return game.state;
     }
 
-    nextQuestion(client: Socket, pin: string): Question {
+    nextQuestion(client: Socket, pin: string): QuestionPayload {
         const game = this.getGame(pin);
         if (!this.isOrganizer(game, client.id)) {
             throw new Error(`Vous n'êtes pas organisateur de la partie ${pin}`);
@@ -193,53 +198,82 @@ export class GameService {
 
         game.loadNextQuestion();
 
-        return game.currentQuestion;
+        return {
+            question: game.currentQuestion as CommonQuestion,
+            isLast: game.currentQuestionIndex === game.quiz.questions.length - 1,
+        };
     }
 
-    toggleSelectChoice(client: Socket, pin: string, choiceIndex: number): Submission[] {
+    toggleSelectChoice(client: Socket, pin: string, choiceIndex: number): SubmissionPayload {
         const game = this.getGame(pin);
         const submission = this.getOrCreateSubmission(client, game);
         submission.choices[choiceIndex].isSelected = !submission.choices[choiceIndex].isSelected;
 
-        return Array.from(game.currentQuestionSubmissions.values());
+        return { clientId: client.id, submission };
+    }
+
+    endGame(client: Socket, pin: string): void {
+        const game = this.getGame(pin);
+
+        if (!this.isOrganizer(game, client.id)) {
+            throw new Error(`Vous n'êtes pas organisateur de la partie ${pin}`);
+        }
+
+        this.games.delete(pin);
+    }
+
+    disconnect(client: Socket): DisconnectPayload {
+        const games = Array.from(this.games.values());
+
+        const toCancel = games
+            .filter((game) => game.organizer.id === client.id && (game.state === GameState.Opened || game.state === GameState.Closed))
+            .map((game) => game.pin);
+
+        const toAbandon = games
+            .filter((game) => Array.from(game.clientPlayers.values()).some((x) => x.socket.id === client.id))
+            .map((game) => game.pin);
+
+        const toEnd = games
+            .filter((game) => game.organizer.id === client.id && (game.state === GameState.Paused || game.state === GameState.Running))
+            .map((game) => game.pin);
+
+        return { toCancel, toAbandon, toEnd };
     }
 
     getGame(pin: string): Game {
         const game = this.games.get(pin);
 
         if (!game) {
-            throw new Error(`Aucune partie ne correspond au pin ${pin}`);
+            throw new Error(` ucune partie ne correspond au pin ${pin}`);
         }
 
         return game;
     }
 
-    disconnect(client: Socket): DisconnectPayload {
-        const toCancel = [];
-        const toAbandon = [];
-        const gameEntries = Array.from(this.games.entries());
+    getOrganizer(pin: string): Socket {
+        const game = this.games.get(pin);
 
-        gameEntries
-            .filter(([, game]) => game.organizer.id === client.id)
-            .forEach(([pin]) => {
-                toCancel.push(pin);
-            });
+        if (!game) {
+            throw new Error(`Aucune partie ne correspond au pin ${pin}`);
+        }
 
-        gameEntries
-            .filter(([, game]) => Array.from(game.clientPlayers.values()).some((x) => x.socket.id === client.id))
-            .forEach(([pin]) => {
-                toAbandon.push(pin);
-            });
-
-        return { toCancel, toAbandon };
+        return game.organizer;
     }
 
-    private isOrganizer(game: Game, clientId: string): boolean {
+    isOrganizer(game: Game, clientId: string): boolean {
         return game.organizer.id === clientId;
     }
 
-    private isGoodAnswer(question: Question, submission: Submission): boolean {
-        const correctAnswersIndices = new Set(question.choices.filter((x) => x.isCorrect).map((_, index) => index));
+    isGoodAnswer(question: Question, submission: Submission): boolean {
+        const correctAnswersIndices = new Set(
+            question.choices.reduce((indices, choice, index) => {
+                if (choice.isCorrect) {
+                    indices.push(index);
+                }
+
+                return indices;
+            }, []),
+        );
         const selectedAnswersIndices = new Set(submission.choices.filter((x) => x.isSelected).map((x) => x.index));
 
         return (
@@ -248,7 +282,7 @@ export class GameService {
         );
     }
 
-    private getOrCreateSubmission(client: Socket, game: Game) {
+    getOrCreateSubmission(client: Socket, game: Game) {
         if (!game.currentQuestionSubmissions.has(client.id)) {
             game.currentQuestionSubmissions.set(client.id, {
                 choices: game.currentQuestion.choices.map((_, index) => {

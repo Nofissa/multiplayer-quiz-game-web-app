@@ -25,7 +25,7 @@ export class TimerService {
         }
 
         if (this.intervals.get(pin)) {
-            this.stopTimer(pin); // to reset the timer
+            this.stopTimer(client, pin); // to reset the timer
         }
 
         if (this.counters.get(pin) === undefined) {
@@ -37,7 +37,7 @@ export class TimerService {
             this.counters.set(pin, this.counters.get(pin) - 1 / TICK_PER_SECOND);
             this.tickSubjects.get(pin).next(this.counters.get(pin));
             if (this.counters.get(pin) <= 0) {
-                this.stopTimer(pin);
+                this.stopTimer(client, pin);
             }
         }, ONE_SECOND_MS / TICK_PER_SECOND);
 
@@ -47,7 +47,13 @@ export class TimerService {
         return this.counters.get(pin);
     }
 
-    stopTimer(pin: string) {
+    stopTimer(client: Socket, pin: string) {
+        const game = this.gameService.getGame(pin);
+
+        if (game.organizer.id !== client.id) {
+            throw new Error(`Seul l'organisateur de la partie ${pin} peut arrêter la minuterie`);
+        }
+
         clearInterval(this.intervals.get(pin));
         this.intervals.delete(pin);
         this.counters.delete(pin);

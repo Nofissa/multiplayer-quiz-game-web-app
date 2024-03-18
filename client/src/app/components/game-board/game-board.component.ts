@@ -11,6 +11,7 @@ import { TimerService } from '@app/services/timer/timer.service';
 import { Evaluation } from '@common/evaluation';
 import { Player } from '@common/player';
 import { Question } from '@common/question';
+import { TimerEventType } from '@common/timer-event-type';
 import { Subscription } from 'rxjs';
 
 const NOT_FOUND_INDEX = -1;
@@ -74,7 +75,7 @@ export class GameBoardComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
-        const player = this.playerService.getCurrentPlayerFromGame(this.pin);
+        const player = this.playerService.getCurrentPlayer(this.pin);
         if (player) {
             this.player = player;
         }
@@ -137,11 +138,11 @@ export class GameBoardComponent implements OnInit, OnDestroy {
 
     private setupSubscriptions(pin: string) {
         this.eventSubscriptions.push(
-            this.gameService.onNextQuestion(pin, (question) => {
-                this.loadNextQuestion(question);
+            this.gameService.onNextQuestion(pin, (data) => {
+                this.loadNextQuestion(data.question);
             }),
             this.gameService.onSubmitChoices(pin, (evaluation) => {
-                if (this.playerService.getCurrentPlayerFromGame(pin)?.socketId === evaluation.player.socketId) {
+                if (this.playerService.getCurrentPlayer(pin)?.socketId === evaluation.player.socketId) {
                     this.cachedEvaluation = evaluation;
                 }
                 if (evaluation.isLast) {
@@ -151,9 +152,9 @@ export class GameBoardComponent implements OnInit, OnDestroy {
                     }
                 }
             }),
-            this.timerService.onTimerTick(pin, (remainingTime) => {
-                if (!remainingTime) {
-                    this.submitChoices(); // so that every player is forced to submit
+            this.timerService.onTimerTick(pin, (payload) => {
+                if (!payload.remainingTime && payload.eventType === TimerEventType.Question) {
+                    this.submitChoices();
                 }
             }),
         );
