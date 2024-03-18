@@ -3,6 +3,7 @@ import { GameService } from '@app/services/game/game.service';
 import { MessageService } from '@app/services/message/message.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { Chatlog } from '@common/chatlog';
+import { Evaluation } from '@common/evaluation';
 import { GameEventPayload } from '@common/game-event-payload';
 import { GameState } from '@common/game-state';
 import { Player } from '@common/player';
@@ -11,11 +12,10 @@ import { TimerEventType } from '@common/timer-event-type';
 import { TimerPayload } from '@common/timer-payload';
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { Evaluation } from '@common/evaluation';
 
 @WebSocketGateway({
     cors: {
-        origin: ['http:localhost:4200', 'https://polytechnique-montr-al.gitlab.io', 'http://polytechnique-montr-al.gitlab.io'],
+        origin: ['http://localhost:4200', 'https://polytechnique-montr-al.gitlab.io', 'http://polytechnique-montr-al.gitlab.io'],
         methods: ['GET', 'POST'],
         transports: ['websocket', 'polling'],
         credentials: false,
