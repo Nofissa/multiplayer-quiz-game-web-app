@@ -11,7 +11,7 @@ export class NavHeaderComponent {
     backArrow = true;
 
     @Input()
-    pin = 'XXXX';
+    pin: string | null;
 
     constructor(private readonly location: Location) {}
 
