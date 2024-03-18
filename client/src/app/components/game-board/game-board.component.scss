@@ -60,6 +60,7 @@ mat-icon {
     left: 50%;
     transform: translate(-50%, -50%);
     font-size: 2rem;
+    background-color: red;
 }
 
 .icon-wrapper {
@@ -77,6 +78,7 @@ mat-icon {
 
 .answer-box:hover {
     cursor: pointer;
+    background-color: #858181;
 }
 
 .answer-box1 {
@@ -108,22 +110,6 @@ mat-icon {
 }
 
 .answer-box4.highlight-selected {
-    background-color: #e69d2f;
-}
-
-.answer-box1:hover {
-    background-color: #dc4d66;
-}
-
-.answer-box2:hover {
-    background-color: #63c5ea;
-}
-
-.answer-box3:hover {
-    background-color: #9cd172;
-}
-
-.answer-box4:hover {
     background-color: #e69d2f;
 }
 
