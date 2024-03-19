@@ -16,7 +16,7 @@ import { io } from 'socket.io-client';
 import { SwiperModule } from 'swiper/angular';
 import { CreateGamePageComponent } from './create-game-page.component';
 
-fdescribe('CreateGamePageComponent', () => {
+describe('CreateGamePageComponent', () => {
     let component: CreateGamePageComponent;
     let fixture: ComponentFixture<CreateGamePageComponent>;
     let quizHttpServiceMock: jasmine.SpyObj<QuizHttpService>;

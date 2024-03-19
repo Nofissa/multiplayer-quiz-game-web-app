@@ -32,7 +32,6 @@ export class BarChartComponent {
                 playersSelected++;
             }
         });
-
         return playersSelected;
     }
 }

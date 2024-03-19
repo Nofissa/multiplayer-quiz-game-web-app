@@ -31,12 +31,15 @@ describe('BarChartService', () => {
         expect(service.getCurrentQuestionData()).toEqual({ question: questionStub()[0], submissions: new Map() });
     });
 
-    it('should getCurrentQuestionData get current BarChartData', () => {
+    it('should getCurrentQuestionData get current BarChartData, or undefined if ther is no data', () => {
         service['barChartData'] = barChartDataStub();
-        const latestBarChart = service.getCurrentQuestionData();
+        let latestBarChart = service.getCurrentQuestionData();
         if (latestBarChart) {
             expect(latestBarChart).toEqual(barChartDataStub()[1]);
         }
+        service['barChartData'] = [];
+        latestBarChart = service.getCurrentQuestionData();
+        expect(latestBarChart).not.toBeDefined();
     });
 
     it('should get all bar chart data', () => {
