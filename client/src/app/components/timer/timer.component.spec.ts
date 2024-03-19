@@ -1,11 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TimerComponent } from './timer.component';
 import { TimerService } from '@app/services/timer/timer.service';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
-import { io } from 'socket.io-client';
-import { Observable, Observer, of } from 'rxjs';
-import { TimerPayload } from '@common/timer-payload';
 import { TimerEventType } from '@common/timer-event-type';
+import { TimerPayload } from '@common/timer-payload';
+import { Observable, Observer, of } from 'rxjs';
+import { io } from 'socket.io-client';
+import { TimerComponent } from './timer.component';
 
 describe('TimerComponent', () => {
     let component: TimerComponent;

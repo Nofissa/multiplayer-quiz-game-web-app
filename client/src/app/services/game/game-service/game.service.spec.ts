@@ -1,9 +1,12 @@
 import { TestBed } from '@angular/core/testing';
+import { firstPlayerStub, secondPlayerStub } from '@app/TestStubs/player.stubs';
 import { SocketServerMock } from '@app/mocks/socket-server-mock';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { Evaluation } from '@common/evaluation';
 import { GameEventPayload } from '@common/game-event-payload';
 import { GameState } from '@common/game-state';
+import { Player } from '@common/player';
+import { PlayerState } from '@common/player-state';
 import { Question } from '@common/question';
 import { Submission } from '@common/submission';
 import { Observable } from 'rxjs';
@@ -81,25 +84,25 @@ describe('GameService', () => {
         expect(webSocketServiceSpy.emit).toHaveBeenCalledWith(stubData.joinGameEventName, { pin: stubData.pin1, username });
     });
 
-    // it('should subscribe to joinGame event and call the callback if pin matches', () => {
-    //     gameService.onJoinGame(stubData.pin1, stubData.callback);
+    it('should subscribe to joinGame event and call the callback if pin matches', () => {
+        gameService.onJoinGame(stubData.pin1, stubData.callback);
 
-    //     const player: Player = {} as Player;
-    //     const payload: GameEventPayload<Player> = { pin: stubData.pin1, data: player };
-    //     socketServerMock.emit(stubData.joinGameEventName, payload);
+        const bundle = { players: [], chatlogs: [] };
+        const payload = { pin: stubData.pin1, data: bundle };
+        socketServerMock.emit(stubData.joinGameEventName, payload);
 
-    //     expect(stubData.callback).toHaveBeenCalledWith(payload);
-    // });
+        expect(stubData.callback).toHaveBeenCalledWith(payload);
+    });
 
-    // it('should subscribe to joinGame event and not call the callback if pin does not match', () => {
-    //     gameService.onJoinGame(stubData.pin1, stubData.callback);
+    it('should subscribe to joinGame event and not call the callback if pin does not match', () => {
+        gameService.onJoinGame(stubData.pin1, stubData.callback);
 
-    // const player: Player = {} as Player;
-    // const payload: GameEventPayload<Player> = { pin: stubData.pin1, data: player };
-    // socketServerMock.emit(stubData.joinGameEventName, payload);
+        const bundle = { players: [], chatlogs: [] };
+        const payload = { pin: stubData.pin2, data: bundle };
+        socketServerMock.emit(stubData.joinGameEventName, payload);
 
-    //     expect(stubData.callback).not.toHaveBeenCalled();
-    // });
+        expect(stubData.callback).not.toHaveBeenCalled();
+    });
 
     it('should raise cancelGame event', () => {
         gameService.cancelGame(stubData.pin1);
@@ -131,25 +134,25 @@ describe('GameService', () => {
         expect(webSocketServiceSpy.emit).toHaveBeenCalledWith(stubData.playerAbandonEventName, { pin: stubData.pin1 });
     });
 
-    // it('should subscribe to playerAbandon event and call the callback if pin matches', () => {
-    //     gameService.onPlayerAbandon(stubData.pin1, stubData.callback);
+    it('should subscribe to playerAbandon event and call the callback if pin matches', () => {
+        gameService.onPlayerAbandon(stubData.pin1, stubData.callback);
 
-    // const player: Player = {} as Player;
-    // const payload: GameEventPayload<Player> = { pin: stubData.pin1, data: player };
-    // socketServerMock.emit(stubData.playerAbandonEventName, payload);
+        const player: Player = secondPlayerStub();
+        const payload: GameEventPayload<Player> = { pin: stubData.pin1, data: player };
+        socketServerMock.emit(stubData.playerAbandonEventName, payload);
 
-    //     expect(stubData.callback).toHaveBeenCalledWith(player);
-    // });
+        expect(stubData.callback).toHaveBeenCalledWith(player);
+    });
 
-    // it('should subscribe to playerAbandon event and not call the callback if does not match', () => {
-    //     gameService.onPlayerAbandon(stubData.pin1, stubData.callback);
+    it('should subscribe to playerAbandon event and not call the callback if does not match', () => {
+        gameService.onPlayerAbandon(stubData.pin1, stubData.callback);
 
-    // const player: Player = {} as Player;
-    // const payload: GameEventPayload<Player> = { pin: stubData.pin2, data: player };
-    // socketServerMock.emit(stubData.playerAbandonEventName, payload);
+        const player: Player = secondPlayerStub();
+        const payload: GameEventPayload<Player> = { pin: stubData.pin2, data: player };
+        socketServerMock.emit(stubData.playerAbandonEventName, payload);
 
-    //     expect(stubData.callback).not.toHaveBeenCalled();
-    // });
+        expect(stubData.callback).not.toHaveBeenCalled();
+    });
 
     it('should raise playerBan event', () => {
         const username = 'user123';
@@ -157,25 +160,27 @@ describe('GameService', () => {
         expect(webSocketServiceSpy.emit).toHaveBeenCalledWith(stubData.playerBanEventName, { pin: stubData.pin1, username });
     });
 
-    // it('should subscribe to playerBan event and call the callback if pin matches', () => {
-    //     gameService.onPlayerBan(stubData.pin1, stubData.callback);
+    it('should subscribe to playerBan event and call the callback if pin matches', () => {
+        gameService.onPlayerBan(stubData.pin1, stubData.callback);
 
-    // const player: Player = {} as Player;
-    // const payload: GameEventPayload<Player> = { pin: stubData.pin1, data: player };
-    // socketServerMock.emit('playerBan', payload);
+        const player: Player = secondPlayerStub();
+        player.state = PlayerState.Banned;
+        const payload: GameEventPayload<Player> = { pin: stubData.pin1, data: player };
+        socketServerMock.emit('playerBan', payload);
 
-    //     expect(stubData.callback).toHaveBeenCalledWith(player);
-    // });
+        expect(stubData.callback).toHaveBeenCalledWith(player);
+    });
 
-    // it('should subscribe to playerBan event and not call the callback if pin does not match', () => {
-    //     gameService.onPlayerBan(stubData.pin1, stubData.callback);
+    it('should subscribe to playerBan event and not call the callback if pin does not match', () => {
+        gameService.onPlayerBan(stubData.pin1, stubData.callback);
 
-    // const player: Player = {} as Player;
-    // const payload: GameEventPayload<Player> = { pin: stubData.pin2, data: player };
-    // socketServerMock.emit('playerBan', payload);
+        const player: Player = secondPlayerStub();
+        player.state = PlayerState.Banned;
+        const payload: GameEventPayload<Player> = { pin: stubData.pin2, data: player };
+        socketServerMock.emit('playerBan', payload);
 
-    //     expect(stubData.callback).not.toHaveBeenCalled();
-    // });
+        expect(stubData.callback).not.toHaveBeenCalled();
+    });
 
     it('should raise toggleSelectChoice event', () => {
         const choiceIndex = 2;
@@ -211,7 +216,7 @@ describe('GameService', () => {
 
     it('should subscribe to submitChoices event and call the callback if pin matches', () => {
         gameService.onSubmitChoices(stubData.pin1, stubData.callback);
-        const evaluation: Evaluation = {} as Evaluation;
+        const evaluation: Evaluation = { player: firstPlayerStub(), correctAnswers: [], score: 80, isFirstCorrect: false, isLast: false };
         const payload: GameEventPayload<Evaluation> = { pin: stubData.pin1, data: evaluation };
         socketServerMock.emit(stubData.submitChoicesEventName, payload);
 
@@ -220,7 +225,7 @@ describe('GameService', () => {
 
     it('should subscribe to submitChoices event and not call the callback if pin does not match', () => {
         gameService.onSubmitChoices(stubData.pin1, stubData.callback);
-        const evaluation: Evaluation = {} as Evaluation;
+        const evaluation: Evaluation = { player: firstPlayerStub(), correctAnswers: [], score: 80, isFirstCorrect: false, isLast: false };
         const payload: GameEventPayload<Evaluation> = { pin: stubData.pin2, data: evaluation };
         socketServerMock.emit(stubData.submitChoicesEventName, payload);
 

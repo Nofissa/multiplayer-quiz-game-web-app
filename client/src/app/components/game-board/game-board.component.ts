@@ -35,6 +35,7 @@ export class GameBoardComponent implements OnInit, OnDestroy {
     hasSubmited: boolean;
     selectedChoiceIndexes: number[];
     cachedEvaluation: Evaluation | null = null;
+    disableShortcuts: boolean = false;
 
     readonly gameHttpService: GameHttpService;
     readonly gameService: GameService;
@@ -61,7 +62,7 @@ export class GameBoardComponent implements OnInit, OnDestroy {
     handleKeyboardEvent(event: KeyboardEvent): void {
         const focusedElement = document.activeElement as HTMLElement;
 
-        if (focusedElement.tagName.toLowerCase() === 'textarea') {
+        if (this.disableShortcuts || focusedElement.tagName.toLowerCase() === 'textarea') {
             return;
         }
 
@@ -96,6 +97,7 @@ export class GameBoardComponent implements OnInit, OnDestroy {
     submitChoices() {
         this.hasSubmited = true;
         this.gameService.submitChoices(this.pin);
+        this.disableShortcuts = true;
     }
 
     toggleSelectChoice(choiceIndex: number) {
@@ -131,6 +133,7 @@ export class GameBoardComponent implements OnInit, OnDestroy {
         this.selectedChoiceIndexes = [];
         this.cachedEvaluation = null;
         this.question = question;
+        this.disableShortcuts = false;
     }
 
     private setupSubscriptions(pin: string) {

@@ -3,7 +3,7 @@
         <mat-icon class="back-arrow" aria-hidden="false" aria-label="Retour" fontIcon="arrow_back"></mat-icon>
     </button>
     <img class="logo" src="https://imed-bennour.github.io/logo-for-game-log2990/logo.png" alt="Logo Projet" routerLink="/" />
-    <mat-card class="pin-container" *ngIf="!pin">
+    <mat-card class="pin-container" *ngIf="pin">
         <mat-card-content>Pin : {{ pin }}</mat-card-content>
     </mat-card>
 </div>
