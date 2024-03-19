@@ -138,7 +138,6 @@ describe('GameGateway', () => {
 
     describe('handleEndGame', () => {
         const pin = 'mockPin';
-
         it('should stop the timer and end the game', () => {
             gameGateway.handleEndGame(socketMock as Socket, { pin });
 
@@ -161,26 +160,20 @@ describe('GameGateway', () => {
             gameServiceMock.endGame = jest.fn().mockImplementation(() => {
                 throw error;
             });
-
             gameGateway.handleEndGame(socketMock as Socket, { pin });
-
             expect(socketMock.emit).toHaveBeenCalledWith('error', errorMessage);
         });
     });
 
     describe('stopTimer', () => {
         const pin = 'mockPin';
-
         it('should stop the timer', () => {
             gameGateway.stopTimer(socketMock as Socket, { pin });
-
             expect(timerServiceMock.stopTimer).toHaveBeenCalledWith(socketMock, pin);
         });
-
         it('should emit the stopTimer event with null payload', () => {
             serverMock.to.mockReturnValue(broadcastMock);
             gameGateway.stopTimer(socketMock as Socket, { pin });
-
             expect(serverMock.to).toHaveBeenCalledWith(pin);
             expect(broadcastMock.emit).toHaveBeenCalledWith('stopTimer', { pin, data: null });
         });
@@ -191,9 +184,7 @@ describe('GameGateway', () => {
             timerServiceMock.stopTimer = jest.fn().mockImplementation(() => {
                 throw error;
             });
-
             gameGateway.stopTimer(socketMock as Socket, { pin });
-
             expect(socketMock.emit).toHaveBeenCalledWith('error', errorMessage);
         });
     });
