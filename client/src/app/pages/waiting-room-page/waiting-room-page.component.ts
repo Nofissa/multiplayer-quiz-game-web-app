@@ -65,7 +65,7 @@ export class WaitingRoomPageComponent implements OnInit, OnDestroy {
 
     leaveGame() {
         this.gameService.playerAbandon(this.pin);
-        this.router.navigate(['/home']);
+        this.router.navigateByUrl('/home');
     }
 
     handleEndGame() {

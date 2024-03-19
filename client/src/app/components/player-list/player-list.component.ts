@@ -44,7 +44,7 @@ export class PlayerListComponent implements OnInit, OnDestroy {
 
     ngOnDestroy() {
         this.eventSubscriptions.forEach((sub) => {
-            if (!sub.closed) {
+            if (sub && !sub.closed) {
                 sub.unsubscribe();
             }
         });

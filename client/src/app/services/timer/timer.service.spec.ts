@@ -51,8 +51,10 @@ describe('TimerService', () => {
 
     it('should raise startTimer event', () => {
         const pin = '1234';
-        timerService.startTimer(pin, TimerEventType.StartGame);
-        expect(webSocketServiceSpy.emit).toHaveBeenCalledWith('startTimer', { pin });
+        const eventType: TimerEventType = TimerEventType.StartGame;
+        const duration = undefined;
+        timerService.startTimer(pin, eventType);
+        expect(webSocketServiceSpy.emit).toHaveBeenCalledWith('startTimer', { pin, eventType, duration });
     });
 
     it('should subscribe to startTimer event and call the callback on server emit if pin matches', () => {
@@ -97,5 +99,12 @@ describe('TimerService', () => {
 
         expect(webSocketServiceSpy.on).toHaveBeenCalledWith(stubData.timerTickEventName, jasmine.any(Function));
         expect(stubData.callback).not.toHaveBeenCalled();
+    });
+
+    it('should raise stopTimer event', () => {
+        const pin = '1234';
+        timerService.stopTimer(pin);
+
+        expect(webSocketServiceSpy.emit).toHaveBeenCalledWith('stopTimer', { pin });
     });
 });

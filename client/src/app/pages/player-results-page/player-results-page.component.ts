@@ -47,7 +47,7 @@ export class PlayerResultsPageComponent implements OnInit {
             },
             error: (error: HttpErrorResponse) => {
                 if (error.status === HttpStatusCode.NotFound) {
-                    this.router.navigateByUrl('/home');
+                    this.leaveGame();
                 }
             },
         });
