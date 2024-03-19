@@ -63,11 +63,10 @@ export class HostGamePageComponent implements OnInit {
 
     ngOnInit() {
         this.pin = this.activatedRoute.snapshot.queryParams['pin'];
-
         this.gameHttpService.getGameSnapshotByPin(this.pin).subscribe({
             error: (error: HttpErrorResponse) => {
                 if (error.status === HttpStatusCode.NotFound) {
-                    this.router.navigateByUrl('/home');
+                    this.router.navigate(['home']);
                 }
             },
         });

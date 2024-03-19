@@ -1,3 +1,4 @@
+import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -30,7 +31,7 @@ import { QuestionPayload } from '@common/question-payload';
 import { SubmissionPayload } from '@common/submission-payload';
 import { TimerEventType } from '@common/timer-event-type';
 import { TimerPayload } from '@common/timer-payload';
-import { Observable, of } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { io } from 'socket.io-client';
 import { HostGamePageComponent } from './host-game-page.component';
 import SpyObj = jasmine.SpyObj;
@@ -176,7 +177,6 @@ describe('HostGamePageComponent', () => {
                 webSocketServiceSpy['socketInstance'].on(eventName, (data) => {
                     observer.next(data);
                 });
-
                 return () => {
                     webSocketServiceSpy['socketInstance'].off(eventName);
                 };
@@ -202,36 +202,28 @@ describe('HostGamePageComponent', () => {
     });
 
     it('should barCharts return all chartData if there is data in the service', () => {
-        barChartServiceSpy.getAllBarChart.and.callFake(() => {
-            return barChartDataStub();
-        });
+        barChartServiceSpy.getAllBarChart.and.returnValue(barChartDataStub());
         const response = component.barCharts;
         expect(barChartServiceSpy.getAllBarChart).toHaveBeenCalled();
         expect(response).toEqual(barChartDataStub());
     });
 
     it('should barCharts return empty array if there is no data in the service', () => {
-        barChartServiceSpy.getAllBarChart.and.callFake(() => {
-            return [];
-        });
+        barChartServiceSpy.getAllBarChart.and.returnValue([]);
         const response = component.barCharts;
         expect(barChartServiceSpy.getAllBarChart).toHaveBeenCalled();
         expect(response).toEqual([]);
     });
 
     it('should barChart get the current question data if there is data is in the service', () => {
-        barChartServiceSpy.getCurrentQuestionData.and.callFake(() => {
-            return barChartDataStub()[0];
-        });
+        barChartServiceSpy.getCurrentQuestionData.and.returnValue(barChartDataStub()[0]);
         const response = component.barChart;
         expect(barChartServiceSpy.getCurrentQuestionData).toHaveBeenCalled();
         expect(response).toEqual(barChartDataStub()[0]);
     });
 
     it('should barChart get undefined if there is no data is in the service', () => {
-        barChartServiceSpy.getCurrentQuestionData.and.callFake(() => {
-            return undefined;
-        });
+        barChartServiceSpy.getCurrentQuestionData.and.returnValue(undefined);
         const response = component.barChart;
         expect(barChartServiceSpy.getCurrentQuestionData).toHaveBeenCalled();
         expect(response).toEqual(undefined);
@@ -248,6 +240,12 @@ describe('HostGamePageComponent', () => {
         expect(gameServiceSpy.onPlayerAbandon).toHaveBeenCalledWith(PIN, jasmine.any(Function));
         expect(gameServiceSpy.onEndGame).toHaveBeenCalledWith(PIN, jasmine.any(Function));
         expect(timerService.onTimerTick).toHaveBeenCalledWith(PIN, jasmine.any(Function));
+    });
+
+    it('should error in NgOnIgnit redirect to home page', () => {
+        gameHttpServiceSpy.getGameSnapshotByPin.and.returnValue(throwError(() => new HttpErrorResponse({ status: HttpStatusCode.NotFound })));
+        component.ngOnInit();
+        expect(routerSpy.navigate).toHaveBeenCalledWith(['home']);
     });
 
     it('should toggleLock call toggleGameLock and change local gameState', () => {
