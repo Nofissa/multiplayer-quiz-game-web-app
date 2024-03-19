@@ -38,7 +38,7 @@ const gameSnapshotStub: GameSnapshot = {
 
 const observableSnapShot = of(gameSnapshotStub);
 
-fdescribe('GameBoardComponent', () => {
+describe('GameBoardComponent', () => {
     let component: GameBoardComponent;
     let fixture: ComponentFixture<GameBoardComponent>;
     let gameHttpServiceMock: jasmine.SpyObj<GameHttpService>;
