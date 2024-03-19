@@ -18,6 +18,7 @@ describe('QuizDetailsDialogComponent', () => {
         onStartGame: jasmine.createSpy('onStartGame'),
         onTestGame: jasmine.createSpy('onTestGame'),
         onNotFound: jasmine.createSpy('onNotFound'),
+        onCreateGame: jasmine.createSpy('onCreateGame'),
     };
 
     beforeEach(() => {
@@ -62,6 +63,14 @@ describe('QuizDetailsDialogComponent', () => {
         expect(quizHttpServiceMock.getVisibleQuizById).toHaveBeenCalledWith('testId');
         expect(mockData.onTestGame).toHaveBeenCalledWith(mockQuiz);
     });
+
+    it('should call onCreateGame with the quiz', () => {
+        quizHttpServiceMock.getVisibleQuizById.and.returnValue(of(mockQuiz));
+        component.startGame();
+        expect(quizHttpServiceMock.getVisibleQuizById).toHaveBeenCalledWith('testId');
+        expect(mockData.onCreateGame).toHaveBeenCalledWith(mockQuiz);
+    });
+
     it('should call onNotFound when testGame quiz is not found', () => {
         const errorResponse = new HttpErrorResponse({ status: 404, statusText: 'Not Found' });
         quizHttpServiceMock.getVisibleQuizById.and.returnValue(throwError(() => errorResponse));
