@@ -41,6 +41,7 @@ export class GameTransitionComponent implements OnInit, OnDestroy {
         this.eventSubscriptions.forEach((sub) => {
             if (!sub.closed) {
                 sub.unsubscribe();
+                this.eventSubscriptions = this.eventSubscriptions.filter((item) => item !== sub);
             }
         });
     }

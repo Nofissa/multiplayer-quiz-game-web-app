@@ -1,8 +1,8 @@
-import { WebSocketService } from './web-socket.service';
-import { Socket } from 'socket.io-client';
 import { TestBed } from '@angular/core/testing';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { SocketServerMock } from '@app/mocks/socket-server-mock';
+import { Socket } from 'socket.io-client';
+import { WebSocketService } from './web-socket.service';
 
 describe('WebSocketService', () => {
     let webSocketService: WebSocketService;

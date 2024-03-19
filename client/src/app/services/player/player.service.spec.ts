@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { Player } from '@common/player';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
+import { Player } from '@common/player';
 import { PlayerService } from './player.service';
 
 describe('PlayerService', () => {
@@ -8,13 +8,12 @@ describe('PlayerService', () => {
     let webSocketServiceSpy: jasmine.SpyObj<WebSocketService>;
 
     beforeEach(() => {
-        const spy = jasmine.createSpyObj('WebSocketService', ['getSocketId']);
+        webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', ['getSocketId']);
 
         TestBed.configureTestingModule({
-            providers: [{ provide: WebSocketService, useValue: spy }],
+            providers: [{ provide: WebSocketService, useValue: webSocketServiceSpy }],
         });
         service = TestBed.inject(PlayerService);
-        webSocketServiceSpy = TestBed.inject(WebSocketService) as jasmine.SpyObj<WebSocketService>;
     });
 
     afterEach(() => {
@@ -44,10 +43,11 @@ describe('PlayerService', () => {
 
     it('should return player if found', () => {
         const pin = '123';
-        const player: Player = {} as Player;
+        const someSocketId = 'someSocketId';
+        const player: Player = { socketId: someSocketId } as Player;
 
         service.setPlayer(pin, player);
-        webSocketServiceSpy.getSocketId.and.returnValue('someSocketId');
+        webSocketServiceSpy.getSocketId.and.returnValue(someSocketId);
 
         expect(service.getCurrentPlayer(pin)).toEqual(player);
     });

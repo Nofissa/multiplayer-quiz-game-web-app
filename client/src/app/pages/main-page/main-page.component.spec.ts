@@ -3,8 +3,10 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { AuthService } from '@app/services/auth/auth.service';
+import { GameService } from '@app/services/game/game-service/game.service';
 import { SessionService } from '@app/services/session/session.service';
-import { of, throwError } from 'rxjs';
+import { firstPlayerStub } from '@app/TestStubs/player.stubs';
+import { of, Subscription, throwError } from 'rxjs';
 import { MainPageComponent } from './main-page.component';
 
 describe('MainPage', () => {
@@ -15,6 +17,7 @@ describe('MainPage', () => {
     let snackBarServiceSpy: jasmine.SpyObj<MatSnackBar>;
     let authServiceSpy: jasmine.SpyObj<AuthService>;
     let sessionServiceSpy: jasmine.SpyObj<SessionService>;
+    let gameServiceSpy: jasmine.SpyObj<GameService>;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
@@ -25,6 +28,7 @@ describe('MainPage', () => {
                 { provide: MatSnackBar, useValue: jasmine.createSpyObj('MatSnackBar', ['open']) },
                 { provide: AuthService, useValue: jasmine.createSpyObj('AuthService', ['verify', 'login']) },
                 { provide: SessionService, useValue: jasmine.createSpyObj('SessionService', ['getSession', 'setSession']) },
+                { provide: GameService, useValue: jasmine.createSpyObj('GameService', ['joinGame', 'onJoinGame']) },
             ],
         }).compileComponents();
 
@@ -33,6 +37,7 @@ describe('MainPage', () => {
         snackBarServiceSpy = TestBed.inject(MatSnackBar) as jasmine.SpyObj<MatSnackBar>;
         authServiceSpy = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
         sessionServiceSpy = TestBed.inject(SessionService) as jasmine.SpyObj<SessionService>;
+        gameServiceSpy = TestBed.inject(GameService) as jasmine.SpyObj<GameService>;
     });
 
     beforeEach(() => {
@@ -162,6 +167,29 @@ describe('MainPage', () => {
 
             expect(authServiceSpy.login).toHaveBeenCalledWith({ username: 'Admin', password: 'invalidAdminPassword' });
             expect(snackBarServiceSpy.open).toHaveBeenCalled();
+        }));
+    });
+
+    describe('joinGame', () => {
+        it('should join the game and navigate to the waiting room', fakeAsync(() => {
+            const pin = '1234';
+            const username = 'testUser';
+            const dialogRefSpyObj = jasmine.createSpyObj({ afterClosed: of({ pin, username }) });
+            const fakeSubscription = new Subscription();
+
+            dialogServiceSpy.open.and.returnValue(dialogRefSpyObj);
+            gameServiceSpy.onJoinGame.and.callFake((pinArg, callback) => {
+                callback(firstPlayerStub());
+                return fakeSubscription;
+            });
+
+            component.joinGame();
+
+            tick();
+
+            expect(dialogServiceSpy.open).toHaveBeenCalled();
+            expect(gameServiceSpy.joinGame).toHaveBeenCalledWith(pin, username);
+            expect(routerSpy.navigate).toHaveBeenCalledWith(['waiting-room'], { queryParams: { pin } });
         }));
     });
 });
