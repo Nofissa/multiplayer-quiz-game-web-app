@@ -43,3 +43,20 @@ export const submissionStub = (): Submission[] => {
         },
     ];
 };
+
+export const submissionMapStub = (): Map<string, Submission>[] => {
+    return [
+        new Map([
+            ['ClientID1', submissionStub()[0]],
+            ['ClientID2', submissionStub()[1]],
+            ['ClientID3', submissionStub()[2]],
+            ['ClientID4', submissionStub()[3]],
+        ]),
+        new Map([
+            ['ClientID5', submissionStub()[1]],
+            ['ClientID6', submissionStub()[1]],
+            ['ClientID7', submissionStub()[1]],
+            ['ClientID8', submissionStub()[1]],
+        ]),
+    ];
+};

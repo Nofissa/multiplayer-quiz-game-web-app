@@ -9,23 +9,33 @@ import { GameState } from '@common/game-state';
 import { of } from 'rxjs';
 import { GameTransitionComponent } from './game-transition.component';
 
-describe('GameTransitionComponent', () => {
+const gameSnapshotStub: GameSnapshot = {
+    players: [],
+    chatlogs: [],
+    quiz: quizStub(),
+    state: GameState.Paused,
+    currentQuestionIndex: 0,
+    questionSubmissions: [],
+};
+
+fdescribe('GameTransitionComponent', () => {
     let component: GameTransitionComponent;
     let fixture: ComponentFixture<GameTransitionComponent>;
     let gameHttpServiceSpy: jasmine.SpyObj<GameHttpService>;
     let timerServiceSpy: jasmine.SpyObj<TimerService>;
+    const pin = '1234';
 
     beforeEach(async () => {
         const gameHttpServiceMock = jasmine.createSpyObj('GameHttpService', ['getGameSnapshotByPin']);
-        const timerServiceMock = jasmine.createSpyObj('TimerService', ['onStartTimer']);
+        const timerServiceMock = jasmine.createSpyObj('TimerService', ['onStartTimer', 'onTimerTick']);
 
         await TestBed.configureTestingModule({
             declarations: [GameTransitionComponent],
             providers: [
                 GameServicesProvider,
-                MatSnackBar,
                 { provide: GameHttpService, useValue: gameHttpServiceMock },
                 { provide: TimerService, useValue: timerServiceMock },
+                MatSnackBar,
             ],
         }).compileComponents();
 
@@ -39,34 +49,59 @@ describe('GameTransitionComponent', () => {
         fixture.detectChanges();
     });
 
+    afterEach(() => {
+        fixture.destroy();
+    });
+
     it('should create', () => {
         expect(component).toBeTruthy();
     });
 
     it('should set up subscriptions on initialization', () => {
-        expect(timerServiceSpy.onStartTimer).toHaveBeenCalledWith(component.pin, jasmine.any(Function));
+        const onStartTimerCallback = timerServiceSpy.onStartTimer.calls.mostRecent().args[1] as () => void;
+        onStartTimerCallback();
+
+        expect(gameHttpServiceSpy.getGameSnapshotByPin).toHaveBeenCalledWith(pin);
+    });
+
+    it('should update snapshot on onStartTimer event', () => {
+        gameHttpServiceSpy.getGameSnapshotByPin.and.returnValue(of(gameSnapshotStub));
+
+        const onStartTimerCallback = timerServiceSpy.onStartTimer.calls.mostRecent().args[1] as () => void;
+        onStartTimerCallback();
+
+        expect(component.snapshot).toEqual(gameSnapshotStub);
+    });
+
+    it('should handle onStartTimer event types correctly', () => {
+        const onStartTimerCallback = timerServiceSpy.onStartTimer.calls.mostRecent().args[1] as () => void;
+
+        onStartTimerCallback();
+        expect(component.isStartingGame).toBe(true);
+
+        onStartTimerCallback();
+        expect(component.isLoadingNextQuestion).toBe(true);
+
+        onStartTimerCallback();
+        expect(component.isQuestion).toBe(true);
+    });
+
+    it('should handle onTimerTick event types correctly', () => {
+        const onTimerTickCallback = timerServiceSpy.onTimerTick.calls.mostRecent().args[1] as () => void;
+
+        onTimerTickCallback();
+        expect(component.isStartingGame).toBe(false);
+
+        onTimerTickCallback();
+        expect(component.isLoadingNextQuestion).toBe(false);
+
+        onTimerTickCallback();
+        expect(component.isQuestion).toBe(false);
     });
 
     it('should unsubscribe subscriptions on destruction', () => {
         const subscriptionsCount = component['eventSubscriptions'].length;
         component.ngOnDestroy();
         expect(component['eventSubscriptions'].length).toBeLessThan(subscriptionsCount);
-    });
-
-    it('should update snapshot on onStartTimer event', () => {
-        const expectedSnapshot: GameSnapshot = {
-            players: [],
-            chatlogs: [],
-            quiz: quizStub(),
-            state: GameState.Opened,
-            currentQuestionIndex: 0,
-            questionSubmissions: [],
-        };
-        gameHttpServiceSpy.getGameSnapshotByPin.and.returnValue(of(expectedSnapshot));
-
-        const onStartTimerCallback = timerServiceSpy.onStartTimer.calls.mostRecent().args[1] as () => void;
-        onStartTimerCallback();
-
-        expect(component.snapshot).toEqual(expectedSnapshot);
     });
 });

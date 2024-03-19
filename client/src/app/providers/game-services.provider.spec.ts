@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
@@ -12,7 +13,7 @@ describe('GameServicesProvider', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            providers: [GameHttpService, GameService, TimerService, MessageService, PlayerService, KeyBindingService],
+            providers: [GameHttpService, GameService, TimerService, MessageService, PlayerService, KeyBindingService, HttpClient],
         });
         provider = TestBed.inject(GameServicesProvider);
     });
