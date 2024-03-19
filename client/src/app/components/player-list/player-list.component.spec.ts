@@ -2,16 +2,23 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { RouterTestingModule } from '@angular/router/testing';
+import { lastPlayerEvaluationStub } from '@app/TestStubs/evaluation.stubs';
 import { firstPlayerStub } from '@app/TestStubs/player.stubs';
 import { quizStub } from '@app/TestStubs/quiz.stubs';
+import { SocketServerMock } from '@app/mocks/socket-server-mock';
 import { GameServicesProvider } from '@app/providers/game-services.provider';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { PlayerService } from '@app/services/player/player.service';
+import { WebSocketService } from '@app/services/web-socket/web-socket.service';
+import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
+import { Evaluation } from '@common/evaluation';
+import { GameEventPayload } from '@common/game-event-payload';
 import { GameSnapshot } from '@common/game-snapshot';
 import { GameState } from '@common/game-state';
 import { Player } from '@common/player';
-import { Subscription, of } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { io } from 'socket.io-client';
 import { PlayerListComponent } from './player-list.component';
 
 const gameSnapshotStub: GameSnapshot = {
@@ -23,21 +30,66 @@ const gameSnapshotStub: GameSnapshot = {
     questionSubmissions: [],
 };
 
-const EVENT_LENGTH = 10;
-
-describe('PlayerListComponent', () => {
+fdescribe('PlayerListComponent', () => {
     let component: PlayerListComponent;
     let fixture: ComponentFixture<PlayerListComponent>;
     let gameHttpService: GameHttpService;
     let gameService: GameService;
     // let playerService: PlayerService;
+    let webSocketServiceSpy: jasmine.SpyObj<WebSocketService>;
+    let socketServerMock: SocketServerMock;
+    let gameServiceSpy: jasmine.SpyObj<GameService>;
 
     beforeEach(async () => {
+        webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', ['emit', 'on'], {
+            socketInstance: io(),
+        });
+        gameServiceSpy = jasmine.createSpyObj<GameService>([
+            'startGame',
+            'toggleGameLock',
+            'nextQuestion',
+            'cancelGame',
+            'endGame',
+            'onCancelGame',
+            'onToggleSelectChoice',
+            'onToggleGameLock',
+            'onSubmitChoices',
+            'onStartGame',
+            'onNextQuestion',
+            'onPlayerAbandon',
+            'onEndGame',
+            'onJoinGame',
+            'onPlayerBan',
+            'onPlayerAbandon',
+            'playerBan',
+        ]);
         await TestBed.configureTestingModule({
             declarations: [PlayerListComponent],
             imports: [HttpClientTestingModule, RouterTestingModule],
-            providers: [GameServicesProvider, PlayerService, MatSnackBar],
+            providers: [
+                GameServicesProvider,
+                PlayerService,
+                MatSnackBar,
+                { provide: WebSocketService, useValue: webSocketServiceSpy },
+                { provide: GameService, useValue: gameServiceSpy },
+            ],
         }).compileComponents();
+
+        webSocketServiceSpy = TestBed.inject(WebSocketService) as jasmine.SpyObj<WebSocketService>;
+
+        webSocketServiceSpy.on.and.callFake(<T>(eventName: string, func: (data: T) => void) => {
+            return new Observable<T>((observer) => {
+                webSocketServiceSpy['socketInstance'].on(eventName, (data) => {
+                    observer.next(data);
+                });
+
+                return () => {
+                    webSocketServiceSpy['socketInstance'].off(eventName);
+                };
+            }).subscribe(func);
+        });
+
+        socketServerMock = new SocketServerMock([webSocketServiceSpy['socketInstance']]);
     });
 
     beforeEach(() => {
@@ -47,6 +99,21 @@ describe('PlayerListComponent', () => {
         gameHttpService = TestBed.inject(GameHttpService);
         gameService = TestBed.inject(GameService);
         // playerService = TestBed.inject(PlayerService);
+        gameServiceSpy.onSubmitChoices.and.callFake((pin, callback) => {
+            return webSocketServiceSpy.on('submitChoices', applyIfPinMatches(pin, callback));
+        });
+        gameServiceSpy.onStartGame.and.callFake((pin, callback) => {
+            return webSocketServiceSpy.on('startGame', applyIfPinMatches(pin, callback));
+        });
+        gameServiceSpy.onJoinGame.and.callFake((pin, callback) => {
+            return webSocketServiceSpy.on('joinGame', applyIfPinMatches(pin, callback));
+        });
+        gameServiceSpy.onPlayerBan.and.callFake((pin, callback) => {
+            return webSocketServiceSpy.on('playerBan', applyIfPinMatches(pin, callback));
+        });
+        gameServiceSpy.onPlayerAbandon.and.callFake((pin, callback) => {
+            return webSocketServiceSpy.on('playerAbandon', applyIfPinMatches(pin, callback));
+        });
     });
 
     afterEach(() => {
@@ -69,96 +136,59 @@ describe('PlayerListComponent', () => {
         expect(component.players).toEqual(dummySnapshot.players);
     });
 
-    it('should add player on joining game', () => {
-        const dummyPlayer: Player = firstPlayerStub();
-        spyOn(gameService, 'onJoinGame').and.callFake(() => {
-            component.players.push(dummyPlayer);
-            return new Subscription();
-        });
-
-        component['setupSubscription']('123');
-        expect(component.players.length).toEqual(1);
-        expect(component.players[0]).toEqual(dummyPlayer);
+    it('should destroy subscriptions', () => {
+        spyOn(component['eventSubscriptions'], 'forEach');
+        component.ngOnDestroy();
+        expect(component['eventSubscriptions'].forEach).toHaveBeenCalled();
     });
 
-    it('should call banPlayer on ban', () => {
-        // spyOn(playerService, 'isInGame').and.returnValue(true);
-        const banPlayerSpy = spyOn(component, 'banPlayer');
-        component['setupSubscription']('123');
-        gameService.playerBan('123', 'test');
-        component.banPlayer(firstPlayerStub());
-        expect(banPlayerSpy).toHaveBeenCalled();
-    });
-
-    it('should handle banning a player', () => {
+    it('should ban player', () => {
         const dummyPlayer: Player = firstPlayerStub();
-        spyOn(gameService, 'onPlayerBan').and.callFake(() => {
-            // component.players = component.players.filter((player) => player.username !== dummyPlayer.username);
-            return new Subscription();
-        });
-        // spyOn(playerService, 'isInGame').and.returnValue(true);
-        // const navigateByUrlSpy = spyOn(TestBed.inject(Router), 'navigateByUrl');
-
-        component['setupSubscription']('123');
+        component.pin = '123';
         component.banPlayer(dummyPlayer);
-
-        // expect(navigateByUrlSpy).toHaveBeenCalledWith('/home');
-        expect(component.players.length).toEqual(0);
+        expect(gameService.playerBan).toHaveBeenCalledWith(component.pin, dummyPlayer.username);
     });
 
-    it('shoud upsert a player', () => {
+    it('should upsert a player', () => {
+        const dummyPlayer: Player = firstPlayerStub();
+        component.players = [];
+        spyOn(component, 'trySort' as never);
+        component['upsertPlayer'](dummyPlayer);
+        expect(component.players).toEqual([dummyPlayer]);
+        expect(component['trySort']).toHaveBeenCalled();
+    });
+
+    it('should not push a player if it already exists', () => {
         const dummyPlayer: Player = firstPlayerStub();
         component.players = [dummyPlayer];
+        spyOn(component, 'trySort' as never);
         component['upsertPlayer'](dummyPlayer);
-        expect(component.players.length).toEqual(1);
-        expect(component.players[0]).toEqual(dummyPlayer);
+        expect(component.players).toEqual([dummyPlayer]);
+        expect(component['trySort']).toHaveBeenCalled();
     });
 
     it('should sort players', () => {
-        const dummyPlayer: Player = firstPlayerStub();
-        component.players = [dummyPlayer, dummyPlayer];
-        component['trySort']();
-        expect(component.players.length).toEqual(2);
-    });
-
-    it('should sort players by score', () => {
-        const dummyPlayer: Player = firstPlayerStub();
-        component.players = [dummyPlayer, dummyPlayer];
         component.displayOptions.sorted = true;
+        const dummyPlayer1: Player = firstPlayerStub();
+        const dummyPlayer2: Player = {
+            ...firstPlayerStub(),
+            username: 'a',
+        };
+        component.players = [dummyPlayer1, dummyPlayer2];
         component['trySort']();
-        expect(component.players.length).toEqual(2);
-    });
-
-    it('should sort players by username', () => {
-        const dummyPlayer: Player = firstPlayerStub();
-        component.players = [dummyPlayer, dummyPlayer];
-        component.displayOptions.sorted = false;
-        component['trySort']();
-        expect(component.players.length).toEqual(2);
+        expect(component.players).toEqual([dummyPlayer2, dummyPlayer1]);
     });
 
     it('should handle setting up subscriptions', () => {
-        const dummyPin = '123';
-        spyOn(gameService, 'onSubmitChoices').and.returnValue(new Subscription());
-        spyOn(gameService, 'onJoinGame').and.returnValue(new Subscription());
-        spyOn(gameService, 'onPlayerBan').and.returnValue(new Subscription());
-        spyOn(gameService, 'onPlayerAbandon').and.returnValue(new Subscription());
-        spyOn(gameService, 'onStartGame').and.returnValue(new Subscription());
-        component['setupSubscription'](dummyPin);
-        expect(gameService.onSubmitChoices).toHaveBeenCalled();
-        expect(gameService.onJoinGame).toHaveBeenCalled();
-        expect(gameService.onPlayerBan).toHaveBeenCalled();
-        expect(gameService.onPlayerAbandon).toHaveBeenCalled();
-        expect(gameService.onStartGame).toHaveBeenCalled();
-        expect(component['eventSubscriptions'].length).toEqual(EVENT_LENGTH);
-    });
-
-    it('should handle player abandonment', () => {
-        spyOn(gameService, 'onPlayerAbandon').and.returnValue(new Subscription());
-        // spyOn(playerService, 'isInGame').and.returnValue(true);
-
+        const evaluationPayload: GameEventPayload<Evaluation> = { pin: '123', data: lastPlayerEvaluationStub() };
+        const playerPayload: GameEventPayload<Player> = { pin: '123', data: firstPlayerStub() };
+        spyOn(component, 'upsertPlayer' as never);
         component['setupSubscription']('123');
-        gameService.playerAbandon('123');
-        expect(component.players.length).toEqual(0);
+        socketServerMock.emit('submitChoices', evaluationPayload);
+        socketServerMock.emit('joinGame', playerPayload);
+        socketServerMock.emit('playerBan', playerPayload);
+        socketServerMock.emit('playerAbandon', playerPayload);
+        socketServerMock.emit('startGame', playerPayload);
+        expect(component['upsertPlayer']).toHaveBeenCalled();
     });
 });

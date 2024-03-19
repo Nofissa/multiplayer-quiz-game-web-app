@@ -88,7 +88,7 @@ export class GameBoardComponent implements OnInit, OnDestroy {
 
     ngOnDestroy() {
         this.eventSubscriptions.forEach((sub) => {
-            if (!sub.closed) {
+            if (sub && !sub.closed) {
                 sub.unsubscribe();
             }
         });
@@ -143,6 +143,7 @@ export class GameBoardComponent implements OnInit, OnDestroy {
             }),
             this.gameService.onSubmitChoices(pin, (evaluation) => {
                 if (this.playerService.getCurrentPlayer(pin)?.socketId === evaluation.player.socketId) {
+                    this.disableShortcuts = true;
                     this.cachedEvaluation = evaluation;
                 }
                 if (evaluation.isLast) {
