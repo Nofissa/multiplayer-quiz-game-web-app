@@ -30,7 +30,7 @@ const gameSnapshotStub: GameSnapshot = {
     questionSubmissions: [],
 };
 
-fdescribe('PlayerListComponent', () => {
+describe('PlayerListComponent', () => {
     let component: PlayerListComponent;
     let fixture: ComponentFixture<PlayerListComponent>;
     let gameHttpService: GameHttpService;

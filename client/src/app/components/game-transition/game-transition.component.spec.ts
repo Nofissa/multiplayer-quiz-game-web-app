@@ -1,12 +1,17 @@
+/* eslint-disable @typescript-eslint/naming-convention */
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { quizStub } from '@app/TestStubs/quiz.stubs';
+import { GameTransitionDisplayOptions } from '@app/interfaces/game-transition-display-options';
 import { GameServicesProvider } from '@app/providers/game-services.provider';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { GameSnapshot } from '@common/game-snapshot';
 import { GameState } from '@common/game-state';
-import { of } from 'rxjs';
+import { TimerEventType } from '@common/timer-event-type';
+import { TimerPayload } from '@common/timer-payload';
+import { Subscription, of } from 'rxjs';
 import { GameTransitionComponent } from './game-transition.component';
 
 const gameSnapshotStub: GameSnapshot = {
@@ -18,7 +23,7 @@ const gameSnapshotStub: GameSnapshot = {
     questionSubmissions: [],
 };
 
-fdescribe('GameTransitionComponent', () => {
+describe('GameTransitionComponent', () => {
     let component: GameTransitionComponent;
     let fixture: ComponentFixture<GameTransitionComponent>;
     let gameHttpServiceSpy: jasmine.SpyObj<GameHttpService>;
@@ -31,6 +36,7 @@ fdescribe('GameTransitionComponent', () => {
 
         await TestBed.configureTestingModule({
             declarations: [GameTransitionComponent],
+            imports: [HttpClientTestingModule],
             providers: [
                 GameServicesProvider,
                 { provide: GameHttpService, useValue: gameHttpServiceMock },
@@ -45,7 +51,17 @@ fdescribe('GameTransitionComponent', () => {
 
     beforeEach(() => {
         fixture = TestBed.createComponent(GameTransitionComponent);
+        const options: GameTransitionDisplayOptions = {
+            hideTimerOnStartingGame: true,
+            hideTimerOnLoadingNextQuestion: false,
+            keepDisplayingCurrentQuestion: false,
+            transitionalOnly: true,
+        };
         component = fixture.componentInstance;
+        component.displayOptions = options;
+        component.pin = pin;
+        component['eventSubscriptions'].length = 0;
+        component['eventSubscriptions'] = [new Subscription(), new Subscription()];
         fixture.detectChanges();
     });
 
@@ -54,52 +70,110 @@ fdescribe('GameTransitionComponent', () => {
     });
 
     it('should create', () => {
+        component['eventSubscriptions'] = component['eventSubscriptions'].filter((item) => item !== undefined);
         expect(component).toBeTruthy();
     });
 
     it('should set up subscriptions on initialization', () => {
-        const onStartTimerCallback = timerServiceSpy.onStartTimer.calls.mostRecent().args[1] as () => void;
-        onStartTimerCallback();
+        // only way to spy on a component's private method
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        spyOn<any>(component, 'setupSubscription');
+        component['eventSubscriptions'] = component['eventSubscriptions'].filter((item) => item !== undefined);
+        component.ngOnInit();
+
+        expect(component['setupSubscription']).toHaveBeenCalledWith(pin);
+    });
+
+    it('should setup subscriptions correctly', () => {
+        timerServiceSpy.onStartTimer.and.callFake((_pin: string, callback: (payload: TimerPayload) => void) => {
+            const payload = { remainingTime: 20, eventType: TimerEventType.Question };
+            callback(payload);
+            return of(payload).subscribe(callback);
+        });
+
+        timerServiceSpy.onTimerTick.and.callFake((_pin: string, callback: (payload: TimerPayload) => void) => {
+            const payload = { remainingTime: 0, eventType: TimerEventType.Question };
+            callback(payload);
+            return of(payload).subscribe(callback);
+        });
+
+        gameHttpServiceSpy.getGameSnapshotByPin.and.returnValue(of(gameSnapshotStub));
+        component['eventSubscriptions'] = component['eventSubscriptions'].filter((item) => item !== undefined);
+
+        component['setupSubscription'](pin);
+
+        expect(timerServiceSpy.onStartTimer).toHaveBeenCalledWith(pin, jasmine.any(Function));
+        expect(timerServiceSpy.onTimerTick).toHaveBeenCalledWith(pin, jasmine.any(Function));
 
         expect(gameHttpServiceSpy.getGameSnapshotByPin).toHaveBeenCalledWith(pin);
     });
 
-    it('should update snapshot on onStartTimer event', () => {
+    it('should set flags correctly based on timer event type onStartTimer', () => {
         gameHttpServiceSpy.getGameSnapshotByPin.and.returnValue(of(gameSnapshotStub));
 
-        const onStartTimerCallback = timerServiceSpy.onStartTimer.calls.mostRecent().args[1] as () => void;
-        onStartTimerCallback();
+        timerServiceSpy.onStartTimer.and.callFake((_pin: string, callback: (payload: TimerPayload) => void) => {
+            const payload = { remainingTime: 20, eventType: TimerEventType.StartGame };
+            callback(payload);
+            return of(payload).subscribe(callback);
+        });
 
-        expect(component.snapshot).toEqual(gameSnapshotStub);
+        component['setupSubscription'](pin);
+        expect(component.isStartingGame).toBeTruthy();
+
+        timerServiceSpy.onStartTimer.and.callFake((_pin: string, callback: (payload: TimerPayload) => void) => {
+            const payload = { remainingTime: 10, eventType: TimerEventType.NextQuestion };
+            callback(payload);
+            return of(payload).subscribe(callback);
+        });
+
+        component['setupSubscription'](pin);
+        expect(component.isLoadingNextQuestion).toBeTruthy();
+
+        timerServiceSpy.onStartTimer.and.callFake((_pin: string, callback: (payload: TimerPayload) => void) => {
+            const payload = { remainingTime: 5, eventType: TimerEventType.Question };
+            callback(payload);
+            return of(payload).subscribe(callback);
+        });
+
+        component['setupSubscription'](pin);
+        component['eventSubscriptions'] = component['eventSubscriptions'].filter((item) => item !== undefined);
+        expect(component.isQuestion).toBeTruthy();
     });
 
-    it('should handle onStartTimer event types correctly', () => {
-        const onStartTimerCallback = timerServiceSpy.onStartTimer.calls.mostRecent().args[1] as () => void;
+    it('should set flags correctly based on timer event type onTimerTick', () => {
+        gameHttpServiceSpy.getGameSnapshotByPin.and.returnValue(of(gameSnapshotStub));
 
-        onStartTimerCallback();
-        expect(component.isStartingGame).toBe(true);
+        timerServiceSpy.onTimerTick.and.callFake((_pin: string, callback: (payload: TimerPayload) => void) => {
+            const payload = { remainingTime: 0, eventType: TimerEventType.StartGame };
+            callback(payload);
+            return of(payload).subscribe(callback);
+        });
 
-        onStartTimerCallback();
-        expect(component.isLoadingNextQuestion).toBe(true);
+        component['setupSubscription'](pin);
 
-        onStartTimerCallback();
-        expect(component.isQuestion).toBe(true);
-    });
+        expect(component.isStartingGame).toBeFalsy();
 
-    it('should handle onTimerTick event types correctly', () => {
-        const onTimerTickCallback = timerServiceSpy.onTimerTick.calls.mostRecent().args[1] as () => void;
+        timerServiceSpy.onTimerTick.and.callFake((_pin: string, callback: (payload: TimerPayload) => void) => {
+            const payload = { remainingTime: 0, eventType: TimerEventType.NextQuestion };
+            callback(payload);
+            return of(payload).subscribe(callback);
+        });
 
-        onTimerTickCallback();
-        expect(component.isStartingGame).toBe(false);
+        component['setupSubscription'](pin);
+        expect(component.isLoadingNextQuestion).toBeFalsy();
 
-        onTimerTickCallback();
-        expect(component.isLoadingNextQuestion).toBe(false);
+        timerServiceSpy.onTimerTick.and.callFake((_pin: string, callback: (payload: TimerPayload) => void) => {
+            const payload = { remainingTime: 0, eventType: TimerEventType.Question };
+            callback(payload);
+            return of(payload).subscribe(callback);
+        });
 
-        onTimerTickCallback();
-        expect(component.isQuestion).toBe(false);
+        component['eventSubscriptions'] = component['eventSubscriptions'].filter((item) => item !== undefined);
+        expect(component.isQuestion).toBeFalsy();
     });
 
     it('should unsubscribe subscriptions on destruction', () => {
+        component['eventSubscriptions'] = component['eventSubscriptions'].filter((item) => item !== undefined);
         const subscriptionsCount = component['eventSubscriptions'].length;
         component.ngOnDestroy();
         expect(component['eventSubscriptions'].length).toBeLessThan(subscriptionsCount);
