@@ -1,7 +1,7 @@
+import { GameService } from '@app/services/game/game.service';
 import { Injectable } from '@nestjs/common';
 import { Subject, Subscription } from 'rxjs';
 import { Socket } from 'socket.io';
-import { GameService } from '@app/services/game/game.service';
 
 const TICK_PER_SECOND = 1;
 const ONE_SECOND_MS = 1000;
@@ -25,7 +25,7 @@ export class TimerService {
         }
 
         if (this.intervals.get(pin)) {
-            this.stopTimer(client, pin); // to reset the timer
+            this.stopTimer(client, pin);
         }
 
         if (this.counters.get(pin) === undefined) {

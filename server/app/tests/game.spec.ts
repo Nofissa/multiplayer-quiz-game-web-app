@@ -24,6 +24,11 @@ describe('Game', () => {
         expect(game.state).toBe(GameState.Opened);
     });
 
+    it('should return null if this.currentQuestionIndex >= this.quiz.questions.length', () => {
+        game.currentQuestionIndex = 5;
+        expect(game.currentQuestion).toBeNull();
+    });
+
     it('should load the next question and initialize a new submission map', () => {
         game.loadNextQuestion();
         expect(game.questionSubmissions.length).toEqual(2);
