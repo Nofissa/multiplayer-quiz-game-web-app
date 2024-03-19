@@ -1,7 +1,7 @@
-import { WebSocketService } from './web-socket.service';
 import { TestBed } from '@angular/core/testing';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { SocketServerMock } from '@app/mocks/socket-server-mock';
+import { WebSocketService } from './web-socket.service';
 
 describe('WebSocketService', () => {
     let webSocketService: WebSocketService;
@@ -42,11 +42,9 @@ describe('WebSocketService', () => {
         expect(callback).toHaveBeenCalledWith(testData);
     });
 
-    it('shoudl return the socket ID on getSocketId', () => {
-        const socketId = 'some socket id';
-        webSocketService['socketInstance'].id = socketId;
-        const returnedSocketId = webSocketService.getSocketId();
-
-        expect(returnedSocketId).toEqual(socketId);
+    it('should return the socket ID', () => {
+        webSocketService.socketInstance.id = '930934';
+        const socketId = webSocketService.getSocketId();
+        expect(socketId).toBe('930934');
     });
 });

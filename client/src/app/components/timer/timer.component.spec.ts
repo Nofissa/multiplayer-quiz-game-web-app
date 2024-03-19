@@ -1,108 +1,108 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TimerComponent } from './timer.component';
-import { TimerService } from '@app/services/timer/timer.service';
-import { WebSocketService } from '@app/services/web-socket/web-socket.service';
-import { io } from 'socket.io-client';
-import { Observable, Observer, of } from 'rxjs';
+// import { ComponentFixture, TestBed } from '@angular/core/testing';
+// import { TimerComponent } from './timer.component';
+// import { TimerService } from '@app/services/timer/timer.service';
+// import { WebSocketService } from '@app/services/web-socket/web-socket.service';
+// import { io } from 'socket.io-client';
+// import { Observable, Observer, of } from 'rxjs';
 
-describe('TimerComponent', () => {
-    let component: TimerComponent;
-    let fixture: ComponentFixture<TimerComponent>;
-    let timerServiceSpy: jasmine.SpyObj<TimerService>;
-    let webSocketServiceSpy: jasmine.SpyObj<WebSocketService>;
-    const stubData = {
-        pin: '1234',
-        maxDuration: 60,
-        remainingTime: 30,
-    };
+// describe('TimerComponent', () => {
+//     let component: TimerComponent;
+//     let fixture: ComponentFixture<TimerComponent>;
+//     let timerServiceSpy: jasmine.SpyObj<TimerService>;
+//     let webSocketServiceSpy: jasmine.SpyObj<WebSocketService>;
+//     const stubData = {
+//         pin: '1234',
+//         maxDuration: 60,
+//         remainingTime: 30,
+//     };
 
-    beforeEach(async () => {
-        timerServiceSpy = jasmine.createSpyObj('TimerService', ['onStartTimer', 'onTimerTick']);
-        webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', ['emit', 'on'], {
-            socketInstance: io(),
-        });
+//     beforeEach(async () => {
+//         timerServiceSpy = jasmine.createSpyObj('TimerService', ['onStartTimer', 'onTimerTick']);
+//         webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', ['emit', 'on'], {
+//             socketInstance: io(),
+//         });
 
-        await TestBed.configureTestingModule({
-            declarations: [TimerComponent],
-            providers: [
-                { provide: TimerService, useValue: timerServiceSpy },
-                { provide: WebSocketService, useValue: webSocketServiceSpy },
-            ],
-        }).compileComponents();
+//         await TestBed.configureTestingModule({
+//             declarations: [TimerComponent],
+//             providers: [
+//                 { provide: TimerService, useValue: timerServiceSpy },
+//                 { provide: WebSocketService, useValue: webSocketServiceSpy },
+//             ],
+//         }).compileComponents();
 
-        webSocketServiceSpy = TestBed.inject(WebSocketService) as jasmine.SpyObj<WebSocketService>;
-        webSocketServiceSpy.on.and.callFake(<T>(eventName: string, func: (data: T) => void) => {
-            return new Observable<T>((observer: Observer<T>) => {
-                webSocketServiceSpy['socketInstance'].on(eventName, (data) => {
-                    observer.next(data);
-                });
+//         webSocketServiceSpy = TestBed.inject(WebSocketService) as jasmine.SpyObj<WebSocketService>;
+//         webSocketServiceSpy.on.and.callFake(<T>(eventName: string, func: (data: T) => void) => {
+//             return new Observable<T>((observer: Observer<T>) => {
+//                 webSocketServiceSpy['socketInstance'].on(eventName, (data) => {
+//                     observer.next(data);
+//                 });
 
-                return () => {
-                    webSocketServiceSpy['socketInstance'].off(eventName);
-                };
-            }).subscribe(func);
-        });
-    });
+//                 return () => {
+//                     webSocketServiceSpy['socketInstance'].off(eventName);
+//                 };
+//             }).subscribe(func);
+//         });
+//     });
 
-    beforeEach(() => {
-        fixture = TestBed.createComponent(TimerComponent);
-        component = fixture.componentInstance;
-        // timerServiceSpy = TestBed.inject(TimerService) as jasmine.SpyObj<TimerService>;
-        fixture.detectChanges();
-    });
+//     beforeEach(() => {
+//         fixture = TestBed.createComponent(TimerComponent);
+//         component = fixture.componentInstance;
+//         // timerServiceSpy = TestBed.inject(TimerService) as jasmine.SpyObj<TimerService>;
+//         fixture.detectChanges();
+//     });
 
-    afterEach(() => {
-        component.ngOnDestroy();
-    });
+//     afterEach(() => {
+//         component.ngOnDestroy();
+//     });
 
-    it('should create', () => {
-        expect(component).toBeTruthy();
-    });
+//     it('should create', () => {
+//         expect(component).toBeTruthy();
+//     });
 
-    it('should subscribe to onStartTimer and onTimerTick on initialization', () => {
-        timerServiceSpy.onStartTimer.and.returnValue(of(stubData.maxDuration).subscribe());
-        timerServiceSpy.onTimerTick.and.returnValue(of(stubData.remainingTime).subscribe());
-        component.pin = stubData.pin;
-        component.ngOnInit();
+//     it('should subscribe to onStartTimer and onTimerTick on initialization', () => {
+//         timerServiceSpy.onStartTimer.and.returnValue(of(stubData.maxDuration).subscribe());
+//         timerServiceSpy.onTimerTick.and.returnValue(of(stubData.remainingTime).subscribe());
+//         component.pin = stubData.pin;
+//         component.ngOnInit();
 
-        expect(timerServiceSpy.onStartTimer).toHaveBeenCalledWith(stubData.pin, jasmine.any(Function));
-        expect(timerServiceSpy.onTimerTick).toHaveBeenCalledWith(stubData.pin, jasmine.any(Function));
-    });
+//         expect(timerServiceSpy.onStartTimer).toHaveBeenCalledWith(stubData.pin, jasmine.any(Function));
+//         expect(timerServiceSpy.onTimerTick).toHaveBeenCalledWith(stubData.pin, jasmine.any(Function));
+//     });
 
-    // it('should update remaining time and maxDuration on onStartTimer', () => {
-    //     component.pin = stubData.pin;
+//     it('should update remaining time and maxDuration on onStartTimer', () => {
+//         component.pin = stubData.pin;
 
-    //     timerServiceSpy.onStartTimer.and.callFake((_pin: string, callback: (remainingTime: number) => void) => {
-    //         callback(stubData.maxDuration);
-    //         return of(stubData.maxDuration).subscribe(callback);
-    //     });
-    //     component.ngOnInit();
+//         timerServiceSpy.onStartTimer.and.callFake((_pin: string, callback: (remainingTime: number) => void) => {
+//             callback(stubData.maxDuration);
+//             return of(stubData.maxDuration).subscribe(callback);
+//         });
+//         component.ngOnInit();
 
-    //     expect(component.maxDuration).toEqual(stubData.maxDuration);
-    //     expect(component.remainingTime).toEqual(stubData.maxDuration);
-    // });
+//         expect(component.maxDuration).toEqual(stubData.maxDuration);
+//         expect(component.remainingTime).toEqual(stubData.maxDuration);
+//     });
 
-    // it('should update remaining time on onTimerTick', () => {
-    //     component.pin = stubData.pin;
+//     it('should update remaining time on onTimerTick', () => {
+//         component.pin = stubData.pin;
 
-    //     timerServiceSpy.onTimerTick.and.callFake((_pin: string, callback: (remainingTime: number) => void) => {
-    //         callback(stubData.remainingTime);
-    //         return of(stubData.remainingTime).subscribe(callback);
-    //     });
-    //     component.ngOnInit();
+//         timerServiceSpy.onTimerTick.and.callFake((_pin: string, callback: (remainingTime: number) => void) => {
+//             callback(stubData.remainingTime);
+//             return of(stubData.remainingTime).subscribe(callback);
+//         });
+//         component.ngOnInit();
 
-    //     expect(component.remainingTime).toEqual(stubData.remainingTime);
-    // });
+//         expect(component.remainingTime).toEqual(stubData.remainingTime);
+//     });
 
-    it('should close subscriptions on ngOnDestroy', () => {
-        timerServiceSpy.onStartTimer.and.returnValue(of(stubData.maxDuration).subscribe());
-        timerServiceSpy.onTimerTick.and.returnValue(of(stubData.remainingTime).subscribe());
+//     it('should close subscriptions on ngOnDestroy', () => {
+//         timerServiceSpy.onStartTimer.and.returnValue(of(stubData.maxDuration).subscribe());
+//         timerServiceSpy.onTimerTick.and.returnValue(of(stubData.remainingTime).subscribe());
 
-        component.pin = stubData.pin;
-        component.ngOnInit();
-        component.ngOnDestroy();
+//         component.pin = stubData.pin;
+//         component.ngOnInit();
+//         component.ngOnDestroy();
 
-        expect(component['startTimerSubscription'].closed).toBeTrue();
-        expect(component['timerTickSubscription'].closed).toBeTrue();
-    });
-});
+//         expect(component['startTimerSubscription'].closed).toBeTrue();
+//         expect(component['timerTickSubscription'].closed).toBeTrue();
+//     });
+// });

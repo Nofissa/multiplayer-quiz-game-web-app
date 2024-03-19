@@ -1,180 +1,329 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
+import { barChartDataStub } from '@app/TestStubs/bar-chart-data.stubs';
+import { firstPlayerEvaluationStub, lastPlayerEvaluationStub } from '@app/TestStubs/evaluation.stubs';
+import { questionStub } from '@app/TestStubs/question.stubs';
+import { submissionStub } from '@app/TestStubs/submission.stubs';
+import { SocketServerMock } from '@app/mocks/socket-server-mock';
+import { GameServicesProvider } from '@app/providers/game-services.provider';
+import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { BarChartService } from '@app/services/game/bar-chart-service/bar-chart.service';
 import { GameService } from '@app/services/game/game-service/game.service';
+import { KeyBindingService } from '@app/services/key-binding/key-binding.service';
+import { MessageService } from '@app/services/message/message.service';
+import { PlayerService } from '@app/services/player/player.service';
 import { TimerService } from '@app/services/timer/timer.service';
+import { WebSocketService } from '@app/services/web-socket/web-socket.service';
+import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
+import { Evaluation } from '@common/evaluation';
+import { GameEventPayload } from '@common/game-event-payload';
 import { GameState } from '@common/game-state';
+import { Question } from '@common/question';
+import { SubmissionPayload } from '@common/submission-payload';
+import { TimerEventType } from '@common/timer-event-type';
+import { Observable } from 'rxjs';
+import { io } from 'socket.io-client';
 import { HostGamePageComponent } from './host-game-page.component';
+import SpyObj = jasmine.SpyObj;
 
-// const mockQuestion: Question = questionStub()[0];
+const PIN = '1234';
+const NEXT_QUESTION_DELAY = 5;
 
 fdescribe('HostGamePageComponent', () => {
     let component: HostGamePageComponent;
     let fixture: ComponentFixture<HostGamePageComponent>;
-    let gameService: GameService;
-    let timerService: TimerService;
-    // let router: Router;
+    let gameServiceSpy: SpyObj<GameService>;
+    let timerService: SpyObj<TimerService>;
+    let gameServicesProviderSpy: SpyObj<GameServicesProvider>;
+    let barChartServiceSpy: SpyObj<BarChartService>;
+    let routerSpy: SpyObj<Router>;
+    let webSocketServiceSpy: SpyObj<WebSocketService>;
+    let socketServerMock: SocketServerMock;
+
+    const clearGameServiceSpies = () => {
+        (Object.keys(gameServiceSpy) as (keyof typeof gameServiceSpy)[]).forEach((method) => {
+            gameServiceSpy[method].calls.reset();
+        });
+
+        (Object.keys(timerService) as (keyof typeof timerService)[]).forEach((method) => {
+            timerService[method].calls.reset();
+        });
+    };
+
     beforeEach(() => {
+        webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', ['emit', 'on'], {
+            socketInstance: io(),
+        });
+
+        barChartServiceSpy = jasmine.createSpyObj<BarChartService>([
+            'addQuestion',
+            'updateBarChartData',
+            'getAllBarChart',
+            'getCurrentQuestionData',
+            'setData',
+        ]);
+
+        gameServiceSpy = jasmine.createSpyObj<GameService>([
+            'startGame',
+            'toggleGameLock',
+            'nextQuestion',
+            'cancelGame',
+            'endGame',
+            'onCancelGame',
+            'onToggleSelectChoice',
+            'onToggleGameLock',
+            'onSubmitChoices',
+            'onStartGame',
+            'onNextQuestion',
+            'onPlayerAbandon',
+            'onEndGame',
+        ]);
+
+        gameServiceSpy.onToggleGameLock.and.callFake((pin, callback) => {
+            return webSocketServiceSpy.on('toggleGameLock', applyIfPinMatches(pin, callback));
+        });
+
+        gameServiceSpy.onToggleSelectChoice.and.callFake((pin, callback) => {
+            return webSocketServiceSpy.on('toggleSelectChoice', applyIfPinMatches(pin, callback));
+        });
+
+        gameServiceSpy.onSubmitChoices.and.callFake((pin, callback) => {
+            return webSocketServiceSpy.on('submitChoices', applyIfPinMatches(pin, callback));
+        });
+
+        gameServiceSpy.onStartGame.and.callFake((pin, callback) => {
+            return webSocketServiceSpy.on('startGame', applyIfPinMatches(pin, callback));
+        });
+
+        gameServiceSpy.onNextQuestion.and.callFake((pin, callback) => {
+            return webSocketServiceSpy.on('nextQuestion', applyIfPinMatches(pin, callback));
+        });
+
+        gameServiceSpy.onPlayerAbandon.and.callFake((pin, callback) => {
+            return webSocketServiceSpy.on('playerAbandon', applyIfPinMatches(pin, callback));
+        });
+
+        gameServiceSpy.onEndGame.and.callFake((pin, callback) => {
+            return webSocketServiceSpy.on('endGame', applyIfPinMatches(pin, callback));
+        });
+
+        gameServiceSpy.onCancelGame.and.callFake((pin, callback) => {
+            return webSocketServiceSpy.on('cancelGame', applyIfPinMatches(pin, callback));
+        });
+
+        timerService = jasmine.createSpyObj<TimerService>(['onStartTimer', 'onTimerTick', 'startTimer', 'stopTimer']);
+
+        gameServicesProviderSpy = new GameServicesProvider(
+            {} as GameHttpService, // Mock GameHttpService
+            gameServiceSpy,
+            timerService,
+            {} as MessageService, // Mock MessageService
+            {} as PlayerService, // Mock PlayerService
+            {} as KeyBindingService, // Mock KeyBindingService
+        );
+
+        routerSpy = jasmine.createSpyObj<Router>(['navigate']);
+        routerSpy.navigate.and.stub();
+
         TestBed.configureTestingModule({
             declarations: [HostGamePageComponent],
             providers: [
-                Router,
-                GameService,
-                TimerService,
+                { provide: WebSocketService, useValue: webSocketServiceSpy },
+                { provide: Router, useValue: routerSpy },
+                { provide: GameServicesProvider, useValue: gameServicesProviderSpy },
                 MatSnackBar,
-                BarChartService,
+                { provide: BarChartService, useValue: barChartServiceSpy },
                 {
                     provide: ActivatedRoute,
                     useValue: {
                         snapshot: {
                             queryParams: {
-                                pin: '1234',
+                                pin: PIN,
                             },
                         },
                     },
                 },
             ],
-            imports: [RouterTestingModule, HttpClientTestingModule],
+            imports: [RouterTestingModule, HttpClientTestingModule, BrowserAnimationsModule],
         }).compileComponents();
+
         fixture = TestBed.createComponent(HostGamePageComponent);
-        gameService = TestBed.inject(GameService);
-        timerService = TestBed.inject(TimerService);
-        // router = TestBed.inject(Router);
+
+        webSocketServiceSpy = TestBed.inject(WebSocketService) as SpyObj<WebSocketService>;
+
+        webSocketServiceSpy.on.and.callFake(<T>(eventName: string, func: (data: T) => void) => {
+            return new Observable<T>((observer) => {
+                webSocketServiceSpy['socketInstance'].on(eventName, (data) => {
+                    observer.next(data);
+                });
+
+                return () => {
+                    webSocketServiceSpy['socketInstance'].off(eventName);
+                };
+            }).subscribe(func);
+        });
+
+        socketServerMock = new SocketServerMock([webSocketServiceSpy['socketInstance']]);
         component = fixture.componentInstance;
         fixture.detectChanges();
+
+        clearGameServiceSpies();
     });
     it('should create', () => {
         expect(component).toBeTruthy();
+        expect(timerService).toBeTruthy();
+        expect(socketServerMock).toBeTruthy();
+    });
+
+    it('should component be initialized correctly', () => {
+        expect(component.gameState).toEqual(GameState.Opened);
+        expect(component.currentQuestionHasEnded).toEqual(false);
+        expect(component.isLastQuestion).toEqual(false);
+        expect(component.question).toEqual(undefined);
+        expect(component.nextAvailable).toEqual(false);
+    });
+
+    it('should barCharts return all chartData if there is data in the service', () => {
+        barChartServiceSpy.getAllBarChart.and.callFake(() => {
+            return barChartDataStub();
+        });
+        const response = component.barCharts;
+
+        expect(barChartServiceSpy.getAllBarChart).toHaveBeenCalled();
+        expect(response).toEqual(barChartDataStub());
+    });
+
+    it('should barCharts return empty array if there is no data in the service', () => {
+        barChartServiceSpy.getAllBarChart.and.callFake(() => {
+            return [];
+        });
+        const response = component.barCharts;
+        expect(barChartServiceSpy.getAllBarChart).toHaveBeenCalled();
+        expect(response).toEqual([]);
+    });
+
+    it('should barChart get the current question data if there is data is in the service', () => {
+        barChartServiceSpy.getCurrentQuestionData.and.callFake(() => {
+            return barChartDataStub()[0];
+        });
+        const response = component.barChart;
+        expect(barChartServiceSpy.getCurrentQuestionData).toHaveBeenCalled();
+        expect(response).toEqual(barChartDataStub()[0]);
+    });
+
+    it('should barChart get undefined if there is no data is in the service', () => {
+        barChartServiceSpy.getCurrentQuestionData.and.callFake(() => {
+            return undefined;
+        });
+        const response = component.barChart;
+        expect(barChartServiceSpy.getCurrentQuestionData).toHaveBeenCalled();
+        expect(response).toEqual(undefined);
+    });
+
+    it('should setUpSubscriptions call all needed gameService setUp methods with related callbacks', () => {
+        component.ngOnInit();
+        expect(gameServiceSpy.onStartGame).toHaveBeenCalledWith(PIN, jasmine.any(Function));
+        expect(gameServiceSpy.onCancelGame).toHaveBeenCalledWith(PIN, jasmine.any(Function));
+        expect(gameServiceSpy.onToggleGameLock).toHaveBeenCalledWith(PIN, jasmine.any(Function));
+        expect(gameServiceSpy.onToggleSelectChoice).toHaveBeenCalledWith(PIN, jasmine.any(Function));
+        expect(gameServiceSpy.onSubmitChoices).toHaveBeenCalledWith(PIN, jasmine.any(Function));
+        expect(gameServiceSpy.onNextQuestion).toHaveBeenCalledWith(PIN, jasmine.any(Function));
+        expect(gameServiceSpy.onPlayerAbandon).toHaveBeenCalledWith(PIN, jasmine.any(Function));
+        expect(gameServiceSpy.onEndGame).toHaveBeenCalledWith(PIN, jasmine.any(Function));
+
+        expect(timerService.onTimerTick).toHaveBeenCalledWith(PIN, jasmine.any(Function));
+    });
+
+    it('should toggleLock call toggleGameLock and change local gameState', () => {
+        component.toggleLock();
+        const payload: GameEventPayload<GameState> = { pin: PIN, data: GameState.Closed };
+        socketServerMock.emit('toggleGameLock', payload);
+        expect(component.gameState).toEqual(GameState.Closed);
+    });
+
+    it('should startGame start server Game and related timer instance and change gameState', () => {
+        component.startGame();
+
+        expect(timerService.startTimer).toHaveBeenCalledWith(PIN, TimerEventType.StartGame, NEXT_QUESTION_DELAY);
+
+        const payload: GameEventPayload<Question> = { pin: PIN, data: questionStub()[0] };
+        socketServerMock.emit('startGame', payload);
+    });
+
+    it('should nextQuestion send nextQuestion signal to server and change gameState and set currentQuestionHasEnded', () => {
+        component.nextQuestion();
+
+        expect(gameServiceSpy.nextQuestion).toHaveBeenCalledWith(PIN);
+
+        const payload: GameEventPayload<Question> = { pin: PIN, data: questionStub()[0] };
+        socketServerMock.emit('nextQuestion', payload);
+
+        expect(barChartServiceSpy.addQuestion).toHaveBeenCalled();
+        expect(timerService.startTimer).toHaveBeenCalled();
+    });
+
+    it('should cancelGame cancel game server side', () => {
+        component.cancelGame();
+
+        expect(gameServiceSpy.cancelGame).toHaveBeenCalledWith(PIN);
+
+        const payload: GameEventPayload<string> = { pin: PIN, data: 'Un message' };
+        socketServerMock.emit('cancelGame', payload);
+
+        expect(routerSpy.navigate).toHaveBeenCalledWith(['home']);
+    });
+
+    it('should endGame end game server side', () => {
+        component.endGame();
+
+        expect(gameServiceSpy.endGame).toHaveBeenCalledWith(PIN);
+
+        const payload: GameEventPayload<null> = { pin: PIN, data: null };
+        socketServerMock.emit('endGame', payload);
+        expect(routerSpy.navigate).toHaveBeenCalledWith(['results'], { queryParams: { pin: PIN } });
+    });
+
+    it('should the server emitting toggle select choice affect the barChartData', () => {
+        const payload: GameEventPayload<SubmissionPayload> = { pin: PIN, data: { clientId: 'SomeClientId', submission: submissionStub()[0] } };
+        socketServerMock.emit('toggleSelectChoice', payload);
+
+        expect(barChartServiceSpy.updateBarChartData).toHaveBeenCalledWith(payload.data);
+    });
+
+    it('should the server emitting toggle select choice affect the barChartData', () => {
+        const payload: GameEventPayload<SubmissionPayload> = { pin: PIN, data: { clientId: 'SomeClientId', submission: submissionStub()[0] } };
+        socketServerMock.emit('toggleSelectChoice', payload);
+
+        expect(barChartServiceSpy.updateBarChartData).toHaveBeenCalledWith(payload.data);
+    });
+
+    it('should the server emitting toggle select choice affect the barChartData', () => {
+        let payload: GameEventPayload<Evaluation> = { pin: PIN, data: firstPlayerEvaluationStub() };
+        socketServerMock.emit('submitChoices', payload);
+        expect(component.currentQuestionHasEnded).toBeFalse();
+        payload = { pin: PIN, data: lastPlayerEvaluationStub() };
+        socketServerMock.emit('submitChoices', payload);
+        expect(component.currentQuestionHasEnded).toBeTrue();
+        expect(timerService.stopTimer).toHaveBeenCalled();
     });
 
     it('should initialize pin from ActivatedRoute', () => {
-        expect(component.pin).toEqual('1234');
+        expect(component.pin).toEqual(PIN);
     });
 
-    it('should set isEnded to false initially', () => {
+    it('should set isEnded return true if Game is ended, false otherwise', () => {
         expect(component.isEnded()).toBeFalse();
+        component.gameState = GameState.Ended;
+        expect(component.isEnded()).toBeTrue();
     });
 
-    it('should set gameState to GameState.Opened initially', () => {
-        expect(component.gameState).toEqual(GameState.Opened);
-    });
-
-    it('should toggle game lock', () => {
-        const spyToggleGameLock = spyOn(gameService, 'toggleGameLock');
-        component.toggleLock();
-
-        expect(spyToggleGameLock).toHaveBeenCalledWith('1234');
-    });
-
-    it('should be locked if the game is closed', () => {
-        component.gameState = GameState.Closed;
-        expect(component.isLocked()).toBeTruthy();
-    });
-
-    it('should not be locked if the game is not closed', () => {
-        component.gameState = GameState.Opened;
-        expect(component.isLocked()).toBeFalsy();
-    });
-
-    it('should be started if the game is started', () => {
+    it('should set isLocked return false if game is Openned, false otherwise', () => {
+        expect(component.isLocked()).toBeFalse();
         component.gameState = GameState.Running;
-        expect(component.isRunning()).toBeTruthy();
+        expect(component.isLocked()).toBeTrue();
     });
-
-    it('should not be started if the game is not started', () => {
-        component.gameState = GameState.Closed;
-        expect(component.isRunning()).toBeFalsy();
-    });
-
-    it('should set pin and subscribe to gameService events', () => {
-        spyOn(gameService, 'onNextQuestion');
-        spyOn(gameService, 'onToggleGameLock');
-
-        component.ngOnInit();
-
-        expect(component.pin).toEqual('1234');
-        expect(gameService.onNextQuestion).toHaveBeenCalledWith('1234', jasmine.any(Function));
-        expect(gameService.onToggleGameLock).toHaveBeenCalledWith('1234', jasmine.any(Function));
-    });
-
-    // it('should set question to the current question', () => {
-    //     const fakeSubscription = new Subscription();
-    //     spyOn(gameService, 'onGetCurrentQuestion').and.callFake((pin, callback) => {
-    //         callback(mockQuestion);
-    //         return fakeSubscription;
-    //     });
-    //     component.ngOnInit();
-
-    //     expect(component.question).toEqual(mockQuestion);
-    // });
-
-    // it('should unsubscribe from getCurrentQuestionSubscription on ngOnDestroy', () => {
-    //     const getCurrentQuestionSubscriptionSpy = jasmine.createSpyObj('Subscription', ['unsubscribe']);
-    //     component.getCurrentQuestionSubscription = getCurrentQuestionSubscriptionSpy;
-    //     component.ngOnDestroy();
-
-    //     expect(getCurrentQuestionSubscriptionSpy.unsubscribe).toHaveBeenCalled();
-    // });
-
-    // it('should set gameState to Started and call startTimer on timerService', () => {
-    //     spyOn(timerService, 'startTimer');
-    //     component.startGame();
-
-    //     expect(component['gameState']).toBe(GameState.Running);
-
-    //     expect(timerService.startTimer).toHaveBeenCalledWith(component['pin']);
-    // });
-
-    // it('should set nextAvailable to true', () => {
-    //     component.nextAvailable = false;
-    //     component.onTimerExpired();
-
-    //     expect(component.nextAvailable).toBeTruthy();
-    // });
-
-    it('should end game when last question is over', fakeAsync(() => {
-        spyOn(gameService, 'nextQuestion');
-        spyOn(gameService, 'onNextQuestion');
-        spyOn(timerService, 'startTimer');
-        component.question = undefined;
-
-        component.nextQuestion();
-        const THREE_SECOND_IN_MS = 3000;
-        tick(THREE_SECOND_IN_MS);
-
-        expect(gameService.nextQuestion).toHaveBeenCalledWith('1234');
-        expect(gameService.onNextQuestion).toHaveBeenCalledWith('1234', jasmine.any(Function));
-        expect(timerService.startTimer).not.toHaveBeenCalled();
-        expect(component.nextAvailable).toBeFalsy();
-    }));
-
-    // it('should go to next question when there are questions left', fakeAsync(() => {
-    // const fakeSubscription = new Subscription();
-    // spyOn(gameService, 'nextQuestion');
-    // spyOn(gameService, 'onNextQuestion').and.callFake((pin, callback) => {
-    // callback(mockQuestion);
-    // return fakeSubscription;
-    // });
-    // spyOn(timerService, 'startTimer');
-    // spyOn(router, 'navigateByUrl');
-
-    // component.nextQuestion();
-    // const THREE_SECOND_IN_MS = 3000;
-    // tick(THREE_SECOND_IN_MS);
-
-    // expect(router.navigateByUrl).not.toHaveBeenCalled();
-    // expect(component.nextAvailable).toBeFalsy();
-    // expect(component.question).toBe(mockQuestion);
-    // expect(gameService.nextQuestion).toHaveBeenCalledWith('1234');
-    // expect(gameService.onNextQuestion).toHaveBeenCalledWith('1234', jasmine.any(Function));
-    // expect(timerService.startTimer).toHaveBeenCalledWith('1234');
-    // }));
-
-    // it('should set nextAvailable to true when timer expires', () => {
-    //     component.onTimerExpired();
-    //     expect(component.nextAvailable).toBeTruthy();
-    // });
 });
