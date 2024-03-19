@@ -100,4 +100,11 @@ describe('TimerService', () => {
         expect(webSocketServiceSpy.on).toHaveBeenCalledWith(stubData.timerTickEventName, jasmine.any(Function));
         expect(stubData.callback).not.toHaveBeenCalled();
     });
+
+    it('should raise stopTimer event', () => {
+        const pin = '1234';
+        timerService.stopTimer(pin);
+
+        expect(webSocketServiceSpy.emit).toHaveBeenCalledWith('stopTimer', { pin });
+    });
 });

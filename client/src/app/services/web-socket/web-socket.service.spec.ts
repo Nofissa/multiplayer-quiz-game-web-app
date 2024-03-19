@@ -1,16 +1,22 @@
 import { TestBed } from '@angular/core/testing';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { SocketServerMock } from '@app/mocks/socket-server-mock';
+import { Socket } from 'socket.io-client';
 import { WebSocketService } from './web-socket.service';
 
 describe('WebSocketService', () => {
     let webSocketService: WebSocketService;
     let socketServerMock: SocketServerMock;
+    let socketSpy: jasmine.SpyObj<Socket>;
+    let snackBarServiceSpy: jasmine.SpyObj<MatSnackBar>;
 
     beforeEach(() => {
+        socketSpy = jasmine.createSpyObj('Socket', ['off', 'emit']);
+        snackBarServiceSpy = jasmine.createSpyObj('MatSnackBar', ['open']);
+
         TestBed.configureTestingModule({
             imports: [MatSnackBarModule],
-            providers: [WebSocketService],
+            providers: [WebSocketService, { provide: Socket, useValue: socketSpy }, { provide: MatSnackBar, useValue: snackBarServiceSpy }],
         });
         webSocketService = TestBed.inject(WebSocketService);
         socketServerMock = new SocketServerMock([webSocketService['socketInstance']]);
@@ -24,11 +30,9 @@ describe('WebSocketService', () => {
         const eventName = 'testEvent';
         const testData = { message: 'Hello' };
 
-        spyOn(webSocketService['socketInstance'], 'emit');
-
         webSocketService.emit(eventName, testData);
 
-        expect(webSocketService['socketInstance'].emit).toHaveBeenCalledWith(eventName, testData);
+        expect(socketSpy.emit).toHaveBeenCalledWith(eventName, testData);
     });
 
     it('should subscribe to an event and call the callback', () => {
@@ -42,9 +46,28 @@ describe('WebSocketService', () => {
         expect(callback).toHaveBeenCalledWith(testData);
     });
 
-    it('should return the socket ID', () => {
-        webSocketService.socketInstance.id = '930934';
-        const socketId = webSocketService.getSocketId();
-        expect(socketId).toBe('930934');
+    it('should call web socket off on unsubscribe', () => {
+        const eventName = 'testEvent';
+        const callback = jasmine.createSpy('callback');
+        socketSpy.off.and.stub();
+        const subscription = webSocketService.on(eventName, callback);
+
+        subscription.unsubscribe();
+
+        expect(socketSpy.off).toHaveBeenCalledWith();
+    });
+
+    it('should return the socket ID on getSocketId', () => {
+        const socketId = 'some socket id';
+        webSocketService['socketInstance'].id = socketId;
+        const returnedSocketId = webSocketService.getSocketId();
+
+        expect(returnedSocketId).toEqual(socketId);
+    });
+
+    it('should open snack bar on server error', () => {
+        socketServerMock.emit('error', 'Some error text');
+
+        expect(snackBarServiceSpy.open).toHaveBeenCalled();
     });
 });

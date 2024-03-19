@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { firstPlayerStub, secondPlayerStub } from '@app/TestStubs/player.stubs';
+import { questionStub } from '@app/TestStubs/question.stubs';
 import { SocketServerMock } from '@app/mocks/socket-server-mock';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { Evaluation } from '@common/evaluation';
@@ -8,6 +9,7 @@ import { GameState } from '@common/game-state';
 import { Player } from '@common/player';
 import { PlayerState } from '@common/player-state';
 import { Question } from '@common/question';
+import { QuestionPayload } from '@common/question-payload';
 import { Submission } from '@common/submission';
 import { Observable } from 'rxjs';
 import { io } from 'socket.io-client';
@@ -21,6 +23,9 @@ describe('GameService', () => {
         pin1: '1234',
         pin2: '4321',
         createGameEventName: 'createGame',
+        startGameEventName: 'startGame',
+        playerLeaveEndGameEventName: 'playerLeaveGame',
+        endGameEventName: 'endGame',
         joinGameEventName: 'joinGame',
         cancelGameEventName: 'cancelGame',
         playerAbandonEventName: 'playerAbandon',
@@ -75,6 +80,40 @@ describe('GameService', () => {
         socketServerMock.emit(stubData.createGameEventName, stubData.pin1);
 
         expect(stubData.callback).toHaveBeenCalledWith(stubData.pin1);
+    });
+
+    it('should raise startGame event', () => {
+        gameService.startGame(stubData.pin1);
+        expect(webSocketServiceSpy.emit).toHaveBeenCalledWith(stubData.startGameEventName, { pin: stubData.pin1 });
+    });
+
+    it('should subscribe to startGame event and call the callback if pin matches', () => {
+        gameService.onStartGame(stubData.pin1, stubData.callback);
+
+        const questionPayload: QuestionPayload = { question: questionStub()[0], isLast: false };
+        const payload: GameEventPayload<QuestionPayload> = { pin: stubData.pin1, data: questionPayload };
+        socketServerMock.emit(stubData.startGameEventName, payload);
+
+        expect(stubData.callback).toHaveBeenCalledWith(questionPayload);
+    });
+
+    it('should raise playerLeaveEndGame event', () => {
+        gameService.playerLeaveGameEnd(stubData.pin1);
+        expect(webSocketServiceSpy.emit).toHaveBeenCalledWith(stubData.playerLeaveEndGameEventName, { pin: stubData.pin1 });
+    });
+
+    it('should raise endGame event', () => {
+        gameService.endGame(stubData.pin1);
+        expect(webSocketServiceSpy.emit).toHaveBeenCalledWith(stubData.endGameEventName, { pin: stubData.pin1 });
+    });
+
+    it('should subscribe to endGame event and call the callback if pin matches', () => {
+        gameService.onEndGame(stubData.pin1, stubData.callback);
+
+        const payload: GameEventPayload<unknown> = { pin: stubData.pin1, data: null };
+        socketServerMock.emit(stubData.endGameEventName, payload);
+
+        expect(stubData.callback).toHaveBeenCalledWith(null);
     });
 
     it('should raise joinGame event', () => {

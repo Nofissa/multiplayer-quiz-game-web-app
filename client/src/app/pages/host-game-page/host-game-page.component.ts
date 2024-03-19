@@ -41,7 +41,7 @@ export class HostGamePageComponent implements OnInit {
     // Disabled because this page is rich in interaction an depends on many services as a consequence
     // eslint-disable-next-line max-params
     constructor(
-        private barChartService: BarChartService,
+        private readonly barChartService: BarChartService,
         private readonly snackBarService: MatSnackBar,
         gameServicesProvider: GameServicesProvider,
         routingDependenciesProvider: RoutingDependenciesProvider,
@@ -63,21 +63,19 @@ export class HostGamePageComponent implements OnInit {
 
     ngOnInit() {
         this.pin = this.activatedRoute.snapshot.queryParams['pin'];
-
         this.gameHttpService.getGameSnapshotByPin(this.pin).subscribe({
             error: (error: HttpErrorResponse) => {
                 if (error.status === HttpStatusCode.NotFound) {
-                    this.router.navigateByUrl('/home');
+                    this.router.navigate(['home']);
                 }
             },
         });
 
-        this.barChartService = new BarChartService();
         this.setupSubscriptions(this.pin);
     }
 
     isLocked() {
-        return this.gameState === GameState.Closed;
+        return this.gameState !== GameState.Opened;
     }
 
     isRunning() {
@@ -110,12 +108,8 @@ export class HostGamePageComponent implements OnInit {
         this.gameService.endGame(this.pin);
     }
 
-    handleEndGame() {
+    private handleEndGame() {
         this.router.navigate(['results'], { queryParams: { pin: this.pin } });
-    }
-
-    handleCancelGame() {
-        this.router.navigate(['home'], { queryParams: { pin: this.pin } });
     }
 
     private setupSubscriptions(pin: string) {
@@ -127,7 +121,7 @@ export class HostGamePageComponent implements OnInit {
                     panelClass: ['base-snackbar'],
                 });
 
-                this.router.navigateByUrl('/home');
+                this.router.navigate(['home']);
             }),
 
             this.gameService.onToggleSelectChoice(pin, (submissions) => {
@@ -176,10 +170,6 @@ export class HostGamePageComponent implements OnInit {
 
             this.gameService.onEndGame(pin, () => {
                 this.handleEndGame();
-            }),
-
-            this.gameService.onCancelGame(pin, () => {
-                this.handleCancelGame();
             }),
         );
     }

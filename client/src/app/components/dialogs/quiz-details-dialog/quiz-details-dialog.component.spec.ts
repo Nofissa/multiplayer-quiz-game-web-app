@@ -48,13 +48,6 @@ describe('QuizDetailsDialogComponent', () => {
         expect(dialogRefSpy.close).toHaveBeenCalled();
     });
 
-    // it('should call onStartGame with the quiz when startGame is successful', () => {
-    //     quizHttpServiceMock.getVisibleQuizById.and.returnValue(of(mockQuiz));
-    //     component.startGame();
-    //     expect(quizHttpServiceMock.getVisibleQuizById).toHaveBeenCalledWith('testId');
-    //     expect(mockData.onStartGame).toHaveBeenCalledWith(mockQuiz);
-    // });
-
     it('should call onNotFound when startGame quiz is not found', () => {
         const errorResponse = new HttpErrorResponse({ status: 404, statusText: 'Not Found' });
         quizHttpServiceMock.getVisibleQuizById.and.returnValue(throwError(() => errorResponse));

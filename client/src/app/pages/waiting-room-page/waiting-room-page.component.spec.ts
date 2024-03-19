@@ -2,99 +2,218 @@ import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
-import { RouterTestingModule } from '@angular/router/testing';
-import { GameServicesProvider } from '@app/providers/game-services.provider';
-import { RoutingDependenciesProvider } from '@app/providers/routing-dependencies.provider';
+import { SocketServerMock } from '@app/mocks/socket-server-mock';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { PlayerService } from '@app/services/player/player.service';
-import { Subscription, throwError } from 'rxjs';
+import { WebSocketService } from '@app/services/web-socket/web-socket.service';
+import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
+import { GameEventPayload } from '@common/game-event-payload';
+import { GameSnapshot } from '@common/game-snapshot';
+import { Player } from '@common/player';
+import { QuestionPayload } from '@common/question-payload';
+import { Observable, of, throwError } from 'rxjs';
+import { io } from 'socket.io-client';
 import { WaitingRoomPageComponent } from './waiting-room-page.component';
 
 describe('WaitingRoomPageComponent', () => {
     let component: WaitingRoomPageComponent;
     let fixture: ComponentFixture<WaitingRoomPageComponent>;
-    let spyRouter: jasmine.SpyObj<Router>;
-    let spyGameHttpService: jasmine.SpyObj<GameHttpService>;
-    let spyGameService: jasmine.SpyObj<GameService>;
-    let spyPlayerService: jasmine.SpyObj<PlayerService>;
-    let spySnackBar: jasmine.SpyObj<MatSnackBar>;
+    let mockSnackBar: jasmine.SpyObj<MatSnackBar>;
+    let mockActivatedRoute: Partial<ActivatedRoute>;
+    let mockRouter: Partial<Router>;
+    let mockGameHttpService: jasmine.SpyObj<GameHttpService>;
+    let mockGameService: jasmine.SpyObj<GameService>;
+    let mockPlayerService: jasmine.SpyObj<PlayerService>;
+    let mockWebSocketService: jasmine.SpyObj<WebSocketService>;
+    let socketServerMock: SocketServerMock;
 
     beforeEach(() => {
-        const activatedRouteSpy = {
-            snapshot: {
-                queryParams: { pin: '1234' },
-            },
-        };
-
-        spyRouter = jasmine.createSpyObj<Router>('Router', ['navigateByUrl', 'navigate']);
-        spyGameHttpService = jasmine.createSpyObj('GameHttpService', ['getGameSnapshotByPin']);
-        spyGameService = jasmine.createSpyObj('GameService', ['onCancelGame', 'onPlayerBan', 'onPlayerAbandon', 'onStartGame', 'playerAbandon']);
-        spyPlayerService = jasmine.createSpyObj('PlayerService', ['getCurrentPlayer']);
-        spySnackBar = jasmine.createSpyObj('MatSnackBar', ['open']);
+        mockSnackBar = jasmine.createSpyObj('MatSnackBar', ['open']);
+        mockActivatedRoute = { snapshot: { queryParams: { pin: '123' } } } as never as Partial<ActivatedRoute>;
+        mockRouter = { navigateByUrl: jasmine.createSpy('navigateByUrl'), navigate: jasmine.createSpy('navigate') };
+        mockGameHttpService = jasmine.createSpyObj('GameHttpService', ['getGameSnapshotByPin']);
+        mockGameService = jasmine.createSpyObj('GameService', ['onCancelGame', 'onPlayerBan', 'onPlayerAbandon', 'onStartGame', 'playerAbandon']);
+        mockPlayerService = jasmine.createSpyObj('PlayerService', ['getCurrentPlayer']);
+        mockWebSocketService = jasmine.createSpyObj('WebSocketService', ['on', 'getSocketId'], {
+            socketInstance: io(),
+        });
 
         TestBed.configureTestingModule({
             declarations: [WaitingRoomPageComponent],
             providers: [
-                { provide: Router, useValue: spyRouter },
-                { provide: ActivatedRoute, useValue: activatedRouteSpy },
-                { provide: GameHttpService, useValue: spyGameHttpService },
-                { provide: GameService, useValue: spyGameService },
-                { provide: PlayerService, useValue: spyPlayerService },
-                { provide: MatSnackBar, useValue: spySnackBar },
-                GameServicesProvider,
-                RoutingDependenciesProvider,
+                { provide: MatSnackBar, useValue: mockSnackBar },
+                { provide: ActivatedRoute, useValue: mockActivatedRoute },
+                { provide: Router, useValue: mockRouter },
+                { provide: GameHttpService, useValue: mockGameHttpService },
+                { provide: GameService, useValue: mockGameService },
+                { provide: PlayerService, useValue: mockPlayerService },
+                { provide: WebSocketService, use: mockWebSocketService },
             ],
-            imports: [RouterTestingModule],
         }).compileComponents();
-    });
 
-    beforeEach(() => {
+        socketServerMock = new SocketServerMock([mockWebSocketService['socketInstance']]);
+
+        mockWebSocketService.on.and.callFake(<T>(eventName: string, func: (data: T) => void) => {
+            return new Observable<T>((observer) => {
+                mockWebSocketService['socketInstance'].on(eventName, (data) => {
+                    observer.next(data);
+                });
+
+                return () => {
+                    mockWebSocketService['socketInstance'].off(eventName);
+                };
+            }).subscribe(func);
+        });
+
+        mockGameHttpService.getGameSnapshotByPin.and.returnValue(of({} as GameSnapshot));
+
+        mockGameService.onStartGame.and.callFake((pin, callback) => {
+            return mockWebSocketService.on('startGame', applyIfPinMatches(pin, callback));
+        });
+
+        mockGameService.onCancelGame.and.callFake((pin, callback) => {
+            return mockWebSocketService.on('cancelGame', applyIfPinMatches(pin, callback));
+        });
+
+        mockGameService.onPlayerBan.and.callFake((pin, callback) => {
+            return mockWebSocketService.on('playerBan', applyIfPinMatches(pin, callback));
+        });
+
+        mockGameService.onPlayerAbandon.and.callFake((pin, callback) => {
+            return mockWebSocketService.on('playerAbandon', applyIfPinMatches(pin, callback));
+        });
+
         fixture = TestBed.createComponent(WaitingRoomPageComponent);
-        fixture.detectChanges();
         component = fixture.componentInstance;
     });
 
-    it('should create', () => {
+    it('should create the component', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should navigate to /home if gameHttpService throws 404 error', () => {
-        const errorResponse = new HttpErrorResponse({ status: HttpStatusCode.NotFound });
-        spyGameHttpService.getGameSnapshotByPin.and.returnValue(throwError(() => errorResponse));
+    it('should initialize the component', () => {
+        const pin = '123';
+        const mockGameSnapshot = {} as GameSnapshot;
+        mockGameHttpService.getGameSnapshotByPin.and.returnValue(of(mockGameSnapshot));
 
         component.ngOnInit();
 
-        expect(spyRouter.navigateByUrl).toHaveBeenCalledWith('/home');
+        expect(component.pin).toEqual(pin);
+        expect(mockGameHttpService.getGameSnapshotByPin).toHaveBeenCalledWith(pin);
     });
 
-    it('leaveGame() should call playerAbandon() and navigate to /home', () => {
-        const pin = '1234';
-        component.pin = pin;
+    it('should handle error when game not found', () => {
+        const errorResponse = new HttpErrorResponse({ status: HttpStatusCode.NotFound });
+        mockGameHttpService.getGameSnapshotByPin.and.returnValue(throwError(() => errorResponse));
 
+        component.ngOnInit();
+
+        expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('/home');
+    });
+
+    it('should handle player leaving game', () => {
+        const pin = '123';
+        component.pin = pin;
         component.leaveGame();
 
-        expect(spyGameService.playerAbandon).toHaveBeenCalledWith(pin);
-        expect(spyRouter.navigateByUrl).toHaveBeenCalledWith('/home');
+        expect(mockGameService.playerAbandon).toHaveBeenCalledWith(pin);
+        expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('/home');
     });
 
-    it('handleEndGame() should navigate to results-page with pin as query parameter', () => {
-        const pin = '1234';
+    it('should handle end game navigation', () => {
+        const pin = '123';
         component.pin = pin;
-
         component.handleEndGame();
 
-        expect(spyRouter.navigate).toHaveBeenCalledWith(['results-page'], { queryParams: { pin } });
+        expect(mockRouter.navigate).toHaveBeenCalledWith(['results-page'], { queryParams: { pin } });
     });
 
-    it('should unsubscribe from all subscriptions on ngOnDestroy', () => {
-        const mockSubscription1 = jasmine.createSpyObj<Subscription>('Subscription', ['unsubscribe']);
-        const mockSubscription2 = jasmine.createSpyObj<Subscription>('Subscription', ['unsubscribe']);
+    it('should setup event subscriptions', () => {
+        component.ngOnInit();
 
-        component['eventSubscriptions'] = [mockSubscription1, mockSubscription2];
-        component.ngOnDestroy();
+        expect(mockGameService.onCancelGame).toHaveBeenCalled();
+        expect(mockGameService.onPlayerBan).toHaveBeenCalled();
+        expect(mockGameService.onPlayerAbandon).toHaveBeenCalled();
+        expect(mockGameService.onStartGame).toHaveBeenCalled();
+    });
 
-        expect(mockSubscription1.unsubscribe).toHaveBeenCalled();
-        expect(mockSubscription2.unsubscribe).toHaveBeenCalled();
+    it('should cancelGame open snack bar and navigate to home', () => {
+        const pin = '1234';
+        component['setupSubscriptions'](pin);
+
+        const payload: GameEventPayload<string> = { pin, data: 'someMessage' };
+        socketServerMock.emit('cancelGame', payload);
+
+        expect(mockSnackBar.open).toHaveBeenCalled();
+        expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('/home');
+    });
+
+    it('should playerBan open snack bar and navigate to home if banned player is current player', () => {
+        const pin = '1234';
+        const socketId = 'someSocketId';
+        const player = { socketId } as Player;
+
+        mockPlayerService.getCurrentPlayer.and.returnValue(player);
+        component['setupSubscriptions'](pin);
+
+        const payload: GameEventPayload<Player> = { pin, data: player };
+        socketServerMock.emit('playerBan', payload);
+
+        expect(mockSnackBar.open).toHaveBeenCalled();
+        expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('/home');
+    });
+
+    it('should playerBan not open snack bar and not navigate to home if banned player is not current player', () => {
+        const pin = '1234';
+        const socketId = 'someSocketId';
+        const player = { socketId } as Player;
+
+        mockPlayerService.getCurrentPlayer.and.returnValue({ socketId: 'notTheSameSocketId' } as Player);
+        component['setupSubscriptions'](pin);
+
+        const payload: GameEventPayload<Player> = { pin, data: player };
+        socketServerMock.emit('playerBan', payload);
+
+        expect(mockSnackBar.open).not.toHaveBeenCalled();
+        expect(mockRouter.navigateByUrl).not.toHaveBeenCalledWith('/home');
+    });
+
+    it('should playerAbandon navigate to home if banned player is current player', () => {
+        const pin = '1234';
+        const socketId = 'someSocketId';
+        const player = { socketId } as Player;
+
+        mockPlayerService.getCurrentPlayer.and.returnValue(player);
+        component['setupSubscriptions'](pin);
+
+        const payload: GameEventPayload<Player> = { pin, data: player };
+        socketServerMock.emit('playerAbandon', payload);
+
+        expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('/home');
+    });
+
+    it('should playerAbandon not navigate to home if banned player is not current player', () => {
+        const pin = '1234';
+        const socketId = 'someSocketId';
+        const player = { socketId } as Player;
+
+        mockPlayerService.getCurrentPlayer.and.returnValue({ socketId: 'notTheSameSocketId' } as Player);
+        component['setupSubscriptions'](pin);
+
+        const payload: GameEventPayload<Player> = { pin, data: player };
+        socketServerMock.emit('playerAbandon', payload);
+
+        expect(mockRouter.navigateByUrl).not.toHaveBeenCalledWith('/home');
+    });
+
+    it('should startGame navigate to game with right pin', () => {
+        const pin = '1234';
+        component['setupSubscriptions'](pin);
+
+        const payload: GameEventPayload<QuestionPayload> = { pin, data: {} as QuestionPayload };
+        socketServerMock.emit('startGame', payload);
+
+        expect(mockRouter.navigate).toHaveBeenCalledWith(['/game'], { queryParams: { pin } });
     });
 });
