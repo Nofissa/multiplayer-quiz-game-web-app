@@ -6,7 +6,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { barChartDataStub } from '@app/TestStubs/bar-chart-data.stubs';
 import { firstPlayerEvaluationStub, lastPlayerEvaluationStub } from '@app/TestStubs/evaluation.stubs';
+import { secondPlayerStub } from '@app/TestStubs/player.stubs';
 import { questionStub } from '@app/TestStubs/question.stubs';
+import { mockGameSnapshot } from '@app/TestStubs/snapshot.stubs';
 import { submissionStub } from '@app/TestStubs/submission.stubs';
 import { SocketServerMock } from '@app/mocks/socket-server-mock';
 import { GameServicesProvider } from '@app/providers/game-services.provider';
@@ -22,10 +24,12 @@ import { applyIfPinMatches } from '@app/utils/conditional-applications/condition
 import { Evaluation } from '@common/evaluation';
 import { GameEventPayload } from '@common/game-event-payload';
 import { GameState } from '@common/game-state';
+import { Player } from '@common/player';
 import { Question } from '@common/question';
 import { SubmissionPayload } from '@common/submission-payload';
 import { TimerEventType } from '@common/timer-event-type';
-import { Observable } from 'rxjs';
+import { TimerPayload } from '@common/timer-payload';
+import { Observable, of } from 'rxjs';
 import { io } from 'socket.io-client';
 import { HostGamePageComponent } from './host-game-page.component';
 import SpyObj = jasmine.SpyObj;
@@ -33,10 +37,11 @@ import SpyObj = jasmine.SpyObj;
 const PIN = '1234';
 const NEXT_QUESTION_DELAY = 5;
 
-fdescribe('HostGamePageComponent', () => {
+describe('HostGamePageComponent', () => {
     let component: HostGamePageComponent;
     let fixture: ComponentFixture<HostGamePageComponent>;
     let gameServiceSpy: SpyObj<GameService>;
+    let gameHttpServiceSpy: SpyObj<GameHttpService>;
     let timerService: SpyObj<TimerService>;
     let gameServicesProviderSpy: SpyObj<GameServicesProvider>;
     let barChartServiceSpy: SpyObj<BarChartService>;
@@ -115,10 +120,16 @@ fdescribe('HostGamePageComponent', () => {
             return webSocketServiceSpy.on('cancelGame', applyIfPinMatches(pin, callback));
         });
 
+        gameHttpServiceSpy = jasmine.createSpyObj<GameHttpService>(['getGameSnapshotByPin']);
+
         timerService = jasmine.createSpyObj<TimerService>(['onStartTimer', 'onTimerTick', 'startTimer', 'stopTimer']);
 
+        timerService.onTimerTick.and.callFake((pin, callback) => {
+            return webSocketServiceSpy.on('timerTick', applyIfPinMatches(pin, callback));
+        });
+
         gameServicesProviderSpy = new GameServicesProvider(
-            {} as GameHttpService, // Mock GameHttpService
+            gameHttpServiceSpy,
             gameServiceSpy,
             timerService,
             {} as MessageService, // Mock MessageService
@@ -175,8 +186,6 @@ fdescribe('HostGamePageComponent', () => {
     });
     it('should create', () => {
         expect(component).toBeTruthy();
-        expect(timerService).toBeTruthy();
-        expect(socketServerMock).toBeTruthy();
     });
 
     it('should component be initialized correctly', () => {
@@ -192,7 +201,6 @@ fdescribe('HostGamePageComponent', () => {
             return barChartDataStub();
         });
         const response = component.barCharts;
-
         expect(barChartServiceSpy.getAllBarChart).toHaveBeenCalled();
         expect(response).toEqual(barChartDataStub());
     });
@@ -234,7 +242,6 @@ fdescribe('HostGamePageComponent', () => {
         expect(gameServiceSpy.onNextQuestion).toHaveBeenCalledWith(PIN, jasmine.any(Function));
         expect(gameServiceSpy.onPlayerAbandon).toHaveBeenCalledWith(PIN, jasmine.any(Function));
         expect(gameServiceSpy.onEndGame).toHaveBeenCalledWith(PIN, jasmine.any(Function));
-
         expect(timerService.onTimerTick).toHaveBeenCalledWith(PIN, jasmine.any(Function));
     });
 
@@ -247,61 +254,43 @@ fdescribe('HostGamePageComponent', () => {
 
     it('should startGame start server Game and related timer instance and change gameState', () => {
         component.startGame();
-
         expect(timerService.startTimer).toHaveBeenCalledWith(PIN, TimerEventType.StartGame, NEXT_QUESTION_DELAY);
-
         const payload: GameEventPayload<Question> = { pin: PIN, data: questionStub()[0] };
         socketServerMock.emit('startGame', payload);
     });
 
     it('should nextQuestion send nextQuestion signal to server and change gameState and set currentQuestionHasEnded', () => {
         component.nextQuestion();
-
         expect(gameServiceSpy.nextQuestion).toHaveBeenCalledWith(PIN);
-
         const payload: GameEventPayload<Question> = { pin: PIN, data: questionStub()[0] };
         socketServerMock.emit('nextQuestion', payload);
-
         expect(barChartServiceSpy.addQuestion).toHaveBeenCalled();
         expect(timerService.startTimer).toHaveBeenCalled();
     });
 
     it('should cancelGame cancel game server side', () => {
         component.cancelGame();
-
         expect(gameServiceSpy.cancelGame).toHaveBeenCalledWith(PIN);
-
         const payload: GameEventPayload<string> = { pin: PIN, data: 'Un message' };
         socketServerMock.emit('cancelGame', payload);
-
         expect(routerSpy.navigate).toHaveBeenCalledWith(['home']);
     });
 
     it('should endGame end game server side', () => {
         component.endGame();
-
         expect(gameServiceSpy.endGame).toHaveBeenCalledWith(PIN);
-
         const payload: GameEventPayload<null> = { pin: PIN, data: null };
         socketServerMock.emit('endGame', payload);
         expect(routerSpy.navigate).toHaveBeenCalledWith(['results'], { queryParams: { pin: PIN } });
     });
 
-    it('should the server emitting toggle select choice affect the barChartData', () => {
+    it('should the server emitting toggleSelectChoice affect the barChartData', () => {
         const payload: GameEventPayload<SubmissionPayload> = { pin: PIN, data: { clientId: 'SomeClientId', submission: submissionStub()[0] } };
         socketServerMock.emit('toggleSelectChoice', payload);
-
         expect(barChartServiceSpy.updateBarChartData).toHaveBeenCalledWith(payload.data);
     });
 
-    it('should the server emitting toggle select choice affect the barChartData', () => {
-        const payload: GameEventPayload<SubmissionPayload> = { pin: PIN, data: { clientId: 'SomeClientId', submission: submissionStub()[0] } };
-        socketServerMock.emit('toggleSelectChoice', payload);
-
-        expect(barChartServiceSpy.updateBarChartData).toHaveBeenCalledWith(payload.data);
-    });
-
-    it('should the server emitting toggle select choice affect the barChartData', () => {
+    it('should the server emitting submitChoices do nothing if not last player, or set currentQuestionHasEnded to true', () => {
         let payload: GameEventPayload<Evaluation> = { pin: PIN, data: firstPlayerEvaluationStub() };
         socketServerMock.emit('submitChoices', payload);
         expect(component.currentQuestionHasEnded).toBeFalse();
@@ -309,6 +298,30 @@ fdescribe('HostGamePageComponent', () => {
         socketServerMock.emit('submitChoices', payload);
         expect(component.currentQuestionHasEnded).toBeTrue();
         expect(timerService.stopTimer).toHaveBeenCalled();
+    });
+
+    it('should playerAbandon should cancelGame if no players are left, do nothing otherwise', () => {
+        component.gameState = GameState.Running;
+        const payload: GameEventPayload<Player> = { pin: PIN, data: secondPlayerStub() };
+        gameHttpServiceSpy.getGameSnapshotByPin.and.callFake(() => {
+            return of(mockGameSnapshot()[0]);
+        });
+        socketServerMock.emit('playerAbandon', payload);
+        expect(gameServiceSpy.cancelGame).toHaveBeenCalled();
+        gameServiceSpy.cancelGame.calls.reset();
+        gameHttpServiceSpy.getGameSnapshotByPin.and.callFake(() => {
+            return of(mockGameSnapshot()[1]);
+        });
+        socketServerMock.emit('playerAbandon', payload);
+        expect(gameServiceSpy.cancelGame).not.toHaveBeenCalled();
+    });
+
+    it('should onTimerTick start timer when ', () => {
+        component.gameState = GameState.Running;
+        const payload: GameEventPayload<TimerPayload> = { pin: PIN, data: { remainingTime: 0, eventType: TimerEventType.NextQuestion } };
+
+        socketServerMock.emit('timerTick', payload);
+        expect(timerService.startTimer).toHaveBeenCalled();
     });
 
     it('should initialize pin from ActivatedRoute', () => {
