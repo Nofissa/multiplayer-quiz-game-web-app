@@ -139,8 +139,8 @@ describe('PlayerListComponent', () => {
 
     it('should handle setting up subscriptions', () => {
         component.pin = '123';
-
-        spyOn(gameService, 'onSubmitChoices').and.returnValue(new Subscription());
+        const testSub: Subscription = new Subscription();
+        spyOn(gameService, 'onSubmitChoices').and.returnValue(testSub);
         spyOn(gameService, 'onJoinGame').and.returnValue(new Subscription());
         spyOn(gameService, 'onPlayerBan').and.returnValue(new Subscription());
         spyOn(gameService, 'onPlayerAbandon').and.returnValue(new Subscription());
