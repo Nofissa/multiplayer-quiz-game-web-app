@@ -23,7 +23,7 @@ import { Server, Socket } from 'socket.io';
 })
 export class GameGateway implements OnGatewayDisconnect {
     @WebSocketServer()
-    private server: Server;
+    server: Server;
 
     constructor(
         private readonly gameService: GameService,
@@ -101,6 +101,7 @@ export class GameGateway implements OnGatewayDisconnect {
             const payload: GameEventPayload<Player> = { pin, data: clientPlayer.player };
 
             this.server.to(pin).emit('playerAbandon', payload);
+
             clientPlayer.socket.leave(pin);
         } catch (error) {
             client.emit('error', error.message);
@@ -156,6 +157,18 @@ export class GameGateway implements OnGatewayDisconnect {
         }
     }
 
+    @SubscribeMessage('endGame')
+    handleEndGame(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
+        try {
+            this.timerService.stopTimer(client, pin);
+            this.gameService.endGame(client, pin);
+            const payload: GameEventPayload<null> = { pin, data: null };
+            this.server.to(pin).emit('endGame', payload);
+        } catch (error) {
+            client.emit('error', error.message);
+        }
+    }
+
     @SubscribeMessage('startTimer')
     startTimer(
         @ConnectedSocket() client: Socket,
@@ -202,7 +215,7 @@ export class GameGateway implements OnGatewayDisconnect {
     @SubscribeMessage('endGame')
     endGame(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
         try {
-            this.gameService.endGame(pin, client);
+            this.gameService.endGame(client, pin);
             const payload: GameEventPayload<null> = { pin, data: null };
             this.server.to(pin).emit('endGame', payload);
         } catch (error) {

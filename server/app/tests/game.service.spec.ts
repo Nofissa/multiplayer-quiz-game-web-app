@@ -7,6 +7,7 @@ import { GameService } from '@app/services/game/game.service';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { GameState } from '@common/game-state';
 import { PlayerState } from '@common/player-state';
+import { QuestionPayload } from '@common/question-payload';
 import { Socket } from 'socket.io';
 import { clientPlayerStub } from './stubs/client.player.stub';
 import { evaluationStub } from './stubs/evaluation.stubs';
@@ -63,6 +64,7 @@ describe('GameService', () => {
 
             expect(result).toBeTruthy();
             expect(result).toEqual('mockedPinValue');
+            expect(PinHelper.generateRandomPin).toHaveBeenCalled();
             expect(gameService.getGame(result)).toBeDefined();
         });
 
@@ -279,10 +281,14 @@ describe('GameService', () => {
 
         it('should return the question associated to the next index', () => {
             const game = gameStub();
+            const questionPayloadTest: QuestionPayload = {
+                question: questionStub()[1] as any,
+                isLast: true,
+            };
             jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
             jest.spyOn(GameService.prototype, 'isOrganizer').mockReturnValue(true);
             const result = gameService.nextQuestion(socketMock, game.pin);
-            expect(result).toEqual(game.quiz.questions[1]);
+            expect(result).toEqual(questionPayloadTest);
         });
     });
 
@@ -291,14 +297,23 @@ describe('GameService', () => {
         const disconnectPayloadTest: DisconnectPayload = {
             toCancel: [game.pin],
             toAbandon: [],
+            toEnd: [],
         };
 
         const disconnectPayloadTestPlayer: DisconnectPayload = {
             toCancel: [],
             toAbandon: ['1234'],
+            toEnd: [],
+        };
+
+        const disconnectPayloadEndTest: DisconnectPayload = {
+            toCancel: [],
+            toAbandon: [],
+            toEnd: [game.pin],
         };
         const organizerSocket = { id: 'organizerId' } as any;
         it('should push the game to toCancel if Organizer', () => {
+            game.state = GameState.Opened;
             gameService.games.set(game.pin, game);
             const result = gameService.disconnect(organizerSocket);
             gameService.games.clear();
@@ -310,14 +325,12 @@ describe('GameService', () => {
             const result = gameService.disconnect(game.clientPlayers.get('playerId').socket);
             expect(result).toEqual(disconnectPayloadTestPlayer);
         });
-    });
 
-    describe('getOrganizerId', () => {
-        it('should return the id of the organizer', () => {
-            const game = gameStub();
-            jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
-            const result = gameService.getOrganizerId(game.pin);
-            expect(result).toEqual(game.organizer.id);
+        it('should push the game to toEnd', () => {
+            game.state = GameState.Running;
+            gameService.games.set(game.pin, game);
+            const result = gameService.disconnect(organizerSocket);
+            expect(result).toEqual(disconnectPayloadEndTest);
         });
     });
 
@@ -354,8 +367,8 @@ describe('GameService', () => {
         const question = questionStub()[0];
         it('should return true if correct', () => {
             const submission = submissionStub();
-            submission.choices[3].isSelected = false;
-            submission.choices[0].isSelected = true;
+            submission.choices[3].isSelected = true;
+            submission.choices[0].isSelected = false;
             const result = gameService.isGoodAnswer(question, submission);
             expect(result).toEqual(true);
         });
@@ -402,34 +415,20 @@ describe('GameService', () => {
         });
     });
 
-    describe('getGameResults', () => {
-        const game = gameStub();
-        it("should throw an error if game doesn't exist", () => {
-            jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(null);
-            expect(() => gameService.getGameResults(game.pin)).toThrow(`Aucune partie ne correspond au pin ${game.pin}`);
-        });
-
-        it('should return all the game submissions', () => {
-            jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
-            const result = gameService.getGameResults(game.pin);
-            expect(result).toEqual(game.allSubmissions);
-        });
-    });
-
     describe('endGame', () => {
         const game = gameStub();
         it('should return an error if the client is not the organizer', () => {
             jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
             jest.spyOn(GameService.prototype, 'isOrganizer').mockReturnValue(false);
-            expect(() => gameService.endGame(game.pin, socketMock)).toThrow(`Vous n'êtes pas organisateur de la partie ${game.pin}`);
+            expect(() => gameService.endGame(socketMock, game.pin)).toThrow(`Vous n'êtes pas organisateur de la partie ${game.pin}`);
         });
 
         it('should change the state of the game to Ended', () => {
             jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
             jest.spyOn(GameService.prototype, 'isOrganizer').mockReturnValue(true);
             gameService.games.set(game.pin, game);
-            gameService.endGame(game.pin, socketMock);
-            expect(game.state).toEqual(GameState.Ended);
+            gameService.endGame(socketMock, game.pin);
+            expect(gameService.games.size).toEqual(0);
         });
     });
 
@@ -449,10 +448,14 @@ describe('GameService', () => {
         });
 
         it('should return currentQuestion', () => {
+            const questionPayloadTest: QuestionPayload = {
+                question: questionStub()[0] as any,
+                isLast: false,
+            };
             jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
             jest.spyOn(GameService.prototype, 'isOrganizer').mockReturnValue(true);
             const result = gameService.startGame(socketMock, game.pin);
-            expect(result).toEqual(game.currentQuestion);
+            expect(result).toEqual(questionPayloadTest);
         });
     });
 });

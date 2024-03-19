@@ -60,6 +60,7 @@ mat-icon {
     left: 50%;
     transform: translate(-50%, -50%);
     font-size: 2rem;
+    background-color: red;
 }
 
 .icon-wrapper {
@@ -77,6 +78,7 @@ mat-icon {
 
 .answer-box:hover {
     cursor: pointer;
+    background-color: #858181;
 }
 
 .answer-box1 {

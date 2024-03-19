@@ -1,7 +1,7 @@
+import { GameService } from '@app/services/game/game.service';
 import { Injectable } from '@nestjs/common';
 import { Subject, Subscription } from 'rxjs';
 import { Socket } from 'socket.io';
-import { GameService } from '@app/services/game/game.service';
 
 const TICK_PER_SECOND = 1;
 const ONE_SECOND_MS = 1000;
@@ -25,7 +25,7 @@ export class TimerService {
         }
 
         if (this.intervals.get(pin)) {
-            this.stopTimer(client, pin); // to reset the timer
+            this.stopTimer(client, pin);
         }
 
         if (this.counters.get(pin) === undefined) {
@@ -33,13 +33,7 @@ export class TimerService {
         }
 
         this.tickSubjects.set(pin, new Subject());
-        const interval = setInterval(() => {
-            this.counters.set(pin, this.counters.get(pin) - 1 / TICK_PER_SECOND);
-            this.tickSubjects.get(pin).next(this.counters.get(pin));
-            if (this.counters.get(pin) <= 0) {
-                this.stopTimer(client, pin);
-            }
-        }, ONE_SECOND_MS / TICK_PER_SECOND);
+        const interval = setInterval(this.decrement.bind(this, client, pin), ONE_SECOND_MS / TICK_PER_SECOND);
 
         this.intervals.set(pin, interval);
         this.tickSubscriptions.set(pin, this.tickSubjects.get(pin).subscribe(callback));
@@ -59,5 +53,13 @@ export class TimerService {
         this.counters.delete(pin);
         this.tickSubscriptions.delete(pin);
         this.tickSubjects.get(pin).unsubscribe();
+    }
+
+    private decrement(client: Socket, pin: string) {
+        this.counters.set(pin, this.counters.get(pin) - 1 / TICK_PER_SECOND);
+        this.tickSubjects.get(pin).next(this.counters.get(pin));
+        if (this.counters.get(pin) <= 0) {
+            this.stopTimer(client, pin);
+        }
     }
 }

@@ -1,5 +1,5 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { GameServicesProvider } from '@app/providers/game-services.provider';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
@@ -57,14 +57,14 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
 
     ngOnDestroy() {
         this.eventSubscriptions.forEach((sub) => {
-            if (!sub.closed) {
+            if (sub && !sub.closed) {
                 sub.unsubscribe();
             }
         });
     }
 
     isCurrentUser(author: string): boolean {
-        return this.playerService.getCurrentPlayerFromGame(this.pin)?.username?.toLowerCase() === author.toLowerCase();
+        return this.playerService.getCurrentPlayer(this.pin)?.username?.toLowerCase() === author.toLowerCase();
     }
 
     updateRemainingInputCount() {
@@ -72,8 +72,9 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     }
 
     sendMessage() {
-        if (this.remainigInputCount >= 0 && this.remainigInputCount < MAX_MESSAGE_LENGTH) {
-            this.messageService.sendMessage(this.pin, this.input);
+        const isOnlyWhitespace = /^\s*$/.test(this.input);
+        if (!isOnlyWhitespace) {
+            this.messageService.sendMessage(this.pin, this.input.trim());
             this.input = '';
             this.remainigInputCount = MAX_MESSAGE_LENGTH;
         }
@@ -89,8 +90,10 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     }
 
     private messageValidator(): ValidatorFn {
-        return (): ValidationErrors | null => {
-            return this.remainigInputCount >= 0 ? null : { ok: true };
+        return (control: AbstractControl): ValidationErrors | null => {
+            const message = control.value as string;
+            const isOnlyWhitespace = /^\s*$/.test(message);
+            return !isOnlyWhitespace ? null : { invalidMessage: true };
         };
     }
 }

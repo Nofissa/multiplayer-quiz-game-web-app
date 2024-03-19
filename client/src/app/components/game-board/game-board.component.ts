@@ -12,6 +12,7 @@ import { Evaluation } from '@common/evaluation';
 import { Player } from '@common/player';
 import { Question } from '@common/question';
 import { Subscription } from 'rxjs';
+import { TimerEventType } from '@common/timer-event-type';
 
 const NOT_FOUND_INDEX = -1;
 
@@ -74,7 +75,7 @@ export class GameBoardComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
-        const player = this.playerService.getCurrentPlayerFromGame(this.pin);
+        const player = this.playerService.getCurrentPlayer(this.pin);
         if (player) {
             this.player = player;
         }
@@ -141,7 +142,7 @@ export class GameBoardComponent implements OnInit, OnDestroy {
                 this.loadNextQuestion(data.question);
             }),
             this.gameService.onSubmitChoices(pin, (evaluation) => {
-                if (this.playerService.getCurrentPlayerFromGame(pin)?.socketId === evaluation.player.socketId) {
+                if (this.playerService.getCurrentPlayer(pin)?.socketId === evaluation.player.socketId) {
                     this.cachedEvaluation = evaluation;
                 }
                 if (evaluation.isLast) {
@@ -151,9 +152,9 @@ export class GameBoardComponent implements OnInit, OnDestroy {
                     }
                 }
             }),
-            this.timerService.onTimerTick(pin, (remainingTime) => {
-                if (!remainingTime) {
-                    this.submitChoices(); // so that every player is forced to submit
+            this.timerService.onTimerTick(pin, (payload) => {
+                if (!payload.remainingTime && payload.eventType === TimerEventType.Question) {
+                    this.submitChoices();
                 }
             }),
         );
