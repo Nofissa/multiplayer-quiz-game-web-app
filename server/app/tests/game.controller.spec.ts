@@ -11,7 +11,6 @@ import { gameStub } from './stubs/game.stub';
 describe('GameController', () => {
     let app: INestApplication;
     let gameServiceMock: Partial<GameService>;
-    // let mockedValueTest: any;
     beforeEach(async () => {
         const gameTest = gameStub();
         gameServiceMock = {

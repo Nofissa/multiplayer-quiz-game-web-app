@@ -1,5 +1,5 @@
 /* eslint-disable max-lines */
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-explicit-any */ // useful especially for the socket mocking
 import { GameGateway } from '@app/gateways/game.gateway';
 import { GameService } from '@app/services/game/game.service';
 import { MessageService } from '@app/services/message/message.service';

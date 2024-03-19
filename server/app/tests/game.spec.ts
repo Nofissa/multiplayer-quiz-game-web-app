@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-explicit-any */ // useful especially for the socket mocking
 import { Game } from '@app/classes/game';
 import { Quiz } from '@app/model/database/quiz';
 import { GameState } from '@common/game-state';
@@ -12,8 +12,8 @@ describe('Game', () => {
     let organizer: Socket;
 
     beforeEach(() => {
-        quiz = quizStub(); // Mock quiz object
-        organizer = { id: 'organizerId' } as any; // Mock organizer socket
+        quiz = quizStub();
+        organizer = { id: 'organizerId' } as any;
         game = new Game('PIN123', quiz, organizer);
     });
 
