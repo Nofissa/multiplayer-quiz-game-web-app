@@ -85,12 +85,13 @@
 }
 
 .chat-room {
-    margin: 10px;
     margin-right: 20px;
     grid-area: chat-room;
+    align-items:end;
 }
 
 .app-component {
     display: flex;
     justify-content: center;
+    padding-left: 40%;
 }

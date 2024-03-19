@@ -24,12 +24,14 @@ h3 {
 
 .chat-room-container {
     grid-area: chat-room;
-    align-items: center;
+    align-items:end;
     height: 100%;
+    padding-right: 10%;
 }
 
 .chat-room-container > * {
     height: 100%;
+    width: 50%;
 }
 
 .nav-bar {
