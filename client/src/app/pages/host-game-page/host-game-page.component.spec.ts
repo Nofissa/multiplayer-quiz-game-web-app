@@ -26,6 +26,7 @@ import { GameEventPayload } from '@common/game-event-payload';
 import { GameState } from '@common/game-state';
 import { Player } from '@common/player';
 import { Question } from '@common/question';
+import { QuestionPayload } from '@common/question-payload';
 import { SubmissionPayload } from '@common/submission-payload';
 import { TimerEventType } from '@common/timer-event-type';
 import { TimerPayload } from '@common/timer-payload';
@@ -121,6 +122,10 @@ describe('HostGamePageComponent', () => {
         });
 
         gameHttpServiceSpy = jasmine.createSpyObj<GameHttpService>(['getGameSnapshotByPin']);
+
+        gameHttpServiceSpy.getGameSnapshotByPin.and.callFake(() => {
+            return of(mockGameSnapshot()[1]);
+        });
 
         timerService = jasmine.createSpyObj<TimerService>(['onStartTimer', 'onTimerTick', 'startTimer', 'stopTimer']);
 
@@ -252,11 +257,14 @@ describe('HostGamePageComponent', () => {
         expect(component.gameState).toEqual(GameState.Closed);
     });
 
-    it('should startGame start server Game and related timer instance and change gameState', () => {
+    it('should startGame start server Game', () => {
         component.startGame();
-        expect(timerService.startTimer).toHaveBeenCalledWith(PIN, TimerEventType.StartGame, NEXT_QUESTION_DELAY);
-        const payload: GameEventPayload<Question> = { pin: PIN, data: questionStub()[0] };
+        const payload: GameEventPayload<QuestionPayload> = { pin: PIN, data: { question: questionStub()[0], isLast: false } };
         socketServerMock.emit('startGame', payload);
+        expect(component.gameState).toEqual(GameState.Running);
+        expect(component.isLastQuestion).toBeFalse();
+        expect(barChartServiceSpy.addQuestion).toHaveBeenCalled();
+        expect(timerService.startTimer).toHaveBeenCalledWith(PIN, TimerEventType.StartGame, NEXT_QUESTION_DELAY);
     });
 
     it('should nextQuestion send nextQuestion signal to server and change gameState and set currentQuestionHasEnded', () => {
