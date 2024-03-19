@@ -23,7 +23,7 @@ import { Server, Socket } from 'socket.io';
 })
 export class GameGateway implements OnGatewayDisconnect {
     @WebSocketServer()
-    private server: Server;
+    server: Server;
 
     constructor(
         private readonly gameService: GameService,
@@ -101,6 +101,7 @@ export class GameGateway implements OnGatewayDisconnect {
             const payload: GameEventPayload<Player> = { pin, data: clientPlayer.player };
 
             this.server.to(pin).emit('playerAbandon', payload);
+
             clientPlayer.socket.leave(pin);
         } catch (error) {
             client.emit('error', error.message);
