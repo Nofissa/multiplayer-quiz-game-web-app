@@ -7,7 +7,6 @@ import { PlayerListComponent } from './player-list.component';
 describe('PlayerListComponent', () => {
     let component: PlayerListComponent;
     let fixture: ComponentFixture<PlayerListComponent>;
-    // let gameServiceSpy: jasmine.SpyObj<GameService>;
 
     beforeEach(() => {
         const spy = jasmine.createSpyObj('GameService', ['onJoinGame', 'onPlayerBan', 'onPlayerAbandon', 'playerBan']);
@@ -19,7 +18,6 @@ describe('PlayerListComponent', () => {
 
         fixture = TestBed.createComponent(PlayerListComponent);
         component = fixture.componentInstance;
-        // gameServiceSpy = TestBed.inject(GameService) as jasmine.SpyObj<GameService>;
     });
 
     it('should create', () => {
