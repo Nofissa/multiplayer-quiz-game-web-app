@@ -19,7 +19,7 @@ export class BarChartComponent {
     }
 
     numberOfPlayers(): number {
-        return this.data.submissions ? this.data.submissions.size : 0;
+        return this.data.submissions ? this.data.submissions.length : 0;
     }
 
     playersSelected(index: number): number {
