@@ -49,7 +49,6 @@ export class GameController {
                 },
                 questionSubmissions: game.questionSubmissions.map((x) => Array.from(x.values())),
             };
-            console.log(snapshot.questionSubmissions);
 
             response.status(HttpStatus.OK).json(snapshot);
         } catch (error) {
