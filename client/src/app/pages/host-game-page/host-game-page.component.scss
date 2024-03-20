@@ -31,8 +31,25 @@
 }
 
 .lock-button.mat-mdc-raised-button.mat-unthemed {
-    background-color: var(--main-bg-color);
+    // background-color: var(--main-bg-color);
     --mdc-protected-button-label-text-color: white;
+    background-color: rgb(76, 124, 206);
+}
+
+@keyframes blink {
+    0% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+.blink {
+    animation: blink 1.5s infinite;
 }
 
 .start-button {
@@ -87,7 +104,7 @@
 .chat-room {
     margin-right: 20px;
     grid-area: chat-room;
-    align-items:end;
+    align-items: end;
 }
 
 .app-component {

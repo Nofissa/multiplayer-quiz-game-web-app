@@ -31,6 +31,7 @@ export class CreateGamePageComponent implements OnInit {
     private readonly dialogService: MatDialog;
     private readonly snackBarService: MatSnackBar;
 
+    // this component needs multiple services to work correctly
     // eslint-disable-next-line max-params
     constructor(
         materialServicesProvider: MaterialServicesProvider,
