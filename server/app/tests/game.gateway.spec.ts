@@ -329,17 +329,11 @@ describe('GameGateway', () => {
         it('should toggle the selected choice for the provided pin and emit the "toggleSelectChoice" event to the organizer', () => {
             const pin = 'mockPin';
             const choiceIndex = 0;
-            const submission: Submission = submissionStub();
-            gameServiceMock.toggleSelectChoice.mockReturnValue({ clientId: '1234', submission });
+            const submission: Submission[] = [submissionStub()];
+            gameServiceMock.toggleSelectChoice.mockReturnValue(submission);
             gameServiceMock.getOrganizer.mockReturnValue(socketMock);
             gameGateway.toggleSelectChoice(socketMock, { pin, choiceIndex });
-            expect(socketMock.emit).toHaveBeenCalledWith('toggleSelectChoice', {
-                pin,
-                data: {
-                    clientId: '1234',
-                    submission,
-                },
-            });
+            expect(socketMock.emit).toHaveBeenCalledWith('toggleSelectChoice', { pin, data: submission });
         });
 
         it('should emit "error" event if an error occurs during toggling the selected choice', () => {
