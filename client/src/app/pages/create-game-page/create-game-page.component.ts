@@ -1,6 +1,6 @@
 // for moongodb _id fields
 /* eslint-disable no-underscore-dangle */
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
@@ -13,6 +13,7 @@ import { QuizHttpService } from '@app/services/quiz-http/quiz-http.service';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { Player } from '@common/player';
 import { PlayerState } from '@common/player-state';
+import { Subscription } from 'rxjs';
 import SwiperCore, { EffectCoverflow, Navigation, Pagination } from 'swiper';
 
 SwiperCore.use([Navigation, Pagination, EffectCoverflow]);
@@ -25,8 +26,10 @@ const SNACK_BAR_DURATION_MS = 3000;
     styleUrls: ['./create-game-page.component.scss'],
     encapsulation: ViewEncapsulation.None,
 })
-export class CreateGamePageComponent implements OnInit {
+export class CreateGamePageComponent implements OnInit, OnDestroy {
     quizzArray: Quiz[];
+
+    createGameSubscription: Subscription = new Subscription();
 
     private readonly dialogService: MatDialog;
     private readonly snackBarService: MatSnackBar;
@@ -46,6 +49,12 @@ export class CreateGamePageComponent implements OnInit {
 
     ngOnInit() {
         this.loadQuizzes();
+    }
+
+    ngOnDestroy() {
+        if (!this.createGameSubscription.closed) {
+            this.createGameSubscription.unsubscribe();
+        }
     }
 
     loadQuizzes(): void {
@@ -82,7 +91,7 @@ export class CreateGamePageComponent implements OnInit {
     }
 
     private createGame(quiz: Quiz) {
-        this.gameService.onCreateGame((pin: string) => {
+        this.createGameSubscription = this.gameService.onCreateGame((pin: string) => {
             this.router.navigate(['/host-game'], { queryParams: { pin } });
             const player: Player = {
                 socketId: this.webSockerService.getSocketId(),
