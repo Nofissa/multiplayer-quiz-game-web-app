@@ -2,7 +2,6 @@ import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { GameServicesProvider } from '@app/providers/game-services.provider';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
-import { GameService } from '@app/services/game/game-service/game.service';
 import { MessageService } from '@app/services/message/message.service';
 import { PlayerService } from '@app/services/player/player.service';
 import { Chatlog } from '@common/chatlog';
@@ -26,7 +25,6 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     private eventSubscriptions: Subscription[] = [];
 
     private readonly gameHttpService: GameHttpService;
-    private readonly gameService: GameService;
     private readonly messageService: MessageService;
     private readonly playerService: PlayerService;
 
@@ -35,7 +33,6 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
             message: [this.pin, [Validators.required, this.messageValidator()]],
         });
         this.gameHttpService = gameServicesProvider.gameHttpService;
-        this.gameService = gameServicesProvider.gameService;
         this.messageService = gameServicesProvider.messageService;
         this.playerService = gameServicesProvider.playerService;
     }
@@ -47,10 +44,6 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
         this.eventSubscriptions.push(
             this.messageService.onSendMessage(this.pin, (chatlog: Chatlog) => {
                 this.chatlogs.push(chatlog);
-            }),
-
-            this.gameService.onStartGame(this.pin, () => {
-                this.chatlogs = [];
             }),
         );
     }
@@ -73,7 +66,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
 
     sendMessage() {
         const isOnlyWhitespace = /^\s*$/.test(this.input);
-        if (!isOnlyWhitespace) {
+        if (!isOnlyWhitespace && this.input.length < MAX_MESSAGE_LENGTH) {
             this.messageService.sendMessage(this.pin, this.input.trim());
             this.input = '';
             this.remainigInputCount = MAX_MESSAGE_LENGTH;
@@ -93,7 +86,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
         return (control: AbstractControl): ValidationErrors | null => {
             const message = control.value as string;
             const isOnlyWhitespace = /^\s*$/.test(message);
-            return !isOnlyWhitespace ? null : { invalidMessage: true };
+            return !isOnlyWhitespace && message?.length < MAX_MESSAGE_LENGTH ? null : { invalidMessage: true };
         };
     }
 }

@@ -1,7 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormBuilder } from '@angular/forms';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { questionStub } from '@app/TestStubs/question.stubs';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { MessageService } from '@app/services/message/message.service';
@@ -11,7 +10,6 @@ import { GameSnapshot } from '@common/game-snapshot';
 import { GameState } from '@common/game-state';
 import { Player } from '@common/player';
 import { PlayerState } from '@common/player-state';
-import { QuestionPayload } from '@common/question-payload';
 import { Quiz } from '@common/quiz';
 import { Submission } from '@common/submission';
 import { Subscription, of } from 'rxjs';
@@ -59,10 +57,6 @@ describe('ChatRoomComponent', () => {
     const mockState: GameState = GameState.Opened;
 
     const mockQuestionSubmissions: Submission[][] = [[{ choices: [{ index: 0, isSelected: true }], isFinal: false }]];
-    const mockQuestionPayload: QuestionPayload = {
-        question: questionStub()[0],
-        isLast: false,
-    };
 
     const mockGameSnapshot: GameSnapshot = {
         players: mockPlayers,
@@ -170,12 +164,6 @@ describe('ChatRoomComponent', () => {
         component.ngOnInit();
         mockMessageService.onSendMessage.calls.mostRecent().args[1](testChatlog);
         expect(component.chatlogs).toContain(testChatlog);
-    });
-
-    it('should clear chatlogs when game starts', () => {
-        component.ngOnInit();
-        mockGameService.onStartGame.calls.mostRecent().args[1](mockQuestionPayload);
-        expect(component.chatlogs).toEqual([]);
     });
 
     it('should unsubscribe from all subscriptions on destroy', () => {

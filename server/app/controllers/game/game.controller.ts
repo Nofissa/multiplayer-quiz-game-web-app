@@ -49,6 +49,7 @@ export class GameController {
                 },
                 questionSubmissions: game.questionSubmissions.map((x) => Array.from(x.values())),
             };
+
             response.status(HttpStatus.OK).json(snapshot);
         } catch (error) {
             response.status(HttpStatus.NOT_FOUND).send('Cannot find game');

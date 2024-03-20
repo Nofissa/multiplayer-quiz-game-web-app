@@ -72,6 +72,7 @@ describe('QuizComponent', () => {
 
     it('should edit quiz', () => {
         component.editQuiz();
+        // for mongodb id
         // eslint-disable-next-line no-underscore-dangle
         expect(mockRouter.navigate).toHaveBeenCalledWith(['/qcm-creation'], { queryParams: { quizId: mockQuiz._id } });
     });
@@ -87,7 +88,7 @@ describe('QuizComponent', () => {
         mockQuizHttpService.hideQuizById.and.returnValue(of(updatedQuiz));
 
         component.onToggleChange();
-
+        // for mongodb id
         // eslint-disable-next-line no-underscore-dangle
         expect(component.quiz).toEqual(updatedQuiz);
     });
