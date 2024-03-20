@@ -27,7 +27,8 @@ export class BarChartComponent {
             return 0;
         }
         let playersSelected = 0;
-        this.data.submissions.forEach((submission) => {
+
+        Array.from(this.data.submissions.values()).forEach((submission) => {
             if (submission.choices.some((choice) => choice.index === index && choice.isSelected)) {
                 playersSelected++;
             }

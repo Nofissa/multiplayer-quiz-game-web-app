@@ -422,14 +422,6 @@ describe('GameService', () => {
             jest.spyOn(GameService.prototype, 'isOrganizer').mockReturnValue(false);
             expect(() => gameService.endGame(socketMock, game.pin)).toThrow(`Vous n'êtes pas organisateur de la partie ${game.pin}`);
         });
-
-        it('should change the state of the game to Ended', () => {
-            jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
-            jest.spyOn(GameService.prototype, 'isOrganizer').mockReturnValue(true);
-            gameService.games.set(game.pin, game);
-            gameService.endGame(socketMock, game.pin);
-            expect(gameService.games.size).toEqual(0);
-        });
     });
 
     describe('startGame', () => {

@@ -154,7 +154,7 @@ export class GameBoardComponent implements OnInit, OnDestroy {
                 }
             }),
             this.timerService.onTimerTick(pin, (payload) => {
-                if (!payload.remainingTime && payload.eventType === TimerEventType.Question) {
+                if (!payload.remainingTime && payload.eventType === TimerEventType.Question && !this.hasSubmited) {
                     this.submitChoices();
                 }
             }),

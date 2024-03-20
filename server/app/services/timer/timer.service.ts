@@ -52,7 +52,10 @@ export class TimerService {
         this.intervals.delete(pin);
         this.counters.delete(pin);
         this.tickSubscriptions.delete(pin);
-        this.tickSubjects.get(pin).unsubscribe();
+        if (this.tickSubjects.has(pin)) {
+            this.tickSubjects.get(pin).unsubscribe();
+            this.tickSubjects.delete(pin);
+        }
     }
 
     private decrement(client: Socket, pin: string) {
