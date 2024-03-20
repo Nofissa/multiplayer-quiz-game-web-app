@@ -116,7 +116,9 @@ export class GameService {
         const gameSubmissions = Array.from(game.currentQuestionSubmissions.values());
         const isCorrect = this.isGoodAnswer(question, submission);
         const isFirst = gameSubmissions.filter((x) => x.isFinal).length === 1;
-        const isLast = gameSubmissions.filter((x) => x.isFinal).length === game.clientPlayers.size;
+        const isLast =
+            gameSubmissions.filter((x) => x.isFinal).length ===
+            Array.from(game.clientPlayers.values()).filter((x) => x.player.state === PlayerState.Playing).length;
 
         let score = isCorrect ? question.points : NO_POINTS;
         score *= isFirst ? BONUS_MULTIPLIER : NO_BONUS_MULTIPLIER;
