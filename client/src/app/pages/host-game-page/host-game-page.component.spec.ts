@@ -72,6 +72,7 @@ describe('HostGamePageComponent', () => {
             'getAllBarChart',
             'getCurrentQuestionData',
             'setData',
+            'flushData',
         ]);
 
         gameServiceSpy = jasmine.createSpyObj<GameService>([
