@@ -157,7 +157,6 @@ export class GameService {
 
     cancelGame(client: Socket, pin: string): string {
         const game = this.getGame(pin);
-        this.games.delete(pin);
 
         const isOrganizer = this.isOrganizer(game, client.id);
         const gameHasPlayersLeft = Array.from(game.clientPlayers.values()).some((player) => player.player.state === PlayerState.Playing);
@@ -218,8 +217,6 @@ export class GameService {
         if (!this.isOrganizer(game, client.id)) {
             throw new Error(`Vous n'êtes pas organisateur de la partie ${pin}`);
         }
-
-        this.games.delete(pin);
     }
 
     disconnect(client: Socket): DisconnectPayload {
