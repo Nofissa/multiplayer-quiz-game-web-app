@@ -47,7 +47,7 @@ export class GameController {
                         };
                     }),
                 },
-                questionSubmissions: game.questionSubmissions,
+                questionSubmissions: game.questionSubmissions.map((x) => Array.from(x.values())),
             };
 
             response.status(HttpStatus.OK).json(snapshot);
