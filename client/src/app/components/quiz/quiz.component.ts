@@ -15,10 +15,9 @@ export class QuizComponent {
     @Input()
     quiz: Quiz;
     @Output()
-    delete = new EventEmitter<Quiz>(); // Output event for deletion
+    delete = new EventEmitter<Quiz>();
 
     constructor(
-        // eslint-disable-next-line @typescript-eslint/naming-convention
         private readonly dialog: MatDialog,
         private readonly quizHttpService: QuizHttpService,
         private readonly router: Router,
@@ -45,11 +44,13 @@ export class QuizComponent {
     }
 
     editQuiz() {
+        // for mongodb id
         // eslint-disable-next-line no-underscore-dangle
         this.router.navigate(['/qcm-creation'], { queryParams: { quizId: this.quiz._id } });
     }
 
     exportQuiz() {
+        // is used in the html
         // eslint-disable-next-line no-unused-vars
         const { isHidden, ...quizCopy } = this.quiz;
         const blob = new Blob([JSON.stringify(quizCopy)], { type: 'text/json;charset=utf-8' });
@@ -57,6 +58,7 @@ export class QuizComponent {
     }
 
     onToggleChange() {
+        // for mongodb id
         // eslint-disable-next-line no-underscore-dangle
         this.quizHttpService.hideQuizById(this.quiz._id).subscribe((quiz) => {
             this.quiz = quiz;

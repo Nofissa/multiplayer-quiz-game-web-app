@@ -19,7 +19,7 @@
             <mat-icon class="icon" fontIcon="logout"></mat-icon>
         </button>
         <button *ngIf="!isRunning()" class="lock-button" mat-raised-button (click)="toggleLock()">
-            <mat-icon class="icon" *ngIf="!isLocked()" fontIcon="lock_open"></mat-icon>
+            <mat-icon class="icon blink" *ngIf="!isLocked()" fontIcon="lock_open"></mat-icon>
             <mat-icon class="icon" *ngIf="isLocked()" fontIcon="lock"></mat-icon>
         </button>
         <div class="action-button">

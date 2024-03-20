@@ -2,6 +2,7 @@ import { ValidationArguments, ValidationOptions, ValidatorConstraint, ValidatorC
 
 @ValidatorConstraint({ name: 'isMultipleOfTen', async: false })
 class IsMultipleOfConstraint implements ValidatorConstraintInterface {
+    // _ could be used, optional parameter
     // eslint-disable-next-line no-unused-vars
     validate(value: unknown, args: ValidationArguments) {
         const multipleOf = args.constraints[0];
@@ -14,6 +15,7 @@ class IsMultipleOfConstraint implements ValidatorConstraintInterface {
     }
 }
 
+// works with this convention
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const IsMultipleOf = (multipleOf: number, validationOptions?: ValidationOptions) => {
     return (object: object, propertyName: string) => {

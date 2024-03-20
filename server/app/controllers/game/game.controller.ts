@@ -1,7 +1,7 @@
 import { GameService } from '@app/services/game/game.service';
+import { GameSnapshot } from '@common/game-snapshot';
 import { Controller, Get, HttpStatus, Param, Res } from '@nestjs/common';
 import { ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { GameSnapshot } from '@common/game-snapshot';
 import { Response } from 'express';
 
 @ApiTags('Games')
@@ -49,7 +49,6 @@ export class GameController {
                 },
                 questionSubmissions: game.questionSubmissions.map((x) => Array.from(x.values())),
             };
-            console.log(snapshot.questionSubmissions);
 
             response.status(HttpStatus.OK).json(snapshot);
         } catch (error) {

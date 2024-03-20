@@ -1,10 +1,10 @@
+// for mongo db ids
 /* eslint-disable no-underscore-dangle */
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
 import { UpsertQuestionDialogComponent } from '@app/components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
-import { Question } from '@common/question';
 import { QuestionListOptions } from '@app/interfaces/question-list-options';
 import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog-data';
 import { MaterialServicesProvider } from '@app/providers/material-services.provider';
@@ -12,6 +12,7 @@ import { QuestionServicesProvider } from '@app/providers/question-services.provi
 import { QuestionHttpService } from '@app/services/question-http/question-http.service';
 import { QuestionInteractionService } from '@app/services/question-interaction/question-interaction.service';
 import { QuestionSharingService } from '@app/services/question-sharing/question-sharing.service';
+import { Question } from '@common/question';
 import { Subscription } from 'rxjs';
 
 const NOT_FOUND_INDEX = -1;

@@ -8,9 +8,9 @@ import { MaterialServicesProvider } from '@app/providers/material-services.provi
 import { SecurityServicesProvider } from '@app/providers/security-services.provider';
 import { AuthService } from '@app/services/auth/auth.service';
 import { GameService } from '@app/services/game/game-service/game.service';
+import { PlayerService } from '@app/services/player/player.service';
 import { SessionService } from '@app/services/session/session.service';
 import { AuthPayload } from '@common/auth-payload';
-import { PlayerService } from '@app/services/player/player.service';
 
 @Component({
     selector: 'app-main-page',
@@ -23,6 +23,7 @@ export class MainPageComponent {
     private readonly dialogService: MatDialog;
     private readonly snackBarService: MatSnackBar;
 
+    // needs multiple services to work
     // eslint-disable-next-line max-params
     constructor(
         private readonly playerService: PlayerService,

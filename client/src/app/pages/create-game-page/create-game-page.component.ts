@@ -1,4 +1,4 @@
-// for moongodb _id fields
+// for mongodb _id fields
 /* eslint-disable no-underscore-dangle */
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
@@ -34,6 +34,7 @@ export class CreateGamePageComponent implements OnInit, OnDestroy {
     private readonly dialogService: MatDialog;
     private readonly snackBarService: MatSnackBar;
 
+    // this component needs multiple services to work correctly
     // eslint-disable-next-line max-params
     constructor(
         materialServicesProvider: MaterialServicesProvider,

@@ -2,6 +2,7 @@ import { ValidationArguments, ValidationOptions, ValidatorConstraint, ValidatorC
 
 @ValidatorConstraint({ name: 'arrayNotContainEmpty', async: false })
 export class ArrayNoEmptyValuesConstraint implements ValidatorConstraintInterface {
+    // _ could be used, optional parameter
     // eslint-disable-next-line no-unused-vars
     validate(value: unknown[], _: ValidationArguments) {
         return (
@@ -17,6 +18,7 @@ export class ArrayNoEmptyValuesConstraint implements ValidatorConstraintInterfac
     }
 }
 
+// works with this convention
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export const ArrayNoEmptyValues = (validationOptions?: ValidationOptions) => {
     return (object: object, propertyName: string) => {

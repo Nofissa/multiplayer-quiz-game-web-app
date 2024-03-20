@@ -83,8 +83,10 @@ export class QuizListComponent implements OnInit {
     }
 
     deleteQuiz(quiz: Quiz) {
+        // for mongodb id
         // eslint-disable-next-line no-underscore-dangle
         this.quizHttpService.deleteQuizById(quiz._id).subscribe(() => {
+            // for mongodb id
             // eslint-disable-next-line no-underscore-dangle
             this.quizzes = this.quizzes.filter((x) => x._id !== quiz._id);
         });
