@@ -6,13 +6,13 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { UpsertQuestionDialogComponent } from '@app/components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
-import { Question } from '@common/question';
+import { SNACK_MESSAGE_DURATION } from '@app/constants';
 import { Quiz } from '@app/interfaces/quiz';
 import { MaterialServicesProvider } from '@app/providers/material-services.provider';
 import { QuestionInteractionService } from '@app/services/question-interaction/question-interaction.service';
 import { QuestionSharingService } from '@app/services/question-sharing/question-sharing.service';
 import { QuizHttpService } from '@app/services/quiz-http/quiz-http.service';
-import { SNACK_MESSAGE_DURATION } from '@app/constants';
+import { Question } from '@common/question';
 import { Subscription } from 'rxjs';
 
 const ID_LENGTH = 10;
@@ -33,6 +33,7 @@ export class QCMCreationPageComponent implements OnInit, OnDestroy {
     private readonly dialogService: MatDialog;
     private readonly snackBarService: MatSnackBar;
 
+    // needs multiple services to work correctly
     // eslint-disable-next-line max-params
     constructor(
         private readonly formBuilder: FormBuilder,
@@ -152,6 +153,7 @@ export class QCMCreationPageComponent implements OnInit, OnDestroy {
                 questions: this.questionsContainer,
                 isHidden: true,
                 lastModification: new Date(),
+                // for mongodb id
                 // eslint-disable-next-line no-underscore-dangle
                 _id: this.quiz ? this.quiz._id : '',
             };

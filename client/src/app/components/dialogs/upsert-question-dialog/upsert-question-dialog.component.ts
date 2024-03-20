@@ -3,10 +3,10 @@ import { Component, Inject } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MAX_CHOICE_COUNT, MIN_CHOICE_COUNT, POINT_VALUE_BASE_MULTIPLE, SNACK_MESSAGE_DURATION } from '@app/constants';
+import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog-data';
 import { Choice } from '@common/choice';
 import { Question } from '@common/question';
-import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog-data';
-import { MAX_CHOICE_COUNT, MIN_CHOICE_COUNT, SNACK_MESSAGE_DURATION, POINT_VALUE_BASE_MULTIPLE } from '@app/constants';
 
 const ID_LENGTH = 10;
 
@@ -58,6 +58,7 @@ export class UpsertQuestionDialogComponent {
         return this.toggle;
     }
 
+    // needs to be able to work with different types of data
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     drop(event: CdkDragDrop<any[]>): void {
         moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
@@ -108,6 +109,7 @@ export class UpsertQuestionDialogComponent {
                 points: this.formGroup.value.points,
                 choices: this.formGroup.value.choices,
                 lastModification: new Date(),
+                // for mongodb id
                 // eslint-disable-next-line no-underscore-dangle
                 _id: this.data.question._id ? this.data.question._id : this.generateRandomString(),
             };

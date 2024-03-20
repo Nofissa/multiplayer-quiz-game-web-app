@@ -1,9 +1,10 @@
+// choice is only used within question so both classes are in this file
 // eslint-disable-next-line max-classes-per-file
+import { QuestionType } from '@common/question-type';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
-import { Document } from 'mongoose';
 import { IsDate, ValidateNested } from 'class-validator';
-import { QuestionType } from '@common/question-type';
+import { Document } from 'mongoose';
 
 export class Choice {
     @ApiProperty()
