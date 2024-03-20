@@ -16,7 +16,7 @@ export class BarChartService {
         }
         const newBarchartData: BarChartData = {
             question,
-            submissions: new Map(),
+            submissions: [],
         };
         this.barChartData.push(newBarchartData);
     }
@@ -24,7 +24,7 @@ export class BarChartService {
     updateBarChartData(data: SubmissionPayload): void {
         const chartData: BarChartData | undefined = this.getCurrentQuestionData();
         if (chartData && data.submission && data.clientId) {
-            chartData.submissions.set(data.clientId, data.submission);
+            chartData.submissions.push(data.submission);
         }
     }
 
@@ -39,7 +39,7 @@ export class BarChartService {
         return this.barChartData;
     }
 
-    setData(chartData: { submissions: Map<string, Submission>[]; questions: Question[] }): void {
+    setData(chartData: { submissions: Submission[][]; questions: Question[] }): void {
         this.barChartData = [];
         for (let i = 0; i < chartData.questions.length; i++) {
             const newBarChart: BarChartData = {
@@ -48,5 +48,9 @@ export class BarChartService {
             };
             this.barChartData.push(newBarChart);
         }
+    }
+
+    flushData(): void {
+        this.barChartData = [];
     }
 }

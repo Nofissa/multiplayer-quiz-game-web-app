@@ -58,9 +58,7 @@ describe('ChatRoomComponent', () => {
 
     const mockState: GameState = GameState.Opened;
 
-    const mockQuestionSubmissions: Map<string, Submission>[] = [
-        new Map([['questionId1', { choices: [{ index: 0, isSelected: true }], isFinal: false }]]),
-    ];
+    const mockQuestionSubmissions: Submission[][] = [[{ choices: [{ index: 0, isSelected: true }], isFinal: false }]];
     const mockQuestionPayload: QuestionPayload = {
         question: questionStub()[0],
         isLast: false,

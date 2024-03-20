@@ -6,7 +6,6 @@ import { GameServicesProvider } from '@app/providers/game-services.provider';
 import { RoutingDependenciesProvider } from '@app/providers/routing-dependencies.provider';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { BarChartService } from '@app/services/game/bar-chart-service/bar-chart.service';
-import { Player } from '@common/player';
 
 @Component({
     selector: 'app-player-results-page',
@@ -15,7 +14,6 @@ import { Player } from '@common/player';
 })
 export class PlayerResultsPageComponent implements OnInit {
     pin: string;
-    players: Player[] = [];
 
     private readonly activatedRoute: ActivatedRoute;
     private readonly router: Router;
@@ -43,7 +41,6 @@ export class PlayerResultsPageComponent implements OnInit {
         this.gameHttpService.getGameSnapshotByPin(this.pin).subscribe({
             next: (snapshot) => {
                 this.barChartService.setData({ submissions: snapshot.questionSubmissions, questions: snapshot.quiz.questions });
-                this.players = snapshot.players;
             },
             error: (error: HttpErrorResponse) => {
                 if (error.status === HttpStatusCode.NotFound) {
