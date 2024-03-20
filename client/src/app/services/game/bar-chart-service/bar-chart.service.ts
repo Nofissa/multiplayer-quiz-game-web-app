@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { BarChartData } from '@app/interfaces/bar-chart-data';
 import { Question } from '@common/question';
 import { Submission } from '@common/submission';
-import { SubmissionPayload } from '@common/submission-payload';
 
 @Injectable({
     providedIn: 'root',
@@ -21,10 +20,10 @@ export class BarChartService {
         this.barChartData.push(newBarchartData);
     }
 
-    updateBarChartData(data: SubmissionPayload): void {
+    updateBarChartData(data: Submission[]): void {
         const chartData: BarChartData | undefined = this.getCurrentQuestionData();
-        if (chartData && data.submission && data.clientId) {
-            chartData.submissions.push(data.submission);
+        if (chartData && data) {
+            chartData.submissions = data;
         }
     }
 

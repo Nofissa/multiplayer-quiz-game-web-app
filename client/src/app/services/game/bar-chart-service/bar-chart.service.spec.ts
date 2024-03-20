@@ -1,8 +1,8 @@
 import { TestBed } from '@angular/core/testing';
+import { BarChartData } from '@app/interfaces/bar-chart-data';
 import { barChartDataStub } from '@app/TestStubs/bar-chart-data.stubs';
 import { questionStub } from '@app/TestStubs/question.stubs';
 import { submissionsStub, submissionStub } from '@app/TestStubs/submission.stubs';
-import { BarChartData } from '@app/interfaces/bar-chart-data';
 import { Question } from '@common/question';
 import { Submission } from '@common/submission';
 import { BarChartService } from './bar-chart.service';
@@ -17,19 +17,6 @@ describe('BarChartService', () => {
     });
     it('should be created', () => {
         expect(service).toBeTruthy();
-    });
-
-    it('should updatebBarChartData when given a submission', () => {
-        service['barChartData'] = [{ question: questionStub()[0], submissions: [] }];
-        service.updateBarChartData({ clientId: 'SomeID', submission: submissionStub()[0] });
-
-        expect(service['barChartData']).toEqual([{ question: questionStub()[0], submissions: [submissionStub()[0]] }]);
-    });
-
-    it('should not update barChartData when given a bad clientId and a submission', () => {
-        service['barChartData'] = [{ question: questionStub()[0], submissions: [] }];
-        service.updateBarChartData({ clientId: undefined as unknown as string, submission: submissionStub()[0] });
-        expect(service.getCurrentQuestionData()).toEqual({ question: questionStub()[0], submissions: [] });
     });
 
     it('should getCurrentQuestionData get current BarChartData, or undefined if ther is no data', () => {
@@ -70,28 +57,15 @@ describe('BarChartService', () => {
 
     it('should not update barChartData when given a bad clientId and submission', () => {
         service['barChartData'] = [{ question: questionStub()[0], submissions: [] }];
-        service.updateBarChartData({ clientId: 'someClientId', submission: undefined as unknown as Submission });
+        service.updateBarChartData(undefined as unknown as Submission[]);
         expect(service.getCurrentQuestionData()).toEqual({ question: questionStub()[0], submissions: [] });
-    });
-
-    it('should not duplicate submissions when player toggles different choices one after the other', () => {
-        service['barChartData'] = [{ question: questionStub()[0], submissions: [] }];
-        const mockElement3 = { clientId: 'someClientId', submission: submissionStub()[2] };
-        const mockBarChart: BarChartData = {
-            question: questionStub()[0],
-            submissions: [mockElement3.submission],
-        };
-        service.updateBarChartData({ clientId: 'someClientId', submission: submissionStub()[0] });
-        service.updateBarChartData({ clientId: 'someClientId', submission: submissionStub()[1] });
-        service.updateBarChartData(mockElement3);
-        expect(service.getCurrentQuestionData()).toEqual(mockBarChart);
     });
 
     it('should contain multiple players submissions', () => {
         service['barChartData'] = [{ question: questionStub()[0], submissions: [] }];
-        submissionsStub()[0].forEach((submission, clientId) => {
-            service.updateBarChartData({ clientId: clientId.toString(), submission });
-        });
+
+        service.updateBarChartData(submissionStub());
+
         expect(service.getCurrentQuestionData()).toEqual(barChartDataStub()[0]);
     });
 
@@ -105,7 +79,7 @@ describe('BarChartService', () => {
             { question: questionStub()[0], submissions: [] },
             { question: questionStub()[1], submissions: [] },
         ];
-        service.updateBarChartData({ clientId: 'someClientId', submission: submissionStub()[0] });
+        service.updateBarChartData(submissionStub());
         const mockBarChartContainer: BarChartData[] = [
             {
                 question: questionStub()[0],
@@ -113,7 +87,7 @@ describe('BarChartService', () => {
             },
             {
                 question: questionStub()[1],
-                submissions: [submissionStub()[0]],
+                submissions: submissionStub(),
             },
         ];
         expect(service.getAllBarChart()).toEqual(mockBarChartContainer);

@@ -404,8 +404,8 @@ describe('GameService', () => {
         const choiceIndex = 1;
         const submission = submissionStub();
         const submissionTest = submissionStub();
-        submissionTest.choices[1].isSelected = true;
-        const expectedResult = { clientId: 'gameId', submission: submissionTest };
+        submissionTest.choices[1].isSelected = false;
+        const expectedResult = [submissionTest];
 
         it('should return the right submission', () => {
             jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);

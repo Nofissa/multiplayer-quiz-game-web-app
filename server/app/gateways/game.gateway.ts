@@ -7,7 +7,7 @@ import { GameEventPayload } from '@common/game-event-payload';
 import { GameState } from '@common/game-state';
 import { Player } from '@common/player';
 import { QuestionPayload } from '@common/question-payload';
-import { SubmissionPayload } from '@common/submission-payload';
+import { Submission } from '@common/submission';
 import { TimerEventType } from '@common/timer-event-type';
 import { TimerPayload } from '@common/timer-payload';
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
@@ -149,7 +149,7 @@ export class GameGateway implements OnGatewayDisconnect {
         try {
             const submission = this.gameService.toggleSelectChoice(client, pin, choiceIndex);
             const organizer = this.gameService.getOrganizer(pin);
-            const payload: GameEventPayload<SubmissionPayload> = { pin, data: submission };
+            const payload: GameEventPayload<Submission[]> = { pin, data: submission };
 
             organizer.emit('toggleSelectChoice', payload);
         } catch (error) {
