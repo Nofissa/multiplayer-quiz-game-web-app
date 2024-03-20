@@ -70,7 +70,7 @@ export class HostGamePageComponent implements OnInit {
                 }
             },
         });
-
+        this.barChartService.flushData();
         this.setupSubscriptions(this.pin);
     }
 
