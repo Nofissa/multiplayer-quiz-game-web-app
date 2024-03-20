@@ -33,7 +33,7 @@ import { PromptDialogComponent } from './components/dialogs/prompt-dialog/prompt
 import { QuizDetailsDialogComponent } from './components/dialogs/quiz-details-dialog/quiz-details-dialog.component';
 import { UpsertQuestionDialogComponent } from './components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
 import { GameBoardComponent } from './components/game-board/game-board.component';
-import { BarChartComponent } from './components/histogramme/bar-chart/bar-chart.component';
+import { BarChartComponent } from './components/bar-chart/bar-chart.component';
 import { NavHeaderComponent } from './components/nav-header/nav-header.component';
 import { PlayerListComponent } from './components/player-list/player-list.component';
 import { QuestionBankComponent } from './components/question-bank/question-bank.component';
