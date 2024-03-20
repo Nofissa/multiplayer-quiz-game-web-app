@@ -49,4 +49,8 @@ export class BarChartService {
             this.barChartData.push(newBarChart);
         }
     }
+
+    flushData(): void {
+        this.barChartData = [];
+    }
 }

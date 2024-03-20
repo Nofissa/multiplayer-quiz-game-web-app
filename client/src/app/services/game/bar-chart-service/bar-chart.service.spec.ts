@@ -96,18 +96,8 @@ describe('BarChartService', () => {
     });
 
     it('should contain multiple barCharts', () => {
-        service.addQuestion(questionStub()[0]);
-        service.addQuestion(questionStub()[1]);
-        expect(service['barChartData']).toEqual([
-            {
-                question: questionStub()[0],
-                submissions: [],
-            },
-            {
-                question: questionStub()[1],
-                submissions: [],
-            },
-        ]);
+        service['barChartData'] = barChartDataStub();
+        expect(service['barChartData']).toEqual(barChartDataStub());
     });
 
     it('should update last barChart when logging new submissions', () => {
@@ -127,5 +117,11 @@ describe('BarChartService', () => {
             },
         ];
         expect(service.getAllBarChart()).toEqual(mockBarChartContainer);
+    });
+
+    it('should flushData reset barChartData to []', () => {
+        service['barChartData'] = barChartDataStub();
+        service.flushData();
+        expect(service['barChartData']).toEqual([]);
     });
 });
