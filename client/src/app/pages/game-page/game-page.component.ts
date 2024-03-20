@@ -66,7 +66,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
     ngOnDestroy() {
         this.eventSubscriptions.forEach((sub) => {
-            if (!sub.closed) {
+            if (sub && !sub.closed) {
                 sub.unsubscribe();
             }
         });
@@ -130,7 +130,6 @@ export class GamePageComponent implements OnInit, OnDestroy {
                 if (!this.isTest) {
                     return;
                 }
-
                 if (payload.isLast) {
                     this.isLastQuestion = true;
                 }
