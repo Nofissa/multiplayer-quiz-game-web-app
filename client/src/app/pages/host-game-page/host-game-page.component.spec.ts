@@ -28,13 +28,13 @@ import { GameState } from '@common/game-state';
 import { Player } from '@common/player';
 import { Question } from '@common/question';
 import { QuestionPayload } from '@common/question-payload';
-import { SubmissionPayload } from '@common/submission-payload';
 import { TimerEventType } from '@common/timer-event-type';
 import { TimerPayload } from '@common/timer-payload';
 import { Observable, of, throwError } from 'rxjs';
 import { io } from 'socket.io-client';
 import { HostGamePageComponent } from './host-game-page.component';
 import SpyObj = jasmine.SpyObj;
+import { Submission } from '@common/submission';
 
 const PIN = '1234';
 const NEXT_QUESTION_DELAY = 5;
@@ -292,7 +292,7 @@ describe('HostGamePageComponent', () => {
     });
 
     it('should the server emitting toggleSelectChoice affect the barChartData', () => {
-        const payload: GameEventPayload<SubmissionPayload> = { pin: PIN, data: { clientId: 'SomeClientId', submission: submissionStub()[0] } };
+        const payload: GameEventPayload<Submission[]> = { pin: PIN, data: submissionStub() };
         socketServerMock.emit('toggleSelectChoice', payload);
         expect(barChartServiceSpy.updateBarChartData).toHaveBeenCalledWith(payload.data);
     });
