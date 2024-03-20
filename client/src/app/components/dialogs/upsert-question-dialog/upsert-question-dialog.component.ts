@@ -58,6 +58,7 @@ export class UpsertQuestionDialogComponent {
         return this.toggle;
     }
 
+    // needs to be able to work with different types of data
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     drop(event: CdkDragDrop<any[]>): void {
         moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);

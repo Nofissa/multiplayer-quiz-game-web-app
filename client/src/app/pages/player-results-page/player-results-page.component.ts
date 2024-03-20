@@ -42,7 +42,6 @@ export class PlayerResultsPageComponent implements OnInit {
 
         this.gameHttpService.getGameSnapshotByPin(this.pin).subscribe({
             next: (snapshot) => {
-                console.log(snapshot);
                 this.barChartService.setData({ submissions: snapshot.questionSubmissions, questions: snapshot.quiz.questions });
                 this.players = snapshot.players;
             },

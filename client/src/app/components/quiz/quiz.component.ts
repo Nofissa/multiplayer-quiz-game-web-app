@@ -50,6 +50,7 @@ export class QuizComponent {
     }
 
     exportQuiz() {
+        // is used in the html
         // eslint-disable-next-line no-unused-vars
         const { isHidden, ...quizCopy } = this.quiz;
         const blob = new Blob([JSON.stringify(quizCopy)], { type: 'text/json;charset=utf-8' });

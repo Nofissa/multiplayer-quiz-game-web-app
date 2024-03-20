@@ -1,4 +1,4 @@
-// for moongodb _id fields
+// for mongodb _id fields
 /* eslint-disable no-underscore-dangle */
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';

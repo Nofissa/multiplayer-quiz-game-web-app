@@ -1,11 +1,11 @@
 // Disabled for mongodb _id fields
 /* eslint-disable no-underscore-dangle */
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Component, Input } from '@angular/core';
-import { Question } from '@common/question';
 import { QuestionListOptions } from '@app/interfaces/question-list-options';
 import { QuestionInteractionService } from '@app/services/question-interaction/question-interaction.service';
 import { QuestionSharingService } from '@app/services/question-sharing/question-sharing.service';
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { Question } from '@common/question';
 
 @Component({
     selector: 'app-question-list',
@@ -24,6 +24,7 @@ export class QuestionListComponent {
 
     constructor(private readonly questionSharingService: QuestionSharingService) {}
 
+    // needs to be able to work with different types of data
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     drop(event: CdkDragDrop<any[]>): void {
         moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
