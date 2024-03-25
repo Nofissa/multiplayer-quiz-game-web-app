@@ -80,7 +80,7 @@ export class PlayerListComponent implements OnInit, OnDestroy {
 
     private setupSubscription(pin: string) {
         this.eventSubscriptions.push(
-            this.gameService.onSubmitChoices(pin, (evaluation) => {
+            this.gameService.onQcmSubmit(pin, (evaluation) => {
                 this.upsertPlayer(evaluation.player);
             }),
 

@@ -124,7 +124,7 @@ export class HostGamePageComponent implements OnInit {
                 this.router.navigate(['home']);
             }),
 
-            this.gameService.onToggleSelectChoice(pin, (submissions) => {
+            this.gameService.onQcmToggleChoice(pin, (submissions) => {
                 this.barChartService.updateBarChartData(submissions);
             }),
 
@@ -132,7 +132,7 @@ export class HostGamePageComponent implements OnInit {
                 this.gameState = gameState;
             }),
 
-            this.gameService.onSubmitChoices(pin, (evaluation) => {
+            this.gameService.onQcmSubmit(pin, (evaluation) => {
                 if (evaluation.isLast) {
                     this.currentQuestionHasEnded = true;
                     this.timerService.stopTimer(pin);

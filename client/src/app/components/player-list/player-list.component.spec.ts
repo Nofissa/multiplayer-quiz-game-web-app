@@ -99,7 +99,7 @@ describe('PlayerListComponent', () => {
         gameHttpService = TestBed.inject(GameHttpService);
         gameService = TestBed.inject(GameService);
         // playerService = TestBed.inject(PlayerService);
-        gameServiceSpy.onSubmitChoices.and.callFake((pin, callback) => {
+        gameServiceSpy.onQcmSubmit.and.callFake((pin, callback) => {
             return webSocketServiceSpy.on('submitChoices', applyIfPinMatches(pin, callback));
         });
         gameServiceSpy.onStartGame.and.callFake((pin, callback) => {

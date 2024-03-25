@@ -118,7 +118,7 @@ describe('GamePageComponent', () => {
             return webSocketServiceSpy.on('nextQuestion', applyIfPinMatches(pin, callback));
         });
 
-        gameServiceSpy.onSubmitChoices.and.callFake((pin, callback) => {
+        gameServiceSpy.onQcmSubmit.and.callFake((pin, callback) => {
             return webSocketServiceSpy.on('submitChoices', applyIfPinMatches(pin, callback));
         });
     });

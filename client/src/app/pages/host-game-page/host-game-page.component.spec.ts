@@ -28,13 +28,13 @@ import { GameState } from '@common/game-state';
 import { Player } from '@common/player';
 import { Question } from '@common/question';
 import { QuestionPayload } from '@common/question-payload';
+import { Submission } from '@common/submission';
 import { TimerEventType } from '@common/timer-event-type';
 import { TimerPayload } from '@common/timer-payload';
 import { Observable, of, throwError } from 'rxjs';
 import { io } from 'socket.io-client';
 import { HostGamePageComponent } from './host-game-page.component';
 import SpyObj = jasmine.SpyObj;
-import { Submission } from '@common/submission';
 
 const PIN = '1234';
 const NEXT_QUESTION_DELAY = 5;
@@ -95,11 +95,11 @@ describe('HostGamePageComponent', () => {
             return webSocketServiceSpy.on('toggleGameLock', applyIfPinMatches(pin, callback));
         });
 
-        gameServiceSpy.onToggleSelectChoice.and.callFake((pin, callback) => {
+        gameServiceSpy.onQcmToggleChoice.and.callFake((pin, callback) => {
             return webSocketServiceSpy.on('toggleSelectChoice', applyIfPinMatches(pin, callback));
         });
 
-        gameServiceSpy.onSubmitChoices.and.callFake((pin, callback) => {
+        gameServiceSpy.onQcmSubmit.and.callFake((pin, callback) => {
             return webSocketServiceSpy.on('submitChoices', applyIfPinMatches(pin, callback));
         });
 
@@ -235,8 +235,8 @@ describe('HostGamePageComponent', () => {
         expect(gameServiceSpy.onStartGame).toHaveBeenCalledWith(PIN, jasmine.any(Function));
         expect(gameServiceSpy.onCancelGame).toHaveBeenCalledWith(PIN, jasmine.any(Function));
         expect(gameServiceSpy.onToggleGameLock).toHaveBeenCalledWith(PIN, jasmine.any(Function));
-        expect(gameServiceSpy.onToggleSelectChoice).toHaveBeenCalledWith(PIN, jasmine.any(Function));
-        expect(gameServiceSpy.onSubmitChoices).toHaveBeenCalledWith(PIN, jasmine.any(Function));
+        expect(gameServiceSpy.onQcmToggleChoice).toHaveBeenCalledWith(PIN, jasmine.any(Function));
+        expect(gameServiceSpy.onQcmSubmit).toHaveBeenCalledWith(PIN, jasmine.any(Function));
         expect(gameServiceSpy.onNextQuestion).toHaveBeenCalledWith(PIN, jasmine.any(Function));
         expect(gameServiceSpy.onPlayerAbandon).toHaveBeenCalledWith(PIN, jasmine.any(Function));
         expect(gameServiceSpy.onEndGame).toHaveBeenCalledWith(PIN, jasmine.any(Function));

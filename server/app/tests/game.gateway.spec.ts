@@ -293,7 +293,7 @@ describe('GameGateway', () => {
             const pin = 'mockPin';
             const evaluation: Evaluation = {} as any;
             gameServiceMock.evaluateChoices.mockReturnValue(evaluation);
-            gameGateway.submitChoices(socketMock, { pin });
+            gameGateway.qcmSubmit(socketMock, { pin });
             expect(serverMock.to).toHaveBeenCalledWith(pin);
         });
 
@@ -302,7 +302,7 @@ describe('GameGateway', () => {
             gameServiceMock.evaluateChoices.mockImplementation(() => {
                 throw new Error('Mock error');
             });
-            gameGateway.submitChoices(socketMock, { pin });
+            gameGateway.qcmSubmit(socketMock, { pin });
             expect(socketMock.emit).toHaveBeenCalledWith('error', 'Mock error');
         });
     });
@@ -332,7 +332,7 @@ describe('GameGateway', () => {
             const submission: Submission[] = [submissionStub()];
             gameServiceMock.toggleSelectChoice.mockReturnValue(submission);
             gameServiceMock.getOrganizer.mockReturnValue(socketMock);
-            gameGateway.toggleSelectChoice(socketMock, { pin, choiceIndex });
+            gameGateway.qcmToggleChoice(socketMock, { pin, choiceIndex });
             expect(socketMock.emit).toHaveBeenCalledWith('toggleSelectChoice', { pin, data: submission });
         });
 
@@ -342,7 +342,7 @@ describe('GameGateway', () => {
             gameServiceMock.toggleSelectChoice.mockImplementation(() => {
                 throw new Error('Mock error');
             });
-            gameGateway.toggleSelectChoice(socketMock, { pin, choiceIndex });
+            gameGateway.qcmToggleChoice(socketMock, { pin, choiceIndex });
             expect(socketMock.emit).toHaveBeenCalledWith('error', 'Mock error');
         });
     });

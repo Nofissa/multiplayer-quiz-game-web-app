@@ -223,13 +223,13 @@ describe('GameService', () => {
 
     it('should raise toggleSelectChoice event', () => {
         const choiceIndex = 2;
-        gameService.toggleSelectChoice(stubData.pin1, choiceIndex);
+        gameService.qcmToggleChoice(stubData.pin1, choiceIndex);
 
         expect(webSocketServiceSpy.emit).toHaveBeenCalledWith(stubData.toggleSelectChoiceEventName, { pin: stubData.pin1, choiceIndex });
     });
 
     it('should subscribe to toggleSelectChoice event and call the callback if pin matches', () => {
-        gameService.onToggleSelectChoice(stubData.pin1, stubData.callback);
+        gameService.onQcmToggleChoice(stubData.pin1, stubData.callback);
 
         const submission: Submission = { choices: [], isFinal: false };
         const payload: GameEventPayload<Submission> = { pin: stubData.pin1, data: submission };
@@ -239,7 +239,7 @@ describe('GameService', () => {
     });
 
     it('should subscribe to toggleSelectChoice event and not call the callback if pin does not match', () => {
-        gameService.onToggleSelectChoice(stubData.pin1, stubData.callback);
+        gameService.onQcmToggleChoice(stubData.pin1, stubData.callback);
 
         const submission: Submission = { choices: [], isFinal: false };
         const payload: GameEventPayload<Submission> = { pin: stubData.pin2, data: submission };
@@ -249,12 +249,12 @@ describe('GameService', () => {
     });
 
     it('should raise submitChoices event', () => {
-        gameService.submitChoices(stubData.pin1);
+        gameService.qcmSubmit(stubData.pin1);
         expect(webSocketServiceSpy.emit).toHaveBeenCalledWith(stubData.submitChoicesEventName, { pin: stubData.pin1 });
     });
 
     it('should subscribe to submitChoices event and call the callback if pin matches', () => {
-        gameService.onSubmitChoices(stubData.pin1, stubData.callback);
+        gameService.onQcmSubmit(stubData.pin1, stubData.callback);
         const evaluation: Evaluation = { player: firstPlayerStub(), correctAnswers: [], score: 80, isFirstCorrect: false, isLast: false };
         const payload: GameEventPayload<Evaluation> = { pin: stubData.pin1, data: evaluation };
         socketServerMock.emit(stubData.submitChoicesEventName, payload);
@@ -263,7 +263,7 @@ describe('GameService', () => {
     });
 
     it('should subscribe to submitChoices event and not call the callback if pin does not match', () => {
-        gameService.onSubmitChoices(stubData.pin1, stubData.callback);
+        gameService.onQcmSubmit(stubData.pin1, stubData.callback);
         const evaluation: Evaluation = { player: firstPlayerStub(), correctAnswers: [], score: 80, isFirstCorrect: false, isLast: false };
         const payload: GameEventPayload<Evaluation> = { pin: stubData.pin2, data: evaluation };
         socketServerMock.emit(stubData.submitChoicesEventName, payload);

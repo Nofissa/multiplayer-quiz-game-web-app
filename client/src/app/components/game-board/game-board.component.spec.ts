@@ -110,7 +110,7 @@ describe('GameBoardComponent', () => {
         timerServiceMock.onTimerTick.and.callFake((pin, callback) => {
             return webSocketServiceSpy.on('timerTick', applyIfPinMatches(pin, callback));
         });
-        gameServiceMock.onSubmitChoices.and.callFake((pin, callback) => {
+        gameServiceMock.onQcmSubmit.and.callFake((pin, callback) => {
             return webSocketServiceSpy.on('submitChoices', applyIfPinMatches(pin, callback));
         });
     });
@@ -161,13 +161,13 @@ describe('GameBoardComponent', () => {
 
     it('should submitChoices', () => {
         component.submitChoices();
-        expect(gameServiceMock.submitChoices).toHaveBeenCalled();
+        expect(gameServiceMock.qcmSubmit).toHaveBeenCalled();
     });
 
     it('should toggleSelectChoice', () => {
         const choice = 1;
         component.toggleSelectChoice(choice);
-        expect(gameServiceMock.toggleSelectChoice).toHaveBeenCalled();
+        expect(gameServiceMock.qcmToggleChoice).toHaveBeenCalled();
     });
 
     it('should loadNextQuestion', () => {
@@ -195,7 +195,7 @@ describe('GameBoardComponent', () => {
         socketServerMock.emit('submitChoices', evaluationPayload);
         socketServerMock.emit('timerTick', timerPayload);
         expect(gameServiceMock.onNextQuestion).toHaveBeenCalled();
-        expect(gameServiceMock.onSubmitChoices).toHaveBeenCalled();
+        expect(gameServiceMock.onQcmSubmit).toHaveBeenCalled();
         expect(timerServiceMock.onTimerTick).toHaveBeenCalled();
         expect(component.submitChoices).toHaveBeenCalled();
     });
