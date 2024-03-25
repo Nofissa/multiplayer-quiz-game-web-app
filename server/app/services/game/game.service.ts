@@ -215,6 +215,16 @@ export class GameService {
         return;
     }
 
+    qrlSubmit(clien: Socket, pin: string) {
+        //todo
+        return;
+    }
+
+    mutePlayer(clien: Socket, pin: string) {
+        //todo
+        return;
+    }
+
     endGame(client: Socket, pin: string): void {
         const game = this.getGame(pin);
 

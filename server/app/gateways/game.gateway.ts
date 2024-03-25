@@ -121,6 +121,18 @@ export class GameGateway implements OnGatewayDisconnect {
         }
     }
 
+    @SubscribeMessage('mutePlayer')
+    mutePlayer(@ConnectedSocket() client: Socket, @MessageBody() { pin, username }: { pin: string; username: string }) {
+        try {
+            this.gameService.mutePlayer(client, pin);
+            const payload: GameEventPayload<null> = { pin, data: null };
+
+            this.server.to(pin).emit('mutePlayer', payload);
+        } catch (error) {
+            client.emit('error', error.message);
+        }
+    }
+
     @SubscribeMessage('qcmSubmit')
     qcmSubmit(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
         try {
@@ -128,6 +140,29 @@ export class GameGateway implements OnGatewayDisconnect {
             const payload: GameEventPayload<Evaluation> = { pin, data: evaluation };
 
             this.server.to(pin).emit('qcmSubmit', payload);
+        } catch (error) {
+            client.emit('error', error.message);
+        }
+    }
+
+    @SubscribeMessage('qrlInputChange')
+    qrlInputChange(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
+        try {
+            this.gameService.qrlInputChange(client, pin);
+            const payload: GameEventPayload<null> = { pin, data: null };
+            this.server.to(pin).emit('qrlInputChange', payload);
+        } catch (error) {
+            client.emit('error', error.message);
+        }
+    }
+
+    @SubscribeMessage('qrlSubmit')
+    qrlSubmit(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
+        try {
+            this.gameService.qrlSubmit(client, pin);
+            const payload: GameEventPayload<null> = { pin, data: null };
+
+            this.server.to(pin).emit('qrlSubmit', payload);
         } catch (error) {
             client.emit('error', error.message);
         }
@@ -200,6 +235,30 @@ export class GameGateway implements OnGatewayDisconnect {
         }
     }
 
+    @SubscribeMessage('pauseTimer')
+    pauseTimer(@ConnectedSocket() client: Socket, @MessageBody() { pin, eventType }: { pin: string; eventType: TimerEventType }) {
+        try {
+            this.timerService.pauseTimer(client, pin);
+            const startTimerPayload: GameEventPayload<null> = { pin, data: null };
+
+            this.server.to(pin).emit('pauseTimer', startTimerPayload);
+        } catch (error) {
+            client.emit('error', error.message);
+        }
+    }
+
+    @SubscribeMessage('accTimer')
+    accTimer(@ConnectedSocket() client: Socket, @MessageBody() { pin, eventType }: { pin: string; eventType: TimerEventType }) {
+        try {
+            this.timerService.accTimer(client, pin);
+            const startTimerPayload: GameEventPayload<null> = { pin, data: null };
+
+            this.server.to(pin).emit('accTimer', startTimerPayload);
+        } catch (error) {
+            client.emit('error', error.message);
+        }
+    }
+
     @SubscribeMessage('sendMessage')
     sendMessage(@ConnectedSocket() client: Socket, @MessageBody() { pin, message }: { pin: string; message: string }) {
         try {
@@ -218,17 +277,6 @@ export class GameGateway implements OnGatewayDisconnect {
             this.gameService.endGame(client, pin);
             const payload: GameEventPayload<null> = { pin, data: null };
             this.server.to(pin).emit('endGame', payload);
-        } catch (error) {
-            client.emit('error', error.message);
-        }
-    }
-
-    @SubscribeMessage('qrlInputChange')
-    qrlInputChange(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
-        try {
-            this.gameService.qrlInputChange(client, pin);
-            const payload: GameEventPayload<null> = { pin, data: null };
-            this.server.to(pin).emit('qrlInputChange', payload);
         } catch (error) {
             client.emit('error', error.message);
         }
