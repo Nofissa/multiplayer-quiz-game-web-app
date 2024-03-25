@@ -16,9 +16,7 @@ export class PlayerGateway implements OnGatewayDisconnect {
     @WebSocketServer()
     server: Server;
 
-    constructor(
-        private readonly playerService: PlayerService, // private readonly gameService: GameService,
-    ) {}
+    constructor(private readonly playerService: PlayerService) {}
 
     @SubscribeMessage('playerAbandon')
     playerAbandon(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
