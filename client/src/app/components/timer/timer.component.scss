@@ -1,0 +1,31 @@
+// Timer inspired by https://codepen.io/kirtivernekar/pen/PoJOMbb
+.timer {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    border-radius: 50%;
+    border: solid 4px var(--secondary-fg-color);
+    width: fit-content;
+    color: var(--secondary-fg-color);
+    background-color: var(--secondary-bg-color);
+}
+
+svg {
+    width: 100px;
+    height: 100px;
+}
+
+circle {
+    fill: none;
+    stroke-width: 5;
+    stroke-dasharray: 1;
+    stroke-linecap: round;
+    stroke-opacity: 1;
+    transition: stroke-dashoffset 0.3s ease;
+    transform-origin: center center;
+    transform: rotate(-90deg);
+}
+
+text {
+    font-size: 2.5rem;
+}

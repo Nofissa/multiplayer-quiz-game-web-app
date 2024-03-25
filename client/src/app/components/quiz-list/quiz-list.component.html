@@ -10,5 +10,5 @@
     </button>
 </div>
 <div *ngFor="let quiz of quizzes" class="quizzes-container">
-    <app-quiz [quiz]="quiz"></app-quiz>
+    <app-quiz [quiz]="quiz" (delete)="deleteQuiz($event)"></app-quiz>
 </div>

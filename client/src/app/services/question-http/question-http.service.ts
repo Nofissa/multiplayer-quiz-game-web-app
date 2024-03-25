@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Question } from '@app/interfaces/question';
+import { Question } from '@common/question';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
@@ -9,7 +9,7 @@ import { environment } from 'src/environments/environment';
     providedIn: 'root',
 })
 export class QuestionHttpService {
-    private readonly baseUrl: string = `${environment.serverUrl}/questions`;
+    private readonly baseUrl: string = `${environment.apiUrl}/questions`;
 
     constructor(private readonly http: HttpClient) {}
 

@@ -1,23 +1,31 @@
 <head>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
 </head>
-<div class="header">
-    <app-logo size="m"></app-logo>
-</div>
-<span *ngIf="isTest" class="testMode">MODE TEST</span>
 <div class="container">
-    <div class="game-area">
-        <app-game [quiz]="quiz" [isTest]="isTest"></app-game>
+    <app-nav-header></app-nav-header>
+    <span *ngIf="isTest" class="test-mode">MODE TEST</span>
+    <div
+        [ngClass]="{'game-container': hasStarted && !isStarting && !isLoadingNextQuestion, 'hidden': !hasStarted || isStarting || isLoadingNextQuestion}">
+        <div class="game-area">
+            <app-game-board [pin]="pin" [isTest]="isTest"></app-game-board>
+        </div>
+        <div *ngIf="!isTest" class="right-panel">
+            <app-chat-room [pin]="pin"></app-chat-room>
+        </div>
     </div>
-    <div class="right-panel">
-        <div class="chat-room">
-            <div class="messages-zone font-color text-centered">
-                <h3>Salon de clavardage</h3>
-            </div>
-            <mat-form-field appearance="outline">
-                <mat-label>Message</mat-label>
-                <textarea matInput id="chattingArea" class="write-message" placeholder="Envoyer un message"> </textarea>
-            </mat-form-field>
+    <div class="transition-container">
+        <app-game-transition [pin]="pin" [displayOptions]="{transitionalOnly: true}"></app-game-transition>
+    </div>
+    <div class="" *ngIf="isTest && !isStarting && !isLoadingNextQuestion">
+        <div class="buttons-wrapper">
+            <button class="start-button" *ngIf="!hasStarted" mat-raised-button (click)="startGame()">Commencer la
+                partie</button>
+            <button class="next-button" mat-raised-button *ngIf="currentQuestionHasEnded && !isLastQuestion"
+                (click)="nextQuestion()">
+                Question Suivante
+            </button>
+            <button class="next-button" mat-raised-button *ngIf="isLastQuestion" (click)="endGame()">Terminer la
+                partie</button>
         </div>
     </div>
 </div>

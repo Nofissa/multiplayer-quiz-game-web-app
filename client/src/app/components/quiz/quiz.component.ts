@@ -14,14 +14,10 @@ import { saveAs } from 'file-saver';
 export class QuizComponent {
     @Input()
     quiz: Quiz;
-
     @Output()
-    refresh = new EventEmitter<void>();
-
-    isDeleted: boolean = false;
+    delete = new EventEmitter<Quiz>();
 
     constructor(
-        // eslint-disable-next-line @typescript-eslint/naming-convention
         private readonly dialog: MatDialog,
         private readonly quizHttpService: QuizHttpService,
         private readonly router: Router,
@@ -44,21 +40,17 @@ export class QuizComponent {
     }
 
     deleteQuiz() {
-        // eslint-disable-next-line no-underscore-dangle
-        if (this.quizHttpService.deleteQuizById(this.quiz._id)) {
-            // eslint-disable-next-line no-underscore-dangle
-            this.quizHttpService.deleteQuizById(this.quiz._id).subscribe(() => {
-                this.isDeleted = true;
-            });
-        }
+        this.delete.emit(this.quiz);
     }
 
     editQuiz() {
+        // for mongodb id
         // eslint-disable-next-line no-underscore-dangle
         this.router.navigate(['/qcm-creation'], { queryParams: { quizId: this.quiz._id } });
     }
 
     exportQuiz() {
+        // is used in the html
         // eslint-disable-next-line no-unused-vars
         const { isHidden, ...quizCopy } = this.quiz;
         const blob = new Blob([JSON.stringify(quizCopy)], { type: 'text/json;charset=utf-8' });
@@ -66,6 +58,7 @@ export class QuizComponent {
     }
 
     onToggleChange() {
+        // for mongodb id
         // eslint-disable-next-line no-underscore-dangle
         this.quizHttpService.hideQuizById(this.quiz._id).subscribe((quiz) => {
             this.quiz = quiz;

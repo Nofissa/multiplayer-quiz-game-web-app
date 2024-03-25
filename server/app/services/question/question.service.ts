@@ -1,4 +1,6 @@
+// for mongodb ids
 /* eslint-disable no-underscore-dangle */
+import { escapeRegExp } from '@app/helpers/regex';
 import { Question, QuestionDocument } from '@app/model/database/question';
 import { QuestionDto } from '@app/model/dto/question/question.dto';
 import { Injectable, Logger } from '@nestjs/common';
@@ -53,7 +55,8 @@ export class QuestionService {
     }
 
     async validateQuestion(dto: QuestionDto): Promise<boolean> {
-        const regex = new RegExp(`${dto.text}`, 'i'); // for case unsensitive search
+        const escapedText = escapeRegExp(dto.text);
+        const regex = new RegExp(`^${escapedText}$`, 'i'); // for case unsensitive search
         const question = await this.model.findOne({ text: { $regex: regex } });
 
         if (question === null) {

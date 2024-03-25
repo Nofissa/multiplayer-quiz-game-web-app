@@ -1,19 +1,18 @@
 import { Injectable } from '@angular/core';
-import { Question } from '@app/interfaces/question';
+import { Question } from '@common/question';
+import { Subject, Subscription } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
 })
 export class QuestionSharingService {
-    private callbacks: ((data: Question) => void)[] = [];
+    private shareSubject: Subject<Question> = new Subject<Question>();
 
-    share(data: Question): void {
-        this.callbacks.forEach((callback) => {
-            callback(data);
-        });
+    share(question: Question): void {
+        this.shareSubject.next(question);
     }
 
-    subscribe(callback: (data: Question) => void): void {
-        this.callbacks.push(callback);
+    subscribe(callback: (question: Question) => void): Subscription {
+        return this.shareSubject.subscribe(callback);
     }
 }

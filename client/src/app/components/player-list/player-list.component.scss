@@ -1,0 +1,60 @@
+.list-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--secondary-bg-color);
+    border-radius: 15px;
+    width: 100%;
+    max-width: 600px;
+    height: fit-content;
+    max-height: 400px;
+}
+
+.player-info-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.row-container {
+    align-items: center;
+    display: flex;
+}
+
+.row-container > * {
+    margin: 0px 5px;
+}
+
+.invisible {
+    visibility: hidden;
+}
+
+mat-list {
+    width: 100%;
+}
+
+mat-list-item {
+    color: #000;
+    width: 100%;
+}
+
+h4 {
+    margin: 10px 0px;
+    font-weight: bold;
+    color: var(--secondary-fg-color)
+}
+
+.playing .player-name {
+    color: green;
+}
+
+.abandoned .player-name {
+    text-decoration: line-through;
+}
+
+.hidden {
+    display: none;
+}

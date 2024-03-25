@@ -1,0 +1,26 @@
+<div class="bar-chart">
+    <h3 class="question-container">{{ data.question.text }}</h3>
+
+    <div class="bar-chart-container">
+        <div *ngFor="let choice of data.question.choices; let i = index" class="bar-container">
+            <mat-progress-bar
+                class="progress-bar-{{ i }}"
+                value="{{ adjust(i) }}"
+                [class.correct]="choice.isCorrect"
+                [class.incorrect]="!choice.isCorrect"
+            ></mat-progress-bar>
+            <p>{{ playersSelected(i) }}</p>
+        </div>
+    </div>
+
+    <div class="choice-container">
+        <mat-card *ngFor="let choice of data.question.choices; let i = index" class="choice-{{ i }} choice flex-row">
+            <mat-card-content *ngIf="choice.isCorrect" matBadge="✔" matBadgePosition="above after" matBadgeColor="primary" matBadgeSize="large">{{
+                choice.text
+            }}</mat-card-content>
+            <mat-card-content *ngIf="!choice.isCorrect" matBadge="✘" matBadgePosition="above after" matBadgeColor="warn" matBadgeSize="large">{{
+                choice.text
+            }}</mat-card-content>
+        </mat-card>
+    </div>
+</div>

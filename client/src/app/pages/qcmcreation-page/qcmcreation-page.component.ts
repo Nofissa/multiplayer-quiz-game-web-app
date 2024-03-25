@@ -1,18 +1,19 @@
 // for mongodb's _id fields
 /* eslint-disable no-underscore-dangle */
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { UpsertQuestionDialogComponent } from '@app/components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
-import { Question } from '@app/interfaces/question';
+import { SNACK_MESSAGE_DURATION } from '@app/constants';
 import { Quiz } from '@app/interfaces/quiz';
 import { MaterialServicesProvider } from '@app/providers/material-services.provider';
 import { QuestionInteractionService } from '@app/services/question-interaction/question-interaction.service';
 import { QuestionSharingService } from '@app/services/question-sharing/question-sharing.service';
 import { QuizHttpService } from '@app/services/quiz-http/quiz-http.service';
-import { SNACK_MESSAGE_DURATION } from '@app/constants';
+import { Question } from '@common/question';
+import { Subscription } from 'rxjs';
 
 const ID_LENGTH = 10;
 const DURATION = 10;
@@ -23,14 +24,16 @@ const DURATION = 10;
     styleUrls: ['./qcmcreation-page.component.scss'],
     providers: [QuestionInteractionService],
 })
-export class QCMCreationPageComponent implements OnInit {
+export class QCMCreationPageComponent implements OnInit, OnDestroy {
     formGroup: FormGroup;
     questionsContainer: Question[] = [];
     quiz: Quiz;
 
+    private shareSubscription: Subscription = new Subscription();
     private readonly dialogService: MatDialog;
     private readonly snackBarService: MatSnackBar;
 
+    // needs multiple services to work correctly
     // eslint-disable-next-line max-params
     constructor(
         private readonly formBuilder: FormBuilder,
@@ -88,12 +91,18 @@ export class QCMCreationPageComponent implements OnInit {
                 });
             });
 
-            this.questionSharingService.subscribe((question: Question) => {
+            this.shareSubscription = this.questionSharingService.subscribe((question: Question) => {
                 if (this.questionsContainer.every((x) => x.text !== question.text)) {
                     this.questionsContainer.push(question);
                 }
             });
         });
+    }
+
+    ngOnDestroy(): void {
+        if (!this.shareSubscription?.closed) {
+            this.shareSubscription.unsubscribe();
+        }
     }
 
     deleteQuestion(question: Question) {
@@ -144,6 +153,7 @@ export class QCMCreationPageComponent implements OnInit {
                 questions: this.questionsContainer,
                 isHidden: true,
                 lastModification: new Date(),
+                // for mongodb id
                 // eslint-disable-next-line no-underscore-dangle
                 _id: this.quiz ? this.quiz._id : '',
             };

@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { QuestionSharingService } from './question-sharing.service';
-import { Question } from '@app/interfaces/question';
+import { Question } from '@common/question';
 
 describe('QuestionSharingService', () => {
     let service: QuestionSharingService;
@@ -27,9 +27,9 @@ describe('QuestionSharingService', () => {
         };
 
         // eslint-disable-next-line @typescript-eslint/no-empty-function, no-unused-vars
-        const firstCallbackSpy = jasmine.createSpy('firstCallback', (_question: Question) => {});
+        const firstCallbackSpy = jasmine.createSpy('firstCallback', (_: Question) => {});
         // eslint-disable-next-line @typescript-eslint/no-empty-function, no-unused-vars
-        const secondCallbackSpy = jasmine.createSpy('secondCallback', (_question: Question) => {});
+        const secondCallbackSpy = jasmine.createSpy('secondCallback', (_: Question) => {});
 
         service.subscribe(firstCallbackSpy);
         service.subscribe(secondCallbackSpy);

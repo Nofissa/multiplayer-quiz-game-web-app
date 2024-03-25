@@ -5,6 +5,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { PromptDialogComponent } from '@app/components/dialogs/prompt-dialog/prompt-dialog.component';
 import { Quiz } from '@app/interfaces/quiz';
 import { QuizHttpService } from '@app/services/quiz-http/quiz-http.service';
+import { Observable } from 'rxjs';
 
 const SNACKBAR_DURATION = 5000;
 
@@ -23,41 +24,38 @@ export class QuizListComponent implements OnInit {
     ) {}
 
     ngOnInit() {
-        this.fetchQuizzes();
+        this.observeFetchQuizzes().subscribe((quizzes: Quiz[]) => {
+            this.quizzes = quizzes;
+        });
     }
 
     importQuiz(event: Event) {
-        this.fetchQuizzes();
-        const file = (event.target as HTMLInputElement)?.files?.[0];
-        if (this.filechecker(event)) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                this.readFiles(e);
-            };
+        this.observeFetchQuizzes().subscribe((quizzes: Quiz[]) => {
+            this.quizzes = quizzes;
+            const file = (event.target as HTMLInputElement)?.files?.[0];
+
             if (file) {
+                const reader = new FileReader();
+                reader.onload = (progessEvent) => {
+                    this.readFile(progessEvent);
+                };
                 reader.readAsText(file);
             }
-        }
+        });
     }
 
-    readFiles(e: ProgressEvent<FileReader>) {
-        const quiz = this.tryParse(e);
+    readFile(progressEvent: ProgressEvent<FileReader>) {
+        const quiz = this.parseQuiz(progressEvent);
+
         if (!quiz) {
             return;
         }
-        if (this.isQuizNameTaken(quiz)) {
+
+        if (this.quizzes.some((q) => q.title === quiz.title)) {
             this.openPromptDialog(quiz);
         } else {
             this.handleImportSubscription(quiz);
         }
-    }
-
-    filechecker(event: Event) {
-        const file = (event.target as HTMLInputElement)?.files?.[0];
-        if (file) {
-            return true;
-        }
-        return false;
     }
 
     openPromptDialog(quiz: Quiz) {
@@ -75,11 +73,22 @@ export class QuizListComponent implements OnInit {
         });
         dialogRef.afterClosed().subscribe((data) => {
             quiz.title = data.value;
-            if (this.isQuizNameTaken(quiz)) {
+
+            if (this.quizzes.some((q) => q.title === quiz.title)) {
                 this.handleSnackbarError('Nom de quiz déjà existant');
             } else {
                 this.handleImportSubscription(quiz);
             }
+        });
+    }
+
+    deleteQuiz(quiz: Quiz) {
+        // for mongodb id
+        // eslint-disable-next-line no-underscore-dangle
+        this.quizHttpService.deleteQuizById(quiz._id).subscribe(() => {
+            // for mongodb id
+            // eslint-disable-next-line no-underscore-dangle
+            this.quizzes = this.quizzes.filter((x) => x._id !== quiz._id);
         });
     }
 
@@ -98,17 +107,13 @@ export class QuizListComponent implements OnInit {
         });
     }
 
-    tryParse(e: ProgressEvent<FileReader>): Quiz | null {
+    private parseQuiz(e: ProgressEvent<FileReader>): Quiz | null {
         try {
             return JSON.parse(e.target?.result as string);
         } catch (error) {
             this.handleSnackbarError('Erreur lors de la lecture du fichier');
             return null;
         }
-    }
-
-    isQuizNameTaken(quiz: Quiz): boolean {
-        return this.quizzes.some((q) => q.title === quiz.title);
     }
 
     private handleSnackbarError(error: string) {
@@ -118,11 +123,7 @@ export class QuizListComponent implements OnInit {
         });
     }
 
-    private fetchQuizzes() {
-        if (this.quizHttpService.getAllQuizzes()) {
-            this.quizHttpService.getAllQuizzes().subscribe((quizzes: Quiz[]) => {
-                this.quizzes = quizzes;
-            });
-        }
+    private observeFetchQuizzes(): Observable<Quiz[]> {
+        return this.quizHttpService.getAllQuizzes();
     }
 }

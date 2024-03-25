@@ -1,81 +1,83 @@
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { GameController } from '@app/controllers/game/game.controller';
-import { ChoiceDto } from '@app/model/dto/choice/choice.dto';
 import { GameService } from '@app/services/game/game.service';
-import { QuizService } from '@app/services/quiz/quiz.service';
-import { EvaluationPayload } from '@common/evaluation-payload';
-import { HttpStatus } from '@nestjs/common';
-import { Test } from '@nestjs/testing';
-import * as sinon from 'sinon';
-import { createStubInstance, SinonStubbedInstance } from 'sinon';
-import { firstChoiceStub } from './stubs/choices.stubs';
-import { quizStub } from './stubs/quiz.stubs';
+import { GameSnapshot } from '@common/game-snapshot';
+import { HttpStatus, INestApplication } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+import * as request from 'supertest';
+import { gameStub } from './stubs/game.stub';
 
-describe('gameController', () => {
-    let gameControllerTest: GameController;
-    let quizServiceTest: SinonStubbedInstance<QuizService>;
-    let gameServiceTest: SinonStubbedInstance<GameService>;
-
+describe('GameController', () => {
+    let app: INestApplication;
+    let gameServiceMock: Partial<GameService>;
     beforeEach(async () => {
-        quizServiceTest = createStubInstance(QuizService);
-        gameServiceTest = createStubInstance(GameService);
-        const moduleRef = await Test.createTestingModule({
+        const gameTest = gameStub();
+        gameServiceMock = {
+            getGame: jest.fn().mockReturnValue(gameTest),
+        };
+
+        const module: TestingModule = await Test.createTestingModule({
             controllers: [GameController],
             providers: [
                 {
-                    provide: QuizService,
-                    useValue: quizServiceTest,
-                },
-                {
                     provide: GameService,
-                    useValue: gameServiceTest,
+                    useValue: gameServiceMock,
                 },
             ],
         }).compile();
 
-        gameControllerTest = moduleRef.get<GameController>(GameController);
+        app = module.createNestApplication();
+        await app.init();
     });
 
-    it('should be defined', () => {
-        expect(gameControllerTest).toBeDefined();
+    afterEach(async () => {
+        await app.close();
     });
 
-    describe('evaluateChoices', () => {
-        const mockResponse = {
-            status: sinon.stub().returnsThis(),
-            send: sinon.stub().returnsThis(),
-            json: sinon.stub().returnsThis(),
-        };
-        const choiceDto: ChoiceDto = {
-            text: firstChoiceStub()[3].text,
-            isCorrect: firstChoiceStub()[3].isCorrect,
-        };
-        const choicesDtoArray: ChoiceDto[] = [choiceDto];
-        const correctAnswers = [quizStub().questions[0].choices[3]];
-        const BONUS = 1.2;
-        const mockEvaluationPayload: EvaluationPayload = { correctAnswers, score: quizStub().questions[0].points * BONUS };
-        const questionIndexExist = 0;
-        const questionIndexNotExist = 5;
-        it('should return 200 OK if the choices are valid', async () => {
-            quizServiceTest.getQuizById.resolves(quizStub());
-            jest.spyOn(gameServiceTest, 'evaluateChoices').mockReturnValue(mockEvaluationPayload);
-            await gameControllerTest.evaluateChoices(quizStub().id, questionIndexExist, choicesDtoArray, mockResponse as any);
-            expect(mockResponse.status.calledWith(HttpStatus.OK)).toBeTruthy();
-            expect(mockResponse.json.calledWith(mockEvaluationPayload)).toBeTruthy();
+    describe('GET /games/:pin/snapshot', () => {
+        it('should return game snapshot if game is found', async () => {
+            const game = gameStub();
+            const snapshotTest: GameSnapshot = {
+                chatlogs: game.chatlogs,
+                players: Array.from(game.clientPlayers.values()).map((x) => x.player),
+                state: game.state,
+                currentQuestionIndex: game.currentQuestionIndex,
+                quiz: {
+                    _id: game.quiz._id,
+                    id: game.quiz.id,
+                    title: game.quiz.title,
+                    description: game.quiz.description,
+                    isHidden: game.quiz.isHidden,
+                    duration: game.quiz.duration,
+                    lastModification: game.quiz.lastModification,
+                    questions: game.quiz.questions.map((x) => {
+                        return {
+                            _id: x._id,
+                            type: x.type,
+                            text: x.text,
+                            points: x.points,
+                            choices: x.choices,
+                            lastModification: x.lastModification,
+                        };
+                    }),
+                },
+                questionSubmissions: game.questionSubmissions.map((x) => Array.from(x.values())),
+            };
+            const response = await request(app.getHttpServer()).get('/games/mockPin/snapshot');
+            expect(response.status).toBe(HttpStatus.OK);
+            expect(JSON.stringify(response.body)).toEqual(JSON.stringify(snapshotTest));
+        });
+    });
+
+    it('should return NOT_FOUND status if game is not found', async () => {
+        gameServiceMock.getGame = jest.fn().mockImplementation(() => {
+            throw new Error('Game not found');
         });
 
-        it('should return 400 Bad Request if the choices dont exist', async () => {
-            quizServiceTest.getQuizById.resolves(quizStub());
-            await gameControllerTest.evaluateChoices(quizStub().id, questionIndexNotExist, choicesDtoArray, mockResponse as any);
-            expect(mockResponse.status.calledWith(HttpStatus.BAD_REQUEST)).toBeTruthy();
-            expect(mockResponse.send.calledWith("Cette question n'existe pas")).toBeTruthy();
-        });
+        const response = await request(app.getHttpServer()).get('/games/nonExistentPin/snapshot');
 
-        it('should return 500 Internal Server Error if an error occurs', async () => {
-            quizServiceTest.getQuizById.rejects(quizStub());
-            await gameControllerTest.evaluateChoices(quizStub().id, questionIndexNotExist, choicesDtoArray, mockResponse as any);
-            expect(mockResponse.status.calledWith(HttpStatus.INTERNAL_SERVER_ERROR)).toBeTruthy();
-            expect(mockResponse.send.calledWith('Une erreur est survenue')).toBeTruthy();
-        });
+        expect(response.status).toBe(HttpStatus.NOT_FOUND);
+        expect(response.text).toBe('Cannot find game');
     });
 });

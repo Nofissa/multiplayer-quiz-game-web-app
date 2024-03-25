@@ -1,8 +1,9 @@
+// for mongodb id
 /* eslint-disable no-underscore-dangle */
-import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
+import { Question } from '@common/question';
 import { QuestionHttpService } from './question-http.service';
-import { Question } from '@app/interfaces/question';
 
 describe('QuestionHttpService', () => {
     let service: QuestionHttpService;

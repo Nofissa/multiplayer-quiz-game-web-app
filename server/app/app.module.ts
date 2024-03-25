@@ -1,16 +1,19 @@
 import { Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { AuthController } from './controllers/auth/auth.controller';
+import { GameController } from './controllers/game/game.controller';
 import { QuestionController } from './controllers/question/question.controller';
 import { QuizController } from './controllers/quiz/quiz.controller';
 import { Question, questionSchema } from './model/database/question';
 import { Quiz, quizSchema } from './model/database/quiz';
 import { QuestionService } from './services/question/question.service';
 import { QuizService } from './services/quiz/quiz.service';
-import { AuthController } from './controllers/auth/auth.controller';
 import { AuthService } from './services/auth/auth.service';
-import { GameController } from './controllers/game/game.controller';
 import { GameService } from './services/game/game.service';
+import { GameGateway } from './gateways/game.gateway';
+import { TimerService } from './services/timer/timer.service';
+import { MessageService } from './services/message/message.service';
 
 @Module({
     imports: [
@@ -28,6 +31,6 @@ import { GameService } from './services/game/game.service';
         ]),
     ],
     controllers: [AuthController, GameController, QuestionController, QuizController],
-    providers: [AuthService, GameService, QuestionService, QuizService, Logger],
+    providers: [GameGateway, AuthService, GameService, MessageService, QuestionService, QuizService, TimerService, Logger],
 })
 export class AppModule {}

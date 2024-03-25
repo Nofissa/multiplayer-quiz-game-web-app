@@ -1,13 +1,16 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
-import { AuthService } from '@app/services/auth/auth.service';
-import { SessionService } from '@app/services/session/session.service';
-import { AuthPayload } from '@common/auth-payload';
-import { MaterialServicesProvider } from '@app/providers/material-services.provider';
-import { SecurityServicesProvider } from '@app/providers/security-services.provider';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Router } from '@angular/router';
+import { JoinGameDialogComponent } from '@app/components/dialogs/join-game-dialog/join-game-dialog.component';
 import { PromptDialogComponent } from '@app/components/dialogs/prompt-dialog/prompt-dialog.component';
+import { MaterialServicesProvider } from '@app/providers/material-services.provider';
+import { SecurityServicesProvider } from '@app/providers/security-services.provider';
+import { AuthService } from '@app/services/auth/auth.service';
+import { GameService } from '@app/services/game/game-service/game.service';
+import { PlayerService } from '@app/services/player/player.service';
+import { SessionService } from '@app/services/session/session.service';
+import { AuthPayload } from '@common/auth-payload';
 
 @Component({
     selector: 'app-main-page',
@@ -20,7 +23,11 @@ export class MainPageComponent {
     private readonly dialogService: MatDialog;
     private readonly snackBarService: MatSnackBar;
 
+    // needs multiple services to work
+    // eslint-disable-next-line max-params
     constructor(
+        private readonly playerService: PlayerService,
+        private readonly gameService: GameService,
         securityServicesProvider: SecurityServicesProvider,
         materialServicesProvider: MaterialServicesProvider,
         private readonly router: Router,
@@ -46,6 +53,20 @@ export class MainPageComponent {
         } else {
             this.promptAdminLogin();
         }
+    }
+
+    joinGame() {
+        const dialogRef = this.dialogService.open(JoinGameDialogComponent, {
+            width: '33%',
+        });
+
+        dialogRef.afterClosed().subscribe(({ pin, username }: { pin: string; username: string }) => {
+            this.gameService.onJoinGame(pin, (player) => {
+                this.playerService.setPlayer(pin, player);
+                this.router.navigate(['waiting-room'], { queryParams: { pin } });
+            });
+            this.gameService.joinGame(pin, username);
+        });
     }
 
     private promptAdminLogin() {

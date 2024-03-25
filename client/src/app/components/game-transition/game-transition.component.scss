@@ -1,0 +1,29 @@
+.content-wrapper {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    height: 200px;
+}
+
+.timer-wrapper {
+    position: absolute;
+    top: -54px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.text-wrapper {
+    height: 100%;
+    width: 66%;
+    max-width: 600px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--secondary-fg-color);
+    background-color: var(--secondary-bg-color);
+    border-radius: 15px;
+}
+
+h2 {
+    text-align: center;
+}

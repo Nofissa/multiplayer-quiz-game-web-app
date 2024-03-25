@@ -1,44 +1,58 @@
-import { Question } from '@app/model/database/question';
-import { Quiz } from '@app/model/database/quiz';
-import { ChoiceDto } from '@app/model/dto/choice/choice.dto';
 import { GameService } from '@app/services/game/game.service';
-import { QuizService } from '@app/services/quiz/quiz.service';
-import { Body, Controller, HttpStatus, Param, Post, Query, Res } from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { GameSnapshot } from '@common/game-snapshot';
+import { Controller, Get, HttpStatus, Param, Res } from '@nestjs/common';
+import { ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 
-@ApiTags('Game')
-@Controller('game')
+@ApiTags('Games')
+@Controller('games')
 export class GameController {
-    constructor(
-        private readonly gameService: GameService,
-        private readonly quizService: QuizService,
-    ) {}
+    constructor(private readonly gameService: GameService) {}
 
-    // eslint-disable-next-line max-params
     @ApiOkResponse({
-        description: 'Returns points for the choices',
+        description: 'Return a game snapshot',
     })
-    @Post('/evaluateChoices/:quizId')
-    async evaluateChoices(
-        @Param('quizId') quizId: string,
-        @Query('questionIndex') questionIndex: number,
-        @Body() choices: ChoiceDto[],
-        @Res() response: Response,
-    ) {
+    @ApiNotFoundResponse({
+        description: 'Return NOT_FOUND http status when request fails',
+    })
+    @Get('/:pin/snapshot')
+    async get(@Param('pin') pin: string, @Res() response: Response) {
         try {
-            const quiz: Quiz = await this.quizService.getQuizById(quizId);
-            const questions: Question[] = quiz.questions;
+            const game = this.gameService.getGame(pin);
+            const snapshot: GameSnapshot = {
+                chatlogs: game.chatlogs,
+                players: Array.from(game.clientPlayers.values()).map((x) => x.player),
+                state: game.state,
+                currentQuestionIndex: game.currentQuestionIndex,
+                quiz: {
+                    // Disabled because it comes from mongodb
+                    // eslint-disable-next-line no-underscore-dangle
+                    _id: game.quiz._id,
+                    id: game.quiz.id,
+                    title: game.quiz.title,
+                    description: game.quiz.description,
+                    isHidden: game.quiz.isHidden,
+                    duration: game.quiz.duration,
+                    lastModification: game.quiz.lastModification,
+                    questions: game.quiz.questions.map((x) => {
+                        return {
+                            // Disabled because it comes from mongodb
+                            // eslint-disable-next-line no-underscore-dangle
+                            _id: x._id,
+                            type: x.type,
+                            text: x.text,
+                            points: x.points,
+                            choices: x.choices,
+                            lastModification: x.lastModification,
+                        };
+                    }),
+                },
+                questionSubmissions: game.questionSubmissions.map((x) => Array.from(x.values())),
+            };
 
-            if (questions.length <= questionIndex) {
-                response.status(HttpStatus.BAD_REQUEST).send("Cette question n'existe pas");
-            }
-
-            const targetedQuestion = questions[questionIndex];
-            const payload = this.gameService.evaluateChoices(choices, targetedQuestion);
-            response.status(HttpStatus.OK).json(payload);
+            response.status(HttpStatus.OK).json(snapshot);
         } catch (error) {
-            response.status(HttpStatus.INTERNAL_SERVER_ERROR).send('Une erreur est survenue');
+            response.status(HttpStatus.NOT_FOUND).send('Cannot find game');
         }
     }
 }

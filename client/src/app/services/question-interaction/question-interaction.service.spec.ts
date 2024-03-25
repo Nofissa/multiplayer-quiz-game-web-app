@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { QuestionInteractionService } from './question-interaction.service';
-import { Question } from '@app/interfaces/question';
+import { Question } from '@common/question';
 
 describe('QuestionInteractionService', () => {
     let service: QuestionInteractionService;

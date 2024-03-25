@@ -1,0 +1,51 @@
+.container {
+    display: grid;
+    grid-template-columns: 55% 45%;
+    grid-template-rows: 100px auto 50px;
+    grid-template-areas:
+        'nav-bar nav-bar'
+        'game-information chat-room';
+    flex-grow: 1;
+    justify-content: center;
+    height: 100vh;
+}
+
+.game-information {
+    grid-area: game-information;
+    height: 100%;
+    align-items: center;
+}
+
+.chat-room-container {
+    grid-area: chat-room;
+    align-items: center;
+    height: 100%;
+}
+
+.chat-room-container > * {
+    height: 100%;
+}
+
+.chart-swiper {
+    width: 90%;
+}
+
+.players {
+    width: 90%;
+}
+
+.nav-bar {
+    grid-area: nav-bar;
+    padding-bottom: 20px;
+}
+
+.leave-button {
+    position: absolute;
+    bottom: 50px;
+    font-weight: bold;
+    width: fit-content;
+}
+
+.leave-button:hover {
+    transform: scale(0.96);
+}

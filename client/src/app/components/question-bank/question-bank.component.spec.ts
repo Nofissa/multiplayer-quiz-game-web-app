@@ -3,7 +3,7 @@ import { QuestionBankComponent } from './question-bank.component';
 import { MaterialServicesProvider } from '@app/providers/material-services.provider';
 import { QuestionServicesProvider } from '@app/providers/question-services.provider';
 import { QuestionSharingService } from '@app/services/question-sharing/question-sharing.service';
-import { Question } from '@app/interfaces/question';
+import { Question } from '@common/question';
 import { Subject, of, throwError } from 'rxjs';
 import SpyObj = jasmine.SpyObj;
 import { QuestionHttpService } from '@app/services/question-http/question-http.service';
@@ -16,12 +16,12 @@ describe('QuestionBankComponent', () => {
     let component: QuestionBankComponent;
     let fixture: ComponentFixture<QuestionBankComponent>;
 
-    let materialServicesProviderSpy: SpyObj<MaterialServicesProvider>;
+    let materialServicesProviderSpy: MaterialServicesProvider;
     let dialogServiceSpy: SpyObj<MatDialog>;
     let dialogRefSpy: SpyObj<MatDialogRef<Question>>;
     let snackBarSpy: SpyObj<MatSnackBar>;
 
-    let questionServicesProvider: SpyObj<QuestionServicesProvider>;
+    let questionServicesProvider: QuestionServicesProvider;
     let questionHttpServiceSpy: SpyObj<QuestionHttpService>;
     let questionSharingServiceSpy: SpyObj<QuestionSharingService>;
 
@@ -50,14 +50,12 @@ describe('QuestionBankComponent', () => {
         questionHttpServiceSpy.deleteQuestionById.and.returnValue(of(undefined));
 
         questionSharingServiceSpy = jasmine.createSpyObj(QuestionSharingService, ['share', 'subscribe']);
-        questionSharingServiceSpy['callbacks'] = [];
-        questionSharingServiceSpy.subscribe.and.callFake((callback: (data: Question) => void) => {
-            questionSharingServiceSpy['callbacks'].push(callback);
+        questionSharingServiceSpy['shareSubject'] = new Subject();
+        questionSharingServiceSpy.subscribe.and.callFake((callback: (question: Question) => void) => {
+            return questionSharingServiceSpy['shareSubject'].subscribe(callback);
         });
         questionSharingServiceSpy.share.and.callFake((question: Question) => {
-            questionSharingServiceSpy['callbacks'].forEach((callback: (data: Question) => void) => {
-                callback(question);
-            });
+            questionSharingServiceSpy['shareSubject'].next(question);
         });
 
         questionServicesProvider = new QuestionServicesProvider(questionHttpServiceSpy, questionSharingServiceSpy);
@@ -67,7 +65,7 @@ describe('QuestionBankComponent', () => {
         dialogServiceSpy.open.and.returnValue(dialogRefSpy);
         snackBarSpy = jasmine.createSpyObj('MatSnackBar', ['open']);
 
-        materialServicesProviderSpy = new MaterialServicesProvider(dialogServiceSpy, snackBarSpy) as SpyObj<MaterialServicesProvider>;
+        materialServicesProviderSpy = new MaterialServicesProvider(dialogServiceSpy, snackBarSpy);
 
         await TestBed.configureTestingModule({
             declarations: [QuestionBankComponent],
@@ -84,8 +82,10 @@ describe('QuestionBankComponent', () => {
         component = fixture.componentInstance;
         fixture.detectChanges();
         component.ngOnInit();
-        QuestionBankComponent['hasSetupServices'] = false;
-        component.questions = [];
+    });
+
+    afterEach(() => {
+        TestBed.resetTestingModule();
     });
 
     it('should create', () => {
@@ -109,7 +109,7 @@ describe('QuestionBankComponent', () => {
         it('should invokeOnShare use shareQuestion logic and call addQuestion', () => {
             // to spy on private method
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const addQuestionSpy = spyOn<any>(component, 'addQuestion').and.callThrough();
+            const addQuestionSpy = spyOn<any>(component, 'addQuestion').and.stub();
 
             component.questionInteractionService.invokeOnShareQuestion(mockQuestions[0]);
 

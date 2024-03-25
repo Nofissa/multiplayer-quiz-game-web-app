@@ -10,7 +10,7 @@ import { environment } from 'src/environments/environment';
     providedIn: 'root',
 })
 export class AuthService {
-    private readonly baseUrl: string = `${environment.serverUrl}/auth`;
+    private readonly baseUrl: string = `${environment.apiUrl}/auth`;
 
     constructor(private readonly http: HttpClient) {}
 
