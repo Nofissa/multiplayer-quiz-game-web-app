@@ -45,9 +45,9 @@ describe('GamePageComponent', () => {
             'cancelGame',
             'endGame',
             'onCancelGame',
-            'onToggleSelectChoice',
+            'onQcmToggleChoice',
             'onToggleGameLock',
-            'onSubmitChoices',
+            'onQcmSubmit',
             'onStartGame',
             'onNextQuestion',
             'onPlayerAbandon',
@@ -56,6 +56,7 @@ describe('GamePageComponent', () => {
             'onPlayerBan',
             'onPlayerAbandon',
             'playerBan',
+            'qcmSubmit',
         ]);
 
         timerServiceSpy = jasmine.createSpyObj<TimerService>(['onTimerTick', 'onStartTimer', 'stopTimer', 'startTimer']);
@@ -119,7 +120,7 @@ describe('GamePageComponent', () => {
         });
 
         gameServiceSpy.onQcmSubmit.and.callFake((pin, callback) => {
-            return webSocketServiceSpy.on('submitChoices', applyIfPinMatches(pin, callback));
+            return webSocketServiceSpy.on('qcmSubmit', applyIfPinMatches(pin, callback));
         });
     });
 
@@ -186,7 +187,7 @@ describe('GamePageComponent', () => {
         socketServerMock.emit('startTimer', timerPayload);
         socketServerMock.emit('startGame', payload);
         socketServerMock.emit('nextQuestion', payload);
-        socketServerMock.emit('submitChoices', evaluationPayload);
+        socketServerMock.emit('qcmSubmit', evaluationPayload);
         socketServerMock.emit('timerTick', timerPayload);
 
         expect(timerServiceSpy.startTimer).toHaveBeenCalled();
@@ -214,7 +215,7 @@ describe('GamePageComponent', () => {
         socketServerMock.emit('startTimer', timerPayload);
         socketServerMock.emit('startGame', payload);
         socketServerMock.emit('nextQuestion', payload);
-        socketServerMock.emit('submitChoices', evaluationPayload);
+        socketServerMock.emit('qcmSubmit', evaluationPayload);
         socketServerMock.emit('timerTick', timerPayload);
 
         expect(timerServiceSpy.startTimer).toHaveBeenCalled();
@@ -242,7 +243,7 @@ describe('GamePageComponent', () => {
         socketServerMock.emit('startTimer', timerPayload);
         socketServerMock.emit('startGame', payload);
         socketServerMock.emit('nextQuestion', payload);
-        socketServerMock.emit('submitChoices', evaluationPayload);
+        socketServerMock.emit('qcmSubmit', evaluationPayload);
         socketServerMock.emit('timerTick', timerPayload);
 
         expect(component['router'].navigate).toHaveBeenCalled();

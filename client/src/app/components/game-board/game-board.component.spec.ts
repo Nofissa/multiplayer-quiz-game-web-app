@@ -57,11 +57,11 @@ describe('GameBoardComponent', () => {
         playerServiceMock = jasmine.createSpyObj('PlayerService', ['getCurrentPlayer']);
         keyBindingServiceMock = jasmine.createSpyObj('KeyBindingService', ['setupKeyBindings', 'getExecutor', 'registerKeyBinding']);
         gameServiceMock = jasmine.createSpyObj('GameService', [
-            'submitChoices',
+            'qcmSubmit',
             'nextQuestion',
             'onNextQuestion',
-            'onSubmitChoices',
-            'toggleSelectChoice',
+            'onQcmSubmit',
+            'qcmToggleChoice',
             'playerAbandon',
         ]);
         matDialogMock = jasmine.createSpyObj('MatDialog', ['open']);

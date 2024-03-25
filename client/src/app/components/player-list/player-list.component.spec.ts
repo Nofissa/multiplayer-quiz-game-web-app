@@ -51,9 +51,9 @@ describe('PlayerListComponent', () => {
             'cancelGame',
             'endGame',
             'onCancelGame',
-            'onToggleSelectChoice',
+            'onQcmToggleChoice',
             'onToggleGameLock',
-            'onSubmitChoices',
+            'onQcmSubmit',
             'onStartGame',
             'onNextQuestion',
             'onPlayerAbandon',
@@ -62,6 +62,7 @@ describe('PlayerListComponent', () => {
             'onPlayerBan',
             'onPlayerAbandon',
             'playerBan',
+            'qcmSubmit',
         ]);
         await TestBed.configureTestingModule({
             declarations: [PlayerListComponent],
@@ -100,7 +101,7 @@ describe('PlayerListComponent', () => {
         gameService = TestBed.inject(GameService);
         // playerService = TestBed.inject(PlayerService);
         gameServiceSpy.onQcmSubmit.and.callFake((pin, callback) => {
-            return webSocketServiceSpy.on('submitChoices', applyIfPinMatches(pin, callback));
+            return webSocketServiceSpy.on('qcmSubmit', applyIfPinMatches(pin, callback));
         });
         gameServiceSpy.onStartGame.and.callFake((pin, callback) => {
             return webSocketServiceSpy.on('startGame', applyIfPinMatches(pin, callback));
@@ -184,7 +185,7 @@ describe('PlayerListComponent', () => {
         const playerPayload: GameEventPayload<Player> = { pin: '123', data: firstPlayerStub() };
         spyOn(component, 'upsertPlayer' as never);
         component['setupSubscription']('123');
-        socketServerMock.emit('submitChoices', evaluationPayload);
+        socketServerMock.emit('qcmSubmit', evaluationPayload);
         socketServerMock.emit('joinGame', playerPayload);
         socketServerMock.emit('playerBan', playerPayload);
         socketServerMock.emit('playerAbandon', playerPayload);
