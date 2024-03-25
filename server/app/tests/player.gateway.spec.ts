@@ -37,18 +37,22 @@ describe('PlayerGateway', () => {
         playerGateway.server = serverMock;
     });
 
+    afterAll(() => {
+        jest.restoreAllMocks();
+    });
+
     it('should be describe', () => {
         expect(playerGateway).toBeDefined();
     });
 
     describe('playerBan', () => {
+        const pin = 'mockPin';
+        const username = 'mockUsername';
+        const clientPlayer = {
+            socket: { leave: jest.fn() } as any,
+            player: playerstub(),
+        };
         it('should handle banning a player from the game and emit the "playerBan" event with the correct payload', () => {
-            const pin = 'mockPin';
-            const username = 'mockUsername';
-            const clientPlayer = {
-                socket: { leave: jest.fn() } as any,
-                player: playerstub(),
-            };
             playerService.playerBan.mockReturnValue(clientPlayer);
             const payload: GameEventPayload<Player> = { pin, data: clientPlayer.player };
             serverMock.to.mockReturnValue(broadcastMock);
@@ -56,6 +60,14 @@ describe('PlayerGateway', () => {
             expect(serverMock.to).toHaveBeenCalledWith(pin);
             expect(broadcastMock.emit).toHaveBeenCalledWith('playerBan', payload);
             expect(clientPlayer.socket.leave).toHaveBeenCalledWith(pin);
+        });
+
+        it('should throw an error if there is an issue', () => {
+            playerService.playerBan.mockImplementation(() => {
+                throw new Error('Mock error');
+            });
+            playerGateway.playerBan(socketMock, { pin, username });
+            expect(socketMock.emit).toHaveBeenCalledWith('error', 'Mock error');
         });
     });
 
@@ -91,6 +103,14 @@ describe('PlayerGateway', () => {
             const playerAbandonSpy = jest.spyOn(PlayerGateway.prototype, 'playerAbandon');
             playerGateway.handleDisconnect(socketMock);
             expect(playerAbandonSpy).toHaveBeenCalledWith(socketMock, { pin: 'abandonnedPin' });
+        });
+
+        it('should throw an error if there is an issue', () => {
+            playerService.disconnect.mockImplementation(() => {
+                throw new Error('Mock error');
+            });
+            playerGateway.handleDisconnect(socketMock);
+            expect(socketMock.emit).toHaveBeenCalledWith('error', 'Mock error');
         });
     });
 });

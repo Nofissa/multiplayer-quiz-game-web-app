@@ -292,12 +292,18 @@ describe('GameGateway', () => {
             } as any;
             gameServiceMock.disconnect.mockReturnValue(disconnectPayload);
             const cancelGameSpy = jest.spyOn(GameGateway.prototype, 'cancelGame');
-            // const playerAbandonSpy = jest.spyOn(GameGateway.prototype, 'playerAbandon');
             const endGameSpy = jest.spyOn(GameGateway.prototype, 'endGame');
             gameGateway.handleDisconnect(socketMock);
             expect(cancelGameSpy).toHaveBeenCalledWith(socketMock, { pin: canceledPin });
-            // expect(playerAbandonSpy).toHaveBeenCalledWith(socketMock, { pin: abandonedPin });
             expect(endGameSpy).toBeCalledWith(socketMock, { pin: endPin });
+        });
+
+        it('should throw an error if there is an issue', () => {
+            gameServiceMock.disconnect.mockImplementation(() => {
+                throw new Error('Mock error');
+            });
+            gameGateway.handleDisconnect(socketMock);
+            expect(socketMock.emit).toHaveBeenCalledWith('error', 'Mock error');
         });
     });
 });
