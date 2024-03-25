@@ -41,7 +41,7 @@ describe('GameGateway', () => {
             evaluateChoices: jest.fn(),
             nextQuestion: jest.fn(),
             disconnect: jest.fn(),
-            toggleSelectChoice: jest.fn(),
+            qcmToggleChoice: jest.fn(),
             getOrganizer: jest.fn(),
         } as any;
         messageService = {
@@ -330,16 +330,16 @@ describe('GameGateway', () => {
             const pin = 'mockPin';
             const choiceIndex = 0;
             const submission: Submission[] = [submissionStub()];
-            gameServiceMock.toggleSelectChoice.mockReturnValue(submission);
+            gameServiceMock.qcmToggleChoice.mockReturnValue(submission);
             gameServiceMock.getOrganizer.mockReturnValue(socketMock);
             gameGateway.qcmToggleChoice(socketMock, { pin, choiceIndex });
-            expect(socketMock.emit).toHaveBeenCalledWith('toggleSelectChoice', { pin, data: submission });
+            expect(socketMock.emit).toHaveBeenCalledWith('qcmToggleChoice', { pin, data: submission });
         });
 
         it('should emit "error" event if an error occurs during toggling the selected choice', () => {
             const pin = 'mockPin';
             const choiceIndex = 0;
-            gameServiceMock.toggleSelectChoice.mockImplementation(() => {
+            gameServiceMock.qcmToggleChoice.mockImplementation(() => {
                 throw new Error('Mock error');
             });
             gameGateway.qcmToggleChoice(socketMock, { pin, choiceIndex });

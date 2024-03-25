@@ -202,12 +202,17 @@ export class GameService {
         };
     }
 
-    toggleSelectChoice(client: Socket, pin: string, choiceIndex: number): Submission[] {
+    qcmToggleChoice(client: Socket, pin: string, choiceIndex: number): Submission[] {
         const game = this.getGame(pin);
         const submission = this.getOrCreateSubmission(client, game);
         submission.choices[choiceIndex].isSelected = !submission.choices[choiceIndex].isSelected;
 
         return Array.from(game.currentQuestionSubmissions.values());
+    }
+
+    qrlInputChange(clien: Socket, pin: string) {
+        //todo
+        return;
     }
 
     endGame(client: Socket, pin: string): void {
