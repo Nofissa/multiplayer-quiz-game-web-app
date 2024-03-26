@@ -1,15 +1,11 @@
 import { GameService } from '@app/services/game/game.service';
-import { MessageService } from '@app/services/message/message.service';
 import { TimerService } from '@app/services/timer/timer.service';
-import { Chatlog } from '@common/chatlog';
 import { Evaluation } from '@common/evaluation';
 import { GameEventPayload } from '@common/game-event-payload';
 import { GameState } from '@common/game-state';
 import { Player } from '@common/player';
 import { QuestionPayload } from '@common/question-payload';
 import { Submission } from '@common/submission';
-import { TimerEventType } from '@common/timer-event-type';
-import { TimerPayload } from '@common/timer-payload';
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
@@ -28,7 +24,6 @@ export class GameGateway implements OnGatewayDisconnect {
     constructor(
         private readonly gameService: GameService,
         private readonly timerService: TimerService,
-        private readonly messageService: MessageService,
     ) {}
 
     @SubscribeMessage('createGame')
@@ -94,33 +89,6 @@ export class GameGateway implements OnGatewayDisconnect {
         }
     }
 
-    @SubscribeMessage('playerAbandon')
-    playerAbandon(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
-        try {
-            const clientPlayer = this.gameService.playerAbandon(client, pin);
-            const payload: GameEventPayload<Player> = { pin, data: clientPlayer.player };
-
-            this.server.to(pin).emit('playerAbandon', payload);
-
-            clientPlayer.socket.leave(pin);
-        } catch (error) {
-            client.emit('error', error.message);
-        }
-    }
-
-    @SubscribeMessage('playerBan')
-    playerBan(@ConnectedSocket() client: Socket, @MessageBody() { pin, username }: { pin: string; username: string }) {
-        try {
-            const clientPlayer = this.gameService.playerBan(client, pin, username);
-            const payload: GameEventPayload<Player> = { pin, data: clientPlayer.player };
-
-            this.server.to(pin).emit('playerBan', payload);
-            clientPlayer.socket.leave(pin);
-        } catch (error) {
-            client.emit('error', error.message);
-        }
-    }
-
     @SubscribeMessage('submitChoices')
     submitChoices(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
         try {
@@ -169,49 +137,6 @@ export class GameGateway implements OnGatewayDisconnect {
         }
     }
 
-    @SubscribeMessage('startTimer')
-    startTimer(
-        @ConnectedSocket() client: Socket,
-        @MessageBody() { pin, eventType, duration }: { pin: string; eventType: TimerEventType; duration?: number },
-    ) {
-        try {
-            duration = duration ?? this.gameService.getGame(pin).quiz.duration;
-            const startRemainingTime = this.timerService.startTimer(client, pin, duration, (remainingTime) => {
-                const timerTickPayload: GameEventPayload<TimerPayload> = { pin, data: { remainingTime, eventType } };
-                this.server.to(pin).emit('timerTick', timerTickPayload);
-            });
-            const startTimerPayload: GameEventPayload<TimerPayload> = { pin, data: { remainingTime: startRemainingTime, eventType } };
-
-            this.server.to(pin).emit('startTimer', startTimerPayload);
-        } catch (error) {
-            client.emit('error', error.message);
-        }
-    }
-
-    @SubscribeMessage('stopTimer')
-    stopTimer(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
-        try {
-            this.timerService.stopTimer(client, pin);
-            const payload: GameEventPayload<null> = { pin, data: null };
-
-            this.server.to(pin).emit('stopTimer', payload);
-        } catch (error) {
-            client.emit('error', error.message);
-        }
-    }
-
-    @SubscribeMessage('sendMessage')
-    sendMessage(@ConnectedSocket() client: Socket, @MessageBody() { pin, message }: { pin: string; message: string }) {
-        try {
-            const chatlog = this.messageService.sendMessage(client, pin, message);
-            const payload: GameEventPayload<Chatlog> = { pin, data: chatlog };
-
-            this.server.to(pin).emit('sendMessage', payload);
-        } catch (error) {
-            client.emit('error', error.message);
-        }
-    }
-
     @SubscribeMessage('endGame')
     endGame(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
         try {
@@ -223,16 +148,18 @@ export class GameGateway implements OnGatewayDisconnect {
         }
     }
 
+    // TODO :
+    // qrlInputChanges()
+
+    // TODO :
+    // qrlSubmit()
+
     handleDisconnect(client: Socket) {
         try {
             const payload = this.gameService.disconnect(client);
 
             payload.toCancel.forEach((pin) => {
                 this.cancelGame(client, { pin });
-            });
-
-            payload.toAbandon.forEach((pin) => {
-                this.playerAbandon(client, { pin });
             });
 
             payload.toEnd.forEach((pin) => {
