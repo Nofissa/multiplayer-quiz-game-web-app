@@ -54,16 +54,9 @@ describe('GameBoardComponent', () => {
 
     beforeEach(() => {
         gameHttpServiceMock = jasmine.createSpyObj('GameHttpService', ['getGameSnapshotByPin']);
-        playerServiceMock = jasmine.createSpyObj('PlayerService', ['getCurrentPlayer']);
+        playerServiceMock = jasmine.createSpyObj('PlayerService', ['getCurrentPlayer', 'playerAbandon']);
         keyBindingServiceMock = jasmine.createSpyObj('KeyBindingService', ['setupKeyBindings', 'getExecutor', 'registerKeyBinding']);
-        gameServiceMock = jasmine.createSpyObj('GameService', [
-            'qcmSubmit',
-            'nextQuestion',
-            'onNextQuestion',
-            'onQcmSubmit',
-            'qcmToggleChoice',
-            'playerAbandon',
-        ]);
+        gameServiceMock = jasmine.createSpyObj('GameService', ['qcmSubmit', 'nextQuestion', 'onNextQuestion', 'onQcmSubmit', 'qcmToggleChoice']);
         matDialogMock = jasmine.createSpyObj('MatDialog', ['open']);
         dialogRefSpy = jasmine.createSpyObj('MatDialogRef<ConfirmationDialogComponent>', ['afterClosed']);
         dialogRefSpy.afterClosed.and.returnValue(of(true));

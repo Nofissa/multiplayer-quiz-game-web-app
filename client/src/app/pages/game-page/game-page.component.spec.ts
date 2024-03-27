@@ -33,6 +33,7 @@ describe('GamePageComponent', () => {
     let socketServerMock: SocketServerMock;
     let timerServiceSpy: jasmine.SpyObj<TimerService>;
     let gameServiceSpy: jasmine.SpyObj<GameService>;
+    let playerServiceSpy: jasmine.SpyObj<PlayerService>;
 
     beforeEach(async () => {
         webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', ['emit', 'on'], {
@@ -50,14 +51,12 @@ describe('GamePageComponent', () => {
             'onQcmSubmit',
             'onStartGame',
             'onNextQuestion',
-            'onPlayerAbandon',
             'onEndGame',
             'onJoinGame',
-            'onPlayerBan',
-            'onPlayerAbandon',
-            'playerBan',
             'qcmSubmit',
         ]);
+
+        playerServiceSpy = jasmine.createSpyObj<PlayerService>(['onPlayerAbandon', 'onPlayerBan', 'playerBan', 'playerAbandon']);
 
         timerServiceSpy = jasmine.createSpyObj<TimerService>(['onTimerTick', 'onStartTimer', 'stopTimer', 'startTimer']);
         await TestBed.configureTestingModule({
@@ -65,7 +64,7 @@ describe('GamePageComponent', () => {
             imports: [HttpClientTestingModule, RouterTestingModule, BrowserAnimationsModule],
             providers: [
                 GameServicesProvider,
-                PlayerService,
+                { provide: PlayerService, useValue: playerServiceSpy },
                 MatSnackBar,
                 { provide: WebSocketService, useValue: webSocketServiceSpy },
                 { provide: GameService, useValue: gameServiceSpy },
