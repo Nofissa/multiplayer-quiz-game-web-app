@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
-import { Player } from '@common/player';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
-import { Subscription } from 'rxjs';
 import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
-import { Submission } from '@common/submission';
+import { Player } from '@common/player';
+import { Subscription } from 'rxjs';
 
 @Injectable({
     providedIn: 'root',
@@ -37,11 +36,11 @@ export class PlayerService {
         return this.webSocketService.on('playerBan', applyIfPinMatches(pin, callback));
     }
 
-    playerMute(pin: string, choiceIndex: number) {
-        this.webSocketService.emit('playerMute', { pin, choiceIndex });
+    playerMute(pin: string, username: string) {
+        this.webSocketService.emit('playerMute', { pin, username });
     }
 
-    onPlayerMute(pin: string, callback: (payload: Submission[]) => void): Subscription {
+    onPlayerMute(pin: string, callback: (payload: Player) => void): Subscription {
         return this.webSocketService.on('playerMute', applyIfPinMatches(pin, callback));
     }
 }
