@@ -89,18 +89,6 @@ export class GameGateway implements OnGatewayDisconnect {
         }
     }
 
-    @SubscribeMessage('mutePlayer')
-    mutePlayer(@ConnectedSocket() client: Socket, @MessageBody() { pin, username }: { pin: string; username: string }) {
-        try {
-            this.gameService.mutePlayer(client, pin);
-            const payload: GameEventPayload<null> = { pin, data: null };
-
-            this.server.to(pin).emit('mutePlayer', payload);
-        } catch (error) {
-            client.emit('error', error.message);
-        }
-    }
-
     @SubscribeMessage('qcmSubmit')
     qcmSubmit(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
         try {
@@ -161,7 +149,7 @@ export class GameGateway implements OnGatewayDisconnect {
     }
 
     @SubscribeMessage('endGame')
-    handleEndGame(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
+    endGame(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
         try {
             this.timerService.stopTimer(client, pin);
             this.gameService.endGame(client, pin);
@@ -171,18 +159,6 @@ export class GameGateway implements OnGatewayDisconnect {
             client.emit('error', error.message);
         }
     }
-
-    @SubscribeMessage('endGame')
-    endGame(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
-        try {
-            this.gameService.endGame(client, pin);
-            const payload: GameEventPayload<null> = { pin, data: null };
-            this.server.to(pin).emit('endGame', payload);
-        } catch (error) {
-            client.emit('error', error.message);
-        }
-    }
-
 
     handleDisconnect(client: Socket) {
         try {

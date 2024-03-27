@@ -63,7 +63,7 @@ export class TimerService {
         return;
     }
 
-    accTimer(client: Socket, pin: string) {
+    accelerateTimer(client: Socket, pin: string) {
         // todo
         return;
     }

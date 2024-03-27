@@ -36,7 +36,9 @@ export class PlayerService {
     }
 
     // TODO:
-    // playerMute(client: Socket, pin: string, username: string): ClientPlayer {}
+    playerMute(client: Socket, pin: string, username: string): ClientPlayer {
+        return;
+    }
 
     disconnect(client: Socket): string[] {
         const games = Array.from(this.gameService.games.values());
