@@ -62,12 +62,12 @@ export class GameService {
         return this.webSocketService.on('playerBan', applyIfPinMatches(pin, callback));
     }
 
-    mutePlayer(pin: string, choiceIndex: number) {
-        this.webSocketService.emit('mutePlayer', { pin, choiceIndex });
+    playerMute(pin: string, choiceIndex: number) {
+        this.webSocketService.emit('playerMute', { pin, choiceIndex });
     }
 
-    onMutePlayer(pin: string, callback: (payload: Submission[]) => void): Subscription {
-        return this.webSocketService.on('mutePlayer', applyIfPinMatches(pin, callback));
+    onPlayerMute(pin: string, callback: (payload: Submission[]) => void): Subscription {
+        return this.webSocketService.on('playerMute', applyIfPinMatches(pin, callback));
     }
 
     qcmToggleChoice(pin: string, choiceIndex: number) {

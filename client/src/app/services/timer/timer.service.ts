@@ -36,10 +36,10 @@ export class TimerService {
     }
 
     accTimer(pin: string) {
-        this.webSocketService.emit('accTimer', { pin });
+        this.webSocketService.emit('accelerateTimer', { pin });
     }
 
     onAccTimer(pin: string, callback: (payload: TimerPayload) => void): Subscription {
-        return this.webSocketService.on('accTimer', applyIfPinMatches(pin, callback));
+        return this.webSocketService.on('accelerateTimer', applyIfPinMatches(pin, callback));
     }
 }
