@@ -163,6 +163,26 @@ textarea.blink {
     }
 }
 
+// @keyframes blinkAnimation {
+//     0%,
+//     100% {
+//         background-color: transparent;
+//     }
+//     50% {
+//         background-color: red;
+//     }
+// }
+
+// @keyframes blinkAnimation {
+//     0%,
+//     100% {
+//         background-color: transparent;
+//     }
+//     50% {
+//         background-color: yellow;
+//     }
+// }
+
 ::ng-deep .mat-mdc-text-field-wrapper {
     height: 160px !important;
 }
