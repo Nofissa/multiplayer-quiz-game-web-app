@@ -130,7 +130,7 @@ describe('GameGateway', () => {
     describe('handleEndGame', () => {
         const pin = 'mockPin';
         it('should stop the timer and end the game', () => {
-            gameGateway.handleEndGame(socketMock as Socket, { pin });
+            gameGateway.endGame(socketMock as Socket, { pin });
 
             expect(timerServiceMock.stopTimer).toHaveBeenCalledWith(socketMock, pin);
             expect(gameServiceMock.endGame).toHaveBeenCalledWith(socketMock, pin);
@@ -140,7 +140,7 @@ describe('GameGateway', () => {
             timerServiceMock.stopTimer.mockReturnValue(null);
             gameServiceMock.endGame.mockReturnValue(null);
             serverMock.to.mockReturnValue(broadcastMock);
-            gameGateway.handleEndGame(socketMock as Socket, { pin });
+            gameGateway.endGame(socketMock as Socket, { pin });
             expect(serverMock.to).toHaveBeenCalledWith(pin);
             expect(broadcastMock.emit).toHaveBeenCalledWith('endGame', { pin, data: null });
         });
@@ -151,7 +151,7 @@ describe('GameGateway', () => {
             gameServiceMock.endGame = jest.fn().mockImplementation(() => {
                 throw error;
             });
-            gameGateway.handleEndGame(socketMock as Socket, { pin });
+            gameGateway.endGame(socketMock as Socket, { pin });
             expect(socketMock.emit).toHaveBeenCalledWith('error', errorMessage);
         });
     });
