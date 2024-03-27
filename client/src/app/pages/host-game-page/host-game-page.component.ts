@@ -8,6 +8,7 @@ import { RoutingDependenciesProvider } from '@app/providers/routing-dependencies
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { BarChartService } from '@app/services/game/bar-chart-service/bar-chart.service';
 import { GameService } from '@app/services/game/game-service/game.service';
+import { PlayerService } from '@app/services/player/player.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { GameState } from '@common/game-state';
 import { PlayerState } from '@common/player-state';
@@ -37,6 +38,7 @@ export class HostGamePageComponent implements OnInit {
     private readonly gameHttpService: GameHttpService;
     private readonly gameService: GameService;
     private readonly timerService: TimerService;
+    private readonly playerService: PlayerService;
 
     // Disabled because this page is rich in interaction an depends on many services as a consequence
     // eslint-disable-next-line max-params
@@ -51,6 +53,7 @@ export class HostGamePageComponent implements OnInit {
         this.gameHttpService = gameServicesProvider.gameHttpService;
         this.gameService = gameServicesProvider.gameService;
         this.timerService = gameServicesProvider.timerService;
+        this.playerService = gameServicesProvider.playerService;
     }
 
     get barCharts(): BarChartData[] {
@@ -152,7 +155,7 @@ export class HostGamePageComponent implements OnInit {
                 this.timerService.startTimer(this.pin, TimerEventType.NextQuestion, NEXT_QUESTION_DELAY_SECONDS);
             }),
 
-            this.gameService.onPlayerAbandon(pin, () => {
+            this.playerService.onPlayerAbandon(pin, () => {
                 this.gameHttpService.getGameSnapshotByPin(pin).subscribe((snapshot) => {
                     if (this.isRunning() && snapshot.players.filter((x) => x.state === PlayerState.Playing).length === 0) {
                         this.gameService.cancelGame(pin);

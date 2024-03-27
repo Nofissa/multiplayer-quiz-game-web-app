@@ -46,30 +46,6 @@ export class GameService {
         return this.webSocketService.on('startGame', applyIfPinMatches(pin, callback));
     }
 
-    playerAbandon(pin: string) {
-        this.webSocketService.emit('playerAbandon', { pin });
-    }
-
-    onPlayerAbandon(pin: string, callback: (quitter: Player) => void): Subscription {
-        return this.webSocketService.on('playerAbandon', applyIfPinMatches(pin, callback));
-    }
-
-    playerBan(pin: string, username: string) {
-        this.webSocketService.emit('playerBan', { pin, username });
-    }
-
-    onPlayerBan(pin: string, callback: (bannedPlayer: Player) => void): Subscription {
-        return this.webSocketService.on('playerBan', applyIfPinMatches(pin, callback));
-    }
-
-    playerMute(pin: string, choiceIndex: number) {
-        this.webSocketService.emit('playerMute', { pin, choiceIndex });
-    }
-
-    onPlayerMute(pin: string, callback: (payload: Submission[]) => void): Subscription {
-        return this.webSocketService.on('playerMute', applyIfPinMatches(pin, callback));
-    }
-
     qcmToggleChoice(pin: string, choiceIndex: number) {
         this.webSocketService.emit('qcmToggleChoice', { pin, choiceIndex });
     }
@@ -116,10 +92,6 @@ export class GameService {
 
     onToggleGameLock(pin: string, callback: (gameState: GameState) => void): Subscription {
         return this.webSocketService.on('toggleGameLock', applyIfPinMatches(pin, callback));
-    }
-
-    playerLeaveGameEnd(pin: string) {
-        this.webSocketService.emit('playerLeaveGame', { pin });
     }
 
     endGame(pin: string) {

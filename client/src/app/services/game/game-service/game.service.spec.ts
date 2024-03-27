@@ -1,13 +1,11 @@
 import { TestBed } from '@angular/core/testing';
-import { firstPlayerStub, secondPlayerStub } from '@app/TestStubs/player.stubs';
+import { firstPlayerStub } from '@app/TestStubs/player.stubs';
 import { questionStub } from '@app/TestStubs/question.stubs';
 import { SocketServerMock } from '@app/mocks/socket-server-mock';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { Evaluation } from '@common/evaluation';
 import { GameEventPayload } from '@common/game-event-payload';
 import { GameState } from '@common/game-state';
-import { Player } from '@common/player';
-import { PlayerState } from '@common/player-state';
 import { Question } from '@common/question';
 import { QuestionPayload } from '@common/question-payload';
 import { Submission } from '@common/submission';
@@ -97,11 +95,6 @@ describe('GameService', () => {
         expect(stubData.callback).toHaveBeenCalledWith(questionPayload);
     });
 
-    it('should raise playerLeaveEndGame event', () => {
-        gameService.playerLeaveGameEnd(stubData.pin1);
-        expect(webSocketServiceSpy.emit).toHaveBeenCalledWith(stubData.playerLeaveEndGameEventName, { pin: stubData.pin1 });
-    });
-
     it('should raise endGame event', () => {
         gameService.endGame(stubData.pin1);
         expect(webSocketServiceSpy.emit).toHaveBeenCalledWith(stubData.endGameEventName, { pin: stubData.pin1 });
@@ -164,59 +157,6 @@ describe('GameService', () => {
         const message = 'Game cancelled';
         const payload: GameEventPayload<string> = { pin: stubData.pin2, data: message };
         socketServerMock.emit(stubData.cancelGameEventName, payload);
-
-        expect(stubData.callback).not.toHaveBeenCalled();
-    });
-
-    it('should raise playerAbandon event', () => {
-        gameService.playerAbandon(stubData.pin1);
-        expect(webSocketServiceSpy.emit).toHaveBeenCalledWith(stubData.playerAbandonEventName, { pin: stubData.pin1 });
-    });
-
-    it('should subscribe to playerAbandon event and call the callback if pin matches', () => {
-        gameService.onPlayerAbandon(stubData.pin1, stubData.callback);
-
-        const player: Player = secondPlayerStub();
-        const payload: GameEventPayload<Player> = { pin: stubData.pin1, data: player };
-        socketServerMock.emit(stubData.playerAbandonEventName, payload);
-
-        expect(stubData.callback).toHaveBeenCalledWith(player);
-    });
-
-    it('should subscribe to playerAbandon event and not call the callback if does not match', () => {
-        gameService.onPlayerAbandon(stubData.pin1, stubData.callback);
-
-        const player: Player = secondPlayerStub();
-        const payload: GameEventPayload<Player> = { pin: stubData.pin2, data: player };
-        socketServerMock.emit(stubData.playerAbandonEventName, payload);
-
-        expect(stubData.callback).not.toHaveBeenCalled();
-    });
-
-    it('should raise playerBan event', () => {
-        const username = 'user123';
-        gameService.playerBan(stubData.pin1, username);
-        expect(webSocketServiceSpy.emit).toHaveBeenCalledWith(stubData.playerBanEventName, { pin: stubData.pin1, username });
-    });
-
-    it('should subscribe to playerBan event and call the callback if pin matches', () => {
-        gameService.onPlayerBan(stubData.pin1, stubData.callback);
-
-        const player: Player = secondPlayerStub();
-        player.state = PlayerState.Banned;
-        const payload: GameEventPayload<Player> = { pin: stubData.pin1, data: player };
-        socketServerMock.emit('playerBan', payload);
-
-        expect(stubData.callback).toHaveBeenCalledWith(player);
-    });
-
-    it('should subscribe to playerBan event and not call the callback if pin does not match', () => {
-        gameService.onPlayerBan(stubData.pin1, stubData.callback);
-
-        const player: Player = secondPlayerStub();
-        player.state = PlayerState.Banned;
-        const payload: GameEventPayload<Player> = { pin: stubData.pin2, data: player };
-        socketServerMock.emit('playerBan', payload);
 
         expect(stubData.callback).not.toHaveBeenCalled();
     });

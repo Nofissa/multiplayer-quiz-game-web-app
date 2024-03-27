@@ -120,7 +120,7 @@ export class GameBoardComponent implements OnInit, OnDestroy {
 
         dialogRef.afterClosed().subscribe((result) => {
             if (result) {
-                this.gameService.playerAbandon(this.pin);
+                this.playerService.playerAbandon(this.pin);
                 const redirect = this.isTest ? '/create-game' : '/home';
                 this.router.navigateByUrl(redirect);
             }
