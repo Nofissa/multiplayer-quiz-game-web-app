@@ -73,33 +73,6 @@ export class GameService {
         return clientPlayer.player;
     }
 
-    playerAbandon(client: Socket, pin: string): ClientPlayer {
-        const game = this.getGame(pin);
-        const clientPlayer = game.clientPlayers.get(client.id);
-
-        clientPlayer.player.state = PlayerState.Abandonned;
-
-        return clientPlayer;
-    }
-
-    playerBan(client: Socket, pin: string, username: string): ClientPlayer {
-        const game = this.getGame(pin);
-
-        if (!this.isOrganizer(game, client.id)) {
-            throw new Error(`Vous n'êtes pas organisateur de la partie ${pin}`);
-        }
-
-        const clientPlayer = Array.from(game.clientPlayers.values()).find((x) => {
-            return x.player.username.toLowerCase() === username.toLowerCase() && x.player.state === PlayerState.Playing;
-        });
-
-        if (clientPlayer) {
-            clientPlayer.player.state = PlayerState.Banned;
-        }
-
-        return clientPlayer;
-    }
-
     evaluateChoices(client: Socket, pin: string): Evaluation {
         const game = this.getGame(pin);
         const submission = this.getOrCreateSubmission(client, game);
@@ -227,15 +200,11 @@ export class GameService {
             .filter((game) => game.organizer.id === client.id && (game.state === GameState.Opened || game.state === GameState.Closed))
             .map((game) => game.pin);
 
-        const toAbandon = games
-            .filter((game) => Array.from(game.clientPlayers.values()).some((x) => x.socket.id === client.id))
-            .map((game) => game.pin);
-
         const toEnd = games
             .filter((game) => game.organizer.id === client.id && (game.state === GameState.Paused || game.state === GameState.Running))
             .map((game) => game.pin);
 
-        return { toCancel, toAbandon, toEnd };
+        return { toCancel, toEnd };
     }
 
     getGame(pin: string): Game {
