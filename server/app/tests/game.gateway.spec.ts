@@ -2,18 +2,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */ // useful especially for the socket mocking
 import { GameGateway } from '@app/gateways/game.gateway';
 import { GameService } from '@app/services/game/game.service';
-import { MessageService } from '@app/services/message/message.service';
 import { TimerService } from '@app/services/timer/timer.service';
-import { Chatlog } from '@common/chatlog';
 import { Evaluation } from '@common/evaluation';
 import { GameEventPayload } from '@common/game-event-payload';
 import { GameState } from '@common/game-state';
-import { Player } from '@common/player';
 import { QuestionPayload } from '@common/question-payload';
 import { Submission } from '@common/submission';
-import { TimerEventType } from '@common/timer-event-type';
 import { BroadcastOperator, Server, Socket } from 'socket.io';
-import { gameStub } from './stubs/game.stub';
 import { playerstub } from './stubs/player.stub';
 import { questionStub } from './stubs/question.stubs';
 import { submissionStub } from './stubs/submission.stub';
@@ -23,7 +18,6 @@ describe('GameGateway', () => {
     let gameServiceMock: jest.Mocked<GameService>;
     let socketMock: jest.Mocked<Socket>;
     let timerServiceMock: jest.Mocked<TimerService>;
-    let messageService: jest.Mocked<MessageService>;
     let serverMock: jest.Mocked<Server>;
     let broadcastMock: any;
 
@@ -44,9 +38,6 @@ describe('GameGateway', () => {
             toggleSelectChoice: jest.fn(),
             getOrganizer: jest.fn(),
         } as any;
-        messageService = {
-            sendMessage: jest.fn(),
-        } as any;
         socketMock = {
             id: 'organizerId',
             emit: jest.fn(),
@@ -65,7 +56,7 @@ describe('GameGateway', () => {
         broadcastMock = {
             emit: jest.fn(),
         } as any as BroadcastOperator<any, any>;
-        gameGateway = new GameGateway(gameServiceMock, timerServiceMock, messageService);
+        gameGateway = new GameGateway(gameServiceMock, timerServiceMock);
         gameGateway.server = serverMock;
     });
 
@@ -165,30 +156,6 @@ describe('GameGateway', () => {
         });
     });
 
-    describe('stopTimer', () => {
-        const pin = 'mockPin';
-        it('should stop the timer', () => {
-            gameGateway.stopTimer(socketMock as Socket, { pin });
-            expect(timerServiceMock.stopTimer).toHaveBeenCalledWith(socketMock, pin);
-        });
-        it('should emit the stopTimer event with null payload', () => {
-            serverMock.to.mockReturnValue(broadcastMock);
-            gameGateway.stopTimer(socketMock as Socket, { pin });
-            expect(serverMock.to).toHaveBeenCalledWith(pin);
-            expect(broadcastMock.emit).toHaveBeenCalledWith('stopTimer', { pin, data: null });
-        });
-
-        it('should emit error event if an error occurs', () => {
-            const errorMessage = 'Test error message';
-            const error = new Error(errorMessage);
-            timerServiceMock.stopTimer = jest.fn().mockImplementation(() => {
-                throw error;
-            });
-            gameGateway.stopTimer(socketMock as Socket, { pin });
-            expect(socketMock.emit).toHaveBeenCalledWith('error', errorMessage);
-        });
-    });
-
     describe('cancelGame', () => {
         it('should cancel the game and emit the "cancelGame" event with the message', () => {
             const pin = 'mockPin';
@@ -230,60 +197,6 @@ describe('GameGateway', () => {
                 throw new Error('Mock error');
             });
             gameGateway.toggleGameLock(socketMock, { pin });
-            expect(socketMock.emit).toHaveBeenCalledWith('error', 'Mock error');
-        });
-    });
-
-    describe('playerAbandon', () => {
-        it('should handle player abandoning the game and emit the "playerAbandon" event with the correct payload', () => {
-            const pin = 'mockPin';
-            const clientPlayer = {
-                socket: { leave: jest.fn() } as any,
-                player: playerstub(),
-            };
-            gameServiceMock.playerAbandon.mockReturnValue(clientPlayer);
-            serverMock.to.mockReturnValue(broadcastMock);
-            const payload: GameEventPayload<Player> = { pin, data: clientPlayer.player };
-            gameGateway.playerAbandon(socketMock, { pin });
-            expect(serverMock.to).toHaveBeenCalledWith(pin);
-            expect(broadcastMock.emit).toHaveBeenCalledWith('playerAbandon', payload);
-            expect(clientPlayer.socket.leave).toHaveBeenCalledWith(pin);
-        });
-
-        it('should emit "error" event if an error occurs during handling player abandoning the game', () => {
-            const pin = 'mockPin';
-            gameServiceMock.playerAbandon.mockImplementation(() => {
-                throw new Error('Mock error');
-            });
-            gameGateway.playerAbandon(socketMock, { pin });
-            expect(socketMock.emit).toHaveBeenCalledWith('error', 'Mock error');
-        });
-    });
-
-    describe('playerBan', () => {
-        it('should handle banning a player from the game and emit the "playerBan" event with the correct payload', () => {
-            const pin = 'mockPin';
-            const username = 'mockUsername';
-            const clientPlayer = {
-                socket: { leave: jest.fn() } as any,
-                player: playerstub(),
-            };
-            gameServiceMock.playerBan.mockReturnValue(clientPlayer);
-            const payload: GameEventPayload<Player> = { pin, data: clientPlayer.player };
-            serverMock.to.mockReturnValue(broadcastMock);
-            gameGateway.playerBan(socketMock, { pin, username });
-            expect(serverMock.to).toHaveBeenCalledWith(pin);
-            expect(broadcastMock.emit).toHaveBeenCalledWith('playerBan', payload);
-            expect(clientPlayer.socket.leave).toHaveBeenCalledWith(pin);
-        });
-
-        it('should emit "error" event if an error occurs during handling player ban', () => {
-            const pin = 'mockPin';
-            const username = 'mockUsername';
-            gameServiceMock.playerBan.mockImplementation(() => {
-                throw new Error('Mock error');
-            });
-            gameGateway.playerBan(socketMock, { pin, username });
             expect(socketMock.emit).toHaveBeenCalledWith('error', 'Mock error');
         });
     });
@@ -347,76 +260,6 @@ describe('GameGateway', () => {
         });
     });
 
-    describe('startTimer', () => {
-        it('should start the timer and emit the "startTimer" event with the correct payload', () => {
-            const pin = 'mockPin';
-            const eventType = TimerEventType.Question;
-            const duration = 60;
-            const remainingTime = 60;
-            gameServiceMock.getGame.mockReturnValue(gameStub());
-            // eslint-disable-next-line @typescript-eslint/no-shadow, max-params
-            timerServiceMock.startTimer.mockImplementation((socketMock, pin, duration, callback) => {
-                callback(remainingTime);
-                return duration;
-            });
-            serverMock.to.mockReturnValue(broadcastMock);
-            gameGateway.startTimer(socketMock, { pin, eventType, duration });
-            expect(timerServiceMock.startTimer).toHaveBeenCalledWith(socketMock, pin, duration, expect.any(Function));
-            expect(serverMock.to).toHaveBeenCalledWith(pin);
-            expect(broadcastMock.emit).toHaveBeenCalledWith('startTimer', { pin, data: { remainingTime, eventType } });
-        });
-
-        it('should start the timer with the provided duration and emit the "startTimer" event with the correct payload', () => {
-            const pin = 'mockPin';
-            const eventType = TimerEventType.Question;
-            const duration = 0;
-            const remainingTime = 30;
-            gameServiceMock.getGame.mockReturnValue(gameStub());
-            timerServiceMock.startTimer.mockReturnValue(remainingTime);
-            gameGateway.startTimer(socketMock, { pin, eventType, duration });
-            expect(timerServiceMock.startTimer).toHaveBeenCalledWith(socketMock, pin, duration, expect.any(Function));
-            expect(serverMock.to).toHaveBeenCalledWith(pin);
-        });
-
-        it('should emit "error" event if an error occurs during starting the timer', () => {
-            const pin = 'mockPin';
-            const eventType = TimerEventType.Question;
-            const duration = 30;
-            gameServiceMock.getGame.mockReturnValue(gameStub());
-            timerServiceMock.startTimer.mockImplementation(() => {
-                throw new Error('Mock error');
-            });
-            gameGateway.startTimer(socketMock, { pin, eventType, duration });
-            expect(socketMock.emit).toHaveBeenCalledWith('error', 'Mock error');
-        });
-    });
-
-    describe('sendMessage', () => {
-        const pin = 'mockPin';
-        const message = 'Hello, world!';
-        const chatlogTest: Chatlog = {
-            author: 'Player',
-            message,
-            date: new Date(),
-        };
-
-        it('should send a message to the specified room', () => {
-            messageService.sendMessage.mockReturnValue(chatlogTest);
-            gameGateway.sendMessage(socketMock, { pin, message });
-            expect(serverMock.to).toHaveBeenCalledWith(pin);
-            // expect(serverMock.emit).toHaveBeenCalledWith('message', message);
-        });
-
-        it('should emit "error" event if an error occurs during sending the message', () => {
-            messageService.sendMessage.mockReturnValue(chatlogTest);
-            serverMock.to.mockImplementation(() => {
-                throw new Error('Mock error');
-            });
-            gameGateway.sendMessage(socketMock, { pin, message });
-            expect(socketMock.emit).toHaveBeenCalledWith('error', 'Mock error');
-        });
-    });
-
     describe('endGame', () => {
         it('should end the game and emit the "endGame" event with the correct payload', () => {
             const pin = 'mockPin';
@@ -449,12 +292,18 @@ describe('GameGateway', () => {
             } as any;
             gameServiceMock.disconnect.mockReturnValue(disconnectPayload);
             const cancelGameSpy = jest.spyOn(GameGateway.prototype, 'cancelGame');
-            const playerAbandonSpy = jest.spyOn(GameGateway.prototype, 'playerAbandon');
             const endGameSpy = jest.spyOn(GameGateway.prototype, 'endGame');
             gameGateway.handleDisconnect(socketMock);
             expect(cancelGameSpy).toHaveBeenCalledWith(socketMock, { pin: canceledPin });
-            expect(playerAbandonSpy).toHaveBeenCalledWith(socketMock, { pin: abandonedPin });
             expect(endGameSpy).toBeCalledWith(socketMock, { pin: endPin });
+        });
+
+        it('should throw an error if there is an issue', () => {
+            gameServiceMock.disconnect.mockImplementation(() => {
+                throw new Error('Mock error');
+            });
+            gameGateway.handleDisconnect(socketMock);
+            expect(socketMock.emit).toHaveBeenCalledWith('error', 'Mock error');
         });
     });
 });
