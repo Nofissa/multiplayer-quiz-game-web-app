@@ -97,4 +97,30 @@ describe('TimerService', () => {
             expect(() => timerService.stopTimer(socketMock, pin)).toThrow(`Seul l'organisateur de la partie ${pin} peut arrêter la minuterie`);
         });
     });
+
+    describe('pauseTimer', () => {
+        it('should throw an error if the client is not the organizer', () => {
+            const pin = 'somePin';
+            socketMock = { id: 'differentId' } as jest.Mocked<Socket>;
+            jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(gameStub());
+            expect(() => timerService.pauseTimer(socketMock, pin)).toThrow(
+                `Seul l'organisateur de la partie ${pin} peut mettre en pause la minuterie`,
+            );
+        });
+
+        // TODO : to complete with additional tests
+    });
+
+    describe('accelerateTimer', () => {
+        it('should throw an error if the client is not the organizer', () => {
+            const pin = 'somePin';
+            socketMock = { id: 'differentId' } as jest.Mocked<Socket>;
+            jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(gameStub());
+            expect(() => timerService.accelerateTimer(socketMock, pin)).toThrow(
+                `Seul l'organisateur de la partie ${pin} peut accelerer la minuterie`,
+            );
+        });
+
+        // TODO : to complete with additional tests
+    });
 });

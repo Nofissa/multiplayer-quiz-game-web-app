@@ -58,6 +58,25 @@ export class TimerService {
         }
     }
 
+    pauseTimer(client: Socket, pin: string) {
+        const game = this.gameService.getGame(pin);
+
+        if (game.organizer.id !== client.id) {
+            throw new Error(`Seul l'organisateur de la partie ${pin} peut mettre en pause la minuterie`);
+        }
+        // TODO : To complete with the right behavior
+    }
+
+    accelerateTimer(client: Socket, pin: string) {
+        const game = this.gameService.getGame(pin);
+
+        if (game.organizer.id !== client.id) {
+            throw new Error(`Seul l'organisateur de la partie ${pin} peut accelerer la minuterie`);
+        }
+        // TODO : To complete with the right behavior
+        return;
+    }
+
     private decrement(client: Socket, pin: string) {
         this.counters.set(pin, this.counters.get(pin) - 1 / TICK_PER_SECOND);
         this.tickSubjects.get(pin).next(this.counters.get(pin));

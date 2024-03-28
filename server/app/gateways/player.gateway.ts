@@ -45,9 +45,16 @@ export class PlayerGateway implements OnGatewayDisconnect {
         }
     }
 
-    // TODO :
-    // @SubscribeMessage('playerMute')
-    // playerMute
+    @SubscribeMessage('playerMute')
+    playerMute(@ConnectedSocket() client: Socket, @MessageBody() { pin, username }: { pin: string; username: string }) {
+        try {
+            const clientPlayer = this.playerService.playerMute(client, pin, username);
+            const payload: GameEventPayload<Player> = { pin, data: clientPlayer.player };
+            this.server.to(pin).emit('playerMute', payload);
+        } catch (error) {
+            client.emit('error', error.message);
+        }
+    }
 
     handleDisconnect(client: Socket) {
         try {
