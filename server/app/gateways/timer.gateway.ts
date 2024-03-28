@@ -61,7 +61,7 @@ export class TimerGateway {
     @SubscribeMessage('pauseTimer')
     pauseTimer(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
         try {
-            this.timerService.pauseTimer(client, pin);
+            this.timerService.pauseTimer();
             const payload: GameEventPayload<null> = { pin, data: null };
 
             this.server.to(pin).emit('pauseTimer', payload);
@@ -77,7 +77,7 @@ export class TimerGateway {
     @SubscribeMessage('accelerateTimer')
     accelerateTimer(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
         try {
-            this.timerService.accelerateTimer(client, pin);
+            this.timerService.accelerateTimer();
             const payload: GameEventPayload<null> = { pin, data: null };
 
             this.server.to(pin).emit('accelerateTimer', payload);
