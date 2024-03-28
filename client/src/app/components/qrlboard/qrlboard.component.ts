@@ -64,8 +64,7 @@ export class QRLboardComponent implements OnInit, OnDestroy {
     readonly timerService: TimerService;
 
     private isTyping: boolean = false;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    private interval: any;
+    private interval: ReturnType<typeof setTimeout>;
     private eventSubscriptions: Subscription[] = [];
 
     // Depends on many services
