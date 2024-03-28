@@ -63,6 +63,9 @@ export class QRLboardComponent implements OnInit, OnDestroy {
     readonly gameService: GameService;
     readonly timerService: TimerService;
 
+    private isTyping: boolean = false;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    private interval: any;
     private eventSubscriptions: Subscription[] = [];
 
     // Depends on many services
@@ -91,6 +94,8 @@ export class QRLboardComponent implements OnInit, OnDestroy {
             this.loadNextQuestion(snapshot.quiz.questions[snapshot.currentQuestionIndex]);
         });
         this.setupSubscriptions(this.pin);
+        // TODO:
+        // qrlInputChange(this.isTyping);
     }
 
     blinkTextArea() {
@@ -114,6 +119,19 @@ export class QRLboardComponent implements OnInit, OnDestroy {
 
     updateRemainingInputCount() {
         this.remainingInputCount = MAX_MESSAGE_LENGTH - this.input.length;
+        const FIVE_SECONDS_MS = 5000;
+        if (!this.isTyping) {
+            this.isTyping = true;
+            // TODO:
+            // qrlInputChange(isTyping);
+        }
+
+        this.interval = setInterval(() => {
+            this.isTyping = false;
+            // TODO:
+            // qrlInputChange(isTyping);
+            clearInterval(this.interval);
+        }, FIVE_SECONDS_MS);
     }
 
     submitChoices() {
