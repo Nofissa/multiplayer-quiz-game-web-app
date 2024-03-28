@@ -4,8 +4,7 @@ import { generateRandomPin } from '@app/helpers/pin';
 import { DisconnectPayload } from '@app/interfaces/disconnect-payload';
 import { Question } from '@app/model/database/question';
 import { QuizService } from '@app/services/quiz/quiz.service';
-import { TimerService } from '@app/services/timer/timer.service';
-import { Evaluation } from '@common/evaluation';
+import { QcmEvaluation } from '@common/qcm-evaluation';
 import { GameState } from '@common/game-state';
 import { Player } from '@common/player';
 import { PlayerState } from '@common/player-state';
@@ -84,7 +83,7 @@ export class GameService {
         return clientPlayer.player;
     }
 
-    evaluateChoices(client: Socket, pin: string): Evaluation {
+    evaluateChoices(client: Socket, pin: string): QcmEvaluation {
         const game = this.getGame(pin);
         const submission = this.getOrCreateSubmission(client, game);
 
@@ -110,7 +109,7 @@ export class GameService {
         player.score += score;
         player.speedAwardCount += isCorrect && isFirst ? 1 : 0;
 
-        const evaluation: Evaluation = {
+        const evaluation: QcmEvaluation = {
             player,
             correctAnswers: question.choices.filter((x) => x.isCorrect),
             score,
@@ -188,11 +187,23 @@ export class GameService {
         };
     }
 
-    toggleSelectChoice(client: Socket, pin: string, choiceIndex: number): Submission[] {
+    qcmToggleChoice(client: Socket, pin: string, choiceIndex: number): Submission[] {
         const game = this.getGame(pin);
         const submission = this.getOrCreateSubmission(client, game);
         submission.choices[choiceIndex].isSelected = !submission.choices[choiceIndex].isSelected;
 
+        return Array.from(game.currentQuestionSubmissions.values());
+    }
+
+    // client: Socket, pin: string, hasTypedRecently: boolean
+    qrlInputChange() {
+        return;
+    }
+
+    qrlSubmit(client: Socket, pin: string, qrlText: string) {
+        const game = this.getGame(pin);
+        const submission = this.getOrCreateSubmission(client, game);
+        submission.choices.push({ payload: qrlText });
         return Array.from(game.currentQuestionSubmissions.values());
     }
 
@@ -252,7 +263,7 @@ export class GameService {
                 return indices;
             }, []),
         );
-        const selectedAnswersIndices = new Set(submission.choices.filter((x) => x.isSelected).map((x) => x.index));
+        const selectedAnswersIndices = new Set(submission.choices.filter((x) => x.isSelected).map((x) => x.payload));
 
         return (
             correctAnswersIndices.size === selectedAnswersIndices.size &&
@@ -263,8 +274,8 @@ export class GameService {
     getOrCreateSubmission(client: Socket, game: Game) {
         if (!game.currentQuestionSubmissions.has(client.id)) {
             game.currentQuestionSubmissions.set(client.id, {
-                choices: game.currentQuestion.choices.map((_, index) => {
-                    return { index, isSelected: false };
+                choices: game.currentQuestion.choices.map((_, payload) => {
+                    return { payload, isSelected: false };
                 }),
                 isFinal: false,
             });

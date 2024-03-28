@@ -14,7 +14,7 @@ import { PlayerService } from '@app/services/player/player.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
-import { Evaluation } from '@common/evaluation';
+import { QcmEvaluation } from '@common/qcm-evaluation';
 import { GameEventPayload } from '@common/game-event-payload';
 import { Question } from '@common/question';
 import { QuestionPayload } from '@common/question-payload';
@@ -33,6 +33,7 @@ describe('GamePageComponent', () => {
     let socketServerMock: SocketServerMock;
     let timerServiceSpy: jasmine.SpyObj<TimerService>;
     let gameServiceSpy: jasmine.SpyObj<GameService>;
+    let playerServiceSpy: jasmine.SpyObj<PlayerService>;
 
     beforeEach(async () => {
         webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', ['emit', 'on'], {
@@ -45,18 +46,17 @@ describe('GamePageComponent', () => {
             'cancelGame',
             'endGame',
             'onCancelGame',
-            'onToggleSelectChoice',
+            'onQcmToggleChoice',
             'onToggleGameLock',
-            'onSubmitChoices',
+            'onQcmSubmit',
             'onStartGame',
             'onNextQuestion',
-            'onPlayerAbandon',
             'onEndGame',
             'onJoinGame',
-            'onPlayerBan',
-            'onPlayerAbandon',
-            'playerBan',
+            'qcmSubmit',
         ]);
+
+        playerServiceSpy = jasmine.createSpyObj<PlayerService>(['onPlayerAbandon', 'onPlayerBan', 'playerBan', 'playerAbandon']);
 
         timerServiceSpy = jasmine.createSpyObj<TimerService>(['onTimerTick', 'onStartTimer', 'stopTimer', 'startTimer']);
         await TestBed.configureTestingModule({
@@ -64,7 +64,7 @@ describe('GamePageComponent', () => {
             imports: [HttpClientTestingModule, RouterTestingModule, BrowserAnimationsModule],
             providers: [
                 GameServicesProvider,
-                PlayerService,
+                { provide: PlayerService, useValue: playerServiceSpy },
                 MatSnackBar,
                 { provide: WebSocketService, useValue: webSocketServiceSpy },
                 { provide: GameService, useValue: gameServiceSpy },
@@ -118,8 +118,8 @@ describe('GamePageComponent', () => {
             return webSocketServiceSpy.on('nextQuestion', applyIfPinMatches(pin, callback));
         });
 
-        gameServiceSpy.onSubmitChoices.and.callFake((pin, callback) => {
-            return webSocketServiceSpy.on('submitChoices', applyIfPinMatches(pin, callback));
+        gameServiceSpy.onQcmSubmit.and.callFake((pin, callback) => {
+            return webSocketServiceSpy.on('qcmSubmit', applyIfPinMatches(pin, callback));
         });
     });
 
@@ -173,7 +173,7 @@ describe('GamePageComponent', () => {
     it('should setupSubscriptions', () => {
         const payload: GameEventPayload<Question> = { pin: '123', data: questionStub()[0] };
         const timerPayload: GameEventPayload<TimerPayload> = { pin: '123', data: { remainingTime: 0, eventType: TimerEventType.StartGame } };
-        const evaluationPayload: GameEventPayload<Evaluation> = { pin: '123', data: lastPlayerEvaluationStub() };
+        const evaluationPayload: GameEventPayload<QcmEvaluation> = { pin: '123', data: lastPlayerEvaluationStub() };
         const messagePayload: GameEventPayload<string> = { pin: '123', data: 'message' };
         const voidPayload: GameEventPayload<void> = { pin: '123', data: undefined };
         spyOn(component['router'], 'navigate');
@@ -186,7 +186,7 @@ describe('GamePageComponent', () => {
         socketServerMock.emit('startTimer', timerPayload);
         socketServerMock.emit('startGame', payload);
         socketServerMock.emit('nextQuestion', payload);
-        socketServerMock.emit('submitChoices', evaluationPayload);
+        socketServerMock.emit('qcmSubmit', evaluationPayload);
         socketServerMock.emit('timerTick', timerPayload);
 
         expect(timerServiceSpy.startTimer).toHaveBeenCalled();
@@ -201,7 +201,7 @@ describe('GamePageComponent', () => {
         const questionPayload: QuestionPayload = { question: questionStub()[0], isLast: true };
         const payload: GameEventPayload<QuestionPayload> = { pin: '123', data: questionPayload };
         const timerPayload: GameEventPayload<TimerPayload> = { pin: '123', data: { remainingTime: 0, eventType: TimerEventType.NextQuestion } };
-        const evaluationPayload: GameEventPayload<Evaluation> = { pin: '123', data: lastPlayerEvaluationStub() };
+        const evaluationPayload: GameEventPayload<QcmEvaluation> = { pin: '123', data: lastPlayerEvaluationStub() };
         const messagePayload: GameEventPayload<string> = { pin: '123', data: 'message' };
         const voidPayload: GameEventPayload<void> = { pin: '123', data: undefined };
         spyOn(component['router'], 'navigate');
@@ -214,7 +214,7 @@ describe('GamePageComponent', () => {
         socketServerMock.emit('startTimer', timerPayload);
         socketServerMock.emit('startGame', payload);
         socketServerMock.emit('nextQuestion', payload);
-        socketServerMock.emit('submitChoices', evaluationPayload);
+        socketServerMock.emit('qcmSubmit', evaluationPayload);
         socketServerMock.emit('timerTick', timerPayload);
 
         expect(timerServiceSpy.startTimer).toHaveBeenCalled();
@@ -229,7 +229,7 @@ describe('GamePageComponent', () => {
         const questionPayload: QuestionPayload = { question: questionStub()[0], isLast: true };
         const payload: GameEventPayload<QuestionPayload> = { pin: '123', data: questionPayload };
         const timerPayload: GameEventPayload<TimerPayload> = { pin: '123', data: { remainingTime: 0, eventType: TimerEventType.NextQuestion } };
-        const evaluationPayload: GameEventPayload<Evaluation> = { pin: '123', data: lastPlayerEvaluationStub() };
+        const evaluationPayload: GameEventPayload<QcmEvaluation> = { pin: '123', data: lastPlayerEvaluationStub() };
         const messagePayload: GameEventPayload<string> = { pin: '123', data: 'message' };
         const voidPayload: GameEventPayload<void> = { pin: '123', data: undefined };
         spyOn(component['router'], 'navigate');
@@ -242,7 +242,7 @@ describe('GamePageComponent', () => {
         socketServerMock.emit('startTimer', timerPayload);
         socketServerMock.emit('startGame', payload);
         socketServerMock.emit('nextQuestion', payload);
-        socketServerMock.emit('submitChoices', evaluationPayload);
+        socketServerMock.emit('qcmSubmit', evaluationPayload);
         socketServerMock.emit('timerTick', timerPayload);
 
         expect(component['router'].navigate).toHaveBeenCalled();

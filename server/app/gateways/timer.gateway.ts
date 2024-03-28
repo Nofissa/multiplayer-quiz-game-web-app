@@ -58,7 +58,31 @@ export class TimerGateway {
     // @SubscribeMessage('pauseTimer')
     // pauseTimer()
 
+    @SubscribeMessage('pauseTimer')
+    pauseTimer(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
+        try {
+            this.timerService.pauseTimer();
+            const payload: GameEventPayload<null> = { pin, data: null };
+
+            this.server.to(pin).emit('pauseTimer', payload);
+        } catch (error) {
+            client.emit('error', error.message);
+        }
+    }
+
     // TODO:
     // @SubscribeMessage('accelerateTimer')
     // accelerateTimer()
+
+    @SubscribeMessage('accelerateTimer')
+    accelerateTimer(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
+        try {
+            this.timerService.accelerateTimer();
+            const payload: GameEventPayload<null> = { pin, data: null };
+
+            this.server.to(pin).emit('accelerateTimer', payload);
+        } catch (error) {
+            client.emit('error', error.message);
+        }
+    }
 }
