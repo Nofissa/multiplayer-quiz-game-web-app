@@ -54,19 +54,21 @@ export class GameService {
         return this.webSocketService.on('qcmToggleChoice', applyIfPinMatches(pin, callback));
     }
 
-    qcmSubmit(pin: string) {
-        this.webSocketService.emit('qcmSubmit', { pin });
+    qcmSubmit(pin: string, text: string) {
+        this.webSocketService.emit('qcmSubmit', { pin, text });
     }
 
     onQcmSubmit(pin: string, callback: (evaluation: Evaluation) => void): Subscription {
         return this.webSocketService.on('qcmSubmit', applyIfPinMatches(pin, callback));
     }
 
-    qrlInputChange(pin: string, choiceIndex: number) {
-        this.webSocketService.emit('qrlInputChange', { pin, choiceIndex });
+    // TODO
+    qrlInputChange(pin: string) {
+        this.webSocketService.emit('qrlInputChange', { pin });
     }
 
-    onQrlInputChange(pin: string, callback: (payload: Submission[]) => void): Subscription {
+    // TODO
+    onQrlInputChange(pin: string, callback: () => void): Subscription {
         return this.webSocketService.on('qrlInputChange', applyIfPinMatches(pin, callback));
     }
 
