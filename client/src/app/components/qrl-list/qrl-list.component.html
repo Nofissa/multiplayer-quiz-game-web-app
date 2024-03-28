@@ -20,7 +20,7 @@
                 class="mySwiper"
             >
                 <ng-template swiperSlide *ngFor="let player of players">
-                    <div class="game-slide">
+                    <div *ngIf="evaluationsReceived === players.length" class="game-slide">
                         <h2 class="quiz-title">Réponse de {{ player.username }}</h2>
                         <p class="quiz-subtitle">{{ playersMap.get(player) }}</p>
                         <button mat-flat-button id="validateButton" class="game-button">0%</button>

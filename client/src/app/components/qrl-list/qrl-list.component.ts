@@ -19,6 +19,7 @@ export class QrlListComponent implements OnInit, OnDestroy {
     pin: string;
     players: Player[] = [];
     playersMap: Map<Player, Evaluation | undefined> = new Map();
+    evaluationsReceived: number = 0;
     private eventSubscriptions: Subscription[] = [];
 
     private readonly gameHttpService: GameHttpService;
@@ -57,6 +58,7 @@ export class QrlListComponent implements OnInit, OnDestroy {
             this.gameService.onQrlSubmit(pin, (evaluation) => {
                 const index = this.players.findIndex((x) => x.socketId === evaluation.player.socketId);
                 if (index !== NOT_FOUND_INDEX) {
+                    this.evaluationsReceived += 1;
                     this.playersMap.set(evaluation.player, evaluation);
                 }
             }),
