@@ -48,9 +48,13 @@ export class QrlListComponent implements OnInit, OnDestroy {
         });
     }
 
+    // evaluateAnswer() {
+    //     qrlEvaluate()
+    // }
+
     private setupSubscription(pin: string) {
         this.eventSubscriptions.push(
-            this.gameService.onSubmitChoices(pin, (evaluation) => {
+            this.gameService.onQrlSubmit(pin, (evaluation) => {
                 const index = this.players.findIndex((x) => x.socketId === evaluation.player.socketId);
                 if (index !== NOT_FOUND_INDEX) {
                     this.playersMap.set(evaluation.player, evaluation);
