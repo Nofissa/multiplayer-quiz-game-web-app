@@ -1,8 +1,8 @@
-import { Evaluation } from '@common/evaluation';
+import { QcmEvaluation } from '@common/qcm-evaluation';
 import { firstChoiceStub } from './choices.stubs';
 import { playerstub } from './player.stub';
 
-export const evaluationStub = (): Evaluation => {
+export const evaluationStub = (): QcmEvaluation => {
     return {
         player: playerstub(),
         correctAnswers: [firstChoiceStub()[3]],

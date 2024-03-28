@@ -1,6 +1,6 @@
 import { GameService } from '@app/services/game/game.service';
 import { TimerService } from '@app/services/timer/timer.service';
-import { Evaluation } from '@common/evaluation';
+import { QcmEvaluation } from '@common/qcm-evaluation';
 import { GameEventPayload } from '@common/game-event-payload';
 import { GameState } from '@common/game-state';
 import { Player } from '@common/player';
@@ -93,7 +93,7 @@ export class GameGateway implements OnGatewayDisconnect {
     qcmSubmit(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
         try {
             const evaluation = this.gameService.evaluateChoices(client, pin);
-            const payload: GameEventPayload<Evaluation> = { pin, data: evaluation };
+            const payload: GameEventPayload<QcmEvaluation> = { pin, data: evaluation };
 
             this.server.to(pin).emit('qcmSubmit', payload);
         } catch (error) {

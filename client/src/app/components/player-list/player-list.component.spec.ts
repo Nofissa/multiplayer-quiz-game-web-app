@@ -12,7 +12,7 @@ import { GameService } from '@app/services/game/game-service/game.service';
 import { PlayerService } from '@app/services/player/player.service';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
-import { Evaluation } from '@common/evaluation';
+import { QcmEvaluation } from '@common/qcm-evaluation';
 import { GameEventPayload } from '@common/game-event-payload';
 import { GameSnapshot } from '@common/game-snapshot';
 import { GameState } from '@common/game-state';
@@ -178,7 +178,7 @@ describe('PlayerListComponent', () => {
     });
 
     it('should handle setting up subscriptions', () => {
-        const evaluationPayload: GameEventPayload<Evaluation> = { pin: '123', data: lastPlayerEvaluationStub() };
+        const evaluationPayload: GameEventPayload<QcmEvaluation> = { pin: '123', data: lastPlayerEvaluationStub() };
         const playerPayload: GameEventPayload<Player> = { pin: '123', data: firstPlayerStub() };
         spyOn(component, 'upsertPlayer' as never);
         component['setupSubscription']('123');
