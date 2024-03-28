@@ -28,7 +28,7 @@
     <span *ngIf="hasSubmitted">L'évaluation est en cours...</span>
     <div *ngIf="showNotification100" [@fadeAnimation] class="notification">Vous avez eu 100% des points!</div>
     <div class="buttons-wrapper">
-        <button mat-flat-button id="validateButton" class="game-button" [class.disable-click]="hasSubmitted" (click)="submitChoices()">
+        <button mat-flat-button id="validateButton" class="game-button" [class.disable-click]="hasSubmitted" (click)="submitAnswer()">
             Valider <i class="fas fa-check-circle"></i>
         </button>
         <button button mat-flat-button color="warn" id="giveUpButton" class="game-button" (click)="openConfirmationDialog()">Abandonner</button>

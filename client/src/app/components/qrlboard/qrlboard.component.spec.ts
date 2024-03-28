@@ -198,19 +198,19 @@ fdescribe('QrlBoardComponent', () => {
         expect(mockGameService.onNextQuestion).toHaveBeenCalled();
         expect(mockGameService.onSubmitChoices).toHaveBeenCalled();
         expect(timerServiceMock.onTimerTick).toHaveBeenCalled();
-        expect(component.submitChoices).toHaveBeenCalled();
+        expect(component.submitAnswer).toHaveBeenCalled();
     });
 
     it('should send a message and clear input when valid', () => {
         component.input = 'Test message';
-        component.submitChoices();
+        component.submitAnswer();
         expect(mockGameService.submitChoices).toHaveBeenCalledWith('1234');
         expect(component.input).toBe('');
     });
 
     it('should not send a message if input is only whitespace', () => {
         component.input = '   ';
-        component.submitChoices();
+        component.submitAnswer();
         expect(mockGameService.submitChoices).not.toHaveBeenCalled();
     });
 

@@ -94,8 +94,7 @@ export class QRLboardComponent implements OnInit, OnDestroy {
             this.loadNextQuestion(snapshot.quiz.questions[snapshot.currentQuestionIndex]);
         });
         this.setupSubscriptions(this.pin);
-        // TODO:
-        // qrlInputChange(this.isTyping);
+        this.gameService.qrlInputChange(this.pin, this.isTyping);
     }
 
     blinkTextArea() {
@@ -122,22 +121,20 @@ export class QRLboardComponent implements OnInit, OnDestroy {
         const FIVE_SECONDS_MS = 5000;
         if (!this.isTyping) {
             this.isTyping = true;
-            // TODO:
-            // qrlInputChange(isTyping);
+            this.gameService.qrlInputChange(this.pin, this.isTyping);
         }
 
         this.interval = setInterval(() => {
             this.isTyping = false;
-            // TODO:
-            // qrlInputChange(isTyping);
+            this.gameService.qrlInputChange(this.pin, this.isTyping);
             clearInterval(this.interval);
         }, FIVE_SECONDS_MS);
     }
 
-    submitChoices() {
+    submitAnswer() {
         const isOnlyWhitespace = /^\s*$/.test(this.input);
         if (!isOnlyWhitespace && this.input.length < MAX_MESSAGE_LENGTH) {
-            this.gameService.submitChoices(this.pin); // utiliser le nouveau submit choices avec en parametres un this.input.trim()
+            this.gameService.qrlSubmit(this.pin, this.input.trim());
             this.input = '';
             this.remainingInputCount = MAX_MESSAGE_LENGTH;
         }
@@ -152,7 +149,7 @@ export class QRLboardComponent implements OnInit, OnDestroy {
 
         dialogRef.afterClosed().subscribe((result) => {
             if (result) {
-                this.gameService.playerAbandon(this.pin);
+                this.playerService.playerAbandon(this.pin);
                 const redirect = this.isTest ? '/create-game' : '/home';
                 this.router.navigateByUrl(redirect);
             }
@@ -171,29 +168,29 @@ export class QRLboardComponent implements OnInit, OnDestroy {
             this.gameService.onNextQuestion(pin, (data) => {
                 this.loadNextQuestion(data.question);
             }),
-            this.gameService.onSubmitChoices(pin, (evaluation) => {
-                if (this.playerService.getCurrentPlayer(pin)?.socketId === evaluation.player.socketId) {
-                    this.cachedEvaluation = evaluation;
-                }
-                if (evaluation.isLast) {
-                    this.questionIsOver = true;
-                    if (this.player) {
-                        if (this.isTest) {
-                            this.blinkTextArea();
-                            this.showNotification100 = true;
-                            setTimeout(() => {
-                                this.showNotification100 = false;
-                            }, THREE_SECONDS_MS);
-                            this.player.score += this.question.points;
-                        } else {
-                            this.player.score += this.cachedEvaluation !== null ? this.cachedEvaluation.score : 0;
-                        }
-                    }
-                }
-            }),
+            // this.gameService.onQrlEvaluate(pin, (evaluation) => {
+            //     if (this.playerService.getCurrentPlayer(pin)?.socketId === evaluation.player.socketId) {
+            //         this.cachedEvaluation = evaluation;
+            //     }
+            //     if (evaluation.isLast) {
+            //         this.questionIsOver = true;
+            //         if (this.player) {
+            //             if (this.isTest) {
+            //                 this.blinkTextArea();
+            //                 this.showNotification100 = true;
+            //                 setTimeout(() => {
+            //                     this.showNotification100 = false;
+            //                 }, THREE_SECONDS_MS);
+            //                 this.player.score += question.points;
+            //             } else {
+            //                 this.player.score += this.cachedEvaluation?.score ?? 0;
+            //             }
+            //         }
+            //     }
+            // }),
             this.timerService.onTimerTick(pin, (payload) => {
                 if (!payload.remainingTime && payload.eventType === TimerEventType.Question && !this.hasSubmitted) {
-                    this.submitChoices();
+                    this.submitAnswer();
                 }
             }),
         );

@@ -62,22 +62,18 @@ export class GameService {
         return this.webSocketService.on('qcmSubmit', applyIfPinMatches(pin, callback));
     }
 
-    // TODO
-    qrlInputChange(pin: string) {
-        this.webSocketService.emit('qrlInputChange', { pin });
+    qrlInputChange(pin: string, isTyping: boolean) {
+        this.webSocketService.emit('qrlInputChange', { pin, isTyping });
     }
 
-    // TODO
     onQrlInputChange(pin: string, callback: () => void): Subscription {
         return this.webSocketService.on('qrlInputChange', applyIfPinMatches(pin, callback));
     }
 
-    // TODO
     qrlSubmit(pin: string, text: string) {
         this.webSocketService.emit('qrlSubmit', { pin, text });
     }
 
-    // TODO
     onQrlSubmit(pin: string, callback: () => void): Subscription {
         return this.webSocketService.on('qrlSubmit', applyIfPinMatches(pin, callback));
     }
