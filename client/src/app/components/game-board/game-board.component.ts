@@ -96,7 +96,7 @@ export class GameBoardComponent implements OnInit, OnDestroy {
 
     submitChoices() {
         this.hasSubmited = true;
-        this.gameService.submitChoices(this.pin);
+        this.gameService.qcmSubmit(this.pin);
         this.disableShortcuts = true;
     }
 
@@ -109,7 +109,7 @@ export class GameBoardComponent implements OnInit, OnDestroy {
             this.selectedChoiceIndexes.push(choiceIndex);
         }
 
-        this.gameService.toggleSelectChoice(this.pin, choiceIndex);
+        this.gameService.qcmToggleChoice(this.pin, choiceIndex);
     }
 
     openConfirmationDialog() {
@@ -120,7 +120,7 @@ export class GameBoardComponent implements OnInit, OnDestroy {
 
         dialogRef.afterClosed().subscribe((result) => {
             if (result) {
-                this.gameService.playerAbandon(this.pin);
+                this.playerService.playerAbandon(this.pin);
                 const redirect = this.isTest ? '/create-game' : '/home';
                 this.router.navigateByUrl(redirect);
             }
@@ -141,7 +141,7 @@ export class GameBoardComponent implements OnInit, OnDestroy {
             this.gameService.onNextQuestion(pin, (data) => {
                 this.loadNextQuestion(data.question);
             }),
-            this.gameService.onSubmitChoices(pin, (evaluation) => {
+            this.gameService.onQcmSubmit(pin, (evaluation) => {
                 if (this.playerService.getCurrentPlayer(pin)?.socketId === evaluation.player.socketId) {
                     this.disableShortcuts = true;
                     this.cachedEvaluation = evaluation;

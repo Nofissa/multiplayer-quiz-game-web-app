@@ -54,16 +54,9 @@ describe('GameBoardComponent', () => {
 
     beforeEach(() => {
         gameHttpServiceMock = jasmine.createSpyObj('GameHttpService', ['getGameSnapshotByPin']);
-        playerServiceMock = jasmine.createSpyObj('PlayerService', ['getCurrentPlayer']);
+        playerServiceMock = jasmine.createSpyObj('PlayerService', ['getCurrentPlayer', 'playerAbandon']);
         keyBindingServiceMock = jasmine.createSpyObj('KeyBindingService', ['setupKeyBindings', 'getExecutor', 'registerKeyBinding']);
-        gameServiceMock = jasmine.createSpyObj('GameService', [
-            'submitChoices',
-            'nextQuestion',
-            'onNextQuestion',
-            'onSubmitChoices',
-            'toggleSelectChoice',
-            'playerAbandon',
-        ]);
+        gameServiceMock = jasmine.createSpyObj('GameService', ['qcmSubmit', 'nextQuestion', 'onNextQuestion', 'onQcmSubmit', 'qcmToggleChoice']);
         matDialogMock = jasmine.createSpyObj('MatDialog', ['open']);
         dialogRefSpy = jasmine.createSpyObj('MatDialogRef<ConfirmationDialogComponent>', ['afterClosed']);
         dialogRefSpy.afterClosed.and.returnValue(of(true));
@@ -110,7 +103,7 @@ describe('GameBoardComponent', () => {
         timerServiceMock.onTimerTick.and.callFake((pin, callback) => {
             return webSocketServiceSpy.on('timerTick', applyIfPinMatches(pin, callback));
         });
-        gameServiceMock.onSubmitChoices.and.callFake((pin, callback) => {
+        gameServiceMock.onQcmSubmit.and.callFake((pin, callback) => {
             return webSocketServiceSpy.on('submitChoices', applyIfPinMatches(pin, callback));
         });
     });
@@ -161,13 +154,13 @@ describe('GameBoardComponent', () => {
 
     it('should submitChoices', () => {
         component.submitChoices();
-        expect(gameServiceMock.submitChoices).toHaveBeenCalled();
+        expect(gameServiceMock.qcmSubmit).toHaveBeenCalled();
     });
 
     it('should toggleSelectChoice', () => {
         const choice = 1;
         component.toggleSelectChoice(choice);
-        expect(gameServiceMock.toggleSelectChoice).toHaveBeenCalled();
+        expect(gameServiceMock.qcmToggleChoice).toHaveBeenCalled();
     });
 
     it('should loadNextQuestion', () => {
@@ -195,7 +188,7 @@ describe('GameBoardComponent', () => {
         socketServerMock.emit('submitChoices', evaluationPayload);
         socketServerMock.emit('timerTick', timerPayload);
         expect(gameServiceMock.onNextQuestion).toHaveBeenCalled();
-        expect(gameServiceMock.onSubmitChoices).toHaveBeenCalled();
+        expect(gameServiceMock.onQcmSubmit).toHaveBeenCalled();
         expect(timerServiceMock.onTimerTick).toHaveBeenCalled();
         expect(component.submitChoices).toHaveBeenCalled();
     });

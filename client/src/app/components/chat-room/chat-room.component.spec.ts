@@ -56,7 +56,7 @@ describe('ChatRoomComponent', () => {
 
     const mockState: GameState = GameState.Opened;
 
-    const mockQuestionSubmissions: Submission[][] = [[{ choices: [{ index: 0, isSelected: true }], isFinal: false }]];
+    const mockQuestionSubmissions: Submission[][] = [[{ choices: [{ payload: 0, isSelected: true }], isFinal: false }]];
 
     const mockGameSnapshot: GameSnapshot = {
         players: mockPlayers,
