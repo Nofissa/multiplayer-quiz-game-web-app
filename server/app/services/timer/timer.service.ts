@@ -57,13 +57,14 @@ export class TimerService {
             this.tickSubjects.delete(pin);
         }
     }
-
-    pauseTimer(client: Socket, pin: string) {
+    // client: Socket, pin: string
+    pauseTimer() {
         // todo
         return;
     }
 
-    accelerateTimer(client: Socket, pin: string) {
+    // client: Socket, pin: string
+    accelerateTimer() {
         // todo
         return;
     }
