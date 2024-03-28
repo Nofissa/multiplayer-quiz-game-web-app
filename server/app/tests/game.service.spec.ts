@@ -1,12 +1,10 @@
 /* eslint-disable max-lines */ // to many lines because of many mocks that i had to clear and recreate.
 /* eslint-disable @typescript-eslint/no-explicit-any */ // used for mocking the socket for instance.
-import { ClientPlayer } from '@app/classes/client-player';
 import * as PinHelper from '@app/helpers/pin';
 import { DisconnectPayload } from '@app/interfaces/disconnect-payload';
 import { GameService } from '@app/services/game/game.service';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { GameState } from '@common/game-state';
-import { PlayerState } from '@common/player-state';
 import { QuestionPayload } from '@common/question-payload';
 import { Socket } from 'socket.io';
 import { clientPlayerStub } from './stubs/client.player.stub';
@@ -134,60 +132,6 @@ describe('GameService', () => {
         });
     });
 
-    describe('playerAbandon', () => {
-        const game = gameStub();
-        const playerId = 'playerId';
-        const player = playerstub();
-        player.state = PlayerState.Abandonned;
-        socketMock = { id: 'playerId' } as jest.Mocked<Socket>;
-        it('should return the clientPlayer of the player who has abandoned', () => {
-            const clientPlayerTest = {
-                socket: { id: playerId } as any,
-                player,
-            };
-            jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
-            jest.spyOn(Map.prototype, 'get').mockReturnValue(clientPlayerTest);
-            const result = gameService.playerAbandon(socketMock, game.pin);
-            expect(result).toEqual(clientPlayerTest);
-        });
-    });
-
-    describe('playerBan', () => {
-        const game = gameStub();
-        socketMock = { id: 'OrganizerId' } as jest.Mocked<Socket>;
-        const player = playerstub();
-        player.socketId = 'playerId';
-        it('should throw an error if the client is not the organizer', () => {
-            jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
-            jest.spyOn(GameService.prototype, 'isOrganizer').mockReturnValue(false);
-            expect(() => gameService.playerBan(socketMock, game.pin, player.username)).toThrowError(
-                `Vous n'êtes pas organisateur de la partie ${game.pin}`,
-            );
-        });
-
-        it('should return undefined if no player matched in the clientPlayer', () => {
-            jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
-            jest.spyOn(GameService.prototype, 'isOrganizer').mockReturnValue(true);
-            jest.spyOn(Array.prototype, 'find').mockReturnValue(undefined);
-
-            const result = gameService.playerBan(socketMock, game.pin, player.username);
-            expect(result).toEqual(undefined);
-        });
-
-        it('should return the client player with playerState set on Banned', () => {
-            const playerBanned = playerstub();
-            playerBanned.state = PlayerState.Banned;
-            const clientPLayerTest: ClientPlayer = {
-                socket: { id: 'playerId' } as any,
-                player: playerBanned,
-            };
-            jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
-            jest.spyOn(GameService.prototype, 'isOrganizer').mockReturnValue(true);
-            const result = gameService.playerBan(socketMock, game.pin, player.username);
-            expect(result).toEqual(clientPLayerTest);
-        });
-    });
-
     describe('evaluateChoices', () => {
         const game = gameStub();
         const submission = submissionStub();
@@ -296,19 +240,11 @@ describe('GameService', () => {
         const game = gameStub();
         const disconnectPayloadTest: DisconnectPayload = {
             toCancel: [game.pin],
-            toAbandon: [],
-            toEnd: [],
-        };
-
-        const disconnectPayloadTestPlayer: DisconnectPayload = {
-            toCancel: [],
-            toAbandon: ['1234'],
             toEnd: [],
         };
 
         const disconnectPayloadEndTest: DisconnectPayload = {
             toCancel: [],
-            toAbandon: [],
             toEnd: [game.pin],
         };
         const organizerSocket = { id: 'organizerId' } as any;
@@ -320,11 +256,11 @@ describe('GameService', () => {
             expect(result).toEqual(disconnectPayloadTest);
         });
 
-        it('should push the player to toAbandon', () => {
-            gameService.games.set(game.pin, game);
-            const result = gameService.disconnect(game.clientPlayers.get('playerId').socket);
-            expect(result).toEqual(disconnectPayloadTestPlayer);
-        });
+        // it('should push the player to toAbandon', () => {
+        //     gameService.games.set(game.pin, game);
+        //     const result = gameService.disconnect(game.clientPlayers.get('playerId').socket);
+        //     expect(result).toEqual(disconnectPayloadTestPlayer);
+        // });
 
         it('should push the game to toEnd', () => {
             game.state = GameState.Running;
@@ -410,7 +346,7 @@ describe('GameService', () => {
         it('should return the right submission', () => {
             jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
             jest.spyOn(GameService.prototype, 'getOrCreateSubmission').mockReturnValue(submission);
-            const result = gameService.toggleSelectChoice(socketMock, game.pin, choiceIndex);
+            const result = gameService.qcmToggleChoice(socketMock, game.pin, choiceIndex);
             expect(result).toEqual(expectedResult);
         });
     });

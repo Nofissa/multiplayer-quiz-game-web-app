@@ -34,8 +34,7 @@ describe('PlayerListComponent', () => {
     let component: PlayerListComponent;
     let fixture: ComponentFixture<PlayerListComponent>;
     let gameHttpService: GameHttpService;
-    let gameService: GameService;
-    // let playerService: PlayerService;
+    let playerServiceSpy: jasmine.SpyObj<PlayerService>;
     let webSocketServiceSpy: jasmine.SpyObj<WebSocketService>;
     let socketServerMock: SocketServerMock;
     let gameServiceSpy: jasmine.SpyObj<GameService>;
@@ -51,24 +50,24 @@ describe('PlayerListComponent', () => {
             'cancelGame',
             'endGame',
             'onCancelGame',
-            'onToggleSelectChoice',
+            'onQcmToggleChoice',
             'onToggleGameLock',
-            'onSubmitChoices',
+            'onQcmSubmit',
             'onStartGame',
             'onNextQuestion',
-            'onPlayerAbandon',
             'onEndGame',
             'onJoinGame',
-            'onPlayerBan',
-            'onPlayerAbandon',
-            'playerBan',
+            'qcmSubmit',
         ]);
+
+        playerServiceSpy = jasmine.createSpyObj<PlayerService>(['onPlayerAbandon', 'onPlayerBan', 'onPlayerAbandon', 'playerBan']);
+
         await TestBed.configureTestingModule({
             declarations: [PlayerListComponent],
             imports: [HttpClientTestingModule, RouterTestingModule],
             providers: [
                 GameServicesProvider,
-                PlayerService,
+                { provide: PlayerService, useValue: playerServiceSpy },
                 MatSnackBar,
                 { provide: WebSocketService, useValue: webSocketServiceSpy },
                 { provide: GameService, useValue: gameServiceSpy },
@@ -97,10 +96,9 @@ describe('PlayerListComponent', () => {
         component = fixture.componentInstance;
         fixture.detectChanges();
         gameHttpService = TestBed.inject(GameHttpService);
-        gameService = TestBed.inject(GameService);
-        // playerService = TestBed.inject(PlayerService);
-        gameServiceSpy.onSubmitChoices.and.callFake((pin, callback) => {
-            return webSocketServiceSpy.on('submitChoices', applyIfPinMatches(pin, callback));
+
+        gameServiceSpy.onQcmSubmit.and.callFake((pin, callback) => {
+            return webSocketServiceSpy.on('qcmSubmit', applyIfPinMatches(pin, callback));
         });
         gameServiceSpy.onStartGame.and.callFake((pin, callback) => {
             return webSocketServiceSpy.on('startGame', applyIfPinMatches(pin, callback));
@@ -108,10 +106,10 @@ describe('PlayerListComponent', () => {
         gameServiceSpy.onJoinGame.and.callFake((pin, callback) => {
             return webSocketServiceSpy.on('joinGame', applyIfPinMatches(pin, callback));
         });
-        gameServiceSpy.onPlayerBan.and.callFake((pin, callback) => {
+        playerServiceSpy.onPlayerBan.and.callFake((pin, callback) => {
             return webSocketServiceSpy.on('playerBan', applyIfPinMatches(pin, callback));
         });
-        gameServiceSpy.onPlayerAbandon.and.callFake((pin, callback) => {
+        playerServiceSpy.onPlayerAbandon.and.callFake((pin, callback) => {
             return webSocketServiceSpy.on('playerAbandon', applyIfPinMatches(pin, callback));
         });
     });
@@ -146,7 +144,7 @@ describe('PlayerListComponent', () => {
         const dummyPlayer: Player = firstPlayerStub();
         component.pin = '123';
         component.banPlayer(dummyPlayer);
-        expect(gameService.playerBan).toHaveBeenCalledWith(component.pin, dummyPlayer.username);
+        expect(playerServiceSpy.playerBan).toHaveBeenCalledWith(component.pin, dummyPlayer.username);
     });
 
     it('should upsert a player', () => {
@@ -184,7 +182,7 @@ describe('PlayerListComponent', () => {
         const playerPayload: GameEventPayload<Player> = { pin: '123', data: firstPlayerStub() };
         spyOn(component, 'upsertPlayer' as never);
         component['setupSubscription']('123');
-        socketServerMock.emit('submitChoices', evaluationPayload);
+        socketServerMock.emit('qcmSubmit', evaluationPayload);
         socketServerMock.emit('joinGame', playerPayload);
         socketServerMock.emit('playerBan', playerPayload);
         socketServerMock.emit('playerAbandon', playerPayload);

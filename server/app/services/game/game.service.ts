@@ -73,33 +73,6 @@ export class GameService {
         return clientPlayer.player;
     }
 
-    playerAbandon(client: Socket, pin: string): ClientPlayer {
-        const game = this.getGame(pin);
-        const clientPlayer = game.clientPlayers.get(client.id);
-
-        clientPlayer.player.state = PlayerState.Abandonned;
-
-        return clientPlayer;
-    }
-
-    playerBan(client: Socket, pin: string, username: string): ClientPlayer {
-        const game = this.getGame(pin);
-
-        if (!this.isOrganizer(game, client.id)) {
-            throw new Error(`Vous n'êtes pas organisateur de la partie ${pin}`);
-        }
-
-        const clientPlayer = Array.from(game.clientPlayers.values()).find((x) => {
-            return x.player.username.toLowerCase() === username.toLowerCase() && x.player.state === PlayerState.Playing;
-        });
-
-        if (clientPlayer) {
-            clientPlayer.player.state = PlayerState.Banned;
-        }
-
-        return clientPlayer;
-    }
-
     evaluateChoices(client: Socket, pin: string): Evaluation {
         const game = this.getGame(pin);
         const submission = this.getOrCreateSubmission(client, game);
@@ -204,11 +177,23 @@ export class GameService {
         };
     }
 
-    toggleSelectChoice(client: Socket, pin: string, choiceIndex: number): Submission[] {
+    qcmToggleChoice(client: Socket, pin: string, choiceIndex: number): Submission[] {
         const game = this.getGame(pin);
         const submission = this.getOrCreateSubmission(client, game);
         submission.choices[choiceIndex].isSelected = !submission.choices[choiceIndex].isSelected;
 
+        return Array.from(game.currentQuestionSubmissions.values());
+    }
+
+    // client: Socket, pin: string, hasTypedRecently: boolean
+    qrlInputChange() {
+        return;
+    }
+
+    qrlSubmit(client: Socket, pin: string, qrlText: string) {
+        const game = this.getGame(pin);
+        const submission = this.getOrCreateSubmission(client, game);
+        submission.choices.push({ payload: qrlText });
         return Array.from(game.currentQuestionSubmissions.values());
     }
 
@@ -227,15 +212,11 @@ export class GameService {
             .filter((game) => game.organizer.id === client.id && (game.state === GameState.Opened || game.state === GameState.Closed))
             .map((game) => game.pin);
 
-        const toAbandon = games
-            .filter((game) => Array.from(game.clientPlayers.values()).some((x) => x.socket.id === client.id))
-            .map((game) => game.pin);
-
         const toEnd = games
             .filter((game) => game.organizer.id === client.id && (game.state === GameState.Paused || game.state === GameState.Running))
             .map((game) => game.pin);
 
-        return { toCancel, toAbandon, toEnd };
+        return { toCancel, toEnd };
     }
 
     getGame(pin: string): Game {
@@ -272,7 +253,7 @@ export class GameService {
                 return indices;
             }, []),
         );
-        const selectedAnswersIndices = new Set(submission.choices.filter((x) => x.isSelected).map((x) => x.index));
+        const selectedAnswersIndices = new Set(submission.choices.filter((x) => x.isSelected).map((x) => x.payload));
 
         return (
             correctAnswersIndices.size === selectedAnswersIndices.size &&
@@ -283,8 +264,8 @@ export class GameService {
     getOrCreateSubmission(client: Socket, game: Game) {
         if (!game.currentQuestionSubmissions.has(client.id)) {
             game.currentQuestionSubmissions.set(client.id, {
-                choices: game.currentQuestion.choices.map((_, index) => {
-                    return { index, isSelected: false };
+                choices: game.currentQuestion.choices.map((_, payload) => {
+                    return { payload, isSelected: false };
                 }),
                 isFinal: false,
             });

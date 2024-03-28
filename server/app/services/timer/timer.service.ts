@@ -57,6 +57,17 @@ export class TimerService {
             this.tickSubjects.delete(pin);
         }
     }
+    // client: Socket, pin: string
+    pauseTimer() {
+        // todo
+        return;
+    }
+
+    // client: Socket, pin: string
+    accelerateTimer() {
+        // todo
+        return;
+    }
 
     private decrement(client: Socket, pin: string) {
         this.counters.set(pin, this.counters.get(pin) - 1 / TICK_PER_SECOND);
