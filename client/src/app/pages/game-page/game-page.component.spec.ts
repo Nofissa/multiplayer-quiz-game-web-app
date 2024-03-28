@@ -14,7 +14,7 @@ import { PlayerService } from '@app/services/player/player.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
-import { Evaluation } from '@common/evaluation';
+import { QcmEvaluation } from '@common/evaluation';
 import { GameEventPayload } from '@common/game-event-payload';
 import { Question } from '@common/question';
 import { QuestionPayload } from '@common/question-payload';
@@ -173,7 +173,7 @@ describe('GamePageComponent', () => {
     it('should setupSubscriptions', () => {
         const payload: GameEventPayload<Question> = { pin: '123', data: questionStub()[0] };
         const timerPayload: GameEventPayload<TimerPayload> = { pin: '123', data: { remainingTime: 0, eventType: TimerEventType.StartGame } };
-        const evaluationPayload: GameEventPayload<Evaluation> = { pin: '123', data: lastPlayerEvaluationStub() };
+        const evaluationPayload: GameEventPayload<QcmEvaluation> = { pin: '123', data: lastPlayerEvaluationStub() };
         const messagePayload: GameEventPayload<string> = { pin: '123', data: 'message' };
         const voidPayload: GameEventPayload<void> = { pin: '123', data: undefined };
         spyOn(component['router'], 'navigate');
@@ -201,7 +201,7 @@ describe('GamePageComponent', () => {
         const questionPayload: QuestionPayload = { question: questionStub()[0], isLast: true };
         const payload: GameEventPayload<QuestionPayload> = { pin: '123', data: questionPayload };
         const timerPayload: GameEventPayload<TimerPayload> = { pin: '123', data: { remainingTime: 0, eventType: TimerEventType.NextQuestion } };
-        const evaluationPayload: GameEventPayload<Evaluation> = { pin: '123', data: lastPlayerEvaluationStub() };
+        const evaluationPayload: GameEventPayload<QcmEvaluation> = { pin: '123', data: lastPlayerEvaluationStub() };
         const messagePayload: GameEventPayload<string> = { pin: '123', data: 'message' };
         const voidPayload: GameEventPayload<void> = { pin: '123', data: undefined };
         spyOn(component['router'], 'navigate');
@@ -229,7 +229,7 @@ describe('GamePageComponent', () => {
         const questionPayload: QuestionPayload = { question: questionStub()[0], isLast: true };
         const payload: GameEventPayload<QuestionPayload> = { pin: '123', data: questionPayload };
         const timerPayload: GameEventPayload<TimerPayload> = { pin: '123', data: { remainingTime: 0, eventType: TimerEventType.NextQuestion } };
-        const evaluationPayload: GameEventPayload<Evaluation> = { pin: '123', data: lastPlayerEvaluationStub() };
+        const evaluationPayload: GameEventPayload<QcmEvaluation> = { pin: '123', data: lastPlayerEvaluationStub() };
         const messagePayload: GameEventPayload<string> = { pin: '123', data: 'message' };
         const voidPayload: GameEventPayload<void> = { pin: '123', data: undefined };
         spyOn(component['router'], 'navigate');

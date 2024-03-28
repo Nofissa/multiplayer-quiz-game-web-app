@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
-import { Evaluation } from '@common/evaluation';
 import { GameState } from '@common/game-state';
+import { Grade } from '@common/grade';
 import { Player } from '@common/player';
+import { QcmEvaluation } from '@common/qcm-evaluation';
+import { QrlEvaluation } from '@common/qrl-evaluation';
 import { QuestionPayload } from '@common/question-payload';
 import { Submission } from '@common/submission';
 import { Subscription } from 'rxjs';
@@ -58,28 +60,35 @@ export class GameService {
         this.webSocketService.emit('qcmSubmit', { pin });
     }
 
-    onQcmSubmit(pin: string, callback: (evaluation: Evaluation) => void): Subscription {
+    onQcmSubmit(pin: string, callback: (evaluation: QcmEvaluation) => void): Subscription {
         return this.webSocketService.on('qcmSubmit', applyIfPinMatches(pin, callback));
     }
 
-    // TODO
-    qrlInputChange(pin: string) {
-        this.webSocketService.emit('qrlInputChange', { pin });
+    qrlInputChange(pin: string, isTyping: boolean) {
+        this.webSocketService.emit('qrlInputChange', { pin, isTyping });
     }
 
-    // TODO
+    // TODO:
     onQrlInputChange(pin: string, callback: () => void): Subscription {
         return this.webSocketService.on('qrlInputChange', applyIfPinMatches(pin, callback));
     }
 
-    // TODO
     qrlSubmit(pin: string, text: string) {
         this.webSocketService.emit('qrlSubmit', { pin, text });
     }
 
-    // TODO
-    onQrlSubmit(pin: string, callback: () => void): Subscription {
+    // TODO:
+    onQrlSubmit(pin: string, callback: (qrlEval: QrlEvaluation) => void): Subscription {
         return this.webSocketService.on('qrlSubmit', applyIfPinMatches(pin, callback));
+    }
+
+    qrlEvaluate(pin: string, grade: Grade) {
+        this.webSocketService.emit('qrlEvaluate', { pin, grade });
+    }
+
+    // TODO:
+    onQrlEvaluate(pin: string, callback: () => void): Subscription {
+        return this.webSocketService.on('qrlEvaluate', applyIfPinMatches(pin, callback));
     }
 
     nextQuestion(pin: string) {

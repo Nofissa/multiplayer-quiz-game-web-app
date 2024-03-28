@@ -8,7 +8,7 @@ import { GameService } from '@app/services/game/game-service/game.service';
 import { KeyBindingService } from '@app/services/key-binding/key-binding.service';
 import { PlayerService } from '@app/services/player/player.service';
 import { TimerService } from '@app/services/timer/timer.service';
-import { Evaluation } from '@common/evaluation';
+import { QcmEvaluation } from '@common/evaluation';
 import { Player } from '@common/player';
 import { Question } from '@common/question';
 import { TimerEventType } from '@common/timer-event-type';
@@ -34,7 +34,7 @@ export class GameBoardComponent implements OnInit, OnDestroy {
     questionIsOver: boolean;
     hasSubmited: boolean;
     selectedChoiceIndexes: number[];
-    cachedEvaluation: Evaluation | null = null;
+    cachedEvaluation: QcmEvaluation | null = null;
     disableShortcuts: boolean = false;
 
     readonly gameHttpService: GameHttpService;
