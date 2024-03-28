@@ -346,7 +346,7 @@ describe('GameService', () => {
         it('should return the right submission', () => {
             jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
             jest.spyOn(GameService.prototype, 'getOrCreateSubmission').mockReturnValue(submission);
-            const result = gameService.toggleSelectChoice(socketMock, game.pin, choiceIndex);
+            const result = gameService.qcmToggleChoice(socketMock, game.pin, choiceIndex);
             expect(result).toEqual(expectedResult);
         });
     });

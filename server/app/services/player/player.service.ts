@@ -35,8 +35,23 @@ export class PlayerService {
         return clientPlayer;
     }
 
-    // TODO:
-    // playerMute(client: Socket, pin: string, username: string): ClientPlayer {}
+    playerMute(client: Socket, pin: string, username: string): ClientPlayer {
+        const game = this.gameService.getGame(pin);
+
+        if (!this.gameService.isOrganizer(game, client.id)) {
+            throw new Error(`Vous n'êtes pas organisateur de la partie ${pin}`);
+        }
+
+        const clientPlayer = Array.from(game.clientPlayers.values()).find((x) => {
+            return x.player.username.trim().toLowerCase() === username.trim().toLowerCase() && x.player.state === PlayerState.Playing;
+        });
+
+        if (clientPlayer) {
+            clientPlayer.player.state = PlayerState.Muted;
+        }
+
+        return clientPlayer;
+    }
 
     disconnect(client: Socket): string[] {
         const games = Array.from(this.gameService.games.values());

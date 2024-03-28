@@ -33,6 +33,7 @@ describe('GamePageComponent', () => {
     let socketServerMock: SocketServerMock;
     let timerServiceSpy: jasmine.SpyObj<TimerService>;
     let gameServiceSpy: jasmine.SpyObj<GameService>;
+    let playerServiceSpy: jasmine.SpyObj<PlayerService>;
 
     beforeEach(async () => {
         webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', ['emit', 'on'], {
@@ -45,18 +46,17 @@ describe('GamePageComponent', () => {
             'cancelGame',
             'endGame',
             'onCancelGame',
-            'onToggleSelectChoice',
+            'onQcmToggleChoice',
             'onToggleGameLock',
-            'onSubmitChoices',
+            'onQcmSubmit',
             'onStartGame',
             'onNextQuestion',
-            'onPlayerAbandon',
             'onEndGame',
             'onJoinGame',
-            'onPlayerBan',
-            'onPlayerAbandon',
-            'playerBan',
+            'qcmSubmit',
         ]);
+
+        playerServiceSpy = jasmine.createSpyObj<PlayerService>(['onPlayerAbandon', 'onPlayerBan', 'playerBan', 'playerAbandon']);
 
         timerServiceSpy = jasmine.createSpyObj<TimerService>(['onTimerTick', 'onStartTimer', 'stopTimer', 'startTimer']);
         await TestBed.configureTestingModule({
@@ -64,7 +64,7 @@ describe('GamePageComponent', () => {
             imports: [HttpClientTestingModule, RouterTestingModule, BrowserAnimationsModule],
             providers: [
                 GameServicesProvider,
-                PlayerService,
+                { provide: PlayerService, useValue: playerServiceSpy },
                 MatSnackBar,
                 { provide: WebSocketService, useValue: webSocketServiceSpy },
                 { provide: GameService, useValue: gameServiceSpy },
@@ -118,8 +118,8 @@ describe('GamePageComponent', () => {
             return webSocketServiceSpy.on('nextQuestion', applyIfPinMatches(pin, callback));
         });
 
-        gameServiceSpy.onSubmitChoices.and.callFake((pin, callback) => {
-            return webSocketServiceSpy.on('submitChoices', applyIfPinMatches(pin, callback));
+        gameServiceSpy.onQcmSubmit.and.callFake((pin, callback) => {
+            return webSocketServiceSpy.on('qcmSubmit', applyIfPinMatches(pin, callback));
         });
     });
 
@@ -186,7 +186,7 @@ describe('GamePageComponent', () => {
         socketServerMock.emit('startTimer', timerPayload);
         socketServerMock.emit('startGame', payload);
         socketServerMock.emit('nextQuestion', payload);
-        socketServerMock.emit('submitChoices', evaluationPayload);
+        socketServerMock.emit('qcmSubmit', evaluationPayload);
         socketServerMock.emit('timerTick', timerPayload);
 
         expect(timerServiceSpy.startTimer).toHaveBeenCalled();
@@ -214,7 +214,7 @@ describe('GamePageComponent', () => {
         socketServerMock.emit('startTimer', timerPayload);
         socketServerMock.emit('startGame', payload);
         socketServerMock.emit('nextQuestion', payload);
-        socketServerMock.emit('submitChoices', evaluationPayload);
+        socketServerMock.emit('qcmSubmit', evaluationPayload);
         socketServerMock.emit('timerTick', timerPayload);
 
         expect(timerServiceSpy.startTimer).toHaveBeenCalled();
@@ -242,7 +242,7 @@ describe('GamePageComponent', () => {
         socketServerMock.emit('startTimer', timerPayload);
         socketServerMock.emit('startGame', payload);
         socketServerMock.emit('nextQuestion', payload);
-        socketServerMock.emit('submitChoices', evaluationPayload);
+        socketServerMock.emit('qcmSubmit', evaluationPayload);
         socketServerMock.emit('timerTick', timerPayload);
 
         expect(component['router'].navigate).toHaveBeenCalled();

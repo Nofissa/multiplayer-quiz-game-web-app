@@ -3,6 +3,7 @@ import { PlayerListDisplayOptions } from '@app/interfaces/player-list-display-op
 import { GameServicesProvider } from '@app/providers/game-services.provider';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
+import { PlayerService } from '@app/services/player/player.service';
 import { Player } from '@common/player';
 import { PlayerState } from '@common/player-state';
 import { Subscription } from 'rxjs';
@@ -27,10 +28,12 @@ export class PlayerListComponent implements OnInit, OnDestroy {
 
     private readonly gameHttpService: GameHttpService;
     private readonly gameService: GameService;
+    private readonly playerService: PlayerService;
 
     constructor(gameServicesProvider: GameServicesProvider) {
         this.gameHttpService = gameServicesProvider.gameHttpService;
         this.gameService = gameServicesProvider.gameService;
+        this.playerService = gameServicesProvider.playerService;
     }
 
     ngOnInit() {
@@ -51,7 +54,7 @@ export class PlayerListComponent implements OnInit, OnDestroy {
     }
 
     banPlayer(player: Player) {
-        this.gameService.playerBan(this.pin, player.username);
+        this.playerService.playerBan(this.pin, player.username);
     }
 
     private upsertPlayer(player: Player) {
@@ -80,7 +83,7 @@ export class PlayerListComponent implements OnInit, OnDestroy {
 
     private setupSubscription(pin: string) {
         this.eventSubscriptions.push(
-            this.gameService.onSubmitChoices(pin, (evaluation) => {
+            this.gameService.onQcmSubmit(pin, (evaluation) => {
                 this.upsertPlayer(evaluation.player);
             }),
 
@@ -88,11 +91,11 @@ export class PlayerListComponent implements OnInit, OnDestroy {
                 this.upsertPlayer(player);
             }),
 
-            this.gameService.onPlayerBan(pin, (player) => {
+            this.playerService.onPlayerBan(pin, (player) => {
                 this.upsertPlayer(player);
             }),
 
-            this.gameService.onPlayerAbandon(pin, (player) => {
+            this.playerService.onPlayerAbandon(pin, (player) => {
                 this.upsertPlayer(player);
             }),
 
