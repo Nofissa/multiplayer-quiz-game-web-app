@@ -185,6 +185,19 @@ export class GameService {
         return Array.from(game.currentQuestionSubmissions.values());
     }
 
+    qrlInputChange(client: Socket, pin: string, isTyping: boolean): boolean[] {
+        const game = this.getGame(pin);
+        const clientPlayers = game.clientPlayers;
+
+        clientPlayers.get(client.id).player.isTyping = isTyping;
+
+        if (isTyping) {
+            clientPlayers.get(client.id).player.hasInteracted = true;
+        }
+
+        return Array.from(clientPlayers.values()).map((x) => x.player.isTyping);
+    }
+
     endGame(client: Socket, pin: string): void {
         const game = this.getGame(pin);
 
