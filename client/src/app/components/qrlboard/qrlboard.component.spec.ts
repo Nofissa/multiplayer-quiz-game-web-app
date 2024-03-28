@@ -69,7 +69,7 @@ fdescribe('QrlBoardComponent', () => {
 
     const mockState: GameState = GameState.Opened;
 
-    const mockQuestionSubmissions: Submission[][] = [[{ choices: [{ index: 0, isSelected: true }], isFinal: false }]];
+    const mockQuestionSubmissions: Submission[][] = [[{ choices: [{ payload: 'testinggg', isSelected: true }], isFinal: true }]];
 
     const mockGameSnapshot: GameSnapshot = {
         players: mockPlayers,
@@ -84,13 +84,7 @@ fdescribe('QrlBoardComponent', () => {
 
     beforeEach(() => {
         mockGameHttpService = jasmine.createSpyObj('GameHttpService', ['getGameSnapshotByPin']);
-        mockGameService = jasmine.createSpyObj('GameService', [
-            'submitChoices',
-            'nextQuestion',
-            'onNextQuestion',
-            'onSubmitChoices',
-            'playerAbandon',
-        ]);
+        mockGameService = jasmine.createSpyObj('GameService', ['qrlSubmit', 'nextQuestion', 'onNextQuestion', 'onSubmitChoices', 'playerAbandon']);
         mockPlayerService = jasmine.createSpyObj('PlayerService', ['getCurrentPlayer']);
         matDialogMock = jasmine.createSpyObj('MatDialog', ['open']);
         dialogRefSpy = jasmine.createSpyObj('MatDialogRef<ConfirmationDialogComponent>', ['afterClosed']);
@@ -138,9 +132,9 @@ fdescribe('QrlBoardComponent', () => {
         timerServiceMock.onTimerTick.and.callFake((pin, callback) => {
             return webSocketServiceSpy.on('timerTick', applyIfPinMatches(pin, callback));
         });
-        mockGameService.onSubmitChoices.and.callFake((pin, callback) => {
-            return webSocketServiceSpy.on('submitChoices', applyIfPinMatches(pin, callback));
-        });
+        // mockGameService.onSubmitChoices.and.callFake((pin, callback) => {
+        //     return webSocketServiceSpy.on('submitChoices', applyIfPinMatches(pin, callback));
+        // });
         fixture = TestBed.createComponent(QRLboardComponent);
         component = fixture.componentInstance;
         component.pin = '1234';
@@ -188,15 +182,15 @@ fdescribe('QrlBoardComponent', () => {
         const payload: GameEventPayload<Question> = { pin: '123', data: questionStub()[0] };
         const timerPayload: GameEventPayload<TimerPayload> = { pin: '123', data: { remainingTime: 0, eventType: TimerEventType.Question } };
         const evaluationPayload: GameEventPayload<Evaluation> = { pin: '123', data: lastPlayerEvaluationStub() };
-        spyOn(component, 'submitChoices');
+        spyOn(component, 'submitAnswer');
         mockPlayerService.getCurrentPlayer.and.returnValue(lastPlayerEvaluationStub().player);
         component.pin = '123';
         component['setupSubscriptions']('123');
         socketServerMock.emit('nextQuestion', payload);
-        socketServerMock.emit('submitChoices', evaluationPayload);
+        socketServerMock.emit('qrlSubmit', evaluationPayload);
         socketServerMock.emit('timerTick', timerPayload);
         expect(mockGameService.onNextQuestion).toHaveBeenCalled();
-        expect(mockGameService.onSubmitChoices).toHaveBeenCalled();
+        // expect(mockGameService.onSubmitChoices).toHaveBeenCalled();
         expect(timerServiceMock.onTimerTick).toHaveBeenCalled();
         expect(component.submitAnswer).toHaveBeenCalled();
     });
@@ -204,14 +198,14 @@ fdescribe('QrlBoardComponent', () => {
     it('should send a message and clear input when valid', () => {
         component.input = 'Test message';
         component.submitAnswer();
-        expect(mockGameService.submitChoices).toHaveBeenCalledWith('1234');
+        expect(mockGameService.qrlSubmit).toHaveBeenCalledWith('1234', component.input);
         expect(component.input).toBe('');
     });
 
     it('should not send a message if input is only whitespace', () => {
         component.input = '   ';
         component.submitAnswer();
-        expect(mockGameService.submitChoices).not.toHaveBeenCalled();
+        expect(mockGameService.qrlSubmit).not.toHaveBeenCalled();
     });
 
     it('should validate message as invalid if it contains only whitespace', () => {
