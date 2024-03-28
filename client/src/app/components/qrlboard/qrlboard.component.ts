@@ -97,11 +97,39 @@ export class QRLboardComponent implements OnInit, OnDestroy {
         this.gameService.qrlInputChange(this.pin, this.isTyping);
     }
 
-    blinkTextArea() {
-        this.textarea.nativeElement.classList.add('blink');
-        setTimeout(() => {
-            this.textarea.nativeElement.classList.remove('blink');
-        }, THREE_SECONDS_MS);
+    blinkTextArea(grade: number) {
+        const grade50 = 50;
+        const grade100 = 100;
+        switch (grade) {
+            case 0: {
+                this.textarea.nativeElement.classList.add('blink-red');
+                setTimeout(() => {
+                    this.textarea.nativeElement.classList.remove('blink-red');
+                }, THREE_SECONDS_MS);
+                break;
+            }
+            case grade50: {
+                this.textarea.nativeElement.classList.add('blink-yellow');
+                setTimeout(() => {
+                    this.textarea.nativeElement.classList.remove('blink-yellow');
+                }, THREE_SECONDS_MS);
+                break;
+            }
+            case grade100: {
+                this.textarea.nativeElement.classList.add('blink');
+                setTimeout(() => {
+                    this.textarea.nativeElement.classList.remove('blink');
+                }, THREE_SECONDS_MS);
+                this.showNotification100 = true;
+                setTimeout(() => {
+                    this.showNotification100 = false;
+                }, THREE_SECONDS_MS);
+                break;
+            }
+            default: {
+                break;
+            }
+        }
     }
 
     ngOnDestroy() {
@@ -176,11 +204,7 @@ export class QRLboardComponent implements OnInit, OnDestroy {
             //         this.questionIsOver = true;
             //         if (this.player) {
             //             if (this.isTest) {
-            //                 this.blinkTextArea();
-            //                 this.showNotification100 = true;
-            //                 setTimeout(() => {
-            //                     this.showNotification100 = false;
-            //                 }, THREE_SECONDS_MS);
+            //                 this.blinkTextArea(100);
             //                 this.player.score += question.points;
             //             } else {
             //                 this.player.score += this.cachedEvaluation?.score ?? 0;

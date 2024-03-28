@@ -240,8 +240,9 @@ fdescribe('QrlBoardComponent', () => {
     });
 
     it('should add and remove blink class after a delay', fakeAsync(() => {
+        const grade100 = 100;
         const textarea = fixture.nativeElement.querySelector('textarea');
-        component.blinkTextArea();
+        component.blinkTextArea(grade100);
 
         expect(textarea.classList.contains('blink')).toBe(true);
 

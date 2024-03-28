@@ -163,25 +163,33 @@ textarea.blink {
     }
 }
 
-// @keyframes blinkAnimation {
-//     0%,
-//     100% {
-//         background-color: transparent;
-//     }
-//     50% {
-//         background-color: red;
-//     }
-// }
+textarea.blink-yellow {
+    animation: blinkAnimationYellow 1.5s 3;
+}
 
-// @keyframes blinkAnimation {
-//     0%,
-//     100% {
-//         background-color: transparent;
-//     }
-//     50% {
-//         background-color: yellow;
-//     }
-// }
+@keyframes blinkAnimationYellow {
+    0%,
+    100% {
+        background-color: transparent;
+    }
+    50% {
+        background-color: rgb(205, 207, 49);
+    }
+}
+
+textarea.blink-red {
+    animation: blinkAnimation 1.5s 3;
+}
+
+@keyframes blinkAnimationRed {
+    0%,
+    100% {
+        background-color: transparent;
+    }
+    50% {
+        background-color: rgb(175, 46, 46);
+    }
+}
 
 ::ng-deep .mat-mdc-text-field-wrapper {
     height: 160px !important;
