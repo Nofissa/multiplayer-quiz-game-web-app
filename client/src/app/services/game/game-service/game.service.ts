@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
-import { Evaluation } from '@common/evaluation';
 import { GameState } from '@common/game-state';
 import { Player } from '@common/player';
+import { QcmEvaluation } from '@common/qcm-evaluation';
+import { QrlEvaluation } from '@common/qrl-evaluation';
+import { QrlSubmission } from '@common/qrl-submission';
 import { QuestionPayload } from '@common/question-payload';
 import { Submission } from '@common/submission';
 import { Subscription } from 'rxjs';
@@ -58,7 +60,7 @@ export class GameService {
         this.webSocketService.emit('qcmSubmit', { pin });
     }
 
-    onQcmSubmit(pin: string, callback: (evaluation: Evaluation) => void): Subscription {
+    onQcmSubmit(pin: string, callback: (evaluation: QcmEvaluation) => void): Subscription {
         return this.webSocketService.on('qcmSubmit', applyIfPinMatches(pin, callback));
     }
 
@@ -66,7 +68,7 @@ export class GameService {
         this.webSocketService.emit('qrlInputChange', { pin, isTyping });
     }
 
-    onQrlInputChange(pin: string, callback: () => void): Subscription {
+    onQrlInputChange(pin: string, callback: (activePlayers: boolean[]) => void): Subscription {
         return this.webSocketService.on('qrlInputChange', applyIfPinMatches(pin, callback));
     }
 
@@ -74,8 +76,16 @@ export class GameService {
         this.webSocketService.emit('qrlSubmit', { pin, text });
     }
 
-    onQrlSubmit(pin: string, callback: () => void): Subscription {
+    onQrlSubmit(pin: string, callback: (qrlSubmission: QrlSubmission) => void): Subscription {
         return this.webSocketService.on('qrlSubmit', applyIfPinMatches(pin, callback));
+    }
+
+    qrlEvaluate(pin: string, evaluation: QrlEvaluation) {
+        this.webSocketService.emit('qrlEvaluate', { pin, evaluation });
+    }
+
+    onQrlEvaluate(pin: string, callback: (evaluation: QrlEvaluation) => void): Subscription {
+        return this.webSocketService.on('qrlEvaluate', applyIfPinMatches(pin, callback));
     }
 
     nextQuestion(pin: string) {

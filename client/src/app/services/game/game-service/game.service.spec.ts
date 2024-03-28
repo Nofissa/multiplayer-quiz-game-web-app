@@ -3,7 +3,7 @@ import { firstPlayerStub } from '@app/TestStubs/player.stubs';
 import { questionStub } from '@app/TestStubs/question.stubs';
 import { SocketServerMock } from '@app/mocks/socket-server-mock';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
-import { Evaluation } from '@common/evaluation';
+import { QcmEvaluation } from '@common/qcm-evaluation';
 import { GameEventPayload } from '@common/game-event-payload';
 import { GameState } from '@common/game-state';
 import { Question } from '@common/question';
@@ -195,8 +195,8 @@ describe('GameService', () => {
 
     it('should subscribe to submitChoices event and call the callback if pin matches', () => {
         gameService.onQcmSubmit(stubData.pin1, stubData.callback);
-        const evaluation: Evaluation = { player: firstPlayerStub(), correctAnswers: [], score: 80, isFirstCorrect: false, isLast: false };
-        const payload: GameEventPayload<Evaluation> = { pin: stubData.pin1, data: evaluation };
+        const evaluation: QcmEvaluation = { player: firstPlayerStub(), correctAnswers: [], score: 80, isFirstCorrect: false, isLast: false };
+        const payload: GameEventPayload<QcmEvaluation> = { pin: stubData.pin1, data: evaluation };
         socketServerMock.emit(stubData.submitChoicesEventName, payload);
 
         expect(stubData.callback).toHaveBeenCalledWith(evaluation);
@@ -204,8 +204,8 @@ describe('GameService', () => {
 
     it('should subscribe to submitChoices event and not call the callback if pin does not match', () => {
         gameService.onQcmSubmit(stubData.pin1, stubData.callback);
-        const evaluation: Evaluation = { player: firstPlayerStub(), correctAnswers: [], score: 80, isFirstCorrect: false, isLast: false };
-        const payload: GameEventPayload<Evaluation> = { pin: stubData.pin2, data: evaluation };
+        const evaluation: QcmEvaluation = { player: firstPlayerStub(), correctAnswers: [], score: 80, isFirstCorrect: false, isLast: false };
+        const payload: GameEventPayload<QcmEvaluation> = { pin: stubData.pin2, data: evaluation };
         socketServerMock.emit(stubData.submitChoicesEventName, payload);
 
         expect(stubData.callback).not.toHaveBeenCalled();
