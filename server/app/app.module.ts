@@ -11,9 +11,13 @@ import { QuestionService } from './services/question/question.service';
 import { QuizService } from './services/quiz/quiz.service';
 import { AuthService } from './services/auth/auth.service';
 import { GameService } from './services/game/game.service';
-import { GameGateway } from './gateways/game.gateway';
+import { PlayerService } from './services/player/player.service';
 import { TimerService } from './services/timer/timer.service';
 import { MessageService } from './services/message/message.service';
+import { GameGateway } from './gateways/game.gateway';
+import { MessageGateway } from './gateways/message.gateway';
+import { PlayerGateway } from './gateways/player.gateway';
+import { TimerGateway } from './gateways/timer.gateway';
 
 @Module({
     imports: [
@@ -31,6 +35,19 @@ import { MessageService } from './services/message/message.service';
         ]),
     ],
     controllers: [AuthController, GameController, QuestionController, QuizController],
-    providers: [GameGateway, AuthService, GameService, MessageService, QuestionService, QuizService, TimerService, Logger],
+    providers: [
+        GameGateway,
+        MessageGateway,
+        PlayerGateway,
+        TimerGateway,
+        AuthService,
+        GameService,
+        MessageService,
+        PlayerService,
+        QuestionService,
+        QuizService,
+        TimerService,
+        Logger,
+    ],
 })
 export class AppModule {}
