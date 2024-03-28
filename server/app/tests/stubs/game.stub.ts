@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */ // used for the socket (i only want the id here)
 import { ClientPlayer } from '@app/classes/client-player';
 import { Game } from '@app/classes/game';
+import { qrlEvaluationStub } from '@app/tests/stubs/qrl-evaluation.stub';
 import { GameState } from '@common/game-state';
+import { QrlEvaluation } from '@common/qrl-evaluation';
 import { Submission } from '@common/submission';
 import { clientPlayerStub } from './client.player.stub';
 import { quizStub } from './quiz.stubs';
@@ -16,7 +18,8 @@ export const gameStub = (): Game => {
         chatlogs: [],
         currentQuestionIndex: 0,
         clientPlayers: new Map<string, ClientPlayer>([['playerId', clientPlayerStub()]]),
-        questionSubmissions: [new Map<string, Submission>([['playerId', submissionStub()]])],
+        qcmSubmissions: [new Map<string, Submission>([['playerId', submissionStub()]])],
+        qrlSubmissions: [new Map<string, QrlEvaluation>([['playerId', qrlEvaluationStub()]])],
         loadNextQuestion() {
             this.questionSubmissions.push(new Map());
             this.currentQuestionIndex++;
@@ -24,11 +27,11 @@ export const gameStub = (): Game => {
         get currentQuestion() {
             return this.quiz.questions[this.currentQuestionIndex];
         },
-        get allSubmissions() {
-            return this.questionSubmissions;
-        },
-        get currentQuestionSubmissions() {
+        get currentQuestionQcmSubmissions() {
             return this.questionSubmissions[this.currentQuestionIndex];
+        },
+        get currentQuestionQrlSubmissions() {
+            return this.qrlSubmissions[this.currentQuestionIndex];
         },
     };
 };

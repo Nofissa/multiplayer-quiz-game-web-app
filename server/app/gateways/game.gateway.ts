@@ -4,8 +4,9 @@ import { Evaluation } from '@common/evaluation';
 import { GameEventPayload } from '@common/game-event-payload';
 import { GameState } from '@common/game-state';
 import { Player } from '@common/player';
-import { QuestionPayload } from '@common/question-payload';
+import { QrlEvaluation } from '@common/qrl-evaluation';
 import { QrlSubmission } from '@common/qrl-submission';
+import { QuestionPayload } from '@common/question-payload';
 import { Submission } from '@common/submission';
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
@@ -90,13 +91,13 @@ export class GameGateway implements OnGatewayDisconnect {
         }
     }
 
-    @SubscribeMessage('submitChoices')
-    submitChoices(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
+    @SubscribeMessage('qcmSubmit')
+    qcmSubmit(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
         try {
             const evaluation = this.gameService.evaluateChoices(client, pin);
             const payload: GameEventPayload<Evaluation> = { pin, data: evaluation };
 
-            this.server.to(pin).emit('submitChoices', payload);
+            this.server.to(pin).emit('qcmSubmit', payload);
         } catch (error) {
             client.emit('error', error.message);
         }
@@ -113,14 +114,14 @@ export class GameGateway implements OnGatewayDisconnect {
         }
     }
 
-    @SubscribeMessage('toggleSelectChoice')
-    toggleSelectChoice(@ConnectedSocket() client: Socket, @MessageBody() { pin, choiceIndex }: { pin: string; choiceIndex: number }) {
+    @SubscribeMessage('qcmToggleChoice')
+    qcmToggleChoice(@ConnectedSocket() client: Socket, @MessageBody() { pin, choiceIndex }: { pin: string; choiceIndex: number }) {
         try {
-            const submission = this.gameService.toggleSelectChoice(client, pin, choiceIndex);
+            const submission = this.gameService.qcmToggleChoice(client, pin, choiceIndex);
             const organizer = this.gameService.getOrganizer(pin);
             const payload: GameEventPayload<Submission[]> = { pin, data: submission };
 
-            organizer.emit('toggleSelectChoice', payload);
+            organizer.emit('qcmToggleChoice', payload);
         } catch (error) {
             client.emit('error', error.message);
         }
@@ -152,11 +153,23 @@ export class GameGateway implements OnGatewayDisconnect {
     @SubscribeMessage('qrlSubmit')
     qrlSubmit(@ConnectedSocket() client: Socket, @MessageBody() { pin, answer }: { pin: string; answer: string }) {
         try {
+            const submission = this.gameService.qrlSubmit(client, pin, answer);
             const organizer = this.gameService.getOrganizer(pin);
-            const submission: QrlSubmission = { answer, clientId: client.id };
             const payload: GameEventPayload<QrlSubmission> = { pin, data: submission };
 
             organizer.emit('qrlSubmit', payload);
+        } catch (error) {
+            client.emit('error', error.message);
+        }
+    }
+
+    @SubscribeMessage('qrlEvaluate')
+    qrlEvaluate(@ConnectedSocket() client: Socket, @MessageBody() { pin, qrlEvaluation }: { pin: string; qrlEvaluation: QrlEvaluation }) {
+        try {
+            qrlEvaluation = this.gameService.qrlEvaluate(client, pin, qrlEvaluation);
+            const payload: GameEventPayload<QrlEvaluation> = { pin, data: qrlEvaluation };
+
+            this.server.to(pin).emit('qrlEvaluate', payload);
         } catch (error) {
             client.emit('error', error.message);
         }

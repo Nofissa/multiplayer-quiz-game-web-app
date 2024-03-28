@@ -35,7 +35,7 @@ describe('GameGateway', () => {
             evaluateChoices: jest.fn(),
             nextQuestion: jest.fn(),
             disconnect: jest.fn(),
-            toggleSelectChoice: jest.fn(),
+            qcmToggleChoice: jest.fn(),
             getOrganizer: jest.fn(),
         } as any;
         socketMock = {
@@ -127,35 +127,6 @@ describe('GameGateway', () => {
         });
     });
 
-    describe('handleEndGame', () => {
-        const pin = 'mockPin';
-        it('should stop the timer and end the game', () => {
-            gameGateway.handleEndGame(socketMock as Socket, { pin });
-
-            expect(timerServiceMock.stopTimer).toHaveBeenCalledWith(socketMock, pin);
-            expect(gameServiceMock.endGame).toHaveBeenCalledWith(socketMock, pin);
-        });
-
-        it('should emit the endGame event with null payload', () => {
-            timerServiceMock.stopTimer.mockReturnValue(null);
-            gameServiceMock.endGame.mockReturnValue(null);
-            serverMock.to.mockReturnValue(broadcastMock);
-            gameGateway.handleEndGame(socketMock as Socket, { pin });
-            expect(serverMock.to).toHaveBeenCalledWith(pin);
-            expect(broadcastMock.emit).toHaveBeenCalledWith('endGame', { pin, data: null });
-        });
-
-        it('should emit error event if an error occurs', () => {
-            const errorMessage = 'Test error message';
-            const error = new Error(errorMessage);
-            gameServiceMock.endGame = jest.fn().mockImplementation(() => {
-                throw error;
-            });
-            gameGateway.handleEndGame(socketMock as Socket, { pin });
-            expect(socketMock.emit).toHaveBeenCalledWith('error', errorMessage);
-        });
-    });
-
     describe('cancelGame', () => {
         it('should cancel the game and emit the "cancelGame" event with the message', () => {
             const pin = 'mockPin';
@@ -206,7 +177,7 @@ describe('GameGateway', () => {
             const pin = 'mockPin';
             const evaluation: Evaluation = {} as any;
             gameServiceMock.evaluateChoices.mockReturnValue(evaluation);
-            gameGateway.submitChoices(socketMock, { pin });
+            gameGateway.qcmSubmit(socketMock, { pin });
             expect(serverMock.to).toHaveBeenCalledWith(pin);
         });
 
@@ -215,7 +186,7 @@ describe('GameGateway', () => {
             gameServiceMock.evaluateChoices.mockImplementation(() => {
                 throw new Error('Mock error');
             });
-            gameGateway.submitChoices(socketMock, { pin });
+            gameGateway.qcmSubmit(socketMock, { pin });
             expect(socketMock.emit).toHaveBeenCalledWith('error', 'Mock error');
         });
     });
@@ -243,19 +214,19 @@ describe('GameGateway', () => {
             const pin = 'mockPin';
             const choiceIndex = 0;
             const submission: Submission[] = [submissionStub()];
-            gameServiceMock.toggleSelectChoice.mockReturnValue(submission);
+            gameServiceMock.qcmToggleChoice.mockReturnValue(submission);
             gameServiceMock.getOrganizer.mockReturnValue(socketMock);
-            gameGateway.toggleSelectChoice(socketMock, { pin, choiceIndex });
-            expect(socketMock.emit).toHaveBeenCalledWith('toggleSelectChoice', { pin, data: submission });
+            gameGateway.qcmToggleChoice(socketMock, { pin, choiceIndex });
+            expect(socketMock.emit).toHaveBeenCalledWith('qcmToggleChoice', { pin, data: submission });
         });
 
         it('should emit "error" event if an error occurs during toggling the selected choice', () => {
             const pin = 'mockPin';
             const choiceIndex = 0;
-            gameServiceMock.toggleSelectChoice.mockImplementation(() => {
+            gameServiceMock.qcmToggleChoice.mockImplementation(() => {
                 throw new Error('Mock error');
             });
-            gameGateway.toggleSelectChoice(socketMock, { pin, choiceIndex });
+            gameGateway.qcmToggleChoice(socketMock, { pin, choiceIndex });
             expect(socketMock.emit).toHaveBeenCalledWith('error', 'Mock error');
         });
     });

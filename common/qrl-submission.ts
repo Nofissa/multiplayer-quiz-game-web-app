@@ -1,4 +1,4 @@
 export interface QrlSubmission {
-    answer: string;
     clientId: string;
+    answer: string;
 }
