@@ -12,7 +12,7 @@ import { GameService } from '@app/services/game/game-service/game.service';
 import { PlayerService } from '@app/services/player/player.service';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
-import { QcmEvaluation } from '@common/evaluation';
+import { QcmEvaluation } from '@common/qcm-evaluation';
 import { GameEventPayload } from '@common/game-event-payload';
 import { GameSnapshot } from '@common/game-snapshot';
 import { GameState } from '@common/game-state';

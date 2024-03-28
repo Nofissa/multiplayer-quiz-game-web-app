@@ -1,4 +1,4 @@
-import { QcmEvaluation } from '@common/evaluation';
+import { QcmEvaluation } from '@common/qcm-evaluation';
 import { firstChoiceStub } from './choices.stubs';
 import { playerstub } from './player.stub';
 

@@ -8,7 +8,7 @@ import { GameService } from '@app/services/game/game-service/game.service';
 import { KeyBindingService } from '@app/services/key-binding/key-binding.service';
 import { PlayerService } from '@app/services/player/player.service';
 import { TimerService } from '@app/services/timer/timer.service';
-import { QcmEvaluation } from '@common/evaluation';
+import { QcmEvaluation } from '@common/qcm-evaluation';
 import { Player } from '@common/player';
 import { Question } from '@common/question';
 import { TimerEventType } from '@common/timer-event-type';

@@ -1,4 +1,4 @@
-import { QcmEvaluation } from '@common/evaluation';
+import { QcmEvaluation } from '@common/qcm-evaluation';
 import { firstPlayerStub } from './player.stubs';
 
 export const firstPlayerEvaluationStub = (): QcmEvaluation => {
