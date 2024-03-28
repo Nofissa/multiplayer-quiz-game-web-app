@@ -9,14 +9,16 @@ import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { PlayerService } from '@app/services/player/player.service';
 import { TimerService } from '@app/services/timer/timer.service';
-import { Evaluation } from '@common/evaluation';
 import { Player } from '@common/player';
+import { QrlEvaluation } from '@common/qrl-evaluation';
 import { Question } from '@common/question';
 import { TimerEventType } from '@common/timer-event-type';
 import { Subscription } from 'rxjs';
 
 const MAX_MESSAGE_LENGTH = 200;
 const THREE_SECONDS_MS = 3000;
+const GRADE50 = 50;
+const GRADE100 = 100;
 
 @Component({
     selector: 'app-qrlboard',
@@ -56,7 +58,7 @@ export class QRLboardComponent implements OnInit, OnDestroy {
     question: Question;
     questionIsOver: boolean;
     hasSubmitted: boolean;
-    cachedEvaluation: Evaluation | null = null;
+    cachedEvaluation: QrlEvaluation | null = null;
     formGroup: FormGroup;
 
     readonly gameHttpService: GameHttpService;
@@ -97,8 +99,6 @@ export class QRLboardComponent implements OnInit, OnDestroy {
     }
 
     blinkTextArea(grade: number) {
-        const grade50 = 50;
-        const grade100 = 100;
         switch (grade) {
             case 0: {
                 this.textarea.nativeElement.classList.add('blink-red');
@@ -107,14 +107,14 @@ export class QRLboardComponent implements OnInit, OnDestroy {
                 }, THREE_SECONDS_MS);
                 break;
             }
-            case grade50: {
+            case GRADE50: {
                 this.textarea.nativeElement.classList.add('blink-yellow');
                 setTimeout(() => {
                     this.textarea.nativeElement.classList.remove('blink-yellow');
                 }, THREE_SECONDS_MS);
                 break;
             }
-            case grade100: {
+            case GRADE100: {
                 this.textarea.nativeElement.classList.add('blink');
                 setTimeout(() => {
                     this.textarea.nativeElement.classList.remove('blink');
@@ -195,22 +195,22 @@ export class QRLboardComponent implements OnInit, OnDestroy {
             this.gameService.onNextQuestion(pin, (data) => {
                 this.loadNextQuestion(data.question);
             }),
-            // this.gameService.onQrlEvaluate(pin, (evaluation) => {
-            //     if (this.playerService.getCurrentPlayer(pin)?.socketId === evaluation.player.socketId) {
-            //         this.cachedEvaluation = evaluation;
-            //     }
-            //     if (evaluation.isLast) {
-            //         this.questionIsOver = true;
-            //         if (this.player) {
-            //             if (this.isTest) {
-            //                 this.blinkTextArea(100);
-            //                 this.player.score += question.points;
-            //             } else {
-            //                 this.player.score += this.cachedEvaluation?.score ?? 0;
-            //             }
-            //         }
-            //     }
-            // }),
+            this.gameService.onQrlEvaluate(pin, (evaluation) => {
+                if (this.playerService.getCurrentPlayer(pin)?.socketId === evaluation.clientId) {
+                    this.cachedEvaluation = evaluation;
+                }
+                if (evaluation.isLast) {
+                    this.questionIsOver = true;
+                    if (this.player) {
+                        if (this.isTest) {
+                            this.blinkTextArea(GRADE100);
+                            this.player.score += this.question.points;
+                        } else {
+                            this.player.score += this.cachedEvaluation?.score ?? 0;
+                        }
+                    }
+                }
+            }),
             this.timerService.onTimerTick(pin, (payload) => {
                 if (!payload.remainingTime && payload.eventType === TimerEventType.Question && !this.hasSubmitted) {
                     this.submitAnswer();
