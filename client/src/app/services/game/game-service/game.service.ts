@@ -2,10 +2,10 @@ import { Injectable } from '@angular/core';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
 import { GameState } from '@common/game-state';
-import { Grade } from '@common/grade';
 import { Player } from '@common/player';
 import { QcmEvaluation } from '@common/qcm-evaluation';
 import { QrlEvaluation } from '@common/qrl-evaluation';
+import { QrlSubmission } from '@common/qrl-submission';
 import { QuestionPayload } from '@common/question-payload';
 import { Submission } from '@common/submission';
 import { Subscription } from 'rxjs';
@@ -68,8 +68,7 @@ export class GameService {
         this.webSocketService.emit('qrlInputChange', { pin, isTyping });
     }
 
-    // TODO:
-    onQrlInputChange(pin: string, callback: () => void): Subscription {
+    onQrlInputChange(pin: string, callback: (activePlayers: boolean[]) => void): Subscription {
         return this.webSocketService.on('qrlInputChange', applyIfPinMatches(pin, callback));
     }
 
@@ -77,17 +76,15 @@ export class GameService {
         this.webSocketService.emit('qrlSubmit', { pin, text });
     }
 
-    // TODO:
-    onQrlSubmit(pin: string, callback: (qrlEval: QrlEvaluation) => void): Subscription {
+    onQrlSubmit(pin: string, callback: (qrlSubmission: QrlSubmission) => void): Subscription {
         return this.webSocketService.on('qrlSubmit', applyIfPinMatches(pin, callback));
     }
 
-    qrlEvaluate(pin: string, grade: Grade) {
-        this.webSocketService.emit('qrlEvaluate', { pin, grade });
+    qrlEvaluate(pin: string, evaluation: QrlEvaluation) {
+        this.webSocketService.emit('qrlEvaluate', { pin, evaluation });
     }
 
-    // TODO:
-    onQrlEvaluate(pin: string, callback: () => void): Subscription {
+    onQrlEvaluate(pin: string, callback: (evaluation: QrlEvaluation) => void): Subscription {
         return this.webSocketService.on('qrlEvaluate', applyIfPinMatches(pin, callback));
     }
 
