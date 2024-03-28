@@ -15,7 +15,7 @@ const mockChatlogs: Chatlog[] = [
 
 const mockState: GameState = GameState.Opened;
 
-const mockQuestionSubmissions: Submission[][] = [[{ choices: [{ index: 0, isSelected: true }], isFinal: false }]];
+const mockQuestionSubmissions: Submission[][] = [[{ choices: [{ payload: 0, isSelected: true }], isFinal: false }]];
 
 export const mockGameSnapshot = (): GameSnapshot[] => {
     return [

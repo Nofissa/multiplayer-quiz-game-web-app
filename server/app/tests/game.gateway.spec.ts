@@ -3,7 +3,7 @@
 import { GameGateway } from '@app/gateways/game.gateway';
 import { GameService } from '@app/services/game/game.service';
 import { TimerService } from '@app/services/timer/timer.service';
-import { Evaluation } from '@common/evaluation';
+import { QcmEvaluation } from '@common/qcm-evaluation';
 import { GameEventPayload } from '@common/game-event-payload';
 import { GameState } from '@common/game-state';
 import { QuestionPayload } from '@common/question-payload';
@@ -35,7 +35,7 @@ describe('GameGateway', () => {
             evaluateChoices: jest.fn(),
             nextQuestion: jest.fn(),
             disconnect: jest.fn(),
-            toggleSelectChoice: jest.fn(),
+            qcmToggleChoice: jest.fn(),
             getOrganizer: jest.fn(),
         } as any;
         socketMock = {
@@ -130,7 +130,7 @@ describe('GameGateway', () => {
     describe('handleEndGame', () => {
         const pin = 'mockPin';
         it('should stop the timer and end the game', () => {
-            gameGateway.handleEndGame(socketMock as Socket, { pin });
+            gameGateway.endGame(socketMock as Socket, { pin });
 
             expect(timerServiceMock.stopTimer).toHaveBeenCalledWith(socketMock, pin);
             expect(gameServiceMock.endGame).toHaveBeenCalledWith(socketMock, pin);
@@ -140,7 +140,7 @@ describe('GameGateway', () => {
             timerServiceMock.stopTimer.mockReturnValue(null);
             gameServiceMock.endGame.mockReturnValue(null);
             serverMock.to.mockReturnValue(broadcastMock);
-            gameGateway.handleEndGame(socketMock as Socket, { pin });
+            gameGateway.endGame(socketMock as Socket, { pin });
             expect(serverMock.to).toHaveBeenCalledWith(pin);
             expect(broadcastMock.emit).toHaveBeenCalledWith('endGame', { pin, data: null });
         });
@@ -151,7 +151,7 @@ describe('GameGateway', () => {
             gameServiceMock.endGame = jest.fn().mockImplementation(() => {
                 throw error;
             });
-            gameGateway.handleEndGame(socketMock as Socket, { pin });
+            gameGateway.endGame(socketMock as Socket, { pin });
             expect(socketMock.emit).toHaveBeenCalledWith('error', errorMessage);
         });
     });
@@ -204,9 +204,9 @@ describe('GameGateway', () => {
     describe('submitChoices', () => {
         it('should handle submitting choices and emit the "submitChoices" event with the correct payload', () => {
             const pin = 'mockPin';
-            const evaluation: Evaluation = {} as any;
+            const evaluation: QcmEvaluation = {} as any;
             gameServiceMock.evaluateChoices.mockReturnValue(evaluation);
-            gameGateway.submitChoices(socketMock, { pin });
+            gameGateway.qcmSubmit(socketMock, { pin });
             expect(serverMock.to).toHaveBeenCalledWith(pin);
         });
 
@@ -215,7 +215,7 @@ describe('GameGateway', () => {
             gameServiceMock.evaluateChoices.mockImplementation(() => {
                 throw new Error('Mock error');
             });
-            gameGateway.submitChoices(socketMock, { pin });
+            gameGateway.qcmSubmit(socketMock, { pin });
             expect(socketMock.emit).toHaveBeenCalledWith('error', 'Mock error');
         });
     });
@@ -243,19 +243,19 @@ describe('GameGateway', () => {
             const pin = 'mockPin';
             const choiceIndex = 0;
             const submission: Submission[] = [submissionStub()];
-            gameServiceMock.toggleSelectChoice.mockReturnValue(submission);
+            gameServiceMock.qcmToggleChoice.mockReturnValue(submission);
             gameServiceMock.getOrganizer.mockReturnValue(socketMock);
-            gameGateway.toggleSelectChoice(socketMock, { pin, choiceIndex });
-            expect(socketMock.emit).toHaveBeenCalledWith('toggleSelectChoice', { pin, data: submission });
+            gameGateway.qcmToggleChoice(socketMock, { pin, choiceIndex });
+            expect(socketMock.emit).toHaveBeenCalledWith('qcmToggleChoice', { pin, data: submission });
         });
 
         it('should emit "error" event if an error occurs during toggling the selected choice', () => {
             const pin = 'mockPin';
             const choiceIndex = 0;
-            gameServiceMock.toggleSelectChoice.mockImplementation(() => {
+            gameServiceMock.qcmToggleChoice.mockImplementation(() => {
                 throw new Error('Mock error');
             });
-            gameGateway.toggleSelectChoice(socketMock, { pin, choiceIndex });
+            gameGateway.qcmToggleChoice(socketMock, { pin, choiceIndex });
             expect(socketMock.emit).toHaveBeenCalledWith('error', 'Mock error');
         });
     });

@@ -50,6 +50,17 @@ export class TimerService {
 
         timer.stop();
     }
+    // client: Socket, pin: string
+    pauseTimer() {
+        // todo
+        return;
+    }
+
+    // client: Socket, pin: string
+    accelerateTimer() {
+        // todo
+        return;
+    }
 
     getTimer(pin: string): Timer | null {
         return this.timers.get(pin) || null;

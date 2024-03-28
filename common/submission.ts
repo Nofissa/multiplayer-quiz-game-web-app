@@ -1,7 +1,7 @@
 export interface Submission {
     choices: { 
-        index: number;
-        isSelected: boolean;
+        payload: number|string;
+        isSelected?: boolean;
     }[];
-    isFinal: boolean;
+    isFinal?: boolean;
 }
