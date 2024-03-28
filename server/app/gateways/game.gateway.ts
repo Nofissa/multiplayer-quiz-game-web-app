@@ -5,6 +5,7 @@ import { GameEventPayload } from '@common/game-event-payload';
 import { GameState } from '@common/game-state';
 import { Player } from '@common/player';
 import { QuestionPayload } from '@common/question-payload';
+import { QrlSubmission } from '@common/qrl-submission';
 import { Submission } from '@common/submission';
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
@@ -152,7 +153,8 @@ export class GameGateway implements OnGatewayDisconnect {
     qrlSubmit(@ConnectedSocket() client: Socket, @MessageBody() { pin, answer }: { pin: string; answer: string }) {
         try {
             const organizer = this.gameService.getOrganizer(pin);
-            const payload: GameEventPayload<string> = { pin, data: answer };
+            const submission: QrlSubmission = { answer, clientId: client.id };
+            const payload: GameEventPayload<QrlSubmission> = { pin, data: submission };
 
             organizer.emit('qrlSubmit', payload);
         } catch (error) {
