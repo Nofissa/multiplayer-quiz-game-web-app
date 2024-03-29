@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { MessageGetaway } from '@app/gateways/message.gateway';
+import { MessageGateway } from '@app/gateways/message.gateway';
 import { MessageService } from '@app/services/message/message.service';
 import { Chatlog } from '@common/chatlog';
 import { Server, Socket } from 'socket.io';
 
 describe('MessageGateway', () => {
-    let messageGateway: MessageGetaway;
+    let messageGateway: MessageGateway;
     let messageService: jest.Mocked<MessageService>;
     let socketMock: jest.Mocked<Socket>;
     let serverMock: jest.Mocked<Server>;
@@ -25,7 +25,7 @@ describe('MessageGateway', () => {
             to: jest.fn(),
             socketsLeave: jest.fn(),
         } as any;
-        messageGateway = new MessageGetaway(messageService);
+        messageGateway = new MessageGateway(messageService);
         messageGateway.server = serverMock;
     });
 

@@ -12,7 +12,7 @@ import { Server, Socket } from 'socket.io';
         credentials: false,
     },
 })
-export class MessageGetaway {
+export class MessageGateway {
     @WebSocketServer()
     server: Server;
 
