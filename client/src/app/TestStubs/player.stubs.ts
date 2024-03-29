@@ -1,7 +1,16 @@
 import { PlayerState } from '@common/player-state';
 
 export const firstPlayerStub = () => {
-    return { socketId: '1234', username: 'Joe', state: PlayerState.Playing, score: 20, speedAwardCount: 12 };
+    return {
+        socketId: '1234',
+        username: 'Joe',
+        state: PlayerState.Playing,
+        score: 20,
+        speedAwardCount: 12,
+        isMuted: false,
+        isSelected: false,
+        isSubmitted: false,
+    };
 };
 
 export const secondPlayerStub = () => {
@@ -11,5 +20,8 @@ export const secondPlayerStub = () => {
         state: PlayerState.Abandonned,
         score: 20,
         speedAwardCount: 12,
+        isMuted: true,
+        isSelected: false,
+        isSubmitted: false,
     };
 };

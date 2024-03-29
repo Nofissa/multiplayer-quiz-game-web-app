@@ -44,11 +44,15 @@ mat-list-item {
 h4 {
     margin: 10px 0px;
     font-weight: bold;
-    color: var(--secondary-fg-color)
+    color: var(--secondary-fg-color);
 }
 
 .playing .player-name {
     color: green;
+}
+
+.playing .player-name-muted {
+    color: red;
 }
 
 .abandoned .player-name {

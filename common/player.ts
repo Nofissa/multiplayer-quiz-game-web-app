@@ -6,4 +6,7 @@ export interface Player {
     state: PlayerState;
     score: number;
     speedAwardCount: number;
+    isMuted?: boolean;
+    isSelected?: boolean;
+    isSubmitted?: boolean;
 }

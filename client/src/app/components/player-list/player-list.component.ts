@@ -57,6 +57,10 @@ export class PlayerListComponent implements OnInit, OnDestroy {
         this.playerService.playerBan(this.pin, player.username);
     }
 
+    mutePlayer(player: Player) {
+        this.playerService.playerMute(this.pin, player.username);
+    }
+
     private upsertPlayer(player: Player) {
         const index = this.players.findIndex((x) => x.socketId === player.socketId);
 
@@ -96,6 +100,10 @@ export class PlayerListComponent implements OnInit, OnDestroy {
             }),
 
             this.playerService.onPlayerAbandon(pin, (player) => {
+                this.upsertPlayer(player);
+            }),
+
+            this.playerService.onPlayerMute(pin, (player) => {
                 this.upsertPlayer(player);
             }),
 
