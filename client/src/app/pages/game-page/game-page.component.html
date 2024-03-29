@@ -5,7 +5,11 @@
     <app-nav-header></app-nav-header>
     <span *ngIf="isTest" class="test-mode">MODE TEST</span>
     <div
-        [ngClass]="{'game-container': hasStarted && !isStarting && !isLoadingNextQuestion, 'hidden': !hasStarted || isStarting || isLoadingNextQuestion}">
+        [ngClass]="{
+            'game-container': hasStarted && !isStarting && !isLoadingNextQuestion,
+            hidden: !hasStarted || isStarting || isLoadingNextQuestion
+        }"
+    >
         <div class="game-area">
             <app-game-board [pin]="pin" [isTest]="isTest"></app-game-board>
         </div>
@@ -14,18 +18,15 @@
         </div>
     </div>
     <div class="transition-container">
-        <app-game-transition [pin]="pin" [displayOptions]="{transitionalOnly: true}"></app-game-transition>
+        <app-game-transition [pin]="pin" [displayOptions]="{ transitionalOnly: true }"></app-game-transition>
     </div>
     <div class="" *ngIf="isTest && !isStarting && !isLoadingNextQuestion">
         <div class="buttons-wrapper">
-            <button class="start-button" *ngIf="!hasStarted" mat-raised-button (click)="startGame()">Commencer la
-                partie</button>
-            <button class="next-button" mat-raised-button *ngIf="currentQuestionHasEnded && !isLastQuestion"
-                (click)="nextQuestion()">
+            <button class="start-button" *ngIf="!hasStarted" mat-raised-button (click)="startGame()">Commencer la partie</button>
+            <button class="next-button" mat-raised-button *ngIf="currentQuestionHasEnded && !isLastQuestion" (click)="nextQuestion()">
                 Question Suivante
             </button>
-            <button class="next-button" mat-raised-button *ngIf="isLastQuestion" (click)="endGame()">Terminer la
-                partie</button>
+            <button class="next-button" mat-raised-button *ngIf="isLastQuestion" (click)="endGame()">Terminer la partie</button>
         </div>
     </div>
 </div>

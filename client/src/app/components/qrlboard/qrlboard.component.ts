@@ -2,6 +2,7 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
 import { Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
 import { GameServicesProvider } from '@app/providers/game-services.provider';
@@ -9,6 +10,7 @@ import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { PlayerService } from '@app/services/player/player.service';
 import { TimerService } from '@app/services/timer/timer.service';
+import { Grade } from '@common/grade';
 import { Player } from '@common/player';
 import { QrlEvaluation } from '@common/qrl-evaluation';
 import { Question } from '@common/question';
@@ -17,6 +19,7 @@ import { Subscription } from 'rxjs';
 
 const MAX_MESSAGE_LENGTH = 200;
 const THREE_SECONDS_MS = 3000;
+const ERROR_DURATION = 5000;
 const GRADE50 = 50;
 const GRADE100 = 100;
 
@@ -58,6 +61,7 @@ export class QRLboardComponent implements OnInit, OnDestroy {
     question: Question;
     questionIsOver: boolean;
     hasSubmitted: boolean;
+    isInEvaluation: boolean = false;
     cachedEvaluation: QrlEvaluation | null = null;
     formGroup: FormGroup;
 
@@ -77,6 +81,7 @@ export class QRLboardComponent implements OnInit, OnDestroy {
         private readonly playerService: PlayerService,
         private readonly dialog: MatDialog,
         private readonly router: Router,
+        private readonly snackBar: MatSnackBar,
     ) {
         this.formGroup = formBuilder.group({
             message: [this.pin, [Validators.required, this.messageValidator()]],
@@ -96,6 +101,70 @@ export class QRLboardComponent implements OnInit, OnDestroy {
         });
         this.setupSubscriptions(this.pin);
         this.gameService.qrlInputChange(this.pin, this.isTyping);
+    }
+
+    ngOnDestroy() {
+        this.eventSubscriptions.forEach((sub) => {
+            if (sub && !sub.closed) {
+                sub.unsubscribe();
+            }
+        });
+    }
+
+    isQRL(): boolean {
+        return this.question.type === 'QRL';
+    }
+
+    updateRemainingInputCount() {
+        this.remainingInputCount = MAX_MESSAGE_LENGTH - this.input.length;
+        const FIVE_SECONDS_MS = 5000;
+        if (!this.isTyping) {
+            this.isTyping = true;
+            this.gameService.qrlInputChange(this.pin, this.isTyping);
+        }
+
+        this.interval = setInterval(() => {
+            this.isTyping = false;
+            this.gameService.qrlInputChange(this.pin, this.isTyping);
+            clearInterval(this.interval);
+        }, FIVE_SECONDS_MS);
+    }
+
+    submitAnswer() {
+        const isOnlyWhitespace = /^\s*$/.test(this.input);
+        if (!isOnlyWhitespace && this.input.length <= MAX_MESSAGE_LENGTH) {
+            this.gameService.qrlSubmit(this.pin, this.input.trim());
+            this.remainingInputCount = MAX_MESSAGE_LENGTH;
+            this.hasSubmitted = true;
+            this.isInEvaluation = true;
+        } else if (this.input.length > MAX_MESSAGE_LENGTH) {
+            this.openError('La réponse contient plus de 200 caractères');
+        } else if (isOnlyWhitespace) {
+            this.openError('La réponse est vide');
+        }
+    }
+
+    openConfirmationDialog() {
+        const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+            width: '300px',
+            data: { prompt: 'Voulez-vous vraiment quitter la partie?' },
+        });
+
+        dialogRef.afterClosed().subscribe((result) => {
+            if (result) {
+                this.playerService.playerAbandon(this.pin);
+                const redirect = this.isTest ? '/create-game' : '/home';
+                this.router.navigateByUrl(redirect);
+            }
+        });
+    }
+
+    openError(message: string) {
+        this.snackBar.open(message, undefined, {
+            verticalPosition: 'top',
+            duration: ERROR_DURATION,
+            panelClass: ['error-snackbar'],
+        });
     }
 
     blinkTextArea(grade: number) {
@@ -131,62 +200,11 @@ export class QRLboardComponent implements OnInit, OnDestroy {
         }
     }
 
-    ngOnDestroy() {
-        this.eventSubscriptions.forEach((sub) => {
-            if (sub && !sub.closed) {
-                sub.unsubscribe();
-            }
-        });
-    }
-
-    isQRL(): boolean {
-        return this.question.type === 'QRL';
-    }
-
-    updateRemainingInputCount() {
-        this.remainingInputCount = MAX_MESSAGE_LENGTH - this.input.length;
-        const FIVE_SECONDS_MS = 5000;
-        if (!this.isTyping) {
-            this.isTyping = true;
-            this.gameService.qrlInputChange(this.pin, this.isTyping);
-        }
-
-        this.interval = setInterval(() => {
-            this.isTyping = false;
-            this.gameService.qrlInputChange(this.pin, this.isTyping);
-            clearInterval(this.interval);
-        }, FIVE_SECONDS_MS);
-    }
-
-    submitAnswer() {
-        const isOnlyWhitespace = /^\s*$/.test(this.input);
-        if (!isOnlyWhitespace && this.input.length < MAX_MESSAGE_LENGTH) {
-            this.gameService.qrlSubmit(this.pin, this.input.trim());
-            this.input = '';
-            this.remainingInputCount = MAX_MESSAGE_LENGTH;
-        }
-        this.hasSubmitted = true;
-    }
-
-    openConfirmationDialog() {
-        const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-            width: '300px',
-            data: { prompt: 'Voulez-vous vraiment quitter la partie?' },
-        });
-
-        dialogRef.afterClosed().subscribe((result) => {
-            if (result) {
-                this.playerService.playerAbandon(this.pin);
-                const redirect = this.isTest ? '/create-game' : '/home';
-                this.router.navigateByUrl(redirect);
-            }
-        });
-    }
-
     private loadNextQuestion(question: Question) {
         this.questionIsOver = false;
         this.hasSubmitted = false;
         this.cachedEvaluation = null;
+        this.input = '';
         this.question = question;
     }
 
@@ -195,18 +213,36 @@ export class QRLboardComponent implements OnInit, OnDestroy {
             this.gameService.onNextQuestion(pin, (data) => {
                 this.loadNextQuestion(data.question);
             }),
+            this.gameService.onQrlSubmit(this.pin, () => {
+                if (this.isTest && this.player) {
+                    this.blinkTextArea(GRADE100);
+                    this.player.score += this.question.points;
+                }
+            }),
             this.gameService.onQrlEvaluate(pin, (evaluation) => {
+                this.isInEvaluation = false;
                 if (this.playerService.getCurrentPlayer(pin)?.socketId === evaluation.clientId) {
                     this.cachedEvaluation = evaluation;
                 }
                 if (evaluation.isLast) {
                     this.questionIsOver = true;
                     if (this.player) {
-                        if (this.isTest) {
-                            this.blinkTextArea(GRADE100);
-                            this.player.score += this.question.points;
-                        } else {
-                            this.player.score += this.cachedEvaluation?.score ?? 0;
+                        this.player.score += this.cachedEvaluation?.score ?? 0;
+                        switch (evaluation.grade) {
+                            case Grade.Good: {
+                                this.blinkTextArea(GRADE100);
+                                break;
+                            }
+                            case Grade.Average: {
+                                this.blinkTextArea(GRADE50);
+                                break;
+                            }
+                            case Grade.Bad: {
+                                this.blinkTextArea(0);
+                                break;
+                            }
+                            default:
+                                break;
                         }
                     }
                 }
@@ -218,6 +254,7 @@ export class QRLboardComponent implements OnInit, OnDestroy {
             }),
         );
     }
+
     private messageValidator(): ValidatorFn {
         return (control: AbstractControl): ValidationErrors | null => {
             const message = control.value as string;

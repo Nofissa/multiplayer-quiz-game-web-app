@@ -1,7 +1,9 @@
 <div class="container">
     <div class="question-box font-color">
-        <!-- <span id="questionText" class="text-centered">{{ question.text }}</span> -->
-        <!-- <span id="value" class="text-centered"><strong>{{ question.points }} points</strong></span> -->
+        <span id="questionText" class="text-centered">{{ question.text }}</span>
+        <span id="value" class="text-centered"
+            ><strong>{{ question.points }} points</strong></span
+        >
     </div>
     <form [formGroup]="formGroup" style="margin-top: 4%">
         <mat-form-field appearance="fill">
@@ -18,6 +20,7 @@
                 formControlName="message"
                 class="write-message"
                 placeholder="Entrez votre réponse ici..."
+                [readonly]="hasSubmitted"
             >
             </textarea>
         </mat-form-field>
@@ -25,7 +28,7 @@
     <div class="timer-wrapper">
         <app-timer [pin]="pin"></app-timer>
     </div>
-    <span *ngIf="hasSubmitted">L'évaluation est en cours...</span>
+    <span *ngIf="isInEvaluation && !isTest">L'évaluation est en cours...</span>
     <div *ngIf="showNotification100" [@fadeAnimation] class="notification">Vous avez eu 100% des points!</div>
     <div class="buttons-wrapper">
         <button mat-flat-button id="validateButton" class="game-button" [class.disable-click]="hasSubmitted" (click)="submitAnswer()">
@@ -33,5 +36,5 @@
         </button>
         <button button mat-flat-button color="warn" id="giveUpButton" class="game-button" (click)="openConfirmationDialog()">Abandonner</button>
     </div>
-    <div id="score" class="text-centered">Votre score:points</div>
+    <div id="score" class="text-centered">Votre score: {{ player?.score }} points</div>
 </div>
