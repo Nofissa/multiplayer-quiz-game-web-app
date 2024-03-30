@@ -20,8 +20,6 @@ import { Subscription } from 'rxjs';
 const MAX_MESSAGE_LENGTH = 200;
 const THREE_SECONDS_MS = 3000;
 const ERROR_DURATION = 5000;
-const GRADE50 = 50;
-const GRADE100 = 100;
 
 @Component({
     selector: 'app-qrlboard',
@@ -167,23 +165,23 @@ export class QRLboardComponent implements OnInit, OnDestroy {
         });
     }
 
-    blinkTextArea(grade: number) {
+    blinkTextArea(grade: Grade) {
         switch (grade) {
-            case 0: {
+            case Grade.Bad: {
                 this.textarea.nativeElement.classList.add('blink-red');
                 setTimeout(() => {
                     this.textarea.nativeElement.classList.remove('blink-red');
                 }, THREE_SECONDS_MS);
                 break;
             }
-            case GRADE50: {
+            case Grade.Average: {
                 this.textarea.nativeElement.classList.add('blink-yellow');
                 setTimeout(() => {
                     this.textarea.nativeElement.classList.remove('blink-yellow');
                 }, THREE_SECONDS_MS);
                 break;
             }
-            case GRADE100: {
+            case Grade.Good: {
                 this.textarea.nativeElement.classList.add('blink');
                 setTimeout(() => {
                     this.textarea.nativeElement.classList.remove('blink');
@@ -215,7 +213,7 @@ export class QRLboardComponent implements OnInit, OnDestroy {
             }),
             this.gameService.onQrlSubmit(this.pin, () => {
                 if (this.isTest && this.player) {
-                    this.blinkTextArea(GRADE100);
+                    this.blinkTextArea(Grade.Good);
                     this.player.score += this.question.points;
                 }
             }),
@@ -228,22 +226,7 @@ export class QRLboardComponent implements OnInit, OnDestroy {
                     this.questionIsOver = true;
                     if (this.player) {
                         this.player.score += this.cachedEvaluation?.score ?? 0;
-                        switch (evaluation.grade) {
-                            case Grade.Good: {
-                                this.blinkTextArea(GRADE100);
-                                break;
-                            }
-                            case Grade.Average: {
-                                this.blinkTextArea(GRADE50);
-                                break;
-                            }
-                            case Grade.Bad: {
-                                this.blinkTextArea(0);
-                                break;
-                            }
-                            default:
-                                break;
-                        }
+                        this.blinkTextArea(evaluation.grade);
                     }
                 }
             }),
