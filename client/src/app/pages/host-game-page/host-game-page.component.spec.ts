@@ -22,7 +22,7 @@ import { PlayerService } from '@app/services/player/player.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
-import { Evaluation } from '@common/evaluation';
+import { QcmEvaluation } from '@common/qcm-evaluation';
 import { GameEventPayload } from '@common/game-event-payload';
 import { GameState } from '@common/game-state';
 import { Player } from '@common/player';
@@ -299,7 +299,7 @@ describe('HostGamePageComponent', () => {
     });
 
     it('should the server emitting submitChoices do nothing if not last player, or set currentQuestionHasEnded to true', () => {
-        let payload: GameEventPayload<Evaluation> = { pin: PIN, data: firstPlayerEvaluationStub() };
+        let payload: GameEventPayload<QcmEvaluation> = { pin: PIN, data: firstPlayerEvaluationStub() };
         socketServerMock.emit('submitChoices', payload);
         expect(component.currentQuestionHasEnded).toBeFalse();
         payload = { pin: PIN, data: lastPlayerEvaluationStub() };

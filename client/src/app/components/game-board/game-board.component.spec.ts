@@ -16,10 +16,10 @@ import { PlayerService } from '@app/services/player/player.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
-import { Evaluation } from '@common/evaluation';
 import { GameEventPayload } from '@common/game-event-payload';
 import { GameSnapshot } from '@common/game-snapshot';
 import { GameState } from '@common/game-state';
+import { QcmEvaluation } from '@common/qcm-evaluation';
 import { Question } from '@common/question';
 import { TimerEventType } from '@common/timer-event-type';
 import { TimerPayload } from '@common/timer-payload';
@@ -179,7 +179,7 @@ describe('GameBoardComponent', () => {
     it('should setupSubscriptions', () => {
         const payload: GameEventPayload<Question> = { pin: '123', data: questionStub()[0] };
         const timerPayload: GameEventPayload<TimerPayload> = { pin: '123', data: { remainingTime: 0, eventType: TimerEventType.Question } };
-        const evaluationPayload: GameEventPayload<Evaluation> = { pin: '123', data: lastPlayerEvaluationStub() };
+        const evaluationPayload: GameEventPayload<QcmEvaluation> = { pin: '123', data: lastPlayerEvaluationStub() };
         spyOn(component, 'submitChoices');
         playerServiceMock.getCurrentPlayer.and.returnValue(lastPlayerEvaluationStub().player);
         component.pin = '123';

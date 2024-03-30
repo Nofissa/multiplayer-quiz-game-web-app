@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { QRLboardComponent } from '@app/components/qrlboard/qrlboard.component';
 import { AdminPageComponent } from '@app/pages/admin-page/admin-page.component';
 import { CreateGamePageComponent } from '@app/pages/create-game-page/create-game-page.component';
 import { GamePageComponent } from '@app/pages/game-page/game-page.component';
@@ -20,7 +19,6 @@ const routes: Routes = [
     { path: 'waiting-room', component: WaitingRoomPageComponent },
     { path: 'host-game', component: HostGamePageComponent },
     { path: 'results', component: PlayerResultsPageComponent },
-    { path: 'qrl', component: QRLboardComponent },
     { path: '**', redirectTo: '/home' },
 ];
 

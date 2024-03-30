@@ -4,14 +4,16 @@ import { generateRandomPin } from '@app/helpers/pin';
 import { DisconnectPayload } from '@app/interfaces/disconnect-payload';
 import { Question } from '@app/model/database/question';
 import { QuizService } from '@app/services/quiz/quiz.service';
-import { Evaluation } from '@common/evaluation';
+import { TimerService } from '@app/services/timer/timer.service';
 import { GameState } from '@common/game-state';
 import { Player } from '@common/player';
 import { PlayerState } from '@common/player-state';
+import { QcmEvaluation } from '@common/qcm-evaluation';
 import { Question as CommonQuestion } from '@common/question';
 import { QuestionPayload } from '@common/question-payload';
 import { Submission } from '@common/submission';
 import { Injectable } from '@nestjs/common';
+import { ModuleRef } from '@nestjs/core';
 import { Socket } from 'socket.io';
 
 const NO_POINTS = 0;
@@ -22,7 +24,15 @@ const BONUS_MULTIPLIER = 1.2;
 export class GameService {
     games: Map<string, Game> = new Map();
 
-    constructor(private readonly quizService: QuizService) {}
+    constructor(private readonly moduleRef: ModuleRef) {}
+
+    get quizService(): QuizService {
+        return this.moduleRef.get(QuizService);
+    }
+
+    get timerService(): TimerService {
+        return this.moduleRef.get(TimerService);
+    }
 
     async createGame(client: Socket, quizId: string): Promise<string> {
         const quiz = await this.quizService.getQuizById(quizId);
@@ -73,7 +83,7 @@ export class GameService {
         return clientPlayer.player;
     }
 
-    evaluateChoices(client: Socket, pin: string): Evaluation {
+    evaluateChoices(client: Socket, pin: string): QcmEvaluation {
         const game = this.getGame(pin);
         const submission = this.getOrCreateSubmission(client, game);
 
@@ -87,9 +97,9 @@ export class GameService {
 
         const gameSubmissions = Array.from(game.currentQuestionSubmissions.values());
         const isCorrect = this.isGoodAnswer(question, submission);
-        const isFirst = gameSubmissions.filter((x) => x.isFinal).length === 1;
+        const isFirst = gameSubmissions.filter((x) => x.isFinal).length === 1 && this.timerService.getTimer(pin)?.time !== 0;
         const isLast =
-            gameSubmissions.filter((x) => x.isFinal).length ===
+            gameSubmissions.filter((x) => x.isFinal).length >=
             Array.from(game.clientPlayers.values()).filter((x) => x.player.state === PlayerState.Playing).length;
 
         let score = isCorrect ? question.points : NO_POINTS;
@@ -99,7 +109,7 @@ export class GameService {
         player.score += score;
         player.speedAwardCount += isCorrect && isFirst ? 1 : 0;
 
-        const evaluation: Evaluation = {
+        const evaluation: QcmEvaluation = {
             player,
             correctAnswers: question.choices.filter((x) => x.isCorrect),
             score,
