@@ -6,7 +6,7 @@ export class Timer {
     time: number;
 
     private tickSubject: Subject<number>;
-    private tickSubscription: Subscription;
+    private tickSubscription: Subscription | null;
     private interval: NodeJS.Timer | undefined;
     private tickPerSecond: number = 1;
 
@@ -16,7 +16,7 @@ export class Timer {
 
     setTickPerSecond(tickPerSecond: number) {
         if (tickPerSecond <= 0) {
-            throw new Error('Le nombre de tick par seconde doit être un nombre strictement positif');
+            throw new Error('Le nombre de tic par seconde doit être un nombre strictement positif');
         }
 
         this.tickPerSecond = tickPerSecond;
@@ -28,12 +28,16 @@ export class Timer {
         return this.time;
     }
 
+    pause() {
+        clearInterval(this.interval);
+    }
+
     stop() {
         clearInterval(this.interval);
 
         this.time = 0;
 
-        if (!this.tickSubscription.closed) {
+        if (this.tickSubscription && !this.tickSubscription.closed) {
             this.tickSubscription.unsubscribe();
         }
     }

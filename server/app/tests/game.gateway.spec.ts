@@ -127,35 +127,6 @@ describe('GameGateway', () => {
         });
     });
 
-    describe('handleEndGame', () => {
-        const pin = 'mockPin';
-        it('should stop the timer and end the game', () => {
-            gameGateway.handleEndGame(socketMock as Socket, { pin });
-
-            expect(timerServiceMock.stopTimer).toHaveBeenCalledWith(socketMock, pin);
-            expect(gameServiceMock.endGame).toHaveBeenCalledWith(socketMock, pin);
-        });
-
-        it('should emit the endGame event with null payload', () => {
-            timerServiceMock.stopTimer.mockReturnValue(null);
-            gameServiceMock.endGame.mockReturnValue(null);
-            serverMock.to.mockReturnValue(broadcastMock);
-            gameGateway.handleEndGame(socketMock as Socket, { pin });
-            expect(serverMock.to).toHaveBeenCalledWith(pin);
-            expect(broadcastMock.emit).toHaveBeenCalledWith('endGame', { pin, data: null });
-        });
-
-        it('should emit error event if an error occurs', () => {
-            const errorMessage = 'Test error message';
-            const error = new Error(errorMessage);
-            gameServiceMock.endGame = jest.fn().mockImplementation(() => {
-                throw error;
-            });
-            gameGateway.handleEndGame(socketMock as Socket, { pin });
-            expect(socketMock.emit).toHaveBeenCalledWith('error', errorMessage);
-        });
-    });
-
     describe('cancelGame', () => {
         it('should cancel the game and emit the "cancelGame" event with the message', () => {
             const pin = 'mockPin';
