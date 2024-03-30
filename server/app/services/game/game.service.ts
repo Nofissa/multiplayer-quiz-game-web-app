@@ -27,7 +27,7 @@ export class GameService {
     constructor(private readonly moduleRef: ModuleRef) {}
 
     get quizService(): QuizService {
-        return this.moduleRef.get(QuizService, { strict: false });
+        return this.moduleRef.get(QuizService);
     }
 
     get timerService(): TimerService {
