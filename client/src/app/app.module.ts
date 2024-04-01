@@ -26,6 +26,7 @@ import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { SwiperModule } from 'swiper/angular';
 import { LoaderAnimationComponent } from './components/animations/loader-animation/loader-animation.component';
 import { BarChartSwiperComponent } from './components/bar-chart-swiper/bar-chart-swiper.component';
+import { BarChartComponent } from './components/bar-chart/bar-chart.component';
 import { ChatRoomComponent } from './components/chat-room/chat-room.component';
 import { ConfirmationDialogComponent } from './components/dialogs/confirmation-dialog/confirmation-dialog.component';
 import { JoinGameDialogComponent } from './components/dialogs/join-game-dialog/join-game-dialog.component';
@@ -33,9 +34,11 @@ import { PromptDialogComponent } from './components/dialogs/prompt-dialog/prompt
 import { QuizDetailsDialogComponent } from './components/dialogs/quiz-details-dialog/quiz-details-dialog.component';
 import { UpsertQuestionDialogComponent } from './components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
 import { GameBoardComponent } from './components/game-board/game-board.component';
-import { BarChartComponent } from './components/bar-chart/bar-chart.component';
+import { GameTransitionComponent } from './components/game-transition/game-transition.component';
 import { NavHeaderComponent } from './components/nav-header/nav-header.component';
 import { PlayerListComponent } from './components/player-list/player-list.component';
+import { QrlBoardComponent } from './components/qrl-board/qrl-board.component';
+import { QrlListComponent } from './components/qrl-list/qrl-list.component';
 import { QuestionBankComponent } from './components/question-bank/question-bank.component';
 import { QuestionListComponent } from './components/question-list/question-list.component';
 import { QuizListComponent } from './components/quiz-list/quiz-list.component';
@@ -48,9 +51,6 @@ import { PlayerResultsPageComponent } from './pages/player-results-page/player-r
 import { QCMCreationPageComponent } from './pages/qcmcreation-page/qcmcreation-page.component';
 import { WaitingRoomPageComponent } from './pages/waiting-room-page/waiting-room-page.component';
 import { WebSocketService } from './services/web-socket/web-socket.service';
-import { GameTransitionComponent } from './components/game-transition/game-transition.component';
-import { QRLboardComponent } from './components/qrlboard/qrlboard.component';
-import { QrlListComponent } from './components/qrl-list/qrl-list.component';
 
 /**
  * Main module that is used in main.ts.
@@ -90,7 +90,7 @@ import { QrlListComponent } from './components/qrl-list/qrl-list.component';
         BarChartSwiperComponent,
         ChatRoomComponent,
         GameTransitionComponent,
-        QRLboardComponent,
+        QrlBoardComponent,
         QrlListComponent,
     ],
     imports: [
