@@ -22,9 +22,9 @@ const THREE_SECONDS_MS = 3000;
 const ERROR_DURATION = 5000;
 
 @Component({
-    selector: 'app-qrlboard',
-    templateUrl: './qrlboard.component.html',
-    styleUrls: ['./qrlboard.component.scss'],
+    selector: 'app-qrl-board',
+    templateUrl: './qrl-board.component.html',
+    styleUrls: ['./qrl-board.component.scss'],
     providers: [GameServicesProvider],
     animations: [
         trigger('blinkAnimation', [
@@ -44,7 +44,7 @@ const ERROR_DURATION = 5000;
         ]),
     ],
 })
-export class QRLboardComponent implements OnInit, OnDestroy {
+export class QrlBoardComponent implements OnInit, OnDestroy {
     @Input()
     pin: string;
     @Input()

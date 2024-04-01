@@ -49,7 +49,7 @@ import { QCMCreationPageComponent } from './pages/qcmcreation-page/qcmcreation-p
 import { WaitingRoomPageComponent } from './pages/waiting-room-page/waiting-room-page.component';
 import { WebSocketService } from './services/web-socket/web-socket.service';
 import { GameTransitionComponent } from './components/game-transition/game-transition.component';
-import { QRLboardComponent } from './components/qrlboard/qrlboard.component';
+import { QrlBoardComponent } from './components/qrl-board/qrl-board.component';
 
 /**
  * Main module that is used in main.ts.
@@ -89,7 +89,7 @@ import { QRLboardComponent } from './components/qrlboard/qrlboard.component';
         BarChartSwiperComponent,
         ChatRoomComponent,
         GameTransitionComponent,
-        QRLboardComponent,
+        QrlBoardComponent,
     ],
     imports: [
         AppRoutingModule,

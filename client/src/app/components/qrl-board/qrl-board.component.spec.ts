@@ -33,13 +33,13 @@ import { TimerEventType } from '@common/timer-event-type';
 import { TimerPayload } from '@common/timer-payload';
 import { Observable, Subscription, of } from 'rxjs';
 import { io } from 'socket.io-client';
-import { QRLboardComponent } from './qrlboard.component';
+import { QrlBoardComponent } from './qrl-board.component';
 
 const MAX_MESSAGE_LENGTH = 200;
 
 describe('QrlBoardComponent', () => {
-    let component: QRLboardComponent;
-    let fixture: ComponentFixture<QRLboardComponent>;
+    let component: QrlBoardComponent;
+    let fixture: ComponentFixture<QrlBoardComponent>;
     let mockGameHttpService: jasmine.SpyObj<GameHttpService>;
     let mockGameService: jasmine.SpyObj<GameService>;
     let mockPlayerService: jasmine.SpyObj<PlayerService>;
@@ -106,7 +106,7 @@ describe('QrlBoardComponent', () => {
 
         TestBed.configureTestingModule({
             imports: [MatSnackBarModule, RouterTestingModule, MatDialogModule, BrowserAnimationsModule],
-            declarations: [QRLboardComponent, ConfirmationDialogComponent],
+            declarations: [QrlBoardComponent, ConfirmationDialogComponent],
             providers: [
                 { provide: GameHttpService, useValue: mockGameHttpService },
                 { provide: GameService, useValue: mockGameService },
@@ -152,7 +152,7 @@ describe('QrlBoardComponent', () => {
         mockGameService.onQrlEvaluate.and.callFake((pin, callback) => {
             return webSocketServiceSpy.on('qrlEvaluate', applyIfPinMatches(pin, callback));
         });
-        fixture = TestBed.createComponent(QRLboardComponent);
+        fixture = TestBed.createComponent(QrlBoardComponent);
         component = fixture.componentInstance;
         component.pin = '1234';
         mockGameHttpService.getGameSnapshotByPin.and.returnValue(of(mockGameSnapshot));
