@@ -3,7 +3,6 @@ import { GameServicesProvider } from '@app/providers/game-services.provider';
 import { MaterialServicesProvider } from '@app/providers/material-services.provider';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
-import { Evaluation } from '@common/evaluation';
 import { Player } from '@common/player';
 import { Subscription } from 'rxjs';
 
@@ -18,7 +17,7 @@ export class QrlListComponent implements OnInit, OnDestroy {
     @Input()
     pin: string;
     players: Player[] = [];
-    playersMap: Map<Player, Evaluation | undefined> = new Map();
+    playersMap: Map<Player, string | undefined> = new Map();
     evaluationsReceived: number = 0;
     private eventSubscriptions: Subscription[] = [];
 
@@ -49,17 +48,17 @@ export class QrlListComponent implements OnInit, OnDestroy {
         });
     }
 
-    // evaluateAnswer() {
-    //     qrlEvaluate()
+    // evaluateAnswer(grade: Grade) {
+    //     this.gameService.qrlEvaluate(this.pin, grade);
     // }
 
     private setupSubscription(pin: string) {
         this.eventSubscriptions.push(
-            this.gameService.onQrlSubmit(pin, (evaluation) => {
-                const index = this.players.findIndex((x) => x.socketId === evaluation.player.socketId);
+            this.gameService.onQrlSubmit(pin, (submission) => {
+                const index = this.players.findIndex((x) => x.socketId === submission.clientId);
                 if (index !== NOT_FOUND_INDEX) {
                     this.evaluationsReceived += 1;
-                    this.playersMap.set(evaluation.player, evaluation);
+                    this.playersMap.set(this.players[index], submission.answer);
                 }
             }),
         );
