@@ -28,6 +28,7 @@
                         hidden: !displayOptions.ban,
                         invisible: player.state !== playerStates.Playing || !displayOptions.ban
                     }"
+                    *ngIf="!player.isMuted"
                 >
                     Mute
                 </button>
@@ -45,4 +46,12 @@
             </div>
         </mat-list-item>
     </mat-list>
+
+    <div class="sort-buttons">
+        <mat-button-toggle-group name="favoriteColor" aria-label="Favorite Color">
+            <mat-button-toggle value="Pointage" (click)="sortPlayersByScore()">Pointage</mat-button-toggle>
+            <mat-button-toggle value="Alphabetique" (click)="sortPlayersByName()">Alphabetique</mat-button-toggle>
+            <mat-button-toggle value="Etat" (click)="sortPlayersByState()">Etat du joueurs</mat-button-toggle>
+        </mat-button-toggle-group>
+    </div>
 </div>

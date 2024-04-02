@@ -59,6 +59,23 @@ export class PlayerListComponent implements OnInit, OnDestroy {
 
     mutePlayer(player: Player) {
         this.playerService.playerMute(this.pin, player.username);
+        // mock mute cause not implemented
+        player.isMuted = true;
+    }
+
+    sortPlayersByScore() {
+        this.displayOptions.sorted = true;
+        this.trySort();
+    }
+
+    sortPlayersByName() {
+        this.displayOptions.sorted = false;
+        this.players = this.players.sort((a, b) => a.username.localeCompare(b.username));
+    }
+
+    sortPlayersByState() {
+        this.displayOptions.sorted = false;
+        this.players = this.players.sort((a, b) => a.state - b.state);
     }
 
     private upsertPlayer(player: Player) {
