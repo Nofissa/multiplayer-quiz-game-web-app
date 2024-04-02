@@ -7,6 +7,7 @@ import { QuizService } from '@app/services/quiz/quiz.service';
 import { GameState } from '@common/game-state';
 import { Player } from '@common/player';
 import { PlayerState } from '@common/player-state';
+import { QcmEvaluation } from '@common/qcm-evaluation';
 import { QrlEvaluation } from '@common/qrl-evaluation';
 import { QrlSubmission } from '@common/qrl-submission';
 import { Question as CommonQuestion } from '@common/question';
@@ -75,7 +76,7 @@ export class GameService {
         return clientPlayer.player;
     }
 
-    evaluateChoices(client: Socket, pin: string): Evaluation {
+    evaluateChoices(client: Socket, pin: string): QcmEvaluation {
         const game = this.getGame(pin);
         const submission = this.getOrCreateSubmission(client, game);
 
@@ -101,7 +102,7 @@ export class GameService {
         player.score += score;
         player.speedAwardCount += isCorrect && isFirst ? 1 : 0;
 
-        const evaluation: Evaluation = {
+        const evaluation: QcmEvaluation = {
             player,
             correctAnswers: question.choices.filter((x) => x.isCorrect),
             score,
@@ -229,19 +230,6 @@ export class GameService {
 
         return qrlEvaluation;
     }
-
-    // client: Socket, pin: string, hasTypedRecently: boolean
-    qrlInputChange() {
-        return;
-    }
-
-    qrlSubmit(client: Socket, pin: string, qrlText: string) {
-        const game = this.getGame(pin);
-        const submission = this.getOrCreateSubmission(client, game);
-        submission.choices.push({ payload: qrlText });
-        return Array.from(game.currentQuestionSubmissions.values());
-    }
-
     endGame(client: Socket, pin: string): void {
         const game = this.getGame(pin);
 
@@ -307,10 +295,10 @@ export class GameService {
     }
 
     getOrCreateSubmission(client: Socket, game: Game) {
-        if (!game.currentQuestionSubmissions.has(client.id)) {
-            game.currentQuestionSubmissions.set(client.id, {
+        if (!game.currentQuestionQcmSubmissions.has(client.id)) {
+            game.currentQuestionQcmSubmissions.set(client.id, {
                 choices: game.currentQuestion.choices.map((_, index) => {
-                    return { index, isSelected: false };
+                    return { payload: index, isSelected: false };
                 }),
                 isFinal: false,
             });

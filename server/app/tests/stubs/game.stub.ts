@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */ // used for the socket (i only want the id here)
 import { ClientPlayer } from '@app/classes/client-player';
 import { Game } from '@app/classes/game';
-import { qrlEvaluationStub } from '@app/tests/stubs/qrl-evaluation.stub';
 import { GameState } from '@common/game-state';
-import { QrlEvaluation } from '@common/qrl-evaluation';
+import { QrlSubmission } from '@common/qrl-submission';
 import { Submission } from '@common/submission';
 import { clientPlayerStub } from './client.player.stub';
+import { qrlSubmissionStub } from './qrl.submission.stub';
 import { quizStub } from './quiz.stubs';
 import { submissionStub } from './submission.stub';
 
@@ -19,7 +19,7 @@ export const gameStub = (): Game => {
         currentQuestionIndex: 0,
         clientPlayers: new Map<string, ClientPlayer>([['playerId', clientPlayerStub()]]),
         qcmSubmissions: [new Map<string, Submission>([['playerId', submissionStub()]])],
-        qrlSubmissions: [new Map<string, QrlEvaluation>([['playerId', qrlEvaluationStub()]])],
+        qrlSubmissions: [new Map<string, QrlSubmission>([['playerId', qrlSubmissionStub()]])],
         loadNextQuestion() {
             this.questionSubmissions.push(new Map());
             this.currentQuestionIndex++;

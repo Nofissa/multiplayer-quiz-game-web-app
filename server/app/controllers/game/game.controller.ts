@@ -47,7 +47,8 @@ export class GameController {
                         };
                     }),
                 },
-                questionSubmissions: game.qrlSubmissions.map((x) => Array.from(x.values())),
+                questionQcmSubmissions: game.qcmSubmissions.map((x) => Array.from(x.values())),
+                questionQrlSubmission: game.qrlSubmissions.map((x) => Array.from(x.values())),
             };
 
             response.status(HttpStatus.OK).json(snapshot);
