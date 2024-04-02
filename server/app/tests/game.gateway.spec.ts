@@ -3,7 +3,7 @@
 import { GameGateway } from '@app/gateways/game.gateway';
 import { GameService } from '@app/services/game/game.service';
 import { TimerService } from '@app/services/timer/timer.service';
-import { Evaluation } from '@common/evaluation';
+import { qcmEvaluation } from '@common/evaluation';
 import { GameEventPayload } from '@common/game-event-payload';
 import { GameState } from '@common/game-state';
 import { QuestionPayload } from '@common/question-payload';
@@ -175,7 +175,7 @@ describe('GameGateway', () => {
     describe('submitChoices', () => {
         it('should handle submitting choices and emit the "submitChoices" event with the correct payload', () => {
             const pin = 'mockPin';
-            const evaluation: Evaluation = {} as any;
+            const evaluation: qcmEvaluation = {} as any;
             gameServiceMock.evaluateChoices.mockReturnValue(evaluation);
             gameGateway.qcmSubmit(socketMock, { pin });
             expect(serverMock.to).toHaveBeenCalledWith(pin);

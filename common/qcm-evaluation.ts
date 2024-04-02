@@ -1,7 +1,7 @@
 import { Choice } from './choice';
 import { Player } from './player';
 
-export interface Evaluation {
+export interface qcmEvaluation {
     player: Player;
     correctAnswers: Choice[];
     score: number;

@@ -4,10 +4,10 @@ import { generateRandomPin } from '@app/helpers/pin';
 import { DisconnectPayload } from '@app/interfaces/disconnect-payload';
 import { Question } from '@app/model/database/question';
 import { QuizService } from '@app/services/quiz/quiz.service';
-import { Evaluation } from '@common/evaluation';
 import { GameState } from '@common/game-state';
 import { Player } from '@common/player';
 import { PlayerState } from '@common/player-state';
+import { qcmEvaluation } from '@common/qcm-evaluation';
 import { QrlEvaluation } from '@common/qrl-evaluation';
 import { QrlSubmission } from '@common/qrl-submission';
 import { Question as CommonQuestion } from '@common/question';
@@ -76,7 +76,7 @@ export class GameService {
         return clientPlayer.player;
     }
 
-    evaluateChoices(client: Socket, pin: string): Evaluation {
+    evaluateChoices(client: Socket, pin: string): qcmEvaluation {
         const game = this.getGame(pin);
         const submission = this.getOrCreateSubmission(client, game);
 
@@ -102,7 +102,7 @@ export class GameService {
         player.score += score;
         player.speedAwardCount += isCorrect && isFirst ? 1 : 0;
 
-        const evaluation: Evaluation = {
+        const evaluation: qcmEvaluation = {
             player,
             correctAnswers: question.choices.filter((x) => x.isCorrect),
             score,
