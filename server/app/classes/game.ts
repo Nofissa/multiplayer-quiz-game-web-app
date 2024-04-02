@@ -1,26 +1,30 @@
+import { Question } from '@app/model/database/question';
 import { Quiz } from '@app/model/database/quiz';
 import { Chatlog } from '@common/chatlog';
 import { GameState } from '@common/game-state';
-import { Question } from '@app/model/database/question';
-import { Submission } from '@common/submission';
+import { QrlSubmission } from '@common/qrl-submission';
+import { Submission as QcmSubmission } from '@common/submission';
 import { Socket } from 'socket.io';
 import { ClientPlayer } from './client-player';
 
 export class Game {
     pin: string;
     quiz: Quiz;
-    organizer: Socket;
-    state: GameState;
+    currentQuestionIndex: number = 0;
+    qcmSubmissions: Map<string, QcmSubmission>[] = [];
+    qrlSubmissions: Map<string, QrlSubmission>[] = [];
     chatlogs: Chatlog[] = [];
     clientPlayers: Map<string, ClientPlayer> = new Map();
-    questionSubmissions: Map<string, Submission>[] = [new Map()];
-    currentQuestionIndex: number = 0;
+    state: GameState;
+    organizer: Socket;
 
     constructor(pin: string, quiz: Quiz, organizer: Socket) {
         this.pin = pin;
         this.quiz = quiz;
         this.organizer = organizer;
         this.state = GameState.Opened;
+        this.qcmSubmissions.push(new Map());
+        this.qrlSubmissions.push(new Map());
     }
 
     get currentQuestion(): Question | null {
@@ -30,16 +34,17 @@ export class Game {
         return this.quiz.questions[this.currentQuestionIndex];
     }
 
-    get currentQuestionSubmissions() {
-        return this.questionSubmissions[this.currentQuestionIndex];
+    get currentQuestionQcmSubmissions() {
+        return this.qcmSubmissions[this.currentQuestionIndex];
     }
 
-    get allSubmissions() {
-        return this.questionSubmissions;
+    get currentQuestionQrlSubmissions() {
+        return this.qrlSubmissions[this.currentQuestionIndex];
     }
 
     loadNextQuestion() {
-        this.questionSubmissions.push(new Map());
+        this.qcmSubmissions.push(new Map());
+        this.qrlSubmissions.push(new Map());
         this.currentQuestionIndex++;
     }
 }

@@ -347,7 +347,7 @@ describe('GameService', () => {
         it("should create a new submission if it doesn't exist already", () => {
             jest.spyOn(Map.prototype, 'has').mockReturnValue(true);
             const result = gameService.getOrCreateSubmission(socketMockPlayer, game);
-            expect(result).toEqual(game.currentQuestionSubmissions.get(socketMockPlayer.id));
+            expect(result).toEqual(game.currentQuestionQcmSubmissions.get(socketMockPlayer.id));
         });
     });
 
