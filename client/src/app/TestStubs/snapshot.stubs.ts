@@ -1,6 +1,7 @@
 import { Chatlog } from '@common/chatlog';
 import { GameSnapshot } from '@common/game-snapshot';
 import { GameState } from '@common/game-state';
+import { QrlSubmission } from '@common/qrl-submission';
 import { Submission } from '@common/submission';
 import { firstPlayerStub, secondPlayerStub } from './player.stubs';
 import { quizStub } from './quiz.stubs';
@@ -15,7 +16,8 @@ const mockChatlogs: Chatlog[] = [
 
 const mockState: GameState = GameState.Opened;
 
-const mockQuestionSubmissions: Submission[][] = [[{ choices: [{ payload: 0, isSelected: true }], isFinal: false }]];
+const mockQuestionQcmSubmissions: Submission[][] = [[{ choices: [{ payload: 0, isSelected: true }], isFinal: false }]];
+const mockQuestionQrlSubmissions: QrlSubmission[][] = [[{ answer: 'hello', clientId: 'playerId' }]];
 
 export const mockGameSnapshot = (): GameSnapshot[] => {
     return [
@@ -25,7 +27,8 @@ export const mockGameSnapshot = (): GameSnapshot[] => {
             quiz: quizStub(),
             state: mockState,
             currentQuestionIndex: 0,
-            questionSubmissions: mockQuestionSubmissions,
+            questionQcmSubmissions: mockQuestionQcmSubmissions,
+            questionQrlSubmission: mockQuestionQrlSubmissions,
         },
         {
             players: [firstPlayerStub()],
@@ -33,7 +36,8 @@ export const mockGameSnapshot = (): GameSnapshot[] => {
             quiz: quizStub(),
             state: mockState,
             currentQuestionIndex: 0,
-            questionSubmissions: mockQuestionSubmissions,
+            questionQcmSubmissions: mockQuestionQcmSubmissions,
+            questionQrlSubmission: mockQuestionQrlSubmissions,
         },
         {
             players: [firstPlayerStub(), secondPlayerStub()],
@@ -41,7 +45,8 @@ export const mockGameSnapshot = (): GameSnapshot[] => {
             quiz: quizStub(),
             state: mockState,
             currentQuestionIndex: 0,
-            questionSubmissions: mockQuestionSubmissions,
+            questionQcmSubmissions: mockQuestionQcmSubmissions,
+            questionQrlSubmission: mockQuestionQrlSubmissions,
         },
     ];
 };

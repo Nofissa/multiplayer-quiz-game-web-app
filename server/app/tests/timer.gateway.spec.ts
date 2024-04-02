@@ -112,4 +112,46 @@ describe('TimerGateway', () => {
             expect(socketMock.emit).toHaveBeenCalledWith('error', errorMessage);
         });
     });
+
+    describe('pauseTimer', () => {
+        const pin = 'mockPin';
+        it('should emit the stopTimer event with null payload', () => {
+            serverMock.to.mockReturnValue(broadcastMock);
+            timerService.pauseTimer = jest.fn().mockReturnValue(undefined);
+            timerGateway.pauseTimer(socketMock as Socket, { pin });
+            expect(serverMock.to).toHaveBeenCalledWith(pin);
+            expect(broadcastMock.emit).toHaveBeenCalledWith('pauseTimer', { pin, data: null });
+        });
+
+        it('should emit error event if an error occurs', () => {
+            const errorMessage = 'Test error message';
+            const error = new Error(errorMessage);
+            timerService.pauseTimer = jest.fn().mockImplementation(() => {
+                throw error;
+            });
+            timerGateway.pauseTimer(socketMock as Socket, { pin });
+            expect(socketMock.emit).toHaveBeenCalledWith('error', errorMessage);
+        });
+    });
+
+    describe('accelerateTimer', () => {
+        const pin = 'mockPin';
+        it('should emit the stopTimer event with null payload', () => {
+            serverMock.to.mockReturnValue(broadcastMock);
+            timerService.accelerateTimer = jest.fn().mockReturnValue(undefined);
+            timerGateway.accelerateTimer(socketMock as Socket, { pin });
+            expect(serverMock.to).toHaveBeenCalledWith(pin);
+            expect(broadcastMock.emit).toHaveBeenCalledWith('accelerateTimer', { pin, data: null });
+        });
+
+        it('should emit error event if an error occurs', () => {
+            const errorMessage = 'Test error message';
+            const error = new Error(errorMessage);
+            timerService.accelerateTimer = jest.fn().mockImplementation(() => {
+                throw error;
+            });
+            timerGateway.accelerateTimer(socketMock as Socket, { pin });
+            expect(socketMock.emit).toHaveBeenCalledWith('error', errorMessage);
+        });
+    });
 });

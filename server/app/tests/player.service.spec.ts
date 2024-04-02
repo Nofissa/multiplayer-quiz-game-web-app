@@ -81,6 +81,42 @@ describe('playerService', () => {
         });
     });
 
+    describe('playerMute', () => {
+        const game = gameStub();
+        const socketMock = { id: 'OrganizerId' } as jest.Mocked<Socket>;
+        const player = playerstub();
+        player.socketId = 'playerId';
+        it('should throw an error if the client is not the organizer', () => {
+            gameService.getGame.mockReturnValue(game);
+            gameService.isOrganizer.mockReturnValue(false);
+            expect(() => playerService.playerMute(socketMock, game.pin, player.username)).toThrowError(
+                `Vous n'êtes pas organisateur de la partie ${game.pin}`,
+            );
+        });
+
+        it('should return undefined if no player matched in the clientPlayer', () => {
+            gameService.getGame.mockReturnValue(game);
+            gameService.isOrganizer.mockReturnValue(true);
+            jest.spyOn(Array.prototype, 'find').mockReturnValue(undefined);
+
+            const result = playerService.playerMute(socketMock, game.pin, player.username);
+            expect(result).toEqual(undefined);
+        });
+
+        it('should return the client player with playerState set on Muted', () => {
+            const playerMuted = playerstub();
+            playerMuted.state = PlayerState.Muted;
+            const clientPLayerTest: ClientPlayer = {
+                socket: { id: 'playerId' } as any,
+                player: playerMuted,
+            };
+            gameService.getGame.mockReturnValue(game);
+            gameService.isOrganizer.mockReturnValue(true);
+            const result = playerService.playerMute(socketMock, game.pin, player.username);
+            expect(result).toEqual(clientPLayerTest);
+        });
+    });
+
     describe('disconnect', () => {
         it('should return the right array', () => {
             const game = gameStub();

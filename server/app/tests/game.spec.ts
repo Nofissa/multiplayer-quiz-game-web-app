@@ -31,8 +31,8 @@ describe('Game', () => {
 
     it('should load the next question and initialize a new submission map', () => {
         game.loadNextQuestion();
-        expect(game.questionSubmissions.length).toEqual(2);
-        expect(game.questionSubmissions[1].size).toEqual(0);
+        expect(game.qrlSubmissions.length).toEqual(2);
+        expect(game.qrlSubmissions[1].size).toEqual(0);
         expect(game.currentQuestionIndex).toEqual(1);
     });
 
@@ -44,14 +44,14 @@ describe('Game', () => {
     });
 
     it('should return questionSubmission with the right index', () => {
-        expect(game.questionSubmissions).toEqual([new Map()]);
+        expect(game.qrlSubmissions).toEqual([new Map()]);
     });
 
     it('allSubmission should return questionSubmission', () => {
-        expect(game.allSubmissions).toEqual([new Map()]);
+        expect(game.qcmSubmissions).toEqual([new Map()]);
     });
 
     it('current question Submission should return the right map', () => {
-        expect(game.currentQuestionSubmissions).toEqual(new Map());
+        expect(game.currentQuestionQcmSubmissions).toEqual(new Map());
     });
 });
