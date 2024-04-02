@@ -206,7 +206,6 @@ export class GameService {
         const clientPlayers = game.clientPlayers;
 
         clientPlayers.get(client.id).player.isTyping = isTyping;
-
         if (isTyping) {
             clientPlayers.get(client.id).player.hasInteracted = true;
         }

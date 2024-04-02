@@ -21,14 +21,15 @@ export const gameStub = (): Game => {
         qcmSubmissions: [new Map<string, Submission>([['playerId', submissionStub()]])],
         qrlSubmissions: [new Map<string, QrlSubmission>([['playerId', qrlSubmissionStub()]])],
         loadNextQuestion() {
-            this.questionSubmissions.push(new Map());
+            this.qcmSubmissions.push(new Map());
+            this.qrlSubmissions.push(new Map());
             this.currentQuestionIndex++;
         },
         get currentQuestion() {
             return this.quiz.questions[this.currentQuestionIndex];
         },
         get currentQuestionQcmSubmissions() {
-            return this.questionSubmissions[this.currentQuestionIndex];
+            return this.qcmSubmissions[this.currentQuestionIndex];
         },
         get currentQuestionQrlSubmissions() {
             return this.qrlSubmissions[this.currentQuestionIndex];
