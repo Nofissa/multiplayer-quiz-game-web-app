@@ -15,19 +15,35 @@ import { qrlSubmissionStub } from './stubs/qrl.submission.stub';
 import { questionStub } from './stubs/question.stubs';
 import { quizStub } from './stubs/quiz.stubs';
 import { submissionStub } from './stubs/submission.stub';
+import { TimerService } from '@app/services/timer/timer.service';
+import { ModuleRef } from '@nestjs/core';
 
 describe('GameService', () => {
     let gameService: GameService;
+    let moduleRef: ModuleRef;
     let quizServiceMock: jest.Mocked<QuizService>;
+    let timerServiceMock: jest.Mocked<TimerService>;
     let socketMock: jest.Mocked<Socket>;
 
     beforeEach(async () => {
+        const moduleRefFactory = {
+            get: jest.fn((service) => {
+                if (service === QuizService) return quizServiceMock;
+                if (service === TimerService) return timerServiceMock;
+            }),
+        } as any;
+
+        moduleRef = moduleRefFactory as ModuleRef;
+
         quizServiceMock = {
             getQuizById: jest.fn(),
         } as any;
-        socketMock = { id: 'gameId' } as jest.Mocked<Socket>;
 
-        gameService = new GameService(quizServiceMock);
+        timerServiceMock = {
+            getTimer: jest.fn(),
+        } as any;
+
+        gameService = new GameService(moduleRef);
     });
 
     afterEach(() => {
@@ -82,8 +98,8 @@ describe('GameService', () => {
         const player = playerstub();
         player.socketId = 'gameId';
 
-        socketMock = { id: 'gameId' } as jest.Mocked<Socket>;
         it('should return the right payload if succesfull', () => {
+            socketMock = { id: 'gameId' } as jest.Mocked<Socket>;
             jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(gameTest);
             const payload = gameService.joinGame(socketMock, gameTest.pin, player.username);
             expect(payload).toEqual(player);

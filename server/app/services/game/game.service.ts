@@ -14,6 +14,7 @@ import { Question as CommonQuestion } from '@common/question';
 import { QuestionPayload } from '@common/question-payload';
 import { Submission } from '@common/submission';
 import { Injectable } from '@nestjs/common';
+import { ModuleRef } from '@nestjs/core';
 import { Socket } from 'socket.io';
 
 const PERCENTAGE_DIVIDER = 100;
@@ -25,7 +26,15 @@ const BONUS_MULTIPLIER = 1.2;
 export class GameService {
     games: Map<string, Game> = new Map();
 
-    constructor(private readonly quizService: QuizService) {}
+    constructor(private readonly moduleRef: ModuleRef) {}
+
+    get quizService(): QuizService {
+        return this.moduleRef.get(QuizService);
+    }
+
+    get timerService(): TimerService {
+        return this.moduleRef.get(TimerService);
+    }
 
     async createGame(client: Socket, quizId: string): Promise<string> {
         const quiz = await this.quizService.getQuizById(quizId);
@@ -90,9 +99,9 @@ export class GameService {
 
         const gameSubmissions = Array.from(game.currentQuestionQcmSubmissions.values());
         const isCorrect = this.isGoodAnswer(question, submission);
-        const isFirst = gameSubmissions.filter((x) => x.isFinal).length === 1;
+        const isFirst = gameSubmissions.filter((x) => x.isFinal).length === 1 && this.timerService.getTimer(pin)?.time !== 0;
         const isLast =
-            gameSubmissions.filter((x) => x.isFinal).length ===
+            gameSubmissions.filter((x) => x.isFinal).length >=
             Array.from(game.clientPlayers.values()).filter((x) => x.player.state === PlayerState.Playing).length;
 
         let score = isCorrect ? question.points : NO_POINTS;
