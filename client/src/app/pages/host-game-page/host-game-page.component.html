@@ -31,6 +31,7 @@
             </button>
             <button class="next-button" mat-raised-button *ngIf="currentQuestionHasEnded && isLastQuestion"
                 (click)="endGame()">Résultats</button>
+            <app-panic-mode-button [pin]="pin"></app-panic-mode-button>
         </div>
     </div>
 </div>

@@ -35,11 +35,11 @@ export class TimerService {
         return this.webSocketService.on('pauseTimer', applyIfPinMatches(pin, callback));
     }
 
-    accTimer(pin: string) {
-        this.webSocketService.emit('accelerateTimer', { pin });
+    accelerateTimer(pin: string, ticksPerSecond: number) {
+        this.webSocketService.emit('accelerateTimer', { pin, ticksPerSecond });
     }
 
-    onAccTimer(pin: string, callback: (payload: TimerPayload) => void): Subscription {
+    onAccelerateTimer(pin: string, callback: (payload: TimerPayload) => void): Subscription {
         return this.webSocketService.on('accelerateTimer', applyIfPinMatches(pin, callback));
     }
 }
