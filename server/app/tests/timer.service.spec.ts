@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */ // needed for mocking the socket
 import { GameService } from '@app/services/game/game.service';
 import { TimerService } from '@app/services/timer/timer.service';
+import { ModuleRef } from '@nestjs/core';
 import { Socket } from 'socket.io';
 import { gameStub } from './stubs/game.stub';
-import { ModuleRef } from '@nestjs/core';
 
 describe('TimerService', () => {
     let timerService: TimerService;
@@ -81,7 +81,7 @@ describe('TimerService', () => {
         it('should throw an error if the client is not the organizer', () => {
             const pin = 'somePin';
             socketMock = { id: 'differentId' } as jest.Mocked<Socket>;
-            jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(gameStub());
+            gameServiceMock.getGame.mockReturnValue(gameStub());
             expect(() => timerService.pauseTimer(socketMock, pin)).toThrow(
                 `Seul l'organisateur de la partie ${pin} peut mettre en pause la minuterie`,
             );
@@ -94,7 +94,7 @@ describe('TimerService', () => {
         it('should throw an error if the client is not the organizer', () => {
             const pin = 'somePin';
             socketMock = { id: 'differentId' } as jest.Mocked<Socket>;
-            jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(gameStub());
+            gameServiceMock.getGame.mockReturnValue(gameStub());
             expect(() => timerService.accelerateTimer(socketMock, pin)).toThrow(
                 `Seul l'organisateur de la partie ${pin} peut accelerer la minuterie`,
             );

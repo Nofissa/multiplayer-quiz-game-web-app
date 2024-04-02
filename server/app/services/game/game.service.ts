@@ -4,6 +4,7 @@ import { generateRandomPin } from '@app/helpers/pin';
 import { DisconnectPayload } from '@app/interfaces/disconnect-payload';
 import { Question } from '@app/model/database/question';
 import { QuizService } from '@app/services/quiz/quiz.service';
+import { TimerService } from '@app/services/timer/timer.service';
 import { GameState } from '@common/game-state';
 import { Player } from '@common/player';
 import { PlayerState } from '@common/player-state';
