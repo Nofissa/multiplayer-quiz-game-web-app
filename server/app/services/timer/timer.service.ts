@@ -57,6 +57,17 @@ export class TimerService {
             this.tickSubjects.delete(pin);
         }
     }
+    // client: Socket, pin: string
+    pauseTimer() {
+        // todo
+        return;
+    }
+
+    // client: Socket, pin: string
+    accelerateTimer() {
+        // todo
+        return;
+    }
 
     pauseTimer(client: Socket, pin: string) {
         const game = this.gameService.getGame(pin);

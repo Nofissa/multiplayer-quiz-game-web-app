@@ -137,7 +137,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
                 this.timerService.startTimer(this.pin, TimerEventType.NextQuestion, NEXT_QUESTION_DELAY_SECONDS);
             }),
 
-            this.gameService.onSubmitChoices(pin, (evaluation) => {
+            this.gameService.onQcmSubmit(pin, (evaluation) => {
                 if (this.isTest && evaluation.isLast) {
                     this.currentQuestionHasEnded = true;
                     this.timerService.stopTimer(pin);

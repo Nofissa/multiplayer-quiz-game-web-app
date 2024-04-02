@@ -33,8 +33,14 @@ describe('WaitingRoomPageComponent', () => {
         mockActivatedRoute = { snapshot: { queryParams: { pin: '123' } } } as never as Partial<ActivatedRoute>;
         mockRouter = { navigateByUrl: jasmine.createSpy('navigateByUrl'), navigate: jasmine.createSpy('navigate') };
         mockGameHttpService = jasmine.createSpyObj('GameHttpService', ['getGameSnapshotByPin']);
-        mockGameService = jasmine.createSpyObj('GameService', ['onCancelGame', 'onPlayerBan', 'onPlayerAbandon', 'onStartGame', 'playerAbandon']);
-        mockPlayerService = jasmine.createSpyObj('PlayerService', ['getCurrentPlayer']);
+        mockGameService = jasmine.createSpyObj('GameService', ['onCancelGame', 'onStartGame']);
+        mockPlayerService = jasmine.createSpyObj('PlayerService', [
+            'getCurrentPlayer',
+            'onPlayerBan',
+            'onPlayerAbandon',
+            'onStartGame',
+            'playerAbandon',
+        ]);
         mockWebSocketService = jasmine.createSpyObj('WebSocketService', ['on', 'getSocketId'], {
             socketInstance: io(),
         });
@@ -76,11 +82,11 @@ describe('WaitingRoomPageComponent', () => {
             return mockWebSocketService.on('cancelGame', applyIfPinMatches(pin, callback));
         });
 
-        mockGameService.onPlayerBan.and.callFake((pin, callback) => {
+        mockPlayerService.onPlayerBan.and.callFake((pin, callback) => {
             return mockWebSocketService.on('playerBan', applyIfPinMatches(pin, callback));
         });
 
-        mockGameService.onPlayerAbandon.and.callFake((pin, callback) => {
+        mockPlayerService.onPlayerAbandon.and.callFake((pin, callback) => {
             return mockWebSocketService.on('playerAbandon', applyIfPinMatches(pin, callback));
         });
 
@@ -117,7 +123,7 @@ describe('WaitingRoomPageComponent', () => {
         component.pin = pin;
         component.leaveGame();
 
-        expect(mockGameService.playerAbandon).toHaveBeenCalledWith(pin);
+        expect(mockPlayerService.playerAbandon).toHaveBeenCalledWith(pin);
         expect(mockRouter.navigateByUrl).toHaveBeenCalledWith('/home');
     });
 
@@ -133,8 +139,8 @@ describe('WaitingRoomPageComponent', () => {
         component.ngOnInit();
 
         expect(mockGameService.onCancelGame).toHaveBeenCalled();
-        expect(mockGameService.onPlayerBan).toHaveBeenCalled();
-        expect(mockGameService.onPlayerAbandon).toHaveBeenCalled();
+        expect(mockPlayerService.onPlayerBan).toHaveBeenCalled();
+        expect(mockPlayerService.onPlayerAbandon).toHaveBeenCalled();
         expect(mockGameService.onStartGame).toHaveBeenCalled();
     });
 

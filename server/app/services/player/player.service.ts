@@ -43,7 +43,7 @@ export class PlayerService {
         }
 
         const clientPlayer = Array.from(game.clientPlayers.values()).find((x) => {
-            return x.player.username.toLowerCase() === username.toLowerCase() && x.player.state === PlayerState.Playing;
+            return x.player.username.trim().toLowerCase() === username.trim().toLowerCase() && x.player.state === PlayerState.Playing;
         });
 
         if (clientPlayer) {

@@ -69,7 +69,7 @@ export class TimerGateway {
     @SubscribeMessage('accelerateTimer')
     accelerateTimer(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
         try {
-            this.timerService.accelerateTimer(client, pin);
+            this.timerService.accelerateTimer();
             const payload: GameEventPayload<null> = { pin, data: null };
 
             this.server.to(pin).emit('accelerateTimer', payload);
