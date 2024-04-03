@@ -45,7 +45,7 @@ export class TimerService {
         this.webSocketService.emit(ACCELERATE_TIMER_EVENT, { pin, ticksPerSecond });
     }
 
-    onAccelerateTimer(pin: string, callback: (payload: TimerPayload) => void): Subscription {
+    onAccelerateTimer(pin: string, callback: () => void): Subscription {
         return this.webSocketService.on(ACCELERATE_TIMER_EVENT, applyIfPinMatches(pin, callback));
     }
 }
