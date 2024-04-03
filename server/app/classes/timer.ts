@@ -54,10 +54,8 @@ export class Timer {
     }
 
     restart() {
-        if (!this.isRunning) {
-            clearInterval(this.interval);
-            this.start();
-        }
+        clearInterval(this.interval);
+        this.start();
     }
 
     private decrement() {
