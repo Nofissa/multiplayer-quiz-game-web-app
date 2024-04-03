@@ -32,7 +32,9 @@ export class TimerService {
         timer.time = duration;
         timer.onTick(callback);
 
-        return timer.start();
+        timer.start();
+
+        return timer.time;
     }
 
     stopTimer(client: Socket, pin: string) {
@@ -50,34 +52,34 @@ export class TimerService {
 
         timer.stop();
     }
-    // // client: Socket, pin: string
-    // pauseTimer() {
-    //     // todo
-    //     return;
-    // }
 
-    // // client: Socket, pin: string
-    // accelerateTimer() {
-    //     // todo
-    //     return;
-    // }
+    togglePauseTimer(client: Socket, pin: string): boolean {
+        const organizer = this.gameService.getOrganizer(pin);
 
-    pauseTimer(client: Socket, pin: string) {
-        const game = this.gameService.getGame(pin);
-
-        if (game.organizer.id !== client.id) {
+        if (organizer.id !== client.id) {
             throw new Error(`Seul l'organisateur de la partie ${pin} peut mettre en pause la minuterie`);
         }
-        // TODO : To complete with the right behavior
+
+        const timer = this.timers.get(pin);
+
+        if (timer && timer.isRunning) {
+            timer.pause();
+        } else {
+            timer.start();
+        }
+
+        return timer.isRunning;
     }
 
-    accelerateTimer(client: Socket, pin: string) {
-        const game = this.gameService.getGame(pin);
+    accelerateTimer(client: Socket, pin: string, ticksPerSecond: number) {
+        const organizer = this.gameService.getOrganizer(pin);
 
-        if (game.organizer.id !== client.id) {
-            throw new Error(`Seul l'organisateur de la partie ${pin} peut accelerer la minuterie`);
+        if (organizer.id !== client.id) {
+            throw new Error(`Seul l'organisateur de la partie ${pin} peut accélérer la minuterie`);
         }
-        // TODO : To complete with the right behavior
+
+        this.timers.get(pin).setTicksPerSecond(ticksPerSecond);
+
         return;
     }
 

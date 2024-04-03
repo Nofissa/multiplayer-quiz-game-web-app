@@ -8,24 +8,30 @@ export class Timer {
     private tickSubject: Subject<number>;
     private tickSubscription: Subscription | null;
     private interval: NodeJS.Timer | undefined;
-    private tickPerSecond: number = 1;
+    private ticksPerSecond: number = 1;
 
     constructor() {
         this.tickSubject = new Subject();
     }
 
-    setTickPerSecond(tickPerSecond: number) {
+    get isRunning(): boolean {
+        return this.interval && !this.interval['_destroyed'];
+    }
+
+    setTicksPerSecond(tickPerSecond: number) {
         if (tickPerSecond <= 0) {
             throw new Error('Le nombre de tic par seconde doit être un nombre strictement positif');
         }
 
-        this.tickPerSecond = tickPerSecond;
+        this.ticksPerSecond = tickPerSecond;
+
+        if (this.isRunning) {
+            this.restart();
+        }
     }
 
     start() {
-        this.interval = setInterval(this.decrement.bind(this), ONE_SECOND_MS / this.tickPerSecond);
-
-        return this.time;
+        this.interval = setInterval(this.decrement.bind(this), ONE_SECOND_MS / this.ticksPerSecond);
     }
 
     pause() {
@@ -36,6 +42,7 @@ export class Timer {
         clearInterval(this.interval);
 
         this.time = 0;
+        this.ticksPerSecond = 1;
 
         if (this.tickSubscription && !this.tickSubscription.closed) {
             this.tickSubscription.unsubscribe();
@@ -44,6 +51,13 @@ export class Timer {
 
     onTick(callback: (remainingTime: number) => void) {
         this.tickSubscription = this.tickSubject.subscribe(callback);
+    }
+
+    restart() {
+        if (!this.isRunning) {
+            clearInterval(this.interval);
+            this.start();
+        }
     }
 
     private decrement() {
