@@ -17,10 +17,7 @@ export class SoundService {
         const audio = this.audios.get(name);
 
         if (audio) {
-            const source = this.audioContext.createMediaElementSource(audio);
-
-            source.connect(this.audioContext.destination);
-            audio.play();
+            this.play(audio);
         }
     }
 
@@ -28,8 +25,19 @@ export class SoundService {
         const audio = this.audios.get(name);
 
         if (audio) {
-            audio.pause();
-            audio.currentTime = 0;
+            this.stop(audio);
         }
+    }
+
+    private play(audio: HTMLAudioElement) {
+        const source = this.audioContext.createMediaElementSource(audio);
+
+        source.connect(this.audioContext.destination);
+        audio.play();
+    }
+
+    private stop(audio: HTMLAudioElement) {
+        audio.pause();
+        audio.currentTime = 0;
     }
 }

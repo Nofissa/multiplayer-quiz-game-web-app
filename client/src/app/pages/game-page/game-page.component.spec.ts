@@ -23,17 +23,19 @@ import { TimerPayload } from '@common/timer-payload';
 import { Observable, throwError } from 'rxjs';
 import { io } from 'socket.io-client';
 import { GamePageComponent } from './game-page.component';
+import { SoundService } from '@app/services/sound/sound.service';
 
 describe('GamePageComponent', () => {
     let component: GamePageComponent;
     let fixture: ComponentFixture<GamePageComponent>;
     let gameHttpService: GameHttpService;
     let gameService: GameService;
-    let webSocketServiceSpy: jasmine.SpyObj<WebSocketService>;
     let socketServerMock: SocketServerMock;
+    let webSocketServiceSpy: jasmine.SpyObj<WebSocketService>;
     let timerServiceSpy: jasmine.SpyObj<TimerService>;
     let gameServiceSpy: jasmine.SpyObj<GameService>;
     let playerServiceSpy: jasmine.SpyObj<PlayerService>;
+    let soundServiceSpy: jasmine.SpyObj<SoundService>;
 
     beforeEach(async () => {
         webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', ['emit', 'on'], {
@@ -58,7 +60,7 @@ describe('GamePageComponent', () => {
 
         playerServiceSpy = jasmine.createSpyObj<PlayerService>(['onPlayerAbandon', 'onPlayerBan', 'playerBan', 'playerAbandon']);
 
-        timerServiceSpy = jasmine.createSpyObj<TimerService>(['onTimerTick', 'onStartTimer', 'stopTimer', 'startTimer']);
+        timerServiceSpy = jasmine.createSpyObj<TimerService>(['onStartTimer', 'onTimerTick', 'startTimer', 'stopTimer', 'onAccelerateTimer']);
         await TestBed.configureTestingModule({
             declarations: [GamePageComponent],
             imports: [HttpClientTestingModule, RouterTestingModule, BrowserAnimationsModule],
@@ -69,6 +71,7 @@ describe('GamePageComponent', () => {
                 { provide: WebSocketService, useValue: webSocketServiceSpy },
                 { provide: GameService, useValue: gameServiceSpy },
                 { provide: TimerService, useValue: timerServiceSpy },
+                { provide: SoundService, useValue: soundServiceSpy },
             ],
         }).compileComponents();
 
@@ -85,6 +88,7 @@ describe('GamePageComponent', () => {
                 };
             }).subscribe(func);
         });
+        soundServiceSpy = jasmine.createSpyObj<SoundService>(['loadSound', 'playSound', 'stopSound']);
 
         socketServerMock = new SocketServerMock([webSocketServiceSpy['socketInstance']]);
 
