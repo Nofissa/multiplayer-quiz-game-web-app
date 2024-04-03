@@ -38,6 +38,7 @@ import { GameBoardComponent } from './components/game-board/game-board.component
 import { GameTransitionComponent } from './components/game-transition/game-transition.component';
 import { NavHeaderComponent } from './components/nav-header/nav-header.component';
 import { PlayerListComponent } from './components/player-list/player-list.component';
+import { QrlBoardComponent } from './components/qrl-board/qrl-board.component';
 import { QuestionBankComponent } from './components/question-bank/question-bank.component';
 import { QuestionListComponent } from './components/question-list/question-list.component';
 import { QuizListComponent } from './components/quiz-list/quiz-list.component';
@@ -50,6 +51,7 @@ import { PlayerResultsPageComponent } from './pages/player-results-page/player-r
 import { QCMCreationPageComponent } from './pages/qcmcreation-page/qcmcreation-page.component';
 import { WaitingRoomPageComponent } from './pages/waiting-room-page/waiting-room-page.component';
 import { WebSocketService } from './services/web-socket/web-socket.service';
+
 /**
  * Main module that is used in main.ts.
  * All automatically generated components will appear in this module.
@@ -88,6 +90,7 @@ import { WebSocketService } from './services/web-socket/web-socket.service';
         BarChartSwiperComponent,
         ChatRoomComponent,
         GameTransitionComponent,
+        QrlBoardComponent,
     ],
     imports: [
         AppRoutingModule,
