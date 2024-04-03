@@ -4,8 +4,10 @@ import * as PinHelper from '@app/helpers/pin';
 import { DisconnectPayload } from '@app/interfaces/disconnect-payload';
 import { GameService } from '@app/services/game/game.service';
 import { QuizService } from '@app/services/quiz/quiz.service';
+import { TimerService } from '@app/services/timer/timer.service';
 import { GameState } from '@common/game-state';
 import { QuestionPayload } from '@common/question-payload';
+import { ModuleRef } from '@nestjs/core';
 import { Socket } from 'socket.io';
 import { clientPlayerStub } from './stubs/client.player.stub';
 import { evaluationStub } from './stubs/evaluation.stubs';
@@ -15,8 +17,6 @@ import { qrlSubmissionStub } from './stubs/qrl.submission.stub';
 import { questionStub } from './stubs/question.stubs';
 import { quizStub } from './stubs/quiz.stubs';
 import { submissionStub } from './stubs/submission.stub';
-import { TimerService } from '@app/services/timer/timer.service';
-import { ModuleRef } from '@nestjs/core';
 
 describe('GameService', () => {
     let gameService: GameService;
@@ -403,14 +403,14 @@ describe('GameService', () => {
         const answer = 'hello';
         it('should throw an error if the client already submitted', () => {
             jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
-            jest.spyOn(Map.prototype, 'has').mockReturnValue(false);
+            jest.spyOn(Map.prototype, 'has').mockReturnValue(true);
             expect(() => gameService.qrlSubmit(socketMock, game.pin, answer)).toThrow('Vous avez déjà soumis votre réponse pour cette question');
         });
 
         it('should return the right submission', () => {
             const submission = qrlSubmissionStub();
             jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
-            jest.spyOn(Map.prototype, 'has').mockReturnValue(true);
+            jest.spyOn(Map.prototype, 'has').mockReturnValue(false);
             const setSpy = jest.spyOn(Map.prototype, 'set');
             const result = gameService.qrlSubmit(socketMock, game.pin, answer);
             expect(setSpy).toHaveBeenCalledWith(socketMock.id, qrlSubmissionStub());
