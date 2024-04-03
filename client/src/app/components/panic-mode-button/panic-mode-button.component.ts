@@ -7,6 +7,7 @@ import { Subscription } from 'rxjs';
 
 const QCM_MIN_TIME = 10;
 const QRL_MIN_TIME = 20;
+const PANIC_TICKS_PER_SECOND = 4;
 
 @Component({
     selector: 'app-panic-mode-button',
@@ -16,7 +17,7 @@ const QRL_MIN_TIME = 20;
 export class PanicModeButtonComponent implements OnInit, OnDestroy {
     @Input() pin: string;
     isVisible: boolean = false;
-    isInPanicMode: boolean = false;
+    hasActivatedPanicMode: boolean = false;
 
     private currentQuestion: Question;
     private subscriptions: Subscription[] = [];
@@ -36,9 +37,9 @@ export class PanicModeButtonComponent implements OnInit, OnDestroy {
     }
 
     startPanicMode() {
-        this.isInPanicMode = true;
+        this.hasActivatedPanicMode = true;
 
-        this.timerService.accTimer(this.pin);
+        this.timerService.accelerateTimer(this.pin, PANIC_TICKS_PER_SECOND);
     }
 
     private subscribeToGameEvents() {
@@ -56,6 +57,9 @@ export class PanicModeButtonComponent implements OnInit, OnDestroy {
 
     private subscribeToTimerEvents() {
         this.subscriptions.push(
+            this.timerService.onStartTimer(this.pin, ({ eventType, remainingTime }) => {
+                this.updateVisibility(eventType, remainingTime);
+            }),
             this.timerService.onTimerTick(this.pin, ({ eventType, remainingTime }) => {
                 this.updateVisibility(eventType, remainingTime);
             }),
@@ -64,7 +68,7 @@ export class PanicModeButtonComponent implements OnInit, OnDestroy {
 
     private reset() {
         this.isVisible = false;
-        this.isInPanicMode = false;
+        this.hasActivatedPanicMode = false;
     }
 
     private updateCurrentQuestion(question: Question) {
@@ -74,15 +78,14 @@ export class PanicModeButtonComponent implements OnInit, OnDestroy {
     private updateVisibility(eventType: TimerEventType, remainingTime: number) {
         if (eventType === TimerEventType.Question && this.currentQuestion) {
             if (
-                (this.currentQuestion.type === 'QCM' && remainingTime > QCM_MIN_TIME) ||
-                (this.currentQuestion.type === 'QRL' && remainingTime > QRL_MIN_TIME)
+                (this.currentQuestion.type === 'QCM' && remainingTime <= QCM_MIN_TIME) ||
+                (this.currentQuestion.type === 'QRL' && remainingTime <= QRL_MIN_TIME)
             ) {
+                this.isVisible = false;
+            } else {
                 this.isVisible = true;
-                return;
             }
         }
-
-        this.isVisible = false;
     }
 
     private unsubscribeAll() {
