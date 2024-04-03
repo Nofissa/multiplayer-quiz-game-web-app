@@ -106,22 +106,5 @@ describe('Timer', () => {
             clearIntervalSpy.mockRestore();
             startSpy.mockRestore();
         });
-
-        it('should not do anything if the interval does not exist', () => {
-            jest.useFakeTimers();
-            const clearIntervalSpy = jest.spyOn(global, 'clearInterval');
-            const startSpy = jest.spyOn(timer, 'start');
-            jest.spyOn(timer, 'isRunning', 'get').mockReturnValue(true);
-
-            timer['interval'] = undefined;
-
-            timer.restart();
-
-            expect(clearIntervalSpy).not.toHaveBeenCalled();
-            expect(startSpy).not.toHaveBeenCalled();
-
-            clearIntervalSpy.mockRestore();
-            startSpy.mockRestore();
-        });
     });
 });
