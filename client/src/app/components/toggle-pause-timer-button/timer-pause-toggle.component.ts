@@ -3,11 +3,11 @@ import { TimerService } from '@app/services/timer/timer.service';
 import { Subscription } from 'rxjs';
 
 @Component({
-    selector: 'app-toggle-pause-timer-button',
-    templateUrl: './toggle-pause-timer-button.component.html',
-    styleUrls: ['./toggle-pause-timer-button.component.scss'],
+    selector: 'app-timer-pause-toggle',
+    templateUrl: './timer-pause-toggle.component.html',
+    styleUrls: ['./timer-pause-toggle.component.scss'],
 })
-export class TogglePauseTimerButtonComponent implements OnInit, OnDestroy {
+export class TimerPauseToggleComponent implements OnInit, OnDestroy {
     @Input()
     pin: string;
 

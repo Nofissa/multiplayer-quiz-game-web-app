@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TimerService } from '@app/services/timer/timer.service';
-import { TogglePauseTimerButtonComponent } from './toggle-pause-timer-button.component';
+import { TimerPauseToggleComponent } from './timer-pause-toggle.component';
 import { Observable, Observer, of, Subscription } from 'rxjs';
 import { TimerEventType } from '@common/timer-event-type';
 import { io } from 'socket.io-client';
@@ -8,9 +8,9 @@ import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { TimerPayload } from '@common/timer-payload';
 import { SocketServerMock } from '@app/mocks/socket-server-mock';
 
-describe('TogglePauseTimerButtonComponent', () => {
-    let component: TogglePauseTimerButtonComponent;
-    let fixture: ComponentFixture<TogglePauseTimerButtonComponent>;
+describe('TimerPauseToggleComponent', () => {
+    let component: TimerPauseToggleComponent;
+    let fixture: ComponentFixture<TimerPauseToggleComponent>;
     let timerServiceMock: jasmine.SpyObj<TimerService>;
     let webSocketServiceMock: jasmine.SpyObj<WebSocketService>;
     let socketServerMock: SocketServerMock;
@@ -22,7 +22,7 @@ describe('TogglePauseTimerButtonComponent', () => {
         });
 
         TestBed.configureTestingModule({
-            declarations: [TogglePauseTimerButtonComponent],
+            declarations: [TimerPauseToggleComponent],
             providers: [
                 { provide: TimerService, useValue: timerServiceMock },
                 { provide: WebSocketService, useValue: webSocketServiceMock },
@@ -45,7 +45,7 @@ describe('TogglePauseTimerButtonComponent', () => {
     });
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(TogglePauseTimerButtonComponent);
+        fixture = TestBed.createComponent(TimerPauseToggleComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
 
