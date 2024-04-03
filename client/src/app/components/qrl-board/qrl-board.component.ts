@@ -135,10 +135,10 @@ export class QrlBoardComponent implements OnInit, OnDestroy {
             this.remainingInputCount = MAX_MESSAGE_LENGTH;
             this.hasSubmitted = true;
             this.isInEvaluation = true;
-        } else if (this.input.length > MAX_MESSAGE_LENGTH) {
-            this.openError('La réponse contient plus de 200 caractères');
         } else if (isOnlyWhitespace) {
             this.openError('La réponse est vide');
+        } else if (this.input.length > MAX_MESSAGE_LENGTH) {
+            this.openError('La réponse contient plus de 200 caractères');
         }
     }
 
@@ -224,9 +224,9 @@ export class QrlBoardComponent implements OnInit, OnDestroy {
                 }
                 if (evaluation.isLast) {
                     this.questionIsOver = true;
-                    if (this.player) {
+                    if (this.player && this.cachedEvaluation) {
                         this.player.score += this.cachedEvaluation?.score ?? 0;
-                        this.blinkTextArea(evaluation.grade);
+                        this.blinkTextArea(this.cachedEvaluation.grade);
                     }
                 }
             }),

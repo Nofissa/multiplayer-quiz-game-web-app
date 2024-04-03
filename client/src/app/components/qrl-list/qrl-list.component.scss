@@ -18,6 +18,7 @@
     justify-content: center;
     align-items: center;
     flex-grow: 1;
+    margin: 5%;
 }
 
 .slider-effectCoverFlow {
@@ -33,19 +34,12 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        cursor: pointer;
         width: 300px;
         height: 300px;
         transition:
             transform 0.3s ease,
             box-shadow 0.3s ease,
             background-color 0.3s ease;
-
-        &:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-            background-color: lighten($color: #4bb4de, $amount: 10%);
-        }
     }
 
     .swiper-slide img {
@@ -65,7 +59,7 @@
 
     .quiz-subtitle {
         color: black;
-        font-size: 1.5em;
+        font-size: 1em;
         margin-bottom: 10px;
         max-width: 80%;
         word-wrap: break-word;
@@ -100,4 +94,27 @@
 
 .header {
     height: 100px;
+}
+
+.button-container {
+    display: flex;
+}
+
+.button-container button {
+    margin-right: 10px;
+}
+
+#badButton:hover {
+    background-color: red;
+    color: white;
+}
+
+#averageButton:hover {
+    background-color: rgb(205, 207, 49);
+    color: black;
+}
+
+#goodButton:hover {
+    background-color: rgb(19, 183, 19);
+    color: white;
 }

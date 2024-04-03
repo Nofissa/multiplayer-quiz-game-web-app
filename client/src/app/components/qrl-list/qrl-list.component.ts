@@ -3,6 +3,7 @@ import { GameServicesProvider } from '@app/providers/game-services.provider';
 import { MaterialServicesProvider } from '@app/providers/material-services.provider';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
+import { Grade } from '@common/grade';
 import { Player } from '@common/player';
 import { Subscription } from 'rxjs';
 
@@ -18,6 +19,7 @@ export class QrlListComponent implements OnInit, OnDestroy {
     pin: string;
     players: Player[] = [];
     playersMap: Map<Player, string | undefined> = new Map();
+    playersButtons: Map<Player, boolean> = new Map();
     evaluationsReceived: number = 0;
     private eventSubscriptions: Subscription[] = [];
 
@@ -48,9 +50,10 @@ export class QrlListComponent implements OnInit, OnDestroy {
         });
     }
 
-    // evaluateAnswer(grade: Grade) {
-    //     this.gameService.qrlEvaluate(this.pin, grade);
-    // }
+    evaluateAnswer(player: Player, grade: Grade) {
+        this.gameService.qrlEvaluate(player, this.pin, grade);
+        this.playersButtons.set(player, true);
+    }
 
     private setupSubscription(pin: string) {
         this.eventSubscriptions.push(
@@ -59,6 +62,7 @@ export class QrlListComponent implements OnInit, OnDestroy {
                 if (index !== NOT_FOUND_INDEX) {
                     this.evaluationsReceived += 1;
                     this.playersMap.set(this.players[index], submission.answer);
+                    this.playersButtons.set(this.players[index], false);
                 }
             }),
         );

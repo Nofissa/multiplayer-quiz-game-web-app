@@ -28,7 +28,7 @@
     <div class="timer-wrapper">
         <app-timer [pin]="pin"></app-timer>
     </div>
-    <span *ngIf="isInEvaluation && !isTest">L'évaluation est en cours...</span>
+    <span *ngIf="isInEvaluation && !isTest">L'ÉVALUATION EST EN COURS...</span>
     <div *ngIf="showNotification100" [@fadeAnimation] class="notification">Vous avez eu 100% des points!</div>
     <div class="buttons-wrapper">
         <button mat-flat-button id="validateButton" class="game-button" [class.disable-click]="hasSubmitted" (click)="submitAnswer()">

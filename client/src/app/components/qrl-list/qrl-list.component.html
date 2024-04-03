@@ -1,35 +1,37 @@
-<div class="create-game-page-wrapper">
-    <app-nav-header></app-nav-header>
-    <div class="create-game-container">
-        <div class="slider-effectCoverFlow">
-            <swiper
-                [effect]="'coverflow'"
-                [grabCursor]="true"
-                [centeredSlides]="true"
-                [slideToClickedSlide]="true"
-                [slidesPerView]="'auto'"
-                [coverflowEffect]="{
-                    rotate: 50,
-                    stretch: 0,
-                    depth: 100,
-                    modifier: 1,
-                    slideShadows: true
-                }"
-                [pagination]="true"
-                [navigation]="true"
-                class="mySwiper"
-            >
-                <ng-template swiperSlide *ngFor="let player of players">
-                    <div *ngIf="evaluationsReceived === players.length" class="game-slide">
-                        <h2 class="quiz-title">Réponse de {{ player.username }}</h2>
-                        <p class="quiz-subtitle">{{ playersMap.get(player) }}</p>
-                        <button mat-flat-button id="validateButton" class="game-button">0%</button>
-                        <button mat-flat-button id="validateButton" class="game-button">50%</button>
-                        <button mat-flat-button id="validateButton" class="game-button">100%</button>
-                    </div>
-                </ng-template>
-                >
-            </swiper>
-        </div>
+<div class="create-game-container">
+    <div class="slider-effectCoverFlow">
+        <swiper
+            [effect]="'coverflow'"
+            [grabCursor]="true"
+            [centeredSlides]="true"
+            [slideToClickedSlide]="true"
+            [slidesPerView]="'auto'"
+            [coverflowEffect]="{
+                rotate: 50,
+                stretch: 0,
+                depth: 100,
+                modifier: 1,
+                slideShadows: true
+            }"
+            [pagination]="true"
+            [navigation]="true"
+            class="mySwiper"
+        >
+            <ng-template swiperSlide *ngFor="let player of players">
+                <div *ngIf="evaluationsReceived === players.length" class="button-container" style="display: flex">
+                    <button id="badButton" mat-raised-button [disabled]="playersButtons.get(player)" (click)="evaluateAnswer(player, 0)">0%</button>
+                    <button id="averageButton" mat-raised-button [disabled]="playersButtons.get(player)" (click)="evaluateAnswer(player, 50)">
+                        50%
+                    </button>
+                    <button id="goodButton" mat-raised-button [disabled]="playersButtons.get(player)" (click)="evaluateAnswer(player, 100)">
+                        100%
+                    </button>
+                </div>
+                <div *ngIf="evaluationsReceived === players.length" class="game-slide">
+                    <h2 class="quiz-title">Réponse de {{ player.username }}:</h2>
+                    <p class="quiz-subtitle">{{ playersMap.get(player) }}</p>
+                </div>
+            </ng-template>
+        </swiper>
     </div>
 </div>
