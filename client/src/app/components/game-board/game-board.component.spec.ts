@@ -33,7 +33,8 @@ const gameSnapshotStub: GameSnapshot = {
     quiz: quizStub(),
     state: GameState.Paused,
     currentQuestionIndex: 0,
-    questionSubmissions: [],
+    questionQcmSubmissions: [],
+    questionQrlSubmission: [],
 };
 
 const observableSnapShot = of(gameSnapshotStub);

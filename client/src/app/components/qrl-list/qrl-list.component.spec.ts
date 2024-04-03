@@ -11,21 +11,34 @@ import { applyIfPinMatches } from '@app/utils/conditional-applications/condition
 import { GameEventPayload } from '@common/game-event-payload';
 import { GameSnapshot } from '@common/game-snapshot';
 import { GameState } from '@common/game-state';
+import { PlayerState } from '@common/player-state';
 import { QrlSubmission } from '@common/qrl-submission';
 import { Observable, of } from 'rxjs';
 import { io } from 'socket.io-client';
 import { QrlListComponent } from './qrl-list.component';
 
 const mockGameSnapshot: GameSnapshot = {
-    players: [firstPlayerStub()],
+    players: [
+        {
+            socketId: '1234',
+            username: 'Joe',
+            state: PlayerState.Playing,
+            score: 20,
+            speedAwardCount: 12,
+            hasInteracted: false,
+            hasSubmitted: false,
+            isTyping: false,
+        },
+    ],
     chatlogs: [],
     quiz: quizStub(),
     state: GameState.Opened,
     currentQuestionIndex: 0,
-    questionSubmissions: [[{ choices: [{ payload: 'testinggg', isSelected: true }], isFinal: true }]],
+    questionQrlSubmission: [[{ answer: 'testinggg', clientId: 'ededwdwedw' }]],
+    questionQcmSubmissions: [[{ choices: [{ payload: 'testinggg', isSelected: true }], isFinal: true }]],
 };
 
-fdescribe('QrlListComponent', () => {
+describe('QrlListComponent', () => {
     let component: QrlListComponent;
     let fixture: ComponentFixture<QrlListComponent>;
     let mockGameHttpService: jasmine.SpyObj<GameHttpService>;
@@ -36,7 +49,7 @@ fdescribe('QrlListComponent', () => {
     beforeEach(() => {
         mockGameHttpService = jasmine.createSpyObj('GameHttpService', ['getGameSnapshotByPin']);
         webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', ['emit', 'on'], { socketInstance: io() });
-        mockGameService = jasmine.createSpyObj('GameService', ['onQrlSubmit']);
+        mockGameService = jasmine.createSpyObj('GameService', ['onQrlSubmit', 'qrlEvaluate']);
 
         TestBed.configureTestingModule({
             imports: [MatDialogModule],
@@ -98,5 +111,13 @@ fdescribe('QrlListComponent', () => {
         component['setupSubscription']('123');
         socketServerMock.emit('qrlSubmit', qrlSubmission);
         expect(mockGameService.onQrlSubmit).toHaveBeenCalled();
+    });
+
+    it('should evaluateAnswers', () => {
+        component.pin = '123';
+        component.playersButtons = new Map();
+        component.evaluateAnswer(firstPlayerStub(), 0);
+        expect(mockGameService.qrlEvaluate).toHaveBeenCalledWith(firstPlayerStub(), '123', 0);
+        expect(component.playersButtons.size).toBe(1);
     });
 });

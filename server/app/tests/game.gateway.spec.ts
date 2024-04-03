@@ -6,10 +6,13 @@ import { TimerService } from '@app/services/timer/timer.service';
 import { GameEventPayload } from '@common/game-event-payload';
 import { GameState } from '@common/game-state';
 import { QcmEvaluation } from '@common/qcm-evaluation';
+import { QrlEvaluation } from '@common/qrl-evaluation';
 import { QuestionPayload } from '@common/question-payload';
 import { Submission } from '@common/submission';
 import { BroadcastOperator, Server, Socket } from 'socket.io';
 import { playerstub } from './stubs/player.stub';
+import { qrlEvaluationStub } from './stubs/qrl-evaluation.stub';
+import { qrlSubmissionStub } from './stubs/qrl.submission.stub';
 import { questionStub } from './stubs/question.stubs';
 import { submissionStub } from './stubs/submission.stub';
 
@@ -37,6 +40,9 @@ describe('GameGateway', () => {
             disconnect: jest.fn(),
             qcmToggleChoice: jest.fn(),
             getOrganizer: jest.fn(),
+            qrlInputChange: jest.fn(),
+            qrlSubmit: jest.fn(),
+            qrlEvaluate: jest.fn(),
         } as any;
         socketMock = {
             id: 'organizerId',
@@ -248,6 +254,68 @@ describe('GameGateway', () => {
             });
             gameGateway.endGame(socketMock, { pin });
             expect(socketMock.emit).toHaveBeenCalledWith('error', 'Mock error');
+        });
+    });
+
+    describe('qrlInputChange', () => {
+        const pin = 'mockPin';
+        it('should emit an error if there is an issue', () => {
+            gameServiceMock.qrlInputChange.mockImplementation(() => {
+                throw new Error('Mock error');
+            });
+            gameGateway.qrlInputChange(socketMock, { pin, isTyping: true });
+            expect(socketMock.emit).toHaveBeenCalledWith('error', 'Mock error');
+        });
+        it('should return the right payload', () => {
+            gameServiceMock.qrlInputChange.mockReturnValue([true]);
+            serverMock.to.mockReturnValue(broadcastMock);
+            gameGateway.qrlInputChange(socketMock, { pin, isTyping: true });
+            expect(serverMock.to).toHaveBeenCalledWith(pin);
+            expect(broadcastMock.emit).toHaveBeenCalledWith('qrlInputChange', { data: [true], pin: 'mockPin' } as GameEventPayload<boolean[]>);
+        });
+    });
+
+    describe('qrlSubmit', () => {
+        const pin = 'mockPin';
+        const answer = 'hello';
+        it('should emit an error if there is an issue', () => {
+            gameServiceMock.qrlSubmit.mockImplementation(() => {
+                throw new Error('Mock error');
+            });
+            gameGateway.qrlSubmit(socketMock, { pin, answer });
+            expect(socketMock.emit).toHaveBeenCalledWith('error', 'Mock error');
+        });
+
+        it('should return the right payload', () => {
+            gameServiceMock.qrlSubmit.mockReturnValue(qrlSubmissionStub());
+            gameServiceMock.getOrganizer.mockReturnValue(socketMock);
+            gameGateway.qrlSubmit(socketMock, { pin, answer });
+            expect(socketMock.emit).toHaveBeenCalledWith('qrlSubmit', { data: qrlSubmissionStub(), pin: 'mockPin' });
+        });
+    });
+
+    describe('qrlEvaluate', () => {
+        const pin = 'mockPin';
+        const qrlEvaluation = qrlEvaluationStub();
+        const grade = qrlEvaluationStub().grade;
+        const player = playerstub()[0];
+        it('should emit an error if there is an issue', () => {
+            gameServiceMock.qrlEvaluate.mockImplementation(() => {
+                throw new Error('Mock error');
+            });
+            gameGateway.qrlEvaluate(socketMock, { player, pin, grade });
+            expect(socketMock.emit).toHaveBeenCalledWith('error', 'Mock error');
+        });
+
+        it('should return the right payload', () => {
+            gameServiceMock.qrlEvaluate.mockReturnValue(qrlEvaluation);
+            serverMock.to.mockReturnValue(broadcastMock);
+            gameGateway.qrlEvaluate(socketMock, { player, pin, grade });
+            expect(serverMock.to).toHaveBeenCalledWith(pin);
+            expect(broadcastMock.emit).toHaveBeenCalledWith('qrlEvaluate', {
+                data: qrlEvaluation,
+                pin: 'mockPin',
+            } as GameEventPayload<QrlEvaluation>);
         });
     });
 
