@@ -50,15 +50,23 @@ export class TimerService {
 
         timer.stop();
     }
-    // client: Socket, pin: string
-    pauseTimer() {
-        // todo
-        return;
+
+    pauseTimer(client: Socket, pin: string) {
+        const game = this.gameService.getGame(pin);
+
+        if (game.organizer.id !== client.id) {
+            throw new Error(`Seul l'organisateur de la partie ${pin} peut mettre en pause la minuterie`);
+        }
+        // TODO : To complete with the right behavior
     }
 
-    // client: Socket, pin: string
-    accelerateTimer() {
-        // todo
+    accelerateTimer(client: Socket, pin: string) {
+        const game = this.gameService.getGame(pin);
+
+        if (game.organizer.id !== client.id) {
+            throw new Error(`Seul l'organisateur de la partie ${pin} peut accelerer la minuterie`);
+        }
+        // TODO : To complete with the right behavior
         return;
     }
 

@@ -10,6 +10,7 @@ import { GameSnapshot } from '@common/game-snapshot';
 import { GameState } from '@common/game-state';
 import { Player } from '@common/player';
 import { PlayerState } from '@common/player-state';
+import { QrlSubmission } from '@common/qrl-submission';
 import { Quiz } from '@common/quiz';
 import { Submission } from '@common/submission';
 import { Subscription, of } from 'rxjs';
@@ -40,6 +41,9 @@ describe('ChatRoomComponent', () => {
             state: PlayerState.Playing,
             score: 10,
             speedAwardCount: 1,
+            hasInteracted: false,
+            isTyping: false,
+            hasSubmitted: false,
         },
     ];
 
@@ -57,6 +61,7 @@ describe('ChatRoomComponent', () => {
     const mockState: GameState = GameState.Opened;
 
     const mockQuestionSubmissions: Submission[][] = [[{ choices: [{ payload: 0, isSelected: true }], isFinal: false }]];
+    const mockQuestionQrlSubmissions: QrlSubmission[][] = [[{ answer: 'hello', clientId: 'playerId' }]];
 
     const mockGameSnapshot: GameSnapshot = {
         players: mockPlayers,
@@ -64,7 +69,8 @@ describe('ChatRoomComponent', () => {
         quiz: mockQuiz,
         state: mockState,
         currentQuestionIndex: 0,
-        questionSubmissions: mockQuestionSubmissions,
+        questionQcmSubmissions: mockQuestionSubmissions,
+        questionQrlSubmission: mockQuestionQrlSubmissions,
     };
 
     beforeEach(() => {

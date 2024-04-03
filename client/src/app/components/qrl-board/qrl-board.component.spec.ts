@@ -57,6 +57,9 @@ describe('QrlBoardComponent', () => {
             state: PlayerState.Playing,
             score: 10,
             speedAwardCount: 1,
+            isTyping: false,
+            hasInteracted: false,
+            hasSubmitted: false,
         },
     ];
 
@@ -74,6 +77,7 @@ describe('QrlBoardComponent', () => {
     const mockState: GameState = GameState.Opened;
 
     const mockQuestionSubmissions: Submission[][] = [[{ choices: [{ payload: 'testinggg', isSelected: true }], isFinal: true }]];
+    const mockQuestionQrlSubmissions: QrlSubmission[][] = [[{ answer: 'hello', clientId: 'playerId' }]];
 
     const mockGameSnapshot: GameSnapshot = {
         players: mockPlayers,
@@ -81,7 +85,8 @@ describe('QrlBoardComponent', () => {
         quiz: mockQuiz,
         state: mockState,
         currentQuestionIndex: 0,
-        questionSubmissions: mockQuestionSubmissions,
+        questionQcmSubmissions: mockQuestionSubmissions,
+        questionQrlSubmission: mockQuestionQrlSubmissions,
     };
 
     const observableSnapShot = of(mockGameSnapshot);
