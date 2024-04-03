@@ -1,4 +1,5 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { PlayerListSortingOptions } from '@app/enums/player-list-sorting-options';
 import { PlayerListDisplayOptions } from '@app/interfaces/player-list-display-options';
 import { GameServicesProvider } from '@app/providers/game-services.provider';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
@@ -21,9 +22,10 @@ export class PlayerListComponent implements OnInit, OnDestroy {
     @Input()
     displayOptions: PlayerListDisplayOptions = {};
     players: Player[] = [];
+    sortingOptions = PlayerListSortingOptions.NameAscending;
 
     playerStates = PlayerState;
-
+    playerListSortingOptions = PlayerListSortingOptions;
     private eventSubscriptions: Subscription[] = [];
 
     private readonly gameHttpService: GameHttpService;
@@ -58,24 +60,19 @@ export class PlayerListComponent implements OnInit, OnDestroy {
     }
 
     mutePlayer(player: Player) {
-        this.playerService.playerMute(this.pin, player.username);
+        // server method is not function correctly
+        // this.playerService.playerMute(this.pin, player.username);
         // mock mute cause not implemented
-        player.isMuted = true;
+        if (player.isMuted) {
+            player.isMuted = false;
+        } else {
+            player.isMuted = true;
+        }
     }
 
-    sortPlayersByScore() {
-        this.displayOptions.sorted = true;
+    sortPlayers(option: PlayerListSortingOptions) {
+        this.sortingOptions = option;
         this.trySort();
-    }
-
-    sortPlayersByName() {
-        this.displayOptions.sorted = false;
-        this.players = this.players.sort((a, b) => a.username.localeCompare(b.username));
-    }
-
-    sortPlayersByState() {
-        this.displayOptions.sorted = false;
-        this.players = this.players.sort((a, b) => a.state - b.state);
     }
 
     private upsertPlayer(player: Player) {
@@ -99,6 +96,27 @@ export class PlayerListComponent implements OnInit, OnDestroy {
                     return a.username.localeCompare(b.username);
                 }
             });
+        } else {
+            if (this.sortingOptions === PlayerListSortingOptions.NameAscending) {
+                this.players.sort((a, b) => a.username.localeCompare(b.username));
+            }
+            if (this.sortingOptions === PlayerListSortingOptions.NameDescending) {
+                this.players.sort((a, b) => b.username.localeCompare(a.username));
+            }
+            if (this.sortingOptions === PlayerListSortingOptions.ScoreAscending) {
+                this.players.sort((a, b) => a.score - b.score);
+            }
+            if (this.sortingOptions === PlayerListSortingOptions.ScoreDescending) {
+                this.players.sort((a, b) => b.score - a.score);
+            }
+            if (this.sortingOptions === PlayerListSortingOptions.StatusAscending) {
+                this.players.sort((a, b) => a.username.localeCompare(b.username));
+                this.players.sort((a, b) => a.state - b.state);
+            }
+            if (this.sortingOptions === PlayerListSortingOptions.StatusDescending) {
+                this.players.sort((a, b) => a.username.localeCompare(b.username));
+                this.players.sort((a, b) => b.state - a.state);
+            }
         }
     }
 
