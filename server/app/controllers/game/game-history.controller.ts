@@ -32,7 +32,6 @@ export class GameHistoryController {
             response.status(HttpStatus.NOT_FOUND).send('Game histories not found');
         }
     }
-
     @ApiOkResponse({
         description: 'Delete all game histories',
     })
