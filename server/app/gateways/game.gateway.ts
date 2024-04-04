@@ -56,6 +56,10 @@ export class GameGateway implements OnGatewayDisconnect {
     @SubscribeMessage('startGame')
     startGame(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
         try {
+            const game = this.gameService.getGame(pin);
+            if (game?.isRandom) {
+                this.joinGame(client, { pin, username: 'Organisateur' });
+            }
             const data = this.gameService.startGame(client, pin);
             const payload: GameEventPayload<QuestionPayload> = { pin, data };
 
