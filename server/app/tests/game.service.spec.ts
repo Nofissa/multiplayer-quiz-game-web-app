@@ -150,7 +150,7 @@ describe('GameService', () => {
             jest.spyOn(Array.prototype, 'some').mockReturnValue(true);
             jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(gameTestUsername);
             expect(() => gameService.joinGame(socketMock, gameTest.pin, player.username)).toThrowError(
-                `Le nom d'utilisateur "${player.username}" banni`,
+                `Le nom d'utilisateur "${player.username}" est banni`,
             );
         });
     });
