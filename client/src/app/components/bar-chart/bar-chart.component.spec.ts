@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { questionStub } from '@app/TestStubs/question.stubs';
+import { qcmQuestionStub } from '@app/TestStubs/question.stubs';
 import { submissionStub } from '@app/TestStubs/submission.stubs';
 import { Submission } from '@common/submission';
 import { BarChartComponent } from './bar-chart.component';
@@ -15,7 +15,7 @@ describe('BarChartComponent', () => {
         fixture = TestBed.createComponent(BarChartComponent);
         component = fixture.componentInstance;
         component.data = {
-            question: questionStub()[0],
+            question: qcmQuestionStub()[0],
             submissions: [submissionStub()[0], submissionStub()[1], submissionStub()[2]],
         };
         fixture.detectChanges();

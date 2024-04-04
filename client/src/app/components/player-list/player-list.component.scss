@@ -44,11 +44,15 @@ mat-list-item {
 h4 {
     margin: 10px 0px;
     font-weight: bold;
-    color: var(--secondary-fg-color)
+    color: var(--secondary-fg-color);
 }
 
 .playing .player-name {
     color: green;
+}
+
+.playing .player-name-muted {
+    color: red;
 }
 
 .abandoned .player-name {
@@ -57,4 +61,25 @@ h4 {
 
 .hidden {
     display: none;
+}
+
+.sort-buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    font-size: small;
+    size: 80%;
+}
+.sort-icon{
+    color: #000;
+}
+.list-header{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 0px 10px;
+    background-color: var(--primary-bg-color);
+    border-radius: 15px 15px 0px 0px;
 }

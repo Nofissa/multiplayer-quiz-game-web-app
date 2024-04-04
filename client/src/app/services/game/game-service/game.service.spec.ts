@@ -1,11 +1,11 @@
 import { TestBed } from '@angular/core/testing';
 import { firstPlayerStub } from '@app/TestStubs/player.stubs';
-import { questionStub } from '@app/TestStubs/question.stubs';
+import { qcmQuestionStub } from '@app/TestStubs/question.stubs';
 import { SocketServerMock } from '@app/mocks/socket-server-mock';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
-import { QcmEvaluation } from '@common/qcm-evaluation';
 import { GameEventPayload } from '@common/game-event-payload';
 import { GameState } from '@common/game-state';
+import { QcmEvaluation } from '@common/qcm-evaluation';
 import { Question } from '@common/question';
 import { QuestionPayload } from '@common/question-payload';
 import { Submission } from '@common/submission';
@@ -88,7 +88,7 @@ describe('GameService', () => {
     it('should subscribe to startGame event and call the callback if pin matches', () => {
         gameService.onStartGame(stubData.pin1, stubData.callback);
 
-        const questionPayload: QuestionPayload = { question: questionStub()[0], isLast: false };
+        const questionPayload: QuestionPayload = { question: qcmQuestionStub()[0], isLast: false };
         const payload: GameEventPayload<QuestionPayload> = { pin: stubData.pin1, data: questionPayload };
         socketServerMock.emit(stubData.startGameEventName, payload);
 

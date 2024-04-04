@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { lastPlayerEvaluationStub } from '@app/TestStubs/evaluation.stubs';
 import { firstPlayerStub } from '@app/TestStubs/player.stubs';
-import { questionStub } from '@app/TestStubs/question.stubs';
+import { qcmQuestionStub } from '@app/TestStubs/question.stubs';
 import { quizStub } from '@app/TestStubs/quiz.stubs';
 import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
 import { SocketServerMock } from '@app/mocks/socket-server-mock';
@@ -178,7 +178,7 @@ describe('GameBoardComponent', () => {
     });
 
     it('should setupSubscriptions', () => {
-        const payload: GameEventPayload<Question> = { pin: '123', data: questionStub()[0] };
+        const payload: GameEventPayload<Question> = { pin: '123', data: qcmQuestionStub()[0] };
         const timerPayload: GameEventPayload<TimerPayload> = { pin: '123', data: { remainingTime: 0, eventType: TimerEventType.Question } };
         const evaluationPayload: GameEventPayload<QcmEvaluation> = { pin: '123', data: lastPlayerEvaluationStub() };
         spyOn(component, 'submitChoices');

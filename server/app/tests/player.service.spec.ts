@@ -105,7 +105,7 @@ describe('playerService', () => {
 
         it('should return the client player with playerState set on Muted', () => {
             const playerMuted = playerstub();
-            playerMuted.state = PlayerState.Muted;
+            playerMuted.isMuted = true;
             const clientPLayerTest: ClientPlayer = {
                 socket: { id: 'playerId' } as any,
                 player: playerMuted,

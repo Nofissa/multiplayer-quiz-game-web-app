@@ -27,8 +27,9 @@ export class UpsertQuestionDialogComponent {
         private readonly snackBar: MatSnackBar,
         private readonly dialogRef: MatDialogRef<UpsertQuestionDialogComponent>,
     ) {
+        const choices = this.data.question.choices ?? [];
         this.choicesArray = this.formBuilder.array(
-            this.data.question.choices.map((answer) => {
+            choices.map((answer) => {
                 return this.formBuilder.group({
                     text: [answer.text, Validators.required],
                     isCorrect: [answer.isCorrect, Validators.required],
@@ -101,42 +102,47 @@ export class UpsertQuestionDialogComponent {
         this.dialogRef.close();
     }
 
+    validateChoices() {
+        if (this.toggle) {
+            return true;
+        }
+        return this.formGroup.controls.choices.valid;
+    }
+
     submit() {
-        if (this.formGroup.valid && !this.toggle) {
+        if (this.formGroup.controls.text.valid && this.formGroup.controls.points.valid && this.validateChoices()) {
             const question: Question = {
                 type: this.toggle ? 'QRL' : 'QCM',
                 text: this.formGroup.value.text,
                 points: this.formGroup.value.points,
-                choices: this.formGroup.value.choices,
+                choices: this.toggle ? undefined : this.formGroup.value.choices,
                 lastModification: new Date(),
                 // for mongodb id
                 // eslint-disable-next-line no-underscore-dangle
                 _id: this.data.question._id ? this.data.question._id : this.generateRandomString(),
             };
-
             this.dialogRef.close(question);
-        } else {
-            let snackString = 'Une erreur est présente dans les champs :';
-
-            if (this.toggle) {
-                snackString += " QRL n'est pas implémenté,";
-            } else {
-                if (!this.formGroup.controls.text.valid) {
-                    snackString += ' question,';
-                }
-                if (!this.formGroup.controls.choices.valid) {
-                    snackString += ' réponses,';
-                }
-                if (!this.formGroup.controls.points.valid) {
-                    snackString += ' points,';
-                }
-            }
-            this.snackBar.open(snackString + ' veuillez réessayer', '', { duration: SNACK_MESSAGE_DURATION });
+            return;
         }
+
+        let snackString = 'Une erreur est présente dans les champs :';
+
+        if (!this.formGroup.controls.text.valid) {
+            snackString += ' question,';
+        }
+        if (!this.formGroup.controls.choices.valid) {
+            snackString += ' réponses,';
+        }
+        if (!this.formGroup.controls.points.valid) {
+            snackString += ' points,';
+        }
+
+        this.snackBar.open(snackString + ' veuillez réessayer', '', { duration: SNACK_MESSAGE_DURATION });
     }
 
     private oneTrueValidator(): ValidatorFn {
         return (control: AbstractControl): ValidationErrors | null => {
+            if (this.toggle) return null;
             const answerArray: Choice[] = control.value;
             const hasTrueAnswer = answerArray.some((answer) => answer.isCorrect);
             return hasTrueAnswer ? null : { noTrueAnswer: true };
@@ -145,6 +151,7 @@ export class UpsertQuestionDialogComponent {
 
     private oneFalseValidator(): ValidatorFn {
         return (control: AbstractControl): ValidationErrors | null => {
+            if (this.toggle) return null;
             const answerArray: Choice[] = control.value;
             const hasFalseAnswer = answerArray.some((answer) => !answer.isCorrect);
             return hasFalseAnswer ? null : { noFalseAnswer: true };
