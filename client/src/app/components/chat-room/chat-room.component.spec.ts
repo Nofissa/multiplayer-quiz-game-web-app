@@ -12,7 +12,7 @@ import { Player } from '@common/player';
 import { PlayerState } from '@common/player-state';
 import { QrlSubmission } from '@common/qrl-submission';
 import { Quiz } from '@common/quiz';
-import { Submission } from '@common/submission';
+import { QcmSubmission } from '@common/qcm-submission';
 import { Subscription, of } from 'rxjs';
 import { ChatRoomComponent } from './chat-room.component';
 
@@ -61,7 +61,7 @@ describe('ChatRoomComponent', () => {
 
     const mockState: GameState = GameState.Opened;
 
-    const mockQuestionSubmissions: Submission[][] = [[{ choices: [{ payload: 0, isSelected: true }], isFinal: false }]];
+    const mockQuestionSubmissions: QcmSubmission[][] = [[{ choices: [{ payload: 0, isSelected: true }], isFinal: false }]];
     const mockQuestionQrlSubmissions: QrlSubmission[][] = [[{ answer: 'hello', clientId: 'playerId' }]];
 
     const mockGameSnapshot: GameSnapshot = {

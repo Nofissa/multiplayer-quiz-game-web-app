@@ -5,15 +5,16 @@ import { DisconnectPayload } from '@app/interfaces/disconnect-payload';
 import { Question } from '@app/model/database/question';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { TimerService } from '@app/services/timer/timer.service';
+import { BarchartSubmission } from '@common/barchart-submission';
 import { GameState } from '@common/game-state';
 import { Player } from '@common/player';
 import { PlayerState } from '@common/player-state';
 import { QcmEvaluation } from '@common/qcm-evaluation';
+import { QcmSubmission } from '@common/qcm-submission';
 import { QrlEvaluation } from '@common/qrl-evaluation';
 import { QrlSubmission } from '@common/qrl-submission';
 import { Question as CommonQuestion } from '@common/question';
 import { QuestionPayload } from '@common/question-payload';
-import { QcmSubmission } from '@common/qcm-submission';
 import { Injectable } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { Socket } from 'socket.io';
@@ -190,12 +191,12 @@ export class GameService {
         };
     }
 
-    qcmToggleChoice(client: Socket, pin: string, choiceIndex: number): QcmSubmission[] {
+    qcmToggleChoice(client: Socket, pin: string, choiceIndex: number): BarchartSubmission {
         const game = this.getGame(pin);
         const submission = this.getOrCreateSubmission(client, game);
         submission.choices[choiceIndex].isSelected = !submission.choices[choiceIndex].isSelected;
 
-        return Array.from(game.currentQuestionQcmSubmissions.values());
+        return { clientId: client.id, index: choiceIndex, isSelected: submission.choices[choiceIndex].isSelected };
     }
 
     qrlSubmit(client: Socket, pin: string, answer: string): QrlSubmission {

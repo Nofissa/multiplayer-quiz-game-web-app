@@ -26,13 +26,6 @@ export class BarChartComponent {
         if (!this.data.submissions) {
             return 0;
         }
-        let playersSelected = 0;
-
-        Array.from(this.data.submissions.values()).forEach((submission) => {
-            if (submission.choices.some((choice) => choice.payload === index && choice.isSelected)) {
-                playersSelected++;
-            }
-        });
-        return playersSelected;
+        return this.data.submissions.filter((sumbmission) => sumbmission.index === index).length;
     }
 }

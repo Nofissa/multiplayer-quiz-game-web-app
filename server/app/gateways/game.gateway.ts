@@ -7,7 +7,7 @@ import { QcmEvaluation } from '@common/qcm-evaluation';
 import { QrlEvaluation } from '@common/qrl-evaluation';
 import { QrlSubmission } from '@common/qrl-submission';
 import { QuestionPayload } from '@common/question-payload';
-import { QcmSubmission } from '@common/qcm-submission';
+import { BarchartSubmission } from '@common/barchart-submission';
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
@@ -119,7 +119,7 @@ export class GameGateway implements OnGatewayDisconnect {
         try {
             const submission = this.gameService.qcmToggleChoice(client, pin, choiceIndex);
             const organizer = this.gameService.getOrganizer(pin);
-            const payload: GameEventPayload<QcmSubmission[]> = { pin, data: submission };
+            const payload: GameEventPayload<BarchartSubmission> = { pin, data: submission };
 
             organizer.emit('qcmToggleChoice', payload);
         } catch (error) {
