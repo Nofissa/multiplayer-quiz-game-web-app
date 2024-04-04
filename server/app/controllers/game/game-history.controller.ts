@@ -24,7 +24,7 @@ export class GameHistoryController {
         @Query('orderDirection') orderDirection: 'asc' | 'desc',
     ) {
         try {
-            const field = sortField || 'defaultSortField'; // replace 'defaultSortField' with your actual default field
+            const field = sortField || 'defaultSortField';
             const order = orderDirection || 'asc';
             const gameHistories = await this.gameHistoryService.getGameHistoriesSorted(field, order);
             response.status(HttpStatus.OK).json(gameHistories);
