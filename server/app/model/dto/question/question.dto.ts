@@ -29,6 +29,7 @@ export class QuestionDto {
     points: number;
 
     @IsArray({ message: "le champ 'choices' de question devrait être un tableau" })
+    @IsOptional()
     @ArrayMinSize(ValidationValues.MinAnswersSize, {
         message: `le champ 'choices' de question devrait être de taille plus grande ou égale à ${ValidationValues.MinAnswersSize}`,
     })
@@ -40,7 +41,7 @@ export class QuestionDto {
         message: "Le champ 'choices' de question devrait contenir au moins une entrée valide et une autre entrée invalide",
     })
     @ValidateNested({ each: true })
-    choices: ChoiceDto[];
+    choices?: ChoiceDto[];
 
     @IsDate({ message: "le champ 'lastModification' de question devrait être une date" })
     @IsOptional()

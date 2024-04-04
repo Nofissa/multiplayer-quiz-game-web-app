@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { QuestionBankComponent } from './question-bank.component';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { bothQuestionStub, qcmQuestionStub, qrlQuestionStub } from '@app/TestStubs/question.stubs';
 import { MaterialServicesProvider } from '@app/providers/material-services.provider';
 import { QuestionServicesProvider } from '@app/providers/question-services.provider';
+import { QuestionHttpService } from '@app/services/question-http/question-http.service';
+import { QuestionInteractionService } from '@app/services/question-interaction/question-interaction.service';
 import { QuestionSharingService } from '@app/services/question-sharing/question-sharing.service';
 import { Question } from '@common/question';
 import { Subject, of, throwError } from 'rxjs';
+import { QuestionBankComponent } from './question-bank.component';
 import SpyObj = jasmine.SpyObj;
-import { QuestionHttpService } from '@app/services/question-http/question-http.service';
-import { QuestionInteractionService } from '@app/services/question-interaction/question-interaction.service';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { questionStub } from '@app/TestStubs/question.stubs';
 
 describe('QuestionBankComponent', () => {
     let component: QuestionBankComponent;
@@ -32,7 +32,7 @@ describe('QuestionBankComponent', () => {
     let booleanSubject: Subject<boolean>;
 
     beforeEach(async () => {
-        mockQuestions = questionStub();
+        mockQuestions = qcmQuestionStub();
 
         mockQuestionSubject = new Subject();
         mockQuestionEditedSubject = new Subject();
@@ -224,6 +224,24 @@ describe('QuestionBankComponent', () => {
             booleanSubject.next(true);
             expect(questionHttpServiceSpy.deleteQuestionById).toHaveBeenCalled();
             expect(component.questions).toEqual([]);
+        });
+
+        it('should filterQuestions filter only QCM questions', () => {
+            component.questions = bothQuestionStub();
+            component.filterQuestions('QCM');
+            expect(component.displayedQuestions).toEqual(qcmQuestionStub());
+        });
+
+        it('should filterQuestions filter only QRL questions', () => {
+            component.questions = bothQuestionStub();
+            component.filterQuestions('QRL');
+            expect(component.displayedQuestions).toEqual(qrlQuestionStub());
+        });
+
+        it('should filterQuestions filter all questions when both types are selected', () => {
+            component.questions = bothQuestionStub();
+            component.filterQuestions('BOTH');
+            expect(component.displayedQuestions).toEqual(bothQuestionStub());
         });
     });
 });

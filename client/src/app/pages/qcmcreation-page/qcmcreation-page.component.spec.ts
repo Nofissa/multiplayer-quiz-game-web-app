@@ -1,22 +1,22 @@
 /* eslint-disable max-lines */
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { HttpClientModule } from '@angular/common/http';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { QCMCreationPageComponent } from './qcmcreation-page.component';
-import { ActivatedRoute } from '@angular/router';
-import { Subject, of, throwError } from 'rxjs';
-import { Quiz } from '@app/interfaces/quiz';
-import { Question } from '@common/question';
-import { UpsertQuestionDialogComponent } from '@app/components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
-import { QuizHttpService } from '@app/services/quiz-http/quiz-http.service';
-import { QuestionInteractionService } from '@app/services/question-interaction/question-interaction.service';
-import SpyObj = jasmine.SpyObj;
-import { QuestionSharingService } from '@app/services/question-sharing/question-sharing.service';
-import { MaterialServicesProvider } from '@app/providers/material-services.provider';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormBuilder } from '@angular/forms';
-import { questionStub } from '@app/TestStubs/question.stubs';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { ActivatedRoute } from '@angular/router';
+import { qcmQuestionStub } from '@app/TestStubs/question.stubs';
 import { quizStub } from '@app/TestStubs/quiz.stubs';
+import { UpsertQuestionDialogComponent } from '@app/components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
+import { Quiz } from '@app/interfaces/quiz';
+import { MaterialServicesProvider } from '@app/providers/material-services.provider';
+import { QuestionInteractionService } from '@app/services/question-interaction/question-interaction.service';
+import { QuestionSharingService } from '@app/services/question-sharing/question-sharing.service';
+import { QuizHttpService } from '@app/services/quiz-http/quiz-http.service';
+import { Question } from '@common/question';
+import { Subject, of, throwError } from 'rxjs';
+import { QCMCreationPageComponent } from './qcmcreation-page.component';
+import SpyObj = jasmine.SpyObj;
 
 describe('QCMCreationPageComponent', () => {
     let component: QCMCreationPageComponent;
@@ -34,7 +34,7 @@ describe('QCMCreationPageComponent', () => {
     let mockEditedQuiz: Quiz;
 
     const basicBeforeAll = (): void => {
-        mockQuestions = questionStub();
+        mockQuestions = qcmQuestionStub();
 
         mockQuizs = quizStub();
 
