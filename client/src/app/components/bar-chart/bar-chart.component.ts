@@ -26,6 +26,6 @@ export class BarChartComponent {
         if (!this.data.submissions) {
             return 0;
         }
-        return this.data.submissions.filter((sumbmission) => sumbmission.index === index).length;
+        return this.data.submissions.filter((submission) => submission.index === index && submission.isSelected).length;
     }
 }

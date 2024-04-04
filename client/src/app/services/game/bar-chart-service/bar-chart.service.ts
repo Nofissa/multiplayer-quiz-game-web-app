@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BarChartData } from '@app/interfaces/bar-chart-data';
-import { Question } from '@common/question';
 import { BarchartSubmission } from '@common/barchart-submission';
+import { Question } from '@common/question';
 
 @Injectable({
     providedIn: 'root',
@@ -13,8 +13,15 @@ export class BarChartService {
         if (!question) {
             return;
         }
+        const chartElements = [];
+        if (question.choices) {
+            for (const choice of question.choices) {
+                chartElements.push({ text: choice.text, isCorrect: choice.isCorrect });
+            }
+        }
         const newBarchartData: BarChartData = {
-            question,
+            text: question.text,
+            chartElements,
             submissions: [],
         };
         this.barChartData.push(newBarchartData);
@@ -23,7 +30,12 @@ export class BarChartService {
     updateBarChartData(data: BarchartSubmission): void {
         const chartData: BarChartData | undefined = this.getCurrentQuestionData();
         if (chartData && data) {
-            chartData.submissions.push(data);
+            const submissionIndex = chartData.submissions.findIndex((sub) => sub.clientId === data.clientId && sub.index === data.index);
+            if (submissionIndex >= 0) {
+                chartData.submissions[submissionIndex] = data;
+            } else {
+                chartData.submissions.push(data);
+            }
         }
     }
 
@@ -42,7 +54,8 @@ export class BarChartService {
         this.barChartData = [];
         for (let i = 0; i < chartData.questions.length; i++) {
             const newBarChart: BarChartData = {
-                question: chartData.questions[i],
+                text: chartData.questions[i].text,
+                chartElements: [],
                 submissions: chartData.submissions[i],
             };
             this.barChartData.push(newBarChart);

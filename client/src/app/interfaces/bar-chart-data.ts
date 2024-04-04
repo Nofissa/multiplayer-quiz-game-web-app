@@ -1,7 +1,8 @@
 import { BarchartSubmission } from '@common/barchart-submission';
-import { Question } from '@common/question';
+import { BarchartElement } from './barchart-element';
 
 export interface BarChartData {
-    question: Question;
+    text: string;
+    chartElements: BarchartElement[];
     submissions: BarchartSubmission[];
 }
