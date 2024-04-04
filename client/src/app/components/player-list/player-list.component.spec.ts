@@ -1,7 +1,5 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MatMenu } from '@angular/material/menu';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { RouterTestingModule } from '@angular/router/testing';
 import { lastPlayerEvaluationStub } from '@app/TestStubs/evaluation.stubs';
 import { firstPlayerStub } from '@app/TestStubs/player.stubs';
@@ -21,6 +19,7 @@ import { QcmEvaluation } from '@common/qcm-evaluation';
 import { Observable, of } from 'rxjs';
 import { io } from 'socket.io-client';
 import { PlayerListComponent } from './player-list.component';
+import { MatMenuModule } from '@angular/material/menu';
 
 const gameSnapshotStub: GameSnapshot = {
     players: [],
@@ -66,14 +65,12 @@ describe('PlayerListComponent', () => {
 
         await TestBed.configureTestingModule({
             declarations: [PlayerListComponent],
-            imports: [HttpClientTestingModule, RouterTestingModule],
+            imports: [HttpClientTestingModule, RouterTestingModule, MatMenuModule],
             providers: [
                 GameServicesProvider,
                 { provide: PlayerService, useValue: playerServiceSpy },
-                MatSnackBar,
                 { provide: WebSocketService, useValue: webSocketServiceSpy },
                 { provide: GameService, useValue: gameServiceSpy },
-                MatMenu,
             ],
         }).compileComponents();
 
