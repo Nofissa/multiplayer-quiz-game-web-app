@@ -201,7 +201,7 @@ export class GameService {
     qrlSubmit(client: Socket, pin: string, answer: string): QrlSubmission {
         const game = this.getGame(pin);
 
-        if (!game.currentQuestionQrlSubmissions.has(client.id)) {
+        if (game.currentQuestionQrlSubmissions.has(client.id)) {
             throw new Error('Vous avez déjà soumis votre réponse pour cette question');
         }
 
