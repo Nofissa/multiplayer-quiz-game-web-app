@@ -103,6 +103,7 @@ export class CreateGamePageComponent implements OnInit, OnDestroy {
                 isTyping: false,
                 hasInteracted: false,
                 hasSubmitted: false,
+                isMuted: false,
             };
             this.playerService.setPlayer(pin, player);
         });
@@ -120,6 +121,7 @@ export class CreateGamePageComponent implements OnInit, OnDestroy {
                 isTyping: false,
                 hasInteracted: false,
                 hasSubmitted: false,
+                isMuted: false,
             };
             this.playerService.setPlayer(pin, player);
             this.gameService.joinGame(pin, 'Testeur');
