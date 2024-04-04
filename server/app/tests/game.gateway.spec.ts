@@ -298,19 +298,19 @@ describe('GameGateway', () => {
         const pin = 'mockPin';
         const qrlEvaluation = qrlEvaluationStub();
         const grade = qrlEvaluationStub().grade;
-        const player = playerstub()[0];
+
         it('should emit an error if there is an issue', () => {
             gameServiceMock.qrlEvaluate.mockImplementation(() => {
                 throw new Error('Mock error');
             });
-            gameGateway.qrlEvaluate(socketMock, { player, pin, grade });
+            gameGateway.qrlEvaluate(socketMock, { socketId: 'playerId', pin, grade });
             expect(socketMock.emit).toHaveBeenCalledWith('error', 'Mock error');
         });
 
         it('should return the right payload', () => {
             gameServiceMock.qrlEvaluate.mockReturnValue(qrlEvaluation);
             serverMock.to.mockReturnValue(broadcastMock);
-            gameGateway.qrlEvaluate(socketMock, { player, pin, grade });
+            gameGateway.qrlEvaluate(socketMock, { socketId: 'playerId', pin, grade });
             expect(serverMock.to).toHaveBeenCalledWith(pin);
             expect(broadcastMock.emit).toHaveBeenCalledWith('qrlEvaluate', {
                 data: qrlEvaluation,

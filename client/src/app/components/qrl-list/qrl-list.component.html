@@ -1,11 +1,12 @@
 <div class="create-game-container">
-    <span *ngIf="evaluationsReceived < players.length">LES JOUEURS SONT EN TRAIN DE RÉPONDRE...</span>
-    <div *ngIf="evaluationsReceived === players.length" class="slider-effectCoverFlow">
+    <span *ngIf="submissionsReceived < players.length">LES JOUEURS SONT EN TRAIN DE RÉPONDRE...</span>
+    <div *ngIf="submissionsReceived === players.length" class="slider-effectCoverFlow">
         <swiper
+            #swiperRef
             [effect]="'coverflow'"
             [grabCursor]="true"
             [centeredSlides]="true"
-            [slideToClickedSlide]="true"
+            [slideToClickedSlide]="false"
             [slidesPerView]="'auto'"
             [coverflowEffect]="{
                 rotate: 50,
@@ -15,11 +16,11 @@
                 slideShadows: true
             }"
             [pagination]="true"
-            [navigation]="true"
+            [navigation]="evaluationsSent"
             class="mySwiper"
         >
             <ng-template swiperSlide *ngFor="let player of players">
-                <div *ngIf="evaluationsReceived === players.length" class="button-container" style="display: flex">
+                <div *ngIf="submissionsReceived === players.length" class="button-container" style="display: flex">
                     <button id="badButton" mat-raised-button [disabled]="playersButtons.get(player)" (click)="evaluateAnswer(player.socketId, 0)">
                         0%
                     </button>
@@ -34,8 +35,9 @@
                     <button id="goodButton" mat-raised-button [disabled]="playersButtons.get(player)" (click)="evaluateAnswer(player.socketId, 100)">
                         100%
                     </button>
+                    <!-- <div *ngIf="playersButtons.get(player)">{{}}</div> -->
                 </div>
-                <div *ngIf="evaluationsReceived === players.length" class="game-slide">
+                <div *ngIf="submissionsReceived === players.length" class="game-slide">
                     <h2 class="quiz-title">Réponse de {{ player.username }}:</h2>
                     <p class="quiz-subtitle">{{ playersMap.get(player) }}</p>
                 </div>

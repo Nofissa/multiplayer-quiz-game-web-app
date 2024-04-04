@@ -59,6 +59,7 @@ describe('PlayerListComponent', () => {
             'onEndGame',
             'onJoinGame',
             'qcmSubmit',
+            'onQrlEvaluate',
         ]);
 
         playerServiceSpy = jasmine.createSpyObj<PlayerService>(['onPlayerAbandon', 'onPlayerBan', 'onPlayerAbandon', 'playerBan']);

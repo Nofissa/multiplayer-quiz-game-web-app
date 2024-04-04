@@ -206,7 +206,7 @@ describe('QrlBoardComponent', () => {
         const timerPayload: GameEventPayload<TimerPayload> = { pin: '123', data: { remainingTime: 0, eventType: TimerEventType.Question } };
         const qrlPayload: GameEventPayload<QrlEvaluation> = {
             pin: '123',
-            data: { clientId: 'test', grade: Grade.Good, score: 10, isLast: true },
+            data: { player: firstPlayerStub(), grade: Grade.Good, score: 10, isLast: true },
         };
         const qrlSubmission: GameEventPayload<QrlSubmission> = { pin: '123', data: { answer: 'tesstststs', clientId: 'test' } };
         spyOn(component, 'submitAnswer');

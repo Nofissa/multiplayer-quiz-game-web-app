@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
@@ -22,10 +23,10 @@ import { PlayerService } from '@app/services/player/player.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
-import { QcmEvaluation } from '@common/qcm-evaluation';
 import { GameEventPayload } from '@common/game-event-payload';
 import { GameState } from '@common/game-state';
 import { Player } from '@common/player';
+import { QcmEvaluation } from '@common/qcm-evaluation';
 import { Question } from '@common/question';
 import { QuestionPayload } from '@common/question-payload';
 import { Submission } from '@common/submission';
@@ -90,6 +91,8 @@ describe('HostGamePageComponent', () => {
             'onStartGame',
             'onNextQuestion',
             'onEndGame',
+            'onQrlEvaluate',
+            'onQrlSubmit',
         ]);
 
         gameServiceSpy.onToggleGameLock.and.callFake((pin, callback) => {

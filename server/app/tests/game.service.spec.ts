@@ -43,7 +43,7 @@ describe('GameService', () => {
             getTimer: jest.fn(),
         } as any;
 
-        gameService = new GameService(moduleRef);
+        gameService = new GameService(moduleRef as any);
     });
 
     afterEach(() => {
@@ -74,7 +74,8 @@ describe('GameService', () => {
             const quizExist = quizStub();
             const client = socketMock;
             jest.spyOn(PinHelper, 'generateRandomPin').mockReturnValue('mockedPinValue');
-            quizServiceMock.getQuizById.mockResolvedValue(quizExist);
+            // quizServiceMock.getQuizById.mockResolvedValue(quizExist);
+            jest.spyOn(QuizService.prototype, 'getQuizById').mockResolvedValue(quizExist);
             const result = await gameService.createGame(client, quizId);
 
             expect(result).toBeTruthy();
@@ -413,7 +414,8 @@ describe('GameService', () => {
             jest.spyOn(Map.prototype, 'has').mockReturnValue(false);
             const setSpy = jest.spyOn(Map.prototype, 'set');
             const result = gameService.qrlSubmit(socketMock, game.pin, answer);
-            expect(setSpy).toHaveBeenCalledWith(socketMock.id, qrlSubmissionStub());
+            submission.isLast = false;
+            expect(setSpy).toHaveBeenCalledWith(socketMock.id, submission);
             expect(result).toEqual(submission);
         });
     });

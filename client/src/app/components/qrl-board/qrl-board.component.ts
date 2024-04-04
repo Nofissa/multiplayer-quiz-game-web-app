@@ -52,6 +52,8 @@ export class QrlBoardComponent implements OnInit, OnDestroy {
 
     @ViewChild('textarea') textarea: ElementRef;
     showNotification100: boolean = false;
+    showNotification50: boolean = false;
+    showNotification0: boolean = false;
 
     player: Player | null;
     remainingInputCount: number = MAX_MESSAGE_LENGTH;
@@ -172,12 +174,20 @@ export class QrlBoardComponent implements OnInit, OnDestroy {
                 setTimeout(() => {
                     this.textarea.nativeElement.classList.remove('blink-red');
                 }, THREE_SECONDS_MS);
+                this.showNotification0 = true;
+                setTimeout(() => {
+                    this.showNotification0 = false;
+                }, THREE_SECONDS_MS);
                 break;
             }
             case Grade.Average: {
                 this.textarea.nativeElement.classList.add('blink-yellow');
                 setTimeout(() => {
                     this.textarea.nativeElement.classList.remove('blink-yellow');
+                }, THREE_SECONDS_MS);
+                this.showNotification50 = true;
+                setTimeout(() => {
+                    this.showNotification50 = false;
                 }, THREE_SECONDS_MS);
                 break;
             }
