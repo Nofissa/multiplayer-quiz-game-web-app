@@ -60,6 +60,7 @@ describe('QrlBoardComponent', () => {
             isTyping: false,
             hasInteracted: false,
             hasSubmitted: false,
+            isMuted: false,
         },
     ];
 
