@@ -2,8 +2,10 @@
 import { ClientPlayer } from '@app/classes/client-player';
 import { Game } from '@app/classes/game';
 import { GameState } from '@common/game-state';
+import { QrlSubmission } from '@common/qrl-submission';
 import { Submission } from '@common/submission';
 import { clientPlayerStub } from './client.player.stub';
+import { qrlSubmissionStub } from './qrl.submission.stub';
 import { quizStub } from './quiz.stubs';
 import { submissionStub } from './submission.stub';
 
@@ -16,19 +18,21 @@ export const gameStub = (): Game => {
         chatlogs: [],
         currentQuestionIndex: 0,
         clientPlayers: new Map<string, ClientPlayer>([['playerId', clientPlayerStub()]]),
-        questionSubmissions: [new Map<string, Submission>([['playerId', submissionStub()]])],
+        qcmSubmissions: [new Map<string, Submission>([['playerId', submissionStub()]])],
+        qrlSubmissions: [new Map<string, QrlSubmission>([['playerId', qrlSubmissionStub()]])],
         loadNextQuestion() {
-            this.questionSubmissions.push(new Map());
+            this.qcmSubmissions.push(new Map());
+            this.qrlSubmissions.push(new Map());
             this.currentQuestionIndex++;
         },
         get currentQuestion() {
             return this.quiz.questions[this.currentQuestionIndex];
         },
-        get allSubmissions() {
-            return this.questionSubmissions;
+        get currentQuestionQcmSubmissions() {
+            return this.qcmSubmissions[this.currentQuestionIndex];
         },
-        get currentQuestionSubmissions() {
-            return this.questionSubmissions[this.currentQuestionIndex];
+        get currentQuestionQrlSubmissions() {
+            return this.qrlSubmissions[this.currentQuestionIndex];
         },
     };
 };

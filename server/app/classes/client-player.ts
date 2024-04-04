@@ -8,6 +8,15 @@ export class ClientPlayer {
 
     constructor(socket: Socket, username: string) {
         this.socket = socket;
-        this.player = { socketId: socket.id, username, state: PlayerState.Playing, score: 0, speedAwardCount: 0 };
+        this.player = {
+            socketId: socket.id,
+            username,
+            state: PlayerState.Playing,
+            score: 0,
+            speedAwardCount: 0,
+            hasSubmitted: false,
+            hasInteracted: false,
+            isTyping: false,
+        };
     }
 }

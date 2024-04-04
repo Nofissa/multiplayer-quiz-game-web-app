@@ -4,6 +4,8 @@ import { GameEventPayload } from '@common/game-event-payload';
 import { GameState } from '@common/game-state';
 import { Player } from '@common/player';
 import { QcmEvaluation } from '@common/qcm-evaluation';
+import { QrlEvaluation } from '@common/qrl-evaluation';
+import { QrlSubmission } from '@common/qrl-submission';
 import { QuestionPayload } from '@common/question-payload';
 import { Submission } from '@common/submission';
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
@@ -101,29 +103,6 @@ export class GameGateway implements OnGatewayDisconnect {
         }
     }
 
-    @SubscribeMessage('qrlInputChange')
-    qrlInputChange(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
-        try {
-            this.gameService.qrlInputChange();
-            const payload: GameEventPayload<null> = { pin, data: null };
-            this.server.to(pin).emit('qrlInputChange', payload);
-        } catch (error) {
-            client.emit('error', error.message);
-        }
-    }
-
-    @SubscribeMessage('qrlSubmit')
-    qrlSubmit(@ConnectedSocket() client: Socket, @MessageBody() { pin, qrlText }: { pin: string; qrlText: string }) {
-        try {
-            this.gameService.qrlSubmit(client, pin, qrlText);
-            const payload: GameEventPayload<string> = { pin, data: qrlText };
-
-            this.server.to(pin).emit('qrlSubmit', payload);
-        } catch (error) {
-            client.emit('error', error.message);
-        }
-    }
-
     @SubscribeMessage('nextQuestion')
     nextQuestion(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
         try {
@@ -151,10 +130,46 @@ export class GameGateway implements OnGatewayDisconnect {
     @SubscribeMessage('endGame')
     endGame(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
         try {
-            this.timerService.stopTimer(client, pin);
             this.gameService.endGame(client, pin);
             const payload: GameEventPayload<null> = { pin, data: null };
             this.server.to(pin).emit('endGame', payload);
+        } catch (error) {
+            client.emit('error', error.message);
+        }
+    }
+
+    @SubscribeMessage('qrlInputChange')
+    qrlInputChange(@ConnectedSocket() client: Socket, @MessageBody() { pin, isTyping }: { pin: string; isTyping: boolean }) {
+        try {
+            const typing = this.gameService.qrlInputChange(client, pin, isTyping);
+            const payload: GameEventPayload<boolean[]> = { pin, data: typing };
+
+            this.server.to(pin).emit('qrlInputChange', payload);
+        } catch (error) {
+            client.emit('error', error.message);
+        }
+    }
+
+    @SubscribeMessage('qrlSubmit')
+    qrlSubmit(@ConnectedSocket() client: Socket, @MessageBody() { pin, answer }: { pin: string; answer: string }) {
+        try {
+            const submission = this.gameService.qrlSubmit(client, pin, answer);
+            const organizer = this.gameService.getOrganizer(pin);
+            const payload: GameEventPayload<QrlSubmission> = { pin, data: submission };
+
+            organizer.emit('qrlSubmit', payload);
+        } catch (error) {
+            client.emit('error', error.message);
+        }
+    }
+
+    @SubscribeMessage('qrlEvaluate')
+    qrlEvaluate(@ConnectedSocket() client: Socket, @MessageBody() { pin, qrlEvaluation }: { pin: string; qrlEvaluation: QrlEvaluation }) {
+        try {
+            qrlEvaluation = this.gameService.qrlEvaluate(client, pin, qrlEvaluation);
+            const payload: GameEventPayload<QrlEvaluation> = { pin, data: qrlEvaluation };
+
+            this.server.to(pin).emit('qrlEvaluate', payload);
         } catch (error) {
             client.emit('error', error.message);
         }

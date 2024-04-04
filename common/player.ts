@@ -7,6 +7,7 @@ export interface Player {
     score: number;
     speedAwardCount: number;
     isMuted?: boolean;
-    hasSelected?: boolean;
-    hasSubmitted?: boolean;
+    isTyping: boolean;
+    hasInteracted: boolean;
+    hasSubmitted: boolean;
 }

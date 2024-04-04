@@ -62,7 +62,8 @@ describe('GameController', () => {
                         };
                     }),
                 },
-                questionSubmissions: game.questionSubmissions.map((x) => Array.from(x.values())),
+                questionQcmSubmissions: game.qcmSubmissions.map((x) => Array.from(x.values())),
+                questionQrlSubmission: game.qrlSubmissions.map((x) => Array.from(x.values())),
             };
             const response = await request(app.getHttpServer()).get('/games/mockPin/snapshot');
             expect(response.status).toBe(HttpStatus.OK);

@@ -1,6 +1,7 @@
+import { Player } from '@common/player';
 import { PlayerState } from '@common/player-state';
 
-export const firstPlayerStub = () => {
+export const firstPlayerStub = (): Player => {
     return {
         socketId: '1234',
         username: 'Joe',
@@ -8,20 +9,22 @@ export const firstPlayerStub = () => {
         score: 20,
         speedAwardCount: 12,
         isMuted: false,
-        isSelected: false,
-        isSubmitted: false,
+        isTyping: false,
+        hasInteracted: false,
+        hasSubmitted: false,
     };
 };
 
-export const secondPlayerStub = () => {
+export const secondPlayerStub = (): Player => {
     return {
         socketId: '4632',
         username: 'Bob',
         state: PlayerState.Abandonned,
         score: 20,
         speedAwardCount: 12,
-        isMuted: true,
-        isSelected: false,
-        isSubmitted: false,
+        isMuted: false,
+        isTyping: false,
+        hasInteracted: false,
+        hasSubmitted: false,
     };
 };
