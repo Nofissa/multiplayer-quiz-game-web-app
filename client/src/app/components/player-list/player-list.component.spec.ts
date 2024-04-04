@@ -1,5 +1,6 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatMenu } from '@angular/material/menu';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { RouterTestingModule } from '@angular/router/testing';
 import { lastPlayerEvaluationStub } from '@app/TestStubs/evaluation.stubs';
@@ -72,6 +73,7 @@ describe('PlayerListComponent', () => {
                 MatSnackBar,
                 { provide: WebSocketService, useValue: webSocketServiceSpy },
                 { provide: GameService, useValue: gameServiceSpy },
+                MatMenu,
             ],
         }).compileComponents();
 
