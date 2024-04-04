@@ -1,8 +1,7 @@
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BarChartSwiperComponent } from '@app/components/bar-chart-swiper/bar-chart-swiper.component';
 import { BarChartData } from '@app/interfaces/bar-chart-data';
 import { GameServicesProvider } from '@app/providers/game-services.provider';
 import { RoutingDependenciesProvider } from '@app/providers/routing-dependencies.provider';
@@ -20,7 +19,6 @@ import { Subscription } from 'rxjs';
 
 const START_GAME_COUNTDOWN_DURATION_SECONDS = 5;
 const NEXT_QUESTION_DELAY_SECONDS = 3;
-const SWIPER_SYNC_DELAY_MS = 100;
 const CANCEL_GAME_NOTICE_DURATION_MS = 5000;
 const PANIC_AUDIO_NAME = 'ticking-timer';
 const PANIC_AUDIO_SRC = 'assets/ticking-timer.wav';
@@ -31,7 +29,6 @@ const PANIC_AUDIO_SRC = 'assets/ticking-timer.wav';
     styleUrls: ['./host-game-page.component.scss'],
 })
 export class HostGamePageComponent implements OnInit {
-    @ViewChild(BarChartSwiperComponent) barChartSwiperComponent: BarChartSwiperComponent;
     pin: string;
     gameState: GameState = GameState.Opened;
     currentQuestionHasEnded: boolean = false;
@@ -109,11 +106,6 @@ export class HostGamePageComponent implements OnInit {
         this.gameState = GameState.Running;
         this.currentQuestionHasEnded = false;
         this.gameService.nextQuestion(this.pin);
-        setTimeout(() => {
-            if (this.barChartSwiperComponent && this.barChartSwiperComponent.swiperComponent) {
-                this.barChartSwiperComponent.goToNextSlide();
-            }
-        }, SWIPER_SYNC_DELAY_MS);
     }
 
     cancelGame() {

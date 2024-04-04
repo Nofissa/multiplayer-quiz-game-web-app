@@ -3,7 +3,7 @@
     --mdc-linear-progress-track-height: 20px !important;
     --mdc-linear-progress-track-color: none;
     width: 100%;
-    transform: rotate(-90deg);
+    transform: rotate(-90deg); /* Rotate the container to make the progress bar vertical */
 }
 
 ::ng-deep .mat-mdc-progress-bar.progress-bar-0 {
@@ -42,34 +42,27 @@
     flex-direction: row;
     justify-content: space-between;
     margin: 10%;
-    align-items: center;
-    max-width: 400px;
 }
 
 .bar-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-evenly;
+    justify-content: center;
 }
 
 .choice-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin: 20px;
-    align-items: center;
-    max-width: 650px;
-    padding-bottom: 8%;
+    align-content: space-between;
+    width: 90%;
+    grid-area: choices;
+    display: grid;
+    grid-template-areas:
+        'choice-0 choice-1'
+        'choice-2 choice-3';
 }
 
 .choice {
     margin: 8px;
-}
-
-.mat-mdc-card:not(:not([class*='choice-'])) {
-    max-height: 100px;
-    max-width: 300px;
 }
 
 .mat-mdc-card.choice-0 {
@@ -94,10 +87,11 @@
 }
 
 .progress-container {
-    width: auto;
+    width: 100%;
+
     align-items: center;
     justify-content: center;
-    transform: rotate(-90deg);
+    transform: rotate(-90deg); /* Rotate the container to make the progress bar vertical */
     transform-origin: top left;
 }
 
@@ -111,21 +105,24 @@
 }
 
 .bar-chart {
-    max-width: 1500px;
-    max-height: 800px;
-    grid-template-rows: auto;
-    background-color: white;
+    height: auto;
     color: black;
+    background-color: white;
     border-radius: 15px;
     border: 2px black solid;
+    overflow: hidden;
     justify-content: center;
+    align-items: center;
+    width: 250px;
+    display: grid;
+    grid-template-rows: auto auto auto;
+    grid-template-areas:
+        'question'
+        'bar-chart'
+        'choices';
 }
 
 .choice-container legend {
     font-size: 90%;
     text-align: left;
-}
-
-.green-badge ::ng-deep .mat-badge-content {
-    background-color: green !important;
 }

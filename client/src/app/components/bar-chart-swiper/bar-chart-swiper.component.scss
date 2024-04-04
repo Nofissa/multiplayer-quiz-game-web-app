@@ -4,22 +4,24 @@
 @import 'swiper/css/effect-coverflow';
 
 .slider-effectCoverFlow {
+    box-sizing: border-box;
     .swiper {
-        max-width: 1500px;
+        width: 50%;
         padding-top: 2%;
         padding-bottom: 5%;
     }
 
     .swiper-slide,
     .game-slide {
-        background-color: transparent !important;
+        background-color: none;
+        background-size: cover;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
         cursor: pointer;
-        max-width: 1500px;
-        height: 500px;
+        width: 300px;
+        height: 300px;
         transition:
             transform 0.3s ease,
             box-shadow 0.3s ease,
