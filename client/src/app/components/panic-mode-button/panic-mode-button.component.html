@@ -1,0 +1,5 @@
+<button *ngIf="isVisible" class="panic-button" mat-raised-button (click)="startPanicMode()"
+    [disabled]="hasActivatedPanicMode">
+    Mode Panique
+    <mat-icon class="icon" fontIcon="priority_high"></mat-icon>
+</button>

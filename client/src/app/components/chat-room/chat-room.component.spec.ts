@@ -44,6 +44,7 @@ describe('ChatRoomComponent', () => {
             hasInteracted: false,
             isTyping: false,
             hasSubmitted: false,
+            isMuted: false,
         },
     ];
 

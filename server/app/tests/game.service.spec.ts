@@ -4,10 +4,8 @@ import * as PinHelper from '@app/helpers/pin';
 import { DisconnectPayload } from '@app/interfaces/disconnect-payload';
 import { GameService } from '@app/services/game/game.service';
 import { QuizService } from '@app/services/quiz/quiz.service';
-import { TimerService } from '@app/services/timer/timer.service';
 import { GameState } from '@common/game-state';
 import { QuestionPayload } from '@common/question-payload';
-import { ModuleRef } from '@nestjs/core';
 import { Socket } from 'socket.io';
 import { clientPlayerStub } from './stubs/client.player.stub';
 import { evaluationStub } from './stubs/evaluation.stubs';
@@ -20,30 +18,30 @@ import { submissionStub } from './stubs/submission.stub';
 
 describe('GameService', () => {
     let gameService: GameService;
-    let moduleRef: ModuleRef;
+    // let moduleRef: ModuleRef;
     let quizServiceMock: jest.Mocked<QuizService>;
-    let timerServiceMock: jest.Mocked<TimerService>;
+    // let timerServiceMock: jest.Mocked<TimerService>;
     let socketMock: jest.Mocked<Socket>;
 
     beforeEach(async () => {
-        const moduleRefFactory = {
-            get: jest.fn((service) => {
-                if (service === QuizService) return quizServiceMock;
-                if (service === TimerService) return timerServiceMock;
-            }),
-        } as any;
+        // const moduleRefFactory = {
+        //     get: jest.fn((service) => {
+        //         if (service === QuizService) return quizServiceMock;
+        //         if (service === TimerService) return timerServiceMock;
+        //     }),
+        // } as any;
 
-        moduleRef = moduleRefFactory as ModuleRef;
+        // moduleRef = moduleRefFactory as ModuleRef;
 
         quizServiceMock = {
             getQuizById: jest.fn(),
         } as any;
 
-        timerServiceMock = {
-            getTimer: jest.fn(),
-        } as any;
+        // timerServiceMock = {
+        //     getTimer: jest.fn(),
+        // } as any;
 
-        gameService = new GameService(moduleRef as any);
+        gameService = new GameService(quizServiceMock);
     });
 
     afterEach(() => {
@@ -74,8 +72,8 @@ describe('GameService', () => {
             const quizExist = quizStub();
             const client = socketMock;
             jest.spyOn(PinHelper, 'generateRandomPin').mockReturnValue('mockedPinValue');
-            // quizServiceMock.getQuizById.mockResolvedValue(quizExist);
-            jest.spyOn(QuizService.prototype, 'getQuizById').mockResolvedValue(quizExist);
+            quizServiceMock.getQuizById.mockResolvedValue(quizExist);
+            // jest.spyOn(QuizService.prototype, 'getQuizById').mockResolvedValue(quizExist);
             const result = await gameService.createGame(client, quizId);
 
             expect(result).toBeTruthy();

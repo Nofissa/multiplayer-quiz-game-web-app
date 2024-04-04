@@ -4,6 +4,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
@@ -12,6 +13,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSliderModule } from '@angular/material/slider';
@@ -36,6 +38,7 @@ import { UpsertQuestionDialogComponent } from './components/dialogs/upsert-quest
 import { GameBoardComponent } from './components/game-board/game-board.component';
 import { GameTransitionComponent } from './components/game-transition/game-transition.component';
 import { NavHeaderComponent } from './components/nav-header/nav-header.component';
+import { PanicModeButtonComponent } from './components/panic-mode-button/panic-mode-button.component';
 import { PlayerListComponent } from './components/player-list/player-list.component';
 import { QrlBoardComponent } from './components/qrl-board/qrl-board.component';
 import { QrlListComponent } from './components/qrl-list/qrl-list.component';
@@ -44,6 +47,7 @@ import { QuestionListComponent } from './components/question-list/question-list.
 import { QuizListComponent } from './components/quiz-list/quiz-list.component';
 import { QuizComponent } from './components/quiz/quiz.component';
 import { TimerComponent } from './components/timer/timer.component';
+import { TimerPauseToggleComponent } from './components/toggle-pause-timer-button/timer-pause-toggle.component';
 import { AppRoutingModule } from './modules/app-routing.module';
 import { AdminPageComponent } from './pages/admin-page/admin-page.component';
 import { CreateGamePageComponent } from './pages/create-game-page/create-game-page.component';
@@ -91,6 +95,8 @@ import { WebSocketService } from './services/web-socket/web-socket.service';
         ChatRoomComponent,
         GameTransitionComponent,
         QrlBoardComponent,
+        PanicModeButtonComponent,
+        TimerPauseToggleComponent,
         QrlListComponent,
     ],
     imports: [
@@ -123,6 +129,8 @@ import { WebSocketService } from './services/web-socket/web-socket.service';
         MatProgressBarModule,
         MatBadgeModule,
         MatCardModule,
+        MatButtonToggleModule,
+        MatMenuModule,
     ],
     providers: [],
     bootstrap: [AppComponent],

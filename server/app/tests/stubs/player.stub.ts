@@ -11,5 +11,6 @@ export const playerstub = (): Player => {
         hasSubmitted: false,
         hasInteracted: false,
         isTyping: false,
+        isMuted: false,
     };
 };

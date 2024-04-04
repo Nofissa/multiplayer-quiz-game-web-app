@@ -58,7 +58,9 @@ export class QrlListComponent implements OnInit, OnDestroy {
         this.gameService.qrlEvaluate(socketId, this.pin, grade);
         const index = this.players.findIndex((x) => x.socketId === socketId);
         this.playersButtons.set(this.players[index], true);
-        this.swiperRef.swiperRef.slideNext();
+        if (this.swiperRef) {
+            this.swiperRef.swiperRef.slideNext();
+        }
         this.evaluationsDone += 1;
         if (this.evaluationsDone === this.players.length) {
             this.evaluationsSent = true;

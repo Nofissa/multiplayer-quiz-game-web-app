@@ -29,6 +29,7 @@ export class QuestionBankComponent implements OnInit, OnDestroy {
     options: QuestionListOptions;
 
     questions: Question[] = [];
+    displayedQuestions: Question[] = [];
 
     shareSubscription: Subscription = new Subscription();
 
@@ -126,6 +127,14 @@ export class QuestionBankComponent implements OnInit, OnDestroy {
         });
     }
 
+    filterQuestions(type: string) {
+        if (type.trim().toUpperCase() === 'QCM' || type.trim().toUpperCase() === 'QRL') {
+            this.displayedQuestions = this.questions.filter((question) => question.type.trim().toUpperCase() === type.trim().toUpperCase());
+        } else {
+            this.displayedQuestions = this.questions;
+        }
+    }
+
     private setupServices() {
         this.shareSubscription = this.questionSharingService.subscribe((sharedQuestion: Question) => {
             if (!this.questions.includes(sharedQuestion)) {
@@ -153,6 +162,7 @@ export class QuestionBankComponent implements OnInit, OnDestroy {
     private loadQuestions() {
         this.questionHttpService.getAllQuestions().subscribe((questions: Question[]) => {
             this.questions = questions;
+            this.displayedQuestions = questions;
         });
     }
 

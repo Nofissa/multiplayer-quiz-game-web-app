@@ -21,7 +21,6 @@ export class QuestionService {
         if (!(await this.validateQuestion(dto))) {
             return Promise.reject('Invalid question');
         }
-
         delete dto._id;
         dto.lastModification = new Date();
 

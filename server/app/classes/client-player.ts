@@ -14,6 +14,7 @@ export class ClientPlayer {
             state: PlayerState.Playing,
             score: 0,
             speedAwardCount: 0,
+            isMuted: false,
             hasSubmitted: false,
             hasInteracted: false,
             isTyping: false,

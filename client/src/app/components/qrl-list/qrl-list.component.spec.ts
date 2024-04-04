@@ -28,6 +28,7 @@ const mockGameSnapshot: GameSnapshot = {
             hasInteracted: false,
             hasSubmitted: false,
             isTyping: false,
+            isMuted: false,
         },
     ],
     chatlogs: [],
@@ -116,8 +117,10 @@ describe('QrlListComponent', () => {
     it('should evaluateAnswers', () => {
         component.pin = '123';
         component.playersButtons = new Map();
+        component.evaluationsDone = 0;
         component.evaluateAnswer(firstPlayerStub().socketId, 0);
         expect(mockGameService.qrlEvaluate).toHaveBeenCalledWith(firstPlayerStub().socketId, '123', 0);
         expect(component.playersButtons.size).toBe(1);
+        expect(component.evaluationsDone).toBe(1);
     });
 });
