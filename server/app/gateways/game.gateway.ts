@@ -29,7 +29,7 @@ export class GameGateway implements OnGatewayDisconnect {
     ) {}
 
     @SubscribeMessage('createGame')
-    async createGame(@ConnectedSocket() client: Socket, @MessageBody() { quizId }: { quizId: string }) {
+    async createGame(@ConnectedSocket() client: Socket, @MessageBody() { quizId }: { quizId?: string }) {
         try {
             const pin = await this.gameService.createGame(client, quizId);
             client.join(pin);

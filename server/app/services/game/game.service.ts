@@ -3,7 +3,9 @@ import { Game } from '@app/classes/game';
 import { generateRandomPin } from '@app/helpers/pin';
 import { DisconnectPayload } from '@app/interfaces/disconnect-payload';
 import { Question } from '@app/model/database/question';
+import { Quiz } from '@app/model/database/quiz';
 import { QuizService } from '@app/services/quiz/quiz.service';
+import { QuestionService } from '@app/services/question/question.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { GameState } from '@common/game-state';
 import { Player } from '@common/player';
@@ -22,6 +24,8 @@ const PERCENTAGE_DIVIDER = 100;
 const NO_POINTS = 0;
 const NO_BONUS_MULTIPLIER = 1;
 const BONUS_MULTIPLIER = 1.2;
+const RANDOM_MODE_QUESTION_COUNT = 5;
+const RANDOM_EXPECTATION = 0.5;
 
 @Injectable()
 export class GameService {
@@ -33,12 +37,32 @@ export class GameService {
         return this.moduleRef.get(QuizService);
     }
 
+    get questionService(): QuestionService {
+        return this.moduleRef.get(QuestionService);
+    }
+
     get timerService(): TimerService {
         return this.moduleRef.get(TimerService);
     }
 
-    async createGame(client: Socket, quizId: string): Promise<string> {
-        const quiz = await this.quizService.getQuizById(quizId);
+    async createGame(client: Socket, quizId?: string): Promise<string> {
+        let quiz: Quiz;
+
+        if (quizId) {
+            quiz = await this.quizService.getQuizById(quizId);
+        } else {
+            quiz = new Quiz();
+            quiz.title = 'mode aléatoire';
+            const questions = await this.questionService.getAllQuestions();
+            quiz.duration = 20;
+
+            if (questions.length < RANDOM_MODE_QUESTION_COUNT) {
+                throw new Error("Il n'existe pas assez de questions dans la banque de questions pour faire une partie en mode aléatoire");
+            }
+
+            const shuffledQuestions = questions.slice().sort(() => Math.random() - RANDOM_EXPECTATION); // to have 1/2 chance to be negative
+            quiz.questions = shuffledQuestions.slice(0, RANDOM_MODE_QUESTION_COUNT);
+        }
 
         if (!quiz) {
             throw new Error(`Aucun quiz ne correspond a l'identifiant ${quizId}`);
