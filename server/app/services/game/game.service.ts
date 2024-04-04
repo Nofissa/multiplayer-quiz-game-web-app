@@ -53,14 +53,14 @@ export class GameService {
         } else {
             quiz = new Quiz();
             quiz.title = 'mode aléatoire';
-            const questions = await this.questionService.getAllQuestions();
+            const qcmQuestions = (await this.questionService.getAllQuestions()).filter((x) => x.type.trim().toUpperCase() === 'QCM');
             quiz.duration = 20;
 
-            if (questions.length < RANDOM_MODE_QUESTION_COUNT) {
-                throw new Error("Il n'existe pas assez de questions dans la banque de questions pour faire une partie en mode aléatoire");
+            if (qcmQuestions.length < RANDOM_MODE_QUESTION_COUNT) {
+                throw new Error("Il n'existe pas assez de questions de type QCM dans la banque de questions pour faire une partie en mode aléatoire");
             }
 
-            const shuffledQuestions = questions.slice().sort(() => Math.random() - RANDOM_EXPECTATION); // to have 1/2 chance to be negative
+            const shuffledQuestions = qcmQuestions.slice().sort(() => Math.random() - RANDOM_EXPECTATION); // to have 1/2 chance to be negative
             quiz.questions = shuffledQuestions.slice(0, RANDOM_MODE_QUESTION_COUNT);
         }
 
