@@ -218,13 +218,13 @@ export class QrlBoardComponent implements OnInit, OnDestroy {
                 }
             }),
             this.gameService.onQrlEvaluate(pin, (evaluation) => {
-                this.isInEvaluation = false;
-                if (this.playerService.getCurrentPlayer(pin)?.socketId === evaluation.clientId) {
+                if (this.playerService.getCurrentPlayer(pin)?.socketId === evaluation.player.socketId) {
                     this.cachedEvaluation = evaluation;
                 }
                 if (evaluation.isLast) {
                     this.questionIsOver = true;
                     if (this.player && this.cachedEvaluation) {
+                        this.isInEvaluation = false;
                         this.player.score += this.cachedEvaluation?.score ?? 0;
                         this.blinkTextArea(this.cachedEvaluation.grade);
                     }

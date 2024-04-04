@@ -1,5 +1,5 @@
 <div class="container">
-    <div class="question-box font-color">
+    <div *ngIf="question" class="question-box font-color">
         <span id="questionText" class="text-centered">{{ question.text }}</span>
         <span id="value" class="text-centered"
             ><strong>{{ question.points }} points</strong></span

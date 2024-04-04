@@ -165,9 +165,9 @@ export class GameGateway implements OnGatewayDisconnect {
     }
 
     @SubscribeMessage('qrlEvaluate')
-    qrlEvaluate(@ConnectedSocket() client: Socket, @MessageBody() { player, pin, grade }: { player: Player; pin: string; grade: Grade }) {
+    qrlEvaluate(@ConnectedSocket() client: Socket, @MessageBody() { socketId, pin, grade }: { socketId: string; pin: string; grade: Grade }) {
         try {
-            const qrlEvaluation = this.gameService.qrlEvaluate(player, pin, grade);
+            const qrlEvaluation = this.gameService.qrlEvaluate(socketId, pin, grade);
             const payload: GameEventPayload<QrlEvaluation> = { pin, data: qrlEvaluation };
 
             this.server.to(pin).emit('qrlEvaluate', payload);

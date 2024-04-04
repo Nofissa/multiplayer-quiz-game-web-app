@@ -1,5 +1,6 @@
 <div class="create-game-container">
-    <div class="slider-effectCoverFlow">
+    <span *ngIf="evaluationsReceived < players.length">LES JOUEURS SONT EN TRAIN DE RÉPONDRE...</span>
+    <div *ngIf="evaluationsReceived === players.length" class="slider-effectCoverFlow">
         <swiper
             [effect]="'coverflow'"
             [grabCursor]="true"
@@ -19,11 +20,18 @@
         >
             <ng-template swiperSlide *ngFor="let player of players">
                 <div *ngIf="evaluationsReceived === players.length" class="button-container" style="display: flex">
-                    <button id="badButton" mat-raised-button [disabled]="playersButtons.get(player)" (click)="evaluateAnswer(player, 0)">0%</button>
-                    <button id="averageButton" mat-raised-button [disabled]="playersButtons.get(player)" (click)="evaluateAnswer(player, 50)">
+                    <button id="badButton" mat-raised-button [disabled]="playersButtons.get(player)" (click)="evaluateAnswer(player.socketId, 0)">
+                        0%
+                    </button>
+                    <button
+                        id="averageButton"
+                        mat-raised-button
+                        [disabled]="playersButtons.get(player)"
+                        (click)="evaluateAnswer(player.socketId, 50)"
+                    >
                         50%
                     </button>
-                    <button id="goodButton" mat-raised-button [disabled]="playersButtons.get(player)" (click)="evaluateAnswer(player, 100)">
+                    <button id="goodButton" mat-raised-button [disabled]="playersButtons.get(player)" (click)="evaluateAnswer(player.socketId, 100)">
                         100%
                     </button>
                 </div>

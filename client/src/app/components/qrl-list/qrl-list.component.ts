@@ -50,9 +50,10 @@ export class QrlListComponent implements OnInit, OnDestroy {
         });
     }
 
-    evaluateAnswer(player: Player, grade: Grade) {
-        this.gameService.qrlEvaluate(player, this.pin, grade);
-        this.playersButtons.set(player, true);
+    evaluateAnswer(socketId: string, grade: Grade) {
+        this.gameService.qrlEvaluate(socketId, this.pin, grade);
+        const index = this.players.findIndex((x) => x.socketId === socketId);
+        this.playersButtons.set(this.players[index], true);
     }
 
     private setupSubscription(pin: string) {

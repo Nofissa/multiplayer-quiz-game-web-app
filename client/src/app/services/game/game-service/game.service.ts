@@ -81,8 +81,8 @@ export class GameService {
         return this.webSocketService.on('qrlSubmit', applyIfPinMatches(pin, callback));
     }
 
-    qrlEvaluate(player: Player, pin: string, grade: Grade) {
-        this.webSocketService.emit('qrlEvaluate', { player, pin, grade });
+    qrlEvaluate(socketId: string, pin: string, grade: Grade) {
+        this.webSocketService.emit('qrlEvaluate', { socketId, pin, grade });
     }
 
     onQrlEvaluate(pin: string, callback: (evaluation: QrlEvaluation) => void): Subscription {

@@ -142,6 +142,18 @@ export class HostGamePageComponent implements OnInit {
                 }
             }),
 
+            this.gameService.onQrlEvaluate(pin, (evaluation) => {
+                if (evaluation.isLast) {
+                    this.currentQuestionHasEnded = true;
+                }
+            }),
+
+            this.gameService.onQrlSubmit(pin, (submission) => {
+                if (submission.isLast) {
+                    this.timerService.stopTimer(pin);
+                }
+            }),
+
             this.gameService.onStartGame(pin, (data) => {
                 this.isLastQuestion = data.isLast;
                 this.gameState = GameState.Running;

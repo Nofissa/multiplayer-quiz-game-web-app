@@ -100,9 +100,9 @@ export class CreateGamePageComponent implements OnInit, OnDestroy {
                 score: 0,
                 speedAwardCount: 0,
                 state: PlayerState.Playing,
+                isTyping: false,
                 hasInteracted: false,
                 hasSubmitted: false,
-                isTyping: false,
             };
             this.playerService.setPlayer(pin, player);
         });
@@ -117,9 +117,9 @@ export class CreateGamePageComponent implements OnInit, OnDestroy {
                 score: 0,
                 speedAwardCount: 0,
                 state: PlayerState.Playing,
+                isTyping: false,
                 hasInteracted: false,
                 hasSubmitted: false,
-                isTyping: false,
             };
             this.playerService.setPlayer(pin, player);
             this.gameService.joinGame(pin, 'Testeur');

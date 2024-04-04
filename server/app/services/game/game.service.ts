@@ -199,6 +199,12 @@ export class GameService {
         const submission: QrlSubmission = { clientId: client.id, answer };
         game.currentQuestionQrlSubmissions.set(client.id, submission);
 
+        const isLast =
+            Array.from(game.currentQuestionQrlSubmissions.values()).length ===
+            Array.from(game.clientPlayers.values()).filter((x) => x.player.state === PlayerState.Playing).length;
+
+        submission.isLast = isLast;
+
         return submission;
     }
 
@@ -207,7 +213,6 @@ export class GameService {
         const clientPlayers = game.clientPlayers;
 
         clientPlayers.get(client.id).player.isTyping = isTyping;
-
         if (isTyping) {
             clientPlayers.get(client.id).player.hasInteracted = true;
         }
@@ -215,17 +220,18 @@ export class GameService {
         return Array.from(clientPlayers.values()).map((x) => x.player.isTyping);
     }
 
-    qrlEvaluate(player: Player, pin: string, grade: Grade): QrlEvaluation {
+    qrlEvaluate(socketId: string, pin: string, grade: Grade): QrlEvaluation {
         const game = this.getGame(pin);
         const question = game.currentQuestion;
+        const player = game.clientPlayers.get(socketId).player;
 
         const evalQrl: QrlEvaluation = {
-            clientId: player.socketId,
+            player,
             isLast: false,
             score: 0,
             grade,
         };
-        game.currentQuestionQrlEvaluations.set(player.socketId, evalQrl);
+        game.currentQuestionQrlEvaluations.set(socketId, evalQrl);
         const isLast =
             Array.from(game.currentQuestionQrlEvaluations.values()).length ===
             Array.from(game.clientPlayers.values()).filter((x) => x.player.state === PlayerState.Playing).length;
@@ -234,7 +240,7 @@ export class GameService {
         evalQrl.score = (question.points * evalQrl.grade) / PERCENTAGE_DIVIDER;
         player.score += evalQrl.score;
 
-        game.currentQuestionQrlEvaluations.set(player.socketId, evalQrl);
+        game.currentQuestionQrlEvaluations.set(socketId, evalQrl);
 
         return evalQrl;
     }
