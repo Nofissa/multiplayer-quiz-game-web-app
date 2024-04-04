@@ -1,9 +1,9 @@
 import { GameService } from '@app/services/game/game.service';
 import { TimerService } from '@app/services/timer/timer.service';
-import { QcmEvaluation } from '@common/qcm-evaluation';
 import { GameEventPayload } from '@common/game-event-payload';
 import { GameState } from '@common/game-state';
 import { Player } from '@common/player';
+import { QcmEvaluation } from '@common/qcm-evaluation';
 import { QuestionPayload } from '@common/question-payload';
 import { Submission } from '@common/submission';
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
@@ -155,6 +155,7 @@ export class GameGateway implements OnGatewayDisconnect {
             this.gameService.endGame(client, pin);
             const payload: GameEventPayload<null> = { pin, data: null };
             this.server.to(pin).emit('endGame', payload);
+            this.gameService.concludeGame(pin);
         } catch (error) {
             client.emit('error', error.message);
         }

@@ -15,12 +15,14 @@ export class Game {
     clientPlayers: Map<string, ClientPlayer> = new Map();
     questionSubmissions: Map<string, Submission>[] = [new Map()];
     currentQuestionIndex: number = 0;
+    startDate: Date;
 
     constructor(pin: string, quiz: Quiz, organizer: Socket) {
         this.pin = pin;
         this.quiz = quiz;
         this.organizer = organizer;
         this.state = GameState.Opened;
+        this.startDate = new Date();
     }
 
     get currentQuestion(): Question | null {

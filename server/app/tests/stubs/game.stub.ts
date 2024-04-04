@@ -17,6 +17,7 @@ export const gameStub = (): Game => {
         currentQuestionIndex: 0,
         clientPlayers: new Map<string, ClientPlayer>([['playerId', clientPlayerStub()]]),
         questionSubmissions: [new Map<string, Submission>([['playerId', submissionStub()]])],
+        startDate: new Date(),
         loadNextQuestion() {
             this.questionSubmissions.push(new Map());
             this.currentQuestionIndex++;

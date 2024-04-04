@@ -2,6 +2,7 @@ import { ClientPlayer } from '@app/classes/client-player';
 import { Game } from '@app/classes/game';
 import { generateRandomPin } from '@app/helpers/pin';
 import { DisconnectPayload } from '@app/interfaces/disconnect-payload';
+import { GameHistory } from '@app/model/database/game-history';
 import { Question } from '@app/model/database/question';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { TimerService } from '@app/services/timer/timer.service';
@@ -15,6 +16,7 @@ import { Submission } from '@common/submission';
 import { Injectable } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { Socket } from 'socket.io';
+import { GameHistoryService } from './game-history.service';
 
 const NO_POINTS = 0;
 const NO_BONUS_MULTIPLIER = 1;
@@ -24,7 +26,10 @@ const BONUS_MULTIPLIER = 1.2;
 export class GameService {
     games: Map<string, Game> = new Map();
 
-    constructor(private readonly moduleRef: ModuleRef) {}
+    constructor(
+        private readonly moduleRef: ModuleRef,
+        private gameHistoryService: GameHistoryService,
+    ) {}
 
     get quizService(): QuizService {
         return this.moduleRef.get(QuizService, { strict: false });
@@ -283,5 +288,25 @@ export class GameService {
         }
 
         return game.currentQuestionSubmissions.get(client.id);
+    }
+
+    getHighestScore(game: Game) {
+        return Math.max(...Array.from(game.clientPlayers.values()).map((clientPlayer) => clientPlayer.player.score));
+    }
+
+    async concludeGame(pin: string): Promise<void> {
+        const game = this.getGame(pin);
+        const numberOfPlayers = game.clientPlayers.size;
+        const bestScore = this.getHighestScore(game);
+
+        const gameHistory: GameHistory = {
+            title: game.quiz.title,
+            startDate: game.startDate,
+            numberOfPlayers,
+            bestScore,
+        };
+
+        await this.gameHistoryService.saveGameHistory(gameHistory);
+        console.log('conclude game:', gameHistory);
     }
 }
