@@ -77,6 +77,12 @@ export class QrlListComponent implements OnInit, OnDestroy {
                     this.playersButtons.set(this.players[index], false);
                 }
             }),
+
+            this.gameService.onNextQuestion(pin, () => {
+                this.evaluationsSent = false;
+                this.evaluationsDone = 0;
+                this.submissionsReceived = 0;
+            }),
         );
     }
 }

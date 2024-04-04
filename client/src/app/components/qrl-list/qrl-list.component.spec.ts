@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { firstPlayerStub } from '@app/TestStubs/player.stubs';
+import { qrlQuestionStub } from '@app/TestStubs/question.stubs';
 import { quizStub } from '@app/TestStubs/quiz.stubs';
 import { SocketServerMock } from '@app/mocks/socket-server-mock';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
@@ -39,7 +40,7 @@ const mockGameSnapshot: GameSnapshot = {
     questionQcmSubmissions: [[{ choices: [{ payload: 'testinggg', isSelected: true }], isFinal: true }]],
 };
 
-describe('QrlListComponent', () => {
+fdescribe('QrlListComponent', () => {
     let component: QrlListComponent;
     let fixture: ComponentFixture<QrlListComponent>;
     let mockGameHttpService: jasmine.SpyObj<GameHttpService>;
@@ -50,7 +51,7 @@ describe('QrlListComponent', () => {
     beforeEach(() => {
         mockGameHttpService = jasmine.createSpyObj('GameHttpService', ['getGameSnapshotByPin']);
         webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', ['emit', 'on'], { socketInstance: io() });
-        mockGameService = jasmine.createSpyObj('GameService', ['onQrlSubmit', 'qrlEvaluate']);
+        mockGameService = jasmine.createSpyObj('GameService', ['onQrlSubmit', 'qrlEvaluate', 'onNextQuestion']);
 
         TestBed.configureTestingModule({
             imports: [MatDialogModule],
@@ -78,6 +79,9 @@ describe('QrlListComponent', () => {
         });
         mockGameService.onQrlSubmit.and.callFake((pin, callback) => {
             return webSocketServiceSpy.on('qrlSubmit', applyIfPinMatches(pin, callback));
+        });
+        mockGameService.onNextQuestion.and.callFake((pin, callback) => {
+            return webSocketServiceSpy.on('nextQuestion', applyIfPinMatches(pin, callback));
         });
 
         mockGameHttpService.getGameSnapshotByPin.and.returnValue(of(mockGameSnapshot));
@@ -111,7 +115,9 @@ describe('QrlListComponent', () => {
         component.pin = '123';
         component['setupSubscription']('123');
         socketServerMock.emit('qrlSubmit', qrlSubmission);
+        socketServerMock.emit('nextQuestion', qrlQuestionStub()[0]);
         expect(mockGameService.onQrlSubmit).toHaveBeenCalled();
+        expect(mockGameService.onNextQuestion).toHaveBeenCalled();
     });
 
     it('should evaluateAnswers', () => {

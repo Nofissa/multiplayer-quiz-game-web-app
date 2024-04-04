@@ -20,7 +20,7 @@
             class="mySwiper"
         >
             <ng-template swiperSlide *ngFor="let player of players">
-                <div *ngIf="submissionsReceived === players.length" class="button-container" style="display: flex">
+                <div *ngIf="submissionsReceived === players.length" class="button-container">
                     <button id="badButton" mat-raised-button [disabled]="playersButtons.get(player)" (click)="evaluateAnswer(player.socketId, 0)">
                         0%
                     </button>
@@ -35,7 +35,6 @@
                     <button id="goodButton" mat-raised-button [disabled]="playersButtons.get(player)" (click)="evaluateAnswer(player.socketId, 100)">
                         100%
                     </button>
-                    <!-- <div *ngIf="playersButtons.get(player)">{{}}</div> -->
                 </div>
                 <div *ngIf="submissionsReceived === players.length" class="game-slide">
                     <h2 class="quiz-title">Réponse de {{ player.username }}:</h2>
