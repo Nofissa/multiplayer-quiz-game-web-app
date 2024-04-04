@@ -9,6 +9,7 @@ import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { BarChartService } from '@app/services/game/bar-chart-service/bar-chart.service';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { PlayerService } from '@app/services/player/player.service';
+import { SoundService } from '@app/services/sound/sound.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { GameState } from '@common/game-state';
 import { PlayerState } from '@common/player-state';
@@ -19,6 +20,8 @@ import { Subscription } from 'rxjs';
 const START_GAME_COUNTDOWN_DURATION_SECONDS = 5;
 const NEXT_QUESTION_DELAY_SECONDS = 3;
 const CANCEL_GAME_NOTICE_DURATION_MS = 5000;
+const PANIC_AUDIO_NAME = 'ticking-timer';
+const PANIC_AUDIO_SRC = 'assets/ticking-timer.wav';
 
 @Component({
     selector: 'app-host-game-page',
@@ -39,6 +42,7 @@ export class HostGamePageComponent implements OnInit {
     private readonly gameService: GameService;
     private readonly timerService: TimerService;
     private readonly playerService: PlayerService;
+    private readonly soundService: SoundService;
 
     // Disabled because this page is rich in interaction an depends on many services as a consequence
     // eslint-disable-next-line max-params
@@ -54,6 +58,7 @@ export class HostGamePageComponent implements OnInit {
         this.gameService = gameServicesProvider.gameService;
         this.timerService = gameServicesProvider.timerService;
         this.playerService = gameServicesProvider.playerService;
+        this.soundService = gameServicesProvider.soundService;
     }
 
     get barCharts(): BarChartData[] {
@@ -139,6 +144,7 @@ export class HostGamePageComponent implements OnInit {
                 if (evaluation.isLast) {
                     this.currentQuestionHasEnded = true;
                     this.timerService.stopTimer(pin);
+                    this.soundService.stopSound(PANIC_AUDIO_NAME);
                 }
             }),
 
@@ -169,6 +175,11 @@ export class HostGamePageComponent implements OnInit {
                         this.timerService.startTimer(pin, TimerEventType.Question);
                     }
                 }
+            }),
+
+            this.timerService.onAccelerateTimer(pin, () => {
+                this.soundService.loadSound(PANIC_AUDIO_NAME, PANIC_AUDIO_SRC);
+                this.soundService.playSound(PANIC_AUDIO_NAME);
             }),
 
             this.gameService.onEndGame(pin, () => {

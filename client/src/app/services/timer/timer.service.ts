@@ -5,6 +5,12 @@ import { TimerEventType } from '@common/timer-event-type';
 import { TimerPayload } from '@common/timer-payload';
 import { Subscription } from 'rxjs';
 
+const START_TIMER_EVENT = 'startTimer';
+const STOP_TIMER_EVENT = 'stopTimer';
+const TIMER_TICK_EVENT = 'timerTick';
+const TOGGLE_PAUSE_TIMER_EVENT = 'togglePauseTimer';
+const ACCELERATE_TIMER_EVENT = 'accelerateTimer';
+
 @Injectable({
     providedIn: 'root',
 })
@@ -12,34 +18,34 @@ export class TimerService {
     constructor(private readonly webSocketService: WebSocketService) {}
 
     startTimer(pin: string, eventType: TimerEventType, duration?: number) {
-        this.webSocketService.emit('startTimer', { pin, eventType, duration });
+        this.webSocketService.emit(START_TIMER_EVENT, { pin, eventType, duration });
     }
 
     onStartTimer(pin: string, callback: (payload: TimerPayload) => void): Subscription {
-        return this.webSocketService.on('startTimer', applyIfPinMatches(pin, callback));
+        return this.webSocketService.on(START_TIMER_EVENT, applyIfPinMatches(pin, callback));
     }
 
     stopTimer(pin: string) {
-        this.webSocketService.emit('stopTimer', { pin });
+        this.webSocketService.emit(STOP_TIMER_EVENT, { pin });
     }
 
     onTimerTick(pin: string, callback: (payload: TimerPayload) => void): Subscription {
-        return this.webSocketService.on('timerTick', applyIfPinMatches(pin, callback));
+        return this.webSocketService.on(TIMER_TICK_EVENT, applyIfPinMatches(pin, callback));
     }
 
-    pauseTimer(pin: string) {
-        this.webSocketService.emit('pauseTimer', { pin });
+    togglePauseTimer(pin: string) {
+        this.webSocketService.emit(TOGGLE_PAUSE_TIMER_EVENT, { pin });
     }
 
-    onPauseTimer(pin: string, callback: (payload: TimerPayload) => void): Subscription {
-        return this.webSocketService.on('pauseTimer', applyIfPinMatches(pin, callback));
+    onTogglePauseTimer(pin: string, callback: (isRunning: boolean) => void): Subscription {
+        return this.webSocketService.on(TOGGLE_PAUSE_TIMER_EVENT, applyIfPinMatches(pin, callback));
     }
 
-    accTimer(pin: string) {
-        this.webSocketService.emit('accelerateTimer', { pin });
+    accelerateTimer(pin: string, ticksPerSecond: number) {
+        this.webSocketService.emit(ACCELERATE_TIMER_EVENT, { pin, ticksPerSecond });
     }
 
-    onAccTimer(pin: string, callback: (payload: TimerPayload) => void): Subscription {
-        return this.webSocketService.on('accelerateTimer', applyIfPinMatches(pin, callback));
+    onAccelerateTimer(pin: string, callback: () => void): Subscription {
+        return this.webSocketService.on(ACCELERATE_TIMER_EVENT, applyIfPinMatches(pin, callback));
     }
 }

@@ -6,6 +6,7 @@ import { GameServicesProvider } from '@app/providers/game-services.provider';
 import { RoutingDependenciesProvider } from '@app/providers/routing-dependencies.provider';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
+import { SoundService } from '@app/services/sound/sound.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { TimerEventType } from '@common/timer-event-type';
 import { Subscription } from 'rxjs';
@@ -13,6 +14,8 @@ import { Subscription } from 'rxjs';
 const START_GAME_COUNTDOWN_DURATION_SECONDS = 5;
 const NEXT_QUESTION_DELAY_SECONDS = 3;
 const CANCEL_GAME_NOTICE_DURATION_MS = 5000;
+const PANIC_AUDIO_NAME = 'ticking-timer';
+const PANIC_AUDIO_SRC = 'assets/ticking-timer.wav';
 
 @Component({
     selector: 'app-game-page',
@@ -36,6 +39,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
     private readonly gameHttpService: GameHttpService;
     private readonly gameService: GameService;
     private readonly timerService: TimerService;
+    private readonly soundService: SoundService;
 
     constructor(
         private readonly snackBarService: MatSnackBar,
@@ -47,6 +51,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
         this.gameHttpService = gameServicesProvider.gameHttpService;
         this.gameService = gameServicesProvider.gameService;
         this.timerService = gameServicesProvider.timerService;
+        this.soundService = gameServicesProvider.soundService;
     }
 
     ngOnInit() {
@@ -138,9 +143,13 @@ export class GamePageComponent implements OnInit, OnDestroy {
             }),
 
             this.gameService.onQcmSubmit(pin, (evaluation) => {
-                if (this.isTest && evaluation.isLast) {
-                    this.currentQuestionHasEnded = true;
-                    this.timerService.stopTimer(pin);
+                if (evaluation.isLast) {
+                    this.soundService.stopSound(PANIC_AUDIO_NAME);
+
+                    if (this.isTest) {
+                        this.currentQuestionHasEnded = true;
+                        this.timerService.stopTimer(pin);
+                    }
                 }
             }),
 
@@ -159,6 +168,12 @@ export class GamePageComponent implements OnInit, OnDestroy {
                     }
                 }
             }),
+
+            this.timerService.onAccelerateTimer(pin, () => {
+                this.soundService.loadSound(PANIC_AUDIO_NAME, PANIC_AUDIO_SRC);
+                this.soundService.playSound(PANIC_AUDIO_NAME);
+            }),
+
             this.gameService.onCancelGame(pin, () => {
                 this.handleCancelGame();
             }),
