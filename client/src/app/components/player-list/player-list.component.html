@@ -7,19 +7,19 @@
         <mat-menu #menu="matMenu">
             <button mat-menu-item (click)="sortPlayers(playerListSortingOptions.NameAscending)">
             <mat-icon>arrow_downward</mat-icon>
-            <span>Alphabetique</span>
+            <span>Alphabetique (a..z)</span>
             </button>
             <button mat-menu-item (click)="sortPlayers(playerListSortingOptions.ScoreAscending)">
             <mat-icon>arrow_downward</mat-icon>
-            <span>Pointage</span>
+                <span>Pointage (9..1)</span>
             </button>
             <button mat-menu-item (click)="sortPlayers(playerListSortingOptions.StatusAscending)">
-            <mat-icon>arrow_downward</mat-icon>
-            <span>Etat</span>
+                <mat-icon>arrow_downward (actif..abandon)</mat-icon>
+                <span>État</span>
             </button>
             <button mat-menu-item (click)="sortPlayers(playerListSortingOptions.NameDescending)">
                 <mat-icon>arrow_upward</mat-icon>
-                <span>Alphabetique</span>
+                <span>Alphabétique</span>
             </button>
             <button mat-menu-item (click)="sortPlayers(playerListSortingOptions.ScoreDescending)">
                 <mat-icon>arrow_upward</mat-icon>
@@ -27,7 +27,7 @@
             </button>
             <button mat-menu-item (click)="sortPlayers(playerListSortingOptions.StatusDescending)">
                 <mat-icon>arrow_upward</mat-icon>
-                <span>Etat</span>
+                <span>État</span>
             </button>
         </mat-menu>
     </div>
@@ -60,7 +60,13 @@
                         invisible: player.state !== playerStates.Playing || !displayOptions.ban
                     }"
                 >
-                    {{ player.isMuted ? 'Démuter' : 'Muter' }}
+                    <div *ngIf="player.isMuted; then thenBlock else elseBlock"></div>
+                    <ng-template #thenBlock>
+                        <mat-icon>volume_off</mat-icon>
+                    </ng-template>
+                    <ng-template #elseBlock>
+                        <mat-icon>volume_up</mat-icon>
+                    </ng-template>
                 </button>
                 <button
                     mat-flat-button

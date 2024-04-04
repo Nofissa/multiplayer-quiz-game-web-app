@@ -47,7 +47,7 @@ export class PlayerService {
         });
 
         if (clientPlayer) {
-            clientPlayer.player.state = PlayerState.Muted;
+            clientPlayer.player.isMuted = !clientPlayer.player.isMuted;
         }
 
         return clientPlayer;

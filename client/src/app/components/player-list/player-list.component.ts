@@ -60,14 +60,7 @@ export class PlayerListComponent implements OnInit, OnDestroy {
     }
 
     mutePlayer(player: Player) {
-        // server method is not function correctly
-        // this.playerService.playerMute(this.pin, player.username);
-        // mock mute cause not implemented
-        if (player.isMuted) {
-            player.isMuted = false;
-        } else {
-            player.isMuted = true;
-        }
+        this.playerService.playerMute(this.pin, player.username);
     }
 
     sortPlayers(option: PlayerListSortingOptions) {
