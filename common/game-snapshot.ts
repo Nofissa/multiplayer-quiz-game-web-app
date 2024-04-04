@@ -1,9 +1,9 @@
 import { Chatlog } from './chatlog';
 import { GameState } from './game-state';
 import { Player } from './player';
+import { QcmSubmission } from './qcm-submission';
 import { QrlSubmission } from './qrl-submission';
 import { Quiz } from './quiz';
-import { Submission } from './submission';
 
 export interface GameSnapshot {
     players: Player[];
@@ -11,6 +11,6 @@ export interface GameSnapshot {
     quiz: Quiz;
     state: GameState;
     currentQuestionIndex: number;
-    questionQcmSubmissions: Submission[][];
+    questionQcmSubmissions: QcmSubmission[][];
     questionQrlSubmission: QrlSubmission[][];
 }

@@ -7,7 +7,7 @@ import { QcmEvaluation } from '@common/qcm-evaluation';
 import { QrlEvaluation } from '@common/qrl-evaluation';
 import { QrlSubmission } from '@common/qrl-submission';
 import { QuestionPayload } from '@common/question-payload';
-import { Submission } from '@common/submission';
+import { QcmSubmission } from '@common/qcm-submission';
 import { Subscription } from 'rxjs';
 
 @Injectable({
@@ -52,7 +52,7 @@ export class GameService {
         this.webSocketService.emit('qcmToggleChoice', { pin, choiceIndex });
     }
 
-    onQcmToggleChoice(pin: string, callback: (payload: Submission[]) => void): Subscription {
+    onQcmToggleChoice(pin: string, callback: (payload: QcmSubmission[]) => void): Subscription {
         return this.webSocketService.on('qcmToggleChoice', applyIfPinMatches(pin, callback));
     }
 

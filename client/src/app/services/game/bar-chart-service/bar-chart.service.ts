@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BarChartData } from '@app/interfaces/bar-chart-data';
 import { Question } from '@common/question';
-import { Submission } from '@common/submission';
+import { QcmSubmission } from '@common/qcm-submission';
 
 @Injectable({
     providedIn: 'root',
@@ -20,7 +20,7 @@ export class BarChartService {
         this.barChartData.push(newBarchartData);
     }
 
-    updateBarChartData(data: Submission[]): void {
+    updateBarChartData(data: QcmSubmission[]): void {
         const chartData: BarChartData | undefined = this.getCurrentQuestionData();
         if (chartData && data) {
             chartData.submissions = data;
@@ -38,7 +38,7 @@ export class BarChartService {
         return this.barChartData;
     }
 
-    setData(chartData: { submissions: Submission[][]; questions: Question[] }): void {
+    setData(chartData: { submissions: QcmSubmission[][]; questions: Question[] }): void {
         this.barChartData = [];
         for (let i = 0; i < chartData.questions.length; i++) {
             const newBarChart: BarChartData = {

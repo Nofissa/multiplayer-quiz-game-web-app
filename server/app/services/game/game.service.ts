@@ -13,7 +13,7 @@ import { QrlEvaluation } from '@common/qrl-evaluation';
 import { QrlSubmission } from '@common/qrl-submission';
 import { Question as CommonQuestion } from '@common/question';
 import { QuestionPayload } from '@common/question-payload';
-import { Submission } from '@common/submission';
+import { QcmSubmission } from '@common/qcm-submission';
 import { Injectable } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { Socket } from 'socket.io';
@@ -190,7 +190,7 @@ export class GameService {
         };
     }
 
-    qcmToggleChoice(client: Socket, pin: string, choiceIndex: number): Submission[] {
+    qcmToggleChoice(client: Socket, pin: string, choiceIndex: number): QcmSubmission[] {
         const game = this.getGame(pin);
         const submission = this.getOrCreateSubmission(client, game);
         submission.choices[choiceIndex].isSelected = !submission.choices[choiceIndex].isSelected;
@@ -285,7 +285,7 @@ export class GameService {
         return game.organizer.id === clientId;
     }
 
-    isGoodAnswer(question: Question, submission: Submission): boolean {
+    isGoodAnswer(question: Question, submission: QcmSubmission): boolean {
         const correctAnswersIndices = new Set(
             question.choices.reduce((indices, choice, index) => {
                 if (choice.isCorrect) {

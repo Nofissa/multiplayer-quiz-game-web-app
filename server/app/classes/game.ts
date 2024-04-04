@@ -3,7 +3,7 @@ import { Quiz } from '@app/model/database/quiz';
 import { Chatlog } from '@common/chatlog';
 import { GameState } from '@common/game-state';
 import { QrlSubmission } from '@common/qrl-submission';
-import { Submission as QcmSubmission } from '@common/submission';
+import { QcmSubmission } from '@common/qcm-submission';
 import { Socket } from 'socket.io';
 import { ClientPlayer } from './client-player';
 
