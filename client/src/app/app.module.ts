@@ -50,6 +50,8 @@ import { WaitingRoomPageComponent } from './pages/waiting-room-page/waiting-room
 import { WebSocketService } from './services/web-socket/web-socket.service';
 import { GameTransitionComponent } from './components/game-transition/game-transition.component';
 import { QrlBoardComponent } from './components/qrl-board/qrl-board.component';
+import { PanicModeButtonComponent } from './components/panic-mode-button/panic-mode-button.component';
+import { TimerPauseToggleComponent } from './components/toggle-pause-timer-button/timer-pause-toggle.component';
 
 /**
  * Main module that is used in main.ts.
@@ -90,6 +92,8 @@ import { QrlBoardComponent } from './components/qrl-board/qrl-board.component';
         ChatRoomComponent,
         GameTransitionComponent,
         QrlBoardComponent,
+        PanicModeButtonComponent,
+        TimerPauseToggleComponent,
     ],
     imports: [
         AppRoutingModule,
