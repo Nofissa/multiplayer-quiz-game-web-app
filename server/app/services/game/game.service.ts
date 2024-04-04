@@ -10,6 +10,8 @@ import { GameState } from '@common/game-state';
 import { Player } from '@common/player';
 import { PlayerState } from '@common/player-state';
 import { QcmEvaluation } from '@common/qcm-evaluation';
+import { QrlEvaluation } from '@common/qrl-evaluation';
+import { QrlSubmission } from '@common/qrl-submission';
 import { Question as CommonQuestion } from '@common/question';
 import { QuestionPayload } from '@common/question-payload';
 import { Submission } from '@common/submission';
@@ -18,6 +20,7 @@ import { ModuleRef } from '@nestjs/core';
 import { Socket } from 'socket.io';
 import { GameHistoryService } from './game-history.service';
 
+const PERCENTAGE_DIVIDER = 100;
 const NO_POINTS = 0;
 const NO_BONUS_MULTIPLIER = 1;
 const BONUS_MULTIPLIER = 1.2;
@@ -32,7 +35,7 @@ export class GameService {
     ) {}
 
     get quizService(): QuizService {
-        return this.moduleRef.get(QuizService, { strict: false });
+        return this.moduleRef.get(QuizService);
     }
 
     get timerService(): TimerService {
@@ -101,7 +104,7 @@ export class GameService {
 
         const question = game.currentQuestion;
 
-        const gameSubmissions = Array.from(game.currentQuestionSubmissions.values());
+        const gameSubmissions = Array.from(game.currentQuestionQcmSubmissions.values());
         const isCorrect = this.isGoodAnswer(question, submission);
         const isFirst = gameSubmissions.filter((x) => x.isFinal).length === 1 && this.timerService.getTimer(pin)?.time !== 0;
         const isLast =
@@ -198,21 +201,50 @@ export class GameService {
         const submission = this.getOrCreateSubmission(client, game);
         submission.choices[choiceIndex].isSelected = !submission.choices[choiceIndex].isSelected;
 
-        return Array.from(game.currentQuestionSubmissions.values());
+        return Array.from(game.currentQuestionQcmSubmissions.values());
     }
 
-    // client: Socket, pin: string, hasTypedRecently: boolean
-    qrlInputChange() {
-        return;
-    }
-
-    qrlSubmit(client: Socket, pin: string, qrlText: string) {
+    qrlSubmit(client: Socket, pin: string, answer: string): QrlSubmission {
         const game = this.getGame(pin);
-        const submission = this.getOrCreateSubmission(client, game);
-        submission.choices.push({ payload: qrlText });
-        return Array.from(game.currentQuestionSubmissions.values());
+
+        if (game.currentQuestionQrlSubmissions.has(client.id)) {
+            throw new Error('Vous avez déjà soumis votre réponse pour cette question');
+        }
+
+        const submission: QrlSubmission = { clientId: client.id, answer };
+        game.currentQuestionQrlSubmissions.set(client.id, submission);
+
+        return submission;
     }
 
+    qrlInputChange(client: Socket, pin: string, isTyping: boolean): boolean[] {
+        const game = this.getGame(pin);
+        const clientPlayers = game.clientPlayers;
+
+        clientPlayers.get(client.id).player.isTyping = isTyping;
+        if (isTyping) {
+            clientPlayers.get(client.id).player.hasInteracted = true;
+        }
+
+        return Array.from(clientPlayers.values()).map((x) => x.player.isTyping);
+    }
+
+    qrlEvaluate(client: Socket, pin: string, qrlEvaluation: QrlEvaluation): QrlEvaluation {
+        const game = this.getGame(pin);
+        const question = game.currentQuestion;
+
+        const isLast =
+            Array.from(game.currentQuestionQrlSubmissions.values()).length ===
+            Array.from(game.clientPlayers.values()).filter((x) => x.player.state === PlayerState.Playing).length;
+
+        qrlEvaluation.score = (question.points * qrlEvaluation.grade) / PERCENTAGE_DIVIDER;
+        qrlEvaluation.isLast = isLast;
+
+        const player = game.clientPlayers.get(client.id).player;
+        player.score += qrlEvaluation.score;
+
+        return qrlEvaluation;
+    }
     endGame(client: Socket, pin: string): void {
         const game = this.getGame(pin);
 
@@ -278,16 +310,16 @@ export class GameService {
     }
 
     getOrCreateSubmission(client: Socket, game: Game) {
-        if (!game.currentQuestionSubmissions.has(client.id)) {
-            game.currentQuestionSubmissions.set(client.id, {
-                choices: game.currentQuestion.choices.map((_, payload) => {
-                    return { payload, isSelected: false };
+        if (!game.currentQuestionQcmSubmissions.has(client.id)) {
+            game.currentQuestionQcmSubmissions.set(client.id, {
+                choices: game.currentQuestion.choices.map((_, index) => {
+                    return { payload: index, isSelected: false };
                 }),
                 isFinal: false,
             });
         }
 
-        return game.currentQuestionSubmissions.get(client.id);
+        return game.currentQuestionQcmSubmissions.get(client.id);
     }
 
     getHighestScore(game: Game) {
@@ -307,6 +339,5 @@ export class GameService {
         };
 
         await this.gameHistoryService.saveGameHistory(gameHistory);
-        console.log('conclude game:', gameHistory);
     }
 }

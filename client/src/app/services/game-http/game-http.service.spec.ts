@@ -11,7 +11,8 @@ const gameSnapshotStub: GameSnapshot = {
     quiz: quizStub(),
     state: GameState.Paused,
     currentQuestionIndex: 0,
-    questionSubmissions: [],
+    questionQcmSubmissions: [],
+    questionQrlSubmission: [],
 };
 
 const ERROR = 404;

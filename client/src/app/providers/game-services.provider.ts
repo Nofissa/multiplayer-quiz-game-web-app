@@ -4,6 +4,7 @@ import { GameService } from '@app/services/game/game-service/game.service';
 import { KeyBindingService } from '@app/services/key-binding/key-binding.service';
 import { MessageService } from '@app/services/message/message.service';
 import { PlayerService } from '@app/services/player/player.service';
+import { SoundService } from '@app/services/sound/sound.service';
 import { TimerService } from '@app/services/timer/timer.service';
 
 @Injectable({
@@ -19,6 +20,7 @@ export class GameServicesProvider {
         private readonly message: MessageService,
         private readonly player: PlayerService,
         private readonly keyBinding: KeyBindingService,
+        private readonly sound: SoundService,
     ) {}
 
     get gameHttpService(): GameHttpService {
@@ -43,5 +45,9 @@ export class GameServicesProvider {
 
     get keyBindingService(): KeyBindingService {
         return this.keyBinding;
+    }
+
+    get soundService(): SoundService {
+        return this.sound;
     }
 }

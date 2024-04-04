@@ -21,6 +21,8 @@ describe('TimerGateway', () => {
         timerService = {
             stopTimer: jest.fn(),
             startTimer: jest.fn(),
+            pauseTimer: jest.fn(),
+            accelerateTime: jest.fn(),
         } as any;
         socketMock = {
             id: 'organizerId',
@@ -109,6 +111,50 @@ describe('TimerGateway', () => {
                 throw error;
             });
             timerGateway.stopTimer(socketMock as Socket, { pin });
+            expect(socketMock.emit).toHaveBeenCalledWith('error', errorMessage);
+        });
+    });
+
+    describe('togglePauseTimer', () => {
+        const pin = 'mockPin';
+        it('should emit the togglePauseTimer event with null payload', () => {
+            const isRunning = false;
+            serverMock.to.mockReturnValue(broadcastMock);
+            timerService.togglePauseTimer = jest.fn().mockReturnValue(isRunning);
+            timerGateway.togglePauseTimer(socketMock as Socket, { pin });
+            expect(serverMock.to).toHaveBeenCalledWith(pin);
+            expect(broadcastMock.emit).toHaveBeenCalledWith('togglePauseTimer', { pin, data: isRunning });
+        });
+
+        it('should emit error event if an error occurs', () => {
+            const errorMessage = 'Test error message';
+            const error = new Error(errorMessage);
+            timerService.togglePauseTimer = jest.fn().mockImplementation(() => {
+                throw error;
+            });
+            timerGateway.togglePauseTimer(socketMock as Socket, { pin });
+            expect(socketMock.emit).toHaveBeenCalledWith('error', errorMessage);
+        });
+    });
+
+    describe('accelerateTimer', () => {
+        const pin = 'mockPin';
+        const ticksPerSecond = 4;
+        it('should emit the accelerateTimer event with null payload', () => {
+            serverMock.to.mockReturnValue(broadcastMock);
+            timerService.accelerateTimer = jest.fn().mockReturnValue(undefined);
+            timerGateway.accelerateTimer(socketMock as Socket, { pin, ticksPerSecond });
+            expect(serverMock.to).toHaveBeenCalledWith(pin);
+            expect(broadcastMock.emit).toHaveBeenCalledWith('accelerateTimer', { pin, data: null });
+        });
+
+        it('should emit error event if an error occurs', () => {
+            const errorMessage = 'Test error message';
+            const error = new Error(errorMessage);
+            timerService.accelerateTimer = jest.fn().mockImplementation(() => {
+                throw error;
+            });
+            timerGateway.accelerateTimer(socketMock as Socket, { pin, ticksPerSecond });
             expect(socketMock.emit).toHaveBeenCalledWith('error', errorMessage);
         });
     });

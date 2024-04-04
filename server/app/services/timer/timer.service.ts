@@ -32,7 +32,9 @@ export class TimerService {
         timer.time = duration;
         timer.onTick(callback);
 
-        return timer.start();
+        timer.start();
+
+        return timer.time;
     }
 
     stopTimer(client: Socket, pin: string) {
@@ -50,15 +52,34 @@ export class TimerService {
 
         timer.stop();
     }
-    // client: Socket, pin: string
-    pauseTimer() {
-        // todo
-        return;
+
+    togglePauseTimer(client: Socket, pin: string): boolean {
+        const organizer = this.gameService.getOrganizer(pin);
+
+        if (organizer.id !== client.id) {
+            throw new Error(`Seul l'organisateur de la partie ${pin} peut mettre en pause la minuterie`);
+        }
+
+        const timer = this.timers.get(pin);
+
+        if (timer && timer.isRunning) {
+            timer.pause();
+        } else {
+            timer.start();
+        }
+
+        return timer.isRunning;
     }
 
-    // client: Socket, pin: string
-    accelerateTimer() {
-        // todo
+    accelerateTimer(client: Socket, pin: string, ticksPerSecond: number) {
+        const organizer = this.gameService.getOrganizer(pin);
+
+        if (organizer.id !== client.id) {
+            throw new Error(`Seul l'organisateur de la partie ${pin} peut accélérer la minuterie`);
+        }
+
+        this.timers.get(pin).setTicksPerSecond(ticksPerSecond);
+
         return;
     }
 

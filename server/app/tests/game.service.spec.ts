@@ -4,29 +4,46 @@ import * as PinHelper from '@app/helpers/pin';
 import { DisconnectPayload } from '@app/interfaces/disconnect-payload';
 import { GameService } from '@app/services/game/game.service';
 import { QuizService } from '@app/services/quiz/quiz.service';
+import { TimerService } from '@app/services/timer/timer.service';
 import { GameState } from '@common/game-state';
 import { QuestionPayload } from '@common/question-payload';
+import { ModuleRef } from '@nestjs/core';
 import { Socket } from 'socket.io';
 import { clientPlayerStub } from './stubs/client.player.stub';
 import { evaluationStub } from './stubs/evaluation.stubs';
 import { gameStub } from './stubs/game.stub';
 import { playerstub } from './stubs/player.stub';
+import { qrlSubmissionStub } from './stubs/qrl.submission.stub';
 import { questionStub } from './stubs/question.stubs';
 import { quizStub } from './stubs/quiz.stubs';
 import { submissionStub } from './stubs/submission.stub';
 
 describe('GameService', () => {
     let gameService: GameService;
+    let moduleRef: ModuleRef;
     let quizServiceMock: jest.Mocked<QuizService>;
+    let timerServiceMock: jest.Mocked<TimerService>;
     let socketMock: jest.Mocked<Socket>;
 
     beforeEach(async () => {
+        const moduleRefFactory = {
+            get: jest.fn((service) => {
+                if (service === QuizService) return quizServiceMock;
+                if (service === TimerService) return timerServiceMock;
+            }),
+        } as any;
+
+        moduleRef = moduleRefFactory as ModuleRef;
+
         quizServiceMock = {
             getQuizById: jest.fn(),
         } as any;
-        socketMock = { id: 'gameId' } as jest.Mocked<Socket>;
 
-        gameService = new GameService(quizServiceMock);
+        timerServiceMock = {
+            getTimer: jest.fn(),
+        } as any;
+
+        gameService = new GameService(moduleRef);
     });
 
     afterEach(() => {
@@ -81,8 +98,8 @@ describe('GameService', () => {
         const player = playerstub();
         player.socketId = 'gameId';
 
-        socketMock = { id: 'gameId' } as jest.Mocked<Socket>;
         it('should return the right payload if succesfull', () => {
+            socketMock = { id: 'gameId' } as jest.Mocked<Socket>;
             jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(gameTest);
             const payload = gameService.joinGame(socketMock, gameTest.pin, player.username);
             expect(payload).toEqual(player);
@@ -256,12 +273,6 @@ describe('GameService', () => {
             expect(result).toEqual(disconnectPayloadTest);
         });
 
-        // it('should push the player to toAbandon', () => {
-        //     gameService.games.set(game.pin, game);
-        //     const result = gameService.disconnect(game.clientPlayers.get('playerId').socket);
-        //     expect(result).toEqual(disconnectPayloadTestPlayer);
-        // });
-
         it('should push the game to toEnd', () => {
             game.state = GameState.Running;
             gameService.games.set(game.pin, game);
@@ -331,7 +342,7 @@ describe('GameService', () => {
         it("should create a new submission if it doesn't exist already", () => {
             jest.spyOn(Map.prototype, 'has').mockReturnValue(true);
             const result = gameService.getOrCreateSubmission(socketMockPlayer, game);
-            expect(result).toEqual(game.currentQuestionSubmissions.get(socketMockPlayer.id));
+            expect(result).toEqual(game.currentQuestionQcmSubmissions.get(socketMockPlayer.id));
         });
     });
 
@@ -385,5 +396,46 @@ describe('GameService', () => {
             const result = gameService.startGame(socketMock, game.pin);
             expect(result).toEqual(questionPayloadTest);
         });
+    });
+
+    describe('qrlSubmit', () => {
+        const game = gameStub();
+        const answer = 'hello';
+        it('should throw an error if the client already submitted', () => {
+            jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
+            jest.spyOn(Map.prototype, 'has').mockReturnValue(true);
+            expect(() => gameService.qrlSubmit(socketMock, game.pin, answer)).toThrow('Vous avez déjà soumis votre réponse pour cette question');
+        });
+
+        it('should return the right submission', () => {
+            const submission = qrlSubmissionStub();
+            jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
+            jest.spyOn(Map.prototype, 'has').mockReturnValue(false);
+            const setSpy = jest.spyOn(Map.prototype, 'set');
+            const result = gameService.qrlSubmit(socketMock, game.pin, answer);
+            expect(setSpy).toHaveBeenCalledWith(socketMock.id, qrlSubmissionStub());
+            expect(result).toEqual(submission);
+        });
+    });
+
+    describe('qrlInputChange', () => {
+        const game = gameStub();
+        const playerSocketMock = { id: 'playerId ' } as jest.Mocked<Socket>;
+        const clientPlayer = clientPlayerStub();
+        const clientPlayerIsTyping = clientPlayerStub();
+        clientPlayerIsTyping.player.isTyping = true;
+        it('should return the right result if isTyping is false', () => {
+            jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
+            jest.spyOn(Map.prototype, 'get').mockReturnValue(clientPlayer);
+            const result = gameService.qrlInputChange(playerSocketMock, game.pin, false);
+            expect(result).toEqual([false]);
+        });
+
+        // it('should return the right result if isTyping is true', () => {
+        //     jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
+        //     jest.spyOn(Map.prototype, 'get').mockReturnValueOnce(clientPlayer).mockReturnValueOnce(clientPlayerIsTyping);
+        //     const result = gameService.qrlInputChange(playerSocketMock, game.pin, true);
+        //     expect(result).toEqual([true]);
+        // });
     });
 });
