@@ -28,14 +28,16 @@
 
     .swiper-slide,
     .game-slide {
-        background-color: #4bb4de;
-        background-size: cover;
+        background-color: transparent !important;
+        pointer-events: none !important;
+
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        width: 300px;
-        height: 300px;
+        cursor: default;
+        max-width: 1500px;
+        height: 500px;
         transition:
             transform 0.3s ease,
             box-shadow 0.3s ease,
@@ -79,7 +81,7 @@
     }
 
     .swiper-pagination-bullet {
-        background-color: #4bb4de;
+        background-color: #000000;
         width: 10px;
         height: 10px;
     }
@@ -89,6 +91,10 @@
         font-size: 15px;
         font-weight: bold;
     }
+}
+
+.mySwiper .button-container button {
+    pointer-events: all !important;
 }
 
 .header {
