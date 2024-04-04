@@ -4,7 +4,7 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    max-height: 66vh;
+    max-height: 58vh;
     max-width: 500px;
     background-color: white;
     border-radius: 5px;
@@ -16,6 +16,8 @@
     align-items: center;
     background-color: var(--secondary-bg-color);
     height: 5vh;
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 
 .text-centered {
@@ -23,32 +25,19 @@
     text-align: center;
 }
 
-.text-index {
-    color: black;
-    text-align: center;
-    align-self: center;
-}
-
 .centered {
     justify-self: center;
     align-self: center;
 }
 
-.question-header {
-    position: relative;
-    height: 100%;
-    display: flex;
-    justify-content: center;
+.left-area {
+    color: black;
+    background-color: aliceblue;
+    width: 7%;
+    padding-top: 5px;
+    padding-left: 5px;
     align-items: center;
-}
-
-.question-index {
-    position: absolute;
-    left: 5%;
-    display: flex;
-    justify-content: center;
-    font-size: 1.1rem;
-    font-weight: bold;
+    text-align: center;
 }
 
 .list {
@@ -81,36 +70,23 @@
     overflow-x: hidden;
 }
 
-.list-footer {
-    display: flex;
-    justify-content: center;
-    margin: 10px 0px;
-    height: 5vh;
-    max-height: 50px;
-}
-
-.list-footer .action {
-    color: black;
-    font-size: 3rem;
-}
-
 .question-container {
+    position: relative;
     display: flex;
     min-height: 80px;
     height: fit-content;
-    border-radius: 5px;
     width: 95%;
+    border: 2px black solid;
+    border-radius: 15px;
+    overflow: hidden;
 }
 
 .question-body {
     position: relative;
-    overflow: hidden;
     background-color: aliceblue;
     color: var(--secondary-fg-color);
     flex-grow: 1;
     box-sizing: border-box;
-    border: 2px black solid;
-    border-radius: 15px;
 }
 
 .question-content {
@@ -127,7 +103,7 @@
 
 .question-container:hover {
     .overlay {
-        bottom: 0%;
+        visibility: visible;
     }
 }
 
@@ -137,15 +113,16 @@
     opacity: 0.9;
     display: flex;
     justify-content: center;
-    box-sizing: border-box;
     width: 100%;
     height: 30px;
-    bottom: -30px;
-    z-index: 2;
-    transition: all 0.5s;
+    bottom: 0;
+    transition: all 0.1s;
+    visibility: hidden;
 }
 
 .last-modified-wrapper {
+    position: absolute;
+    top: 0;
     box-sizing: border-box;
     width: 100%;
     display: flex;
@@ -179,7 +156,7 @@
     top: 50%;
     transform: translate(-50%, -50%) scale(1);
     font-size: 1.5rem;
-    transition: all 0.3s;
+    transition: all 0.1s;
 }
 
 .share-wrapper {

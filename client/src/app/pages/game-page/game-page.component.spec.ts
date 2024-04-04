@@ -5,7 +5,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { lastPlayerEvaluationStub } from '@app/TestStubs/evaluation.stubs';
-import { questionStub } from '@app/TestStubs/question.stubs';
+import { qcmQuestionStub } from '@app/TestStubs/question.stubs';
 import { SocketServerMock } from '@app/mocks/socket-server-mock';
 import { GameServicesProvider } from '@app/providers/game-services.provider';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
@@ -14,8 +14,8 @@ import { PlayerService } from '@app/services/player/player.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
-import { QcmEvaluation } from '@common/qcm-evaluation';
 import { GameEventPayload } from '@common/game-event-payload';
+import { QcmEvaluation } from '@common/qcm-evaluation';
 import { Question } from '@common/question';
 import { QuestionPayload } from '@common/question-payload';
 import { TimerEventType } from '@common/timer-event-type';
@@ -175,7 +175,7 @@ describe('GamePageComponent', () => {
     });
 
     it('should setupSubscriptions', () => {
-        const payload: GameEventPayload<Question> = { pin: '123', data: questionStub()[0] };
+        const payload: GameEventPayload<Question> = { pin: '123', data: qcmQuestionStub()[0] };
         const timerPayload: GameEventPayload<TimerPayload> = { pin: '123', data: { remainingTime: 0, eventType: TimerEventType.StartGame } };
         const evaluationPayload: GameEventPayload<QcmEvaluation> = { pin: '123', data: lastPlayerEvaluationStub() };
         const messagePayload: GameEventPayload<string> = { pin: '123', data: 'message' };
@@ -202,7 +202,7 @@ describe('GamePageComponent', () => {
     });
 
     it('should setupSubscriptions if eventType is NextQuestion and is last question', () => {
-        const questionPayload: QuestionPayload = { question: questionStub()[0], isLast: true };
+        const questionPayload: QuestionPayload = { question: qcmQuestionStub()[0], isLast: true };
         const payload: GameEventPayload<QuestionPayload> = { pin: '123', data: questionPayload };
         const timerPayload: GameEventPayload<TimerPayload> = { pin: '123', data: { remainingTime: 0, eventType: TimerEventType.NextQuestion } };
         const evaluationPayload: GameEventPayload<QcmEvaluation> = { pin: '123', data: lastPlayerEvaluationStub() };
@@ -230,7 +230,7 @@ describe('GamePageComponent', () => {
     });
 
     it('should setupSubscriptions if isTest is false', () => {
-        const questionPayload: QuestionPayload = { question: questionStub()[0], isLast: true };
+        const questionPayload: QuestionPayload = { question: qcmQuestionStub()[0], isLast: true };
         const payload: GameEventPayload<QuestionPayload> = { pin: '123', data: questionPayload };
         const timerPayload: GameEventPayload<TimerPayload> = { pin: '123', data: { remainingTime: 0, eventType: TimerEventType.NextQuestion } };
         const evaluationPayload: GameEventPayload<QcmEvaluation> = { pin: '123', data: lastPlayerEvaluationStub() };

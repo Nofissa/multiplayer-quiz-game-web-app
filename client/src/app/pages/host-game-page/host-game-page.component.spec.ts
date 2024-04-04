@@ -8,7 +8,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { barChartDataStub } from '@app/TestStubs/bar-chart-data.stubs';
 import { firstPlayerEvaluationStub, lastPlayerEvaluationStub } from '@app/TestStubs/evaluation.stubs';
 import { secondPlayerStub } from '@app/TestStubs/player.stubs';
-import { questionStub } from '@app/TestStubs/question.stubs';
+import { qcmQuestionStub } from '@app/TestStubs/question.stubs';
 import { mockGameSnapshot } from '@app/TestStubs/snapshot.stubs';
 import { submissionStub } from '@app/TestStubs/submission.stubs';
 import { SocketServerMock } from '@app/mocks/socket-server-mock';
@@ -22,10 +22,10 @@ import { PlayerService } from '@app/services/player/player.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
-import { QcmEvaluation } from '@common/qcm-evaluation';
 import { GameEventPayload } from '@common/game-event-payload';
 import { GameState } from '@common/game-state';
 import { Player } from '@common/player';
+import { QcmEvaluation } from '@common/qcm-evaluation';
 import { Question } from '@common/question';
 import { QuestionPayload } from '@common/question-payload';
 import { Submission } from '@common/submission';
@@ -246,7 +246,7 @@ describe('HostGamePageComponent', () => {
 
     it('should startGame start server Game', () => {
         component.startGame();
-        const payload: GameEventPayload<QuestionPayload> = { pin: PIN, data: { question: questionStub()[0], isLast: false } };
+        const payload: GameEventPayload<QuestionPayload> = { pin: PIN, data: { question: qcmQuestionStub()[0], isLast: false } };
         socketServerMock.emit('startGame', payload);
         expect(component.gameState).toEqual(GameState.Running);
         expect(component.isLastQuestion).toBeFalse();
@@ -257,7 +257,7 @@ describe('HostGamePageComponent', () => {
     it('should nextQuestion send nextQuestion signal to server and change gameState and set currentQuestionHasEnded', () => {
         component.nextQuestion();
         expect(gameServiceSpy.nextQuestion).toHaveBeenCalledWith(PIN);
-        const payload: GameEventPayload<Question> = { pin: PIN, data: questionStub()[0] };
+        const payload: GameEventPayload<Question> = { pin: PIN, data: qcmQuestionStub()[0] };
         socketServerMock.emit('nextQuestion', payload);
         expect(barChartServiceSpy.addQuestion).toHaveBeenCalled();
         expect(timerServiceSpy.startTimer).toHaveBeenCalled();

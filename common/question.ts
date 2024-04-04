@@ -5,7 +5,7 @@ export interface Question {
     type: QuestionType;
     text: string;
     points: number;
-    choices: Choice[];
+    choices?: Choice[];
     lastModification: Date;
     _id: string;
 }
