@@ -97,25 +97,29 @@ export class PlayerListComponent implements OnInit, OnDestroy {
                 }
             });
         } else {
-            if (this.sortingOptions === PlayerListSortingOptions.NameAscending) {
-                this.players.sort((a, b) => a.username.localeCompare(b.username));
-            }
-            if (this.sortingOptions === PlayerListSortingOptions.NameDescending) {
-                this.players.sort((a, b) => b.username.localeCompare(a.username));
-            }
-            if (this.sortingOptions === PlayerListSortingOptions.ScoreAscending) {
-                this.players.sort((a, b) => a.score - b.score);
-            }
-            if (this.sortingOptions === PlayerListSortingOptions.ScoreDescending) {
-                this.players.sort((a, b) => b.score - a.score);
-            }
-            if (this.sortingOptions === PlayerListSortingOptions.StatusAscending) {
-                this.players.sort((a, b) => a.username.localeCompare(b.username));
-                this.players.sort((a, b) => a.state - b.state);
-            }
-            if (this.sortingOptions === PlayerListSortingOptions.StatusDescending) {
-                this.players.sort((a, b) => a.username.localeCompare(b.username));
-                this.players.sort((a, b) => b.state - a.state);
+            switch (this.sortingOptions) {
+                case PlayerListSortingOptions.NameAscending:
+                    this.players.sort((a, b) => a.username.localeCompare(b.username));
+                    break;
+                case PlayerListSortingOptions.NameDescending:
+                    this.players.sort((a, b) => b.username.localeCompare(a.username));
+                    break;
+                case PlayerListSortingOptions.ScoreAscending:
+                    this.players.sort((a, b) => a.score - b.score);
+                    break;
+                case PlayerListSortingOptions.ScoreDescending:
+                    this.players.sort((a, b) => b.score - a.score);
+                    break;
+                case PlayerListSortingOptions.StatusAscending:
+                    this.players.sort((a, b) => a.username.localeCompare(b.username));
+                    this.players.sort((a, b) => a.state - b.state);
+                    break;
+                case PlayerListSortingOptions.StatusDescending:
+                    this.players.sort((a, b) => a.username.localeCompare(b.username));
+                    this.players.sort((a, b) => b.state - a.state);
+                    break;
+                default:
+                    break;
             }
         }
     }
