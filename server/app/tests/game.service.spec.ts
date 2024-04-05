@@ -18,28 +18,13 @@ import { submissionStub } from './stubs/submission.stub';
 
 describe('GameService', () => {
     let gameService: GameService;
-    // let moduleRef: ModuleRef;
     let quizServiceMock: jest.Mocked<QuizService>;
-    // let timerServiceMock: jest.Mocked<TimerService>;
     let socketMock: jest.Mocked<Socket>;
 
     beforeEach(async () => {
-        // const moduleRefFactory = {
-        //     get: jest.fn((service) => {
-        //         if (service === QuizService) return quizServiceMock;
-        //         if (service === TimerService) return timerServiceMock;
-        //     }),
-        // } as any;
-
-        // moduleRef = moduleRefFactory as ModuleRef;
-
         quizServiceMock = {
             getQuizById: jest.fn(),
         } as any;
-
-        // timerServiceMock = {
-        //     getTimer: jest.fn(),
-        // } as any;
 
         gameService = new GameService(quizServiceMock);
     });
@@ -73,7 +58,6 @@ describe('GameService', () => {
             const client = socketMock;
             jest.spyOn(PinHelper, 'generateRandomPin').mockReturnValue('mockedPinValue');
             quizServiceMock.getQuizById.mockResolvedValue(quizExist);
-            // jest.spyOn(QuizService.prototype, 'getQuizById').mockResolvedValue(quizExist);
             const result = await gameService.createGame(client, quizId);
 
             expect(result).toBeTruthy();
