@@ -52,6 +52,8 @@ export class QrlBoardComponent implements OnInit, OnDestroy {
 
     @ViewChild('textarea') textarea: ElementRef;
     showNotification100: boolean = false;
+    showNotification50: boolean = false;
+    showNotification0: boolean = false;
 
     player: Player | null;
     remainingInputCount: number = MAX_MESSAGE_LENGTH;
@@ -135,10 +137,10 @@ export class QrlBoardComponent implements OnInit, OnDestroy {
             this.remainingInputCount = MAX_MESSAGE_LENGTH;
             this.hasSubmitted = true;
             this.isInEvaluation = true;
-        } else if (this.input.length > MAX_MESSAGE_LENGTH) {
-            this.openError('La réponse contient plus de 200 caractères');
         } else if (isOnlyWhitespace) {
             this.openError('La réponse est vide');
+        } else if (this.input.length > MAX_MESSAGE_LENGTH) {
+            this.openError('La réponse contient plus de 200 caractères');
         }
     }
 
@@ -172,12 +174,20 @@ export class QrlBoardComponent implements OnInit, OnDestroy {
                 setTimeout(() => {
                     this.textarea.nativeElement.classList.remove('blink-red');
                 }, THREE_SECONDS_MS);
+                this.showNotification0 = true;
+                setTimeout(() => {
+                    this.showNotification0 = false;
+                }, THREE_SECONDS_MS);
                 break;
             }
             case Grade.Average: {
                 this.textarea.nativeElement.classList.add('blink-yellow');
                 setTimeout(() => {
                     this.textarea.nativeElement.classList.remove('blink-yellow');
+                }, THREE_SECONDS_MS);
+                this.showNotification50 = true;
+                setTimeout(() => {
+                    this.showNotification50 = false;
                 }, THREE_SECONDS_MS);
                 break;
             }
@@ -218,15 +228,15 @@ export class QrlBoardComponent implements OnInit, OnDestroy {
                 }
             }),
             this.gameService.onQrlEvaluate(pin, (evaluation) => {
-                this.isInEvaluation = false;
-                if (this.playerService.getCurrentPlayer(pin)?.socketId === evaluation.clientId) {
+                if (this.playerService.getCurrentPlayer(pin)?.socketId === evaluation.player.socketId) {
                     this.cachedEvaluation = evaluation;
                 }
                 if (evaluation.isLast) {
                     this.questionIsOver = true;
-                    if (this.player) {
+                    if (this.player && this.cachedEvaluation) {
+                        this.isInEvaluation = false;
                         this.player.score += this.cachedEvaluation?.score ?? 0;
-                        this.blinkTextArea(evaluation.grade);
+                        this.blinkTextArea(this.cachedEvaluation.grade);
                     }
                 }
             }),
