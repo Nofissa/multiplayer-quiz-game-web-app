@@ -42,6 +42,12 @@ export class Game {
         return this.qrlSubmissions[this.currentQuestionIndex];
     }
 
+    get isRandom() {
+        // Deactivated because the dangling comes from MongoDB
+        // eslint-disable-next-line no-underscore-dangle
+        return !this.quiz._id;
+    }
+
     loadNextQuestion() {
         this.qcmSubmissions.push(new Map());
         this.qrlSubmissions.push(new Map());
