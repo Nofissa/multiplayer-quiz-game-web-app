@@ -68,6 +68,7 @@ export class QrlBoardComponent implements OnInit, OnDestroy {
     readonly gameHttpService: GameHttpService;
     readonly gameService: GameService;
     readonly timerService: TimerService;
+    readonly playerService: PlayerService;
 
     private isTyping: boolean = false;
     private interval: ReturnType<typeof setTimeout>;
@@ -78,7 +79,6 @@ export class QrlBoardComponent implements OnInit, OnDestroy {
     constructor(
         gameServicesProvider: GameServicesProvider,
         formBuilder: FormBuilder,
-        private readonly playerService: PlayerService,
         private readonly dialog: MatDialog,
         private readonly router: Router,
         private readonly snackBar: MatSnackBar,
@@ -89,13 +89,16 @@ export class QrlBoardComponent implements OnInit, OnDestroy {
         this.gameHttpService = gameServicesProvider.gameHttpService;
         this.gameService = gameServicesProvider.gameService;
         this.timerService = gameServicesProvider.timerService;
+        this.playerService = gameServicesProvider.playerService;
     }
 
     ngOnInit() {
         const player = this.playerService.getCurrentPlayer(this.pin);
+
         if (player) {
             this.player = player;
         }
+
         this.gameHttpService.getGameSnapshotByPin(this.pin).subscribe((snapshot) => {
             this.loadNextQuestion(snapshot.quiz.questions[snapshot.currentQuestionIndex]);
         });
@@ -109,10 +112,6 @@ export class QrlBoardComponent implements OnInit, OnDestroy {
                 sub.unsubscribe();
             }
         });
-    }
-
-    isQRL(): boolean {
-        return this.question.type === 'QRL';
     }
 
     updateRemainingInputCount() {
