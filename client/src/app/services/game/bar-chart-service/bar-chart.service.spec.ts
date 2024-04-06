@@ -37,9 +37,9 @@ describe('BarChartService', () => {
     });
 
     it('should add question when question is valid', () => {
-        service.addQuestion(questionStub()[0]);
+        service.addQuestion(qcmQuestionStub()[0]);
         const mockBarChart: BarChartData = {
-            question: questionStub()[0],
+            question: qcmQuestionStub()[0],
             submissions: [],
         };
         expect(service['barChartData']).toEqual([mockBarChart]);
@@ -51,18 +51,18 @@ describe('BarChartService', () => {
     });
 
     it('should setData populate the service when given data is correct', () => {
-        service.setData({ submissions: submissionsStub(), questions: questionStub() });
+        service.setData({ submissions: submissionsStub(), questions: qcmQuestionStub() });
         expect(service['barChartData']).toEqual(barChartDataStub());
     });
 
     it('should not update barChartData when given a bad clientId and submission', () => {
-        service['barChartData'] = [{ question: questionStub()[0], submissions: [] }];
+        service['barChartData'] = [{ question: qcmQuestionStub()[0], submissions: [] }];
         service.updateBarChartData(undefined as unknown as Submission[]);
-        expect(service.getCurrentQuestionData()).toEqual({ question: questionStub()[0], submissions: [] });
+        expect(service.getCurrentQuestionData()).toEqual({ question: qcmQuestionStub()[0], submissions: [] });
     });
 
     it('should contain multiple players submissions', () => {
-        service['barChartData'] = [{ question: questionStub()[0], submissions: [] }];
+        service['barChartData'] = [{ question: qcmQuestionStub()[0], submissions: [] }];
 
         service.updateBarChartData(submissionStub());
 
@@ -76,17 +76,17 @@ describe('BarChartService', () => {
 
     it('should update last barChart when logging new submissions', () => {
         service['barChartData'] = [
-            { question: questionStub()[0], submissions: [] },
-            { question: questionStub()[1], submissions: [] },
+            { question: qcmQuestionStub()[0], submissions: [] },
+            { question: qcmQuestionStub()[1], submissions: [] },
         ];
         service.updateBarChartData(submissionStub());
         const mockBarChartContainer: BarChartData[] = [
             {
-                question: questionStub()[0],
+                question: qcmQuestionStub()[0],
                 submissions: [],
             },
             {
-                question: questionStub()[1],
+                question: qcmQuestionStub()[1],
                 submissions: submissionStub(),
             },
         ];

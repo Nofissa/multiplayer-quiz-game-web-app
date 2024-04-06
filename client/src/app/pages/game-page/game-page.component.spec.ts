@@ -14,8 +14,8 @@ import { PlayerService } from '@app/services/player/player.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
-import { QcmEvaluation } from '@common/qcm-evaluation';
 import { GameEventPayload } from '@common/game-event-payload';
+import { QcmEvaluation } from '@common/qcm-evaluation';
 import { Question } from '@common/question';
 import { QuestionPayload } from '@common/question-payload';
 import { TimerEventType } from '@common/timer-event-type';
@@ -23,17 +23,19 @@ import { TimerPayload } from '@common/timer-payload';
 import { Observable, throwError } from 'rxjs';
 import { io } from 'socket.io-client';
 import { GamePageComponent } from './game-page.component';
+import { SoundService } from '@app/services/sound/sound.service';
 
 describe('GamePageComponent', () => {
     let component: GamePageComponent;
     let fixture: ComponentFixture<GamePageComponent>;
     let gameHttpService: GameHttpService;
     let gameService: GameService;
-    let webSocketServiceSpy: jasmine.SpyObj<WebSocketService>;
     let socketServerMock: SocketServerMock;
+    let webSocketServiceSpy: jasmine.SpyObj<WebSocketService>;
     let timerServiceSpy: jasmine.SpyObj<TimerService>;
     let gameServiceSpy: jasmine.SpyObj<GameService>;
     let playerServiceSpy: jasmine.SpyObj<PlayerService>;
+    let soundServiceSpy: jasmine.SpyObj<SoundService>;
 
     beforeEach(async () => {
         webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', ['emit', 'on'], {
@@ -58,7 +60,7 @@ describe('GamePageComponent', () => {
 
         playerServiceSpy = jasmine.createSpyObj<PlayerService>(['onPlayerAbandon', 'onPlayerBan', 'playerBan', 'playerAbandon']);
 
-        timerServiceSpy = jasmine.createSpyObj<TimerService>(['onTimerTick', 'onStartTimer', 'stopTimer', 'startTimer']);
+        timerServiceSpy = jasmine.createSpyObj<TimerService>(['onStartTimer', 'onTimerTick', 'startTimer', 'stopTimer', 'onAccelerateTimer']);
         await TestBed.configureTestingModule({
             declarations: [GamePageComponent],
             imports: [HttpClientTestingModule, RouterTestingModule, BrowserAnimationsModule],
@@ -69,6 +71,7 @@ describe('GamePageComponent', () => {
                 { provide: WebSocketService, useValue: webSocketServiceSpy },
                 { provide: GameService, useValue: gameServiceSpy },
                 { provide: TimerService, useValue: timerServiceSpy },
+                { provide: SoundService, useValue: soundServiceSpy },
             ],
         }).compileComponents();
 
@@ -85,6 +88,7 @@ describe('GamePageComponent', () => {
                 };
             }).subscribe(func);
         });
+        soundServiceSpy = jasmine.createSpyObj<SoundService>(['loadSound', 'playSound', 'stopSound']);
 
         socketServerMock = new SocketServerMock([webSocketServiceSpy['socketInstance']]);
 
@@ -171,7 +175,7 @@ describe('GamePageComponent', () => {
     });
 
     it('should setupSubscriptions', () => {
-        const payload: GameEventPayload<Question> = { pin: '123', data: questionStub()[0] };
+        const payload: GameEventPayload<Question> = { pin: '123', data: qcmQuestionStub()[0] };
         const timerPayload: GameEventPayload<TimerPayload> = { pin: '123', data: { remainingTime: 0, eventType: TimerEventType.StartGame } };
         const evaluationPayload: GameEventPayload<QcmEvaluation> = { pin: '123', data: lastPlayerEvaluationStub() };
         const messagePayload: GameEventPayload<string> = { pin: '123', data: 'message' };
@@ -198,7 +202,7 @@ describe('GamePageComponent', () => {
     });
 
     it('should setupSubscriptions if eventType is NextQuestion and is last question', () => {
-        const questionPayload: QuestionPayload = { question: questionStub()[0], isLast: true };
+        const questionPayload: QuestionPayload = { question: qcmQuestionStub()[0], isLast: true };
         const payload: GameEventPayload<QuestionPayload> = { pin: '123', data: questionPayload };
         const timerPayload: GameEventPayload<TimerPayload> = { pin: '123', data: { remainingTime: 0, eventType: TimerEventType.NextQuestion } };
         const evaluationPayload: GameEventPayload<QcmEvaluation> = { pin: '123', data: lastPlayerEvaluationStub() };
@@ -226,7 +230,7 @@ describe('GamePageComponent', () => {
     });
 
     it('should setupSubscriptions if isTest is false', () => {
-        const questionPayload: QuestionPayload = { question: questionStub()[0], isLast: true };
+        const questionPayload: QuestionPayload = { question: qcmQuestionStub()[0], isLast: true };
         const payload: GameEventPayload<QuestionPayload> = { pin: '123', data: questionPayload };
         const timerPayload: GameEventPayload<TimerPayload> = { pin: '123', data: { remainingTime: 0, eventType: TimerEventType.NextQuestion } };
         const evaluationPayload: GameEventPayload<QcmEvaluation> = { pin: '123', data: lastPlayerEvaluationStub() };

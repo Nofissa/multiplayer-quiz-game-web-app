@@ -5,7 +5,7 @@ class IsQuestionTypeConstraint implements ValidatorConstraintInterface {
     // _ could be used, optional parameter
     // eslint-disable-next-line no-unused-vars
     validate(value: unknown[], _: ValidationArguments) {
-        return typeof value === 'string' && (value === 'QCM' || value === 'QRL');
+        return typeof value === 'string' && ((value as string).trim().toUpperCase() === 'QCM' || (value as string).trim().toUpperCase() === 'QRL');
     }
 
     defaultMessage(args: ValidationArguments) {

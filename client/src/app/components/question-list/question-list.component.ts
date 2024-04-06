@@ -52,4 +52,8 @@ export class QuestionListComponent {
     isShared(question: Question) {
         return this.sharedQuestions.includes(question);
     }
+
+    isQcm(question: Question) {
+        return question.type === 'QCM';
+    }
 }

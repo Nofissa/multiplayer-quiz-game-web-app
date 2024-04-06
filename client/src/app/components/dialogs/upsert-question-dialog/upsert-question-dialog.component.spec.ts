@@ -1,11 +1,8 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { UpsertQuestionDialogComponent } from './upsert-question-dialog.component';
-import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog-data';
-import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
-import { Choice } from '@common/choice';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MAX_CHOICE_COUNT, MIN_CHOICE_COUNT } from '@app/constants/constants';
@@ -153,10 +150,11 @@ describe('UpsertQuestionDialogComponent', () => {
 
     it('should choicesArray contains all input choices when choice is added', () => {
         const formGroupValue: Choice[] = [];
-        correctUpsertValues.question.choices.forEach((choice) => {
-            formGroupValue.push(choice);
-        });
-
+        if (correctUpsertValues.question.choices) {
+            correctUpsertValues.question.choices.forEach((choice) => {
+                formGroupValue.push(choice);
+            });
+        }
         const newChoice: Choice = {
             text: '',
             isCorrect: false,
@@ -186,10 +184,11 @@ describe('UpsertQuestionDialogComponent', () => {
 
     it('should ensure choicesArray contains all input choices when first choice is removed', () => {
         const formGroupValue: Choice[] = [];
-        correctUpsertValues.question.choices.forEach((choice) => {
-            formGroupValue.push(choice);
-        });
-
+        if (correctUpsertValues.question.choices) {
+            correctUpsertValues.question.choices.forEach((choice) => {
+                formGroupValue.push(choice);
+            });
+        }
         formGroupValue[0] = formGroupValue[1];
         formGroupValue[1] = {
             text: '',
@@ -268,19 +267,19 @@ describe('UpsertQuestionDialogComponent', () => {
     });
 
     it('should not close the dialog when submit is pressed and form is invalid', () => {
-        component.formGroup.setErrors({});
+        component.formGroup.controls.text.patchValue(null);
         component.submit();
         expect(dialogRefSpy.close).not.toHaveBeenCalled();
     });
 
-    it('should not close the dialog when submit is pressed and qcm toggle is set for QRL', () => {
+    it('should submit Qrl question when submit is pressed and question is valid', () => {
         component.doToggle();
         component.submit();
-        expect(dialogRefSpy.close).not.toHaveBeenCalled();
+        expect(dialogRefSpy.close).toHaveBeenCalled();
     });
 
     it('should spring a snack bar when submit is pressed and form is invalid', () => {
-        component.formGroup.setErrors({});
+        component.formGroup.controls.text.patchValue(null);
         component.submit();
         expect(snackBarSpy.open).toHaveBeenCalled();
     });

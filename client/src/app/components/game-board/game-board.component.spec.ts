@@ -178,7 +178,7 @@ describe('GameBoardComponent', () => {
     });
 
     it('should setupSubscriptions', () => {
-        const payload: GameEventPayload<Question> = { pin: '123', data: questionStub()[0] };
+        const payload: GameEventPayload<Question> = { pin: '123', data: qcmQuestionStub()[0] };
         const timerPayload: GameEventPayload<TimerPayload> = { pin: '123', data: { remainingTime: 0, eventType: TimerEventType.Question } };
         const evaluationPayload: GameEventPayload<QcmEvaluation> = { pin: '123', data: lastPlayerEvaluationStub() };
         spyOn(component, 'submitChoices');

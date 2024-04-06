@@ -1,3 +1,4 @@
+import { CdkDrag, CdkDragDrop, CdkDropList, DragDropModule } from '@angular/cdk/drag-drop';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { qrlQuestionStub } from '@app/test-stubs/question.stubs';
 import { CdkDrag, CdkDragDrop, CdkDropList, DragDropModule } from '@angular/cdk/drag-drop';
@@ -5,7 +6,9 @@ import { QuestionListComponent } from './question-list.component';
 import { Question } from '@common/question';
 import { QuestionInteractionService } from '@app/services/question-interaction/question-interaction.service';
 import { QuestionSharingService } from '@app/services/question-sharing/question-sharing.service';
+import { Question } from '@common/question';
 import { of } from 'rxjs';
+import { QuestionListComponent } from './question-list.component';
 
 describe('QuestionListComponent', () => {
     let component: QuestionListComponent;
@@ -106,6 +109,13 @@ describe('QuestionListComponent', () => {
 
         expect(component.isShared(sharedQuestion)).toBeTrue();
         expect(component.isShared(notSharedQuestion)).toBeFalse();
+    });
+
+    it('should isQCM verify if the question is a QCM', () => {
+        let response = component.isQcm(questionMocks[0]);
+        expect(response).toBeTrue();
+        response = component.isQcm(qrlQuestionStub()[0]);
+        expect(response).toBeFalse();
     });
 
     it('should move item in array on drop', () => {

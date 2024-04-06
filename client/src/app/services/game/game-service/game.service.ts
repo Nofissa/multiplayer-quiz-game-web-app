@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
 import { GameState } from '@common/game-state';
+import { Grade } from '@common/grade';
 import { Player } from '@common/player';
 import { QcmEvaluation } from '@common/qcm-evaluation';
 import { QrlEvaluation } from '@common/qrl-evaluation';
@@ -72,16 +73,16 @@ export class GameService {
         return this.webSocketService.on('qrlInputChange', applyIfPinMatches(pin, callback));
     }
 
-    qrlSubmit(pin: string, text: string) {
-        this.webSocketService.emit('qrlSubmit', { pin, text });
+    qrlSubmit(pin: string, answer: string) {
+        this.webSocketService.emit('qrlSubmit', { pin, answer });
     }
 
     onQrlSubmit(pin: string, callback: (qrlSubmission: QrlSubmission) => void): Subscription {
         return this.webSocketService.on('qrlSubmit', applyIfPinMatches(pin, callback));
     }
 
-    qrlEvaluate(pin: string, evaluation: QrlEvaluation) {
-        this.webSocketService.emit('qrlEvaluate', { pin, evaluation });
+    qrlEvaluate(socketId: string, pin: string, grade: Grade) {
+        this.webSocketService.emit('qrlEvaluate', { socketId, pin, grade });
     }
 
     onQrlEvaluate(pin: string, callback: (evaluation: QrlEvaluation) => void): Subscription {

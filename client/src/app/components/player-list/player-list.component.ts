@@ -1,4 +1,5 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { PlayerListSortingOptions } from '@app/enums/player-list-sorting-options';
 import { PlayerListDisplayOptions } from '@app/interfaces/player-list-display-options';
 import { GameServicesProvider } from '@app/providers/game-services.provider';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
@@ -21,9 +22,10 @@ export class PlayerListComponent implements OnInit, OnDestroy {
     @Input()
     displayOptions: PlayerListDisplayOptions = {};
     players: Player[] = [];
+    sortingOptions = PlayerListSortingOptions.NameAscending;
 
     playerStates = PlayerState;
-
+    playerListSortingOptions = PlayerListSortingOptions;
     private eventSubscriptions: Subscription[] = [];
 
     private readonly gameHttpService: GameHttpService;
@@ -57,6 +59,15 @@ export class PlayerListComponent implements OnInit, OnDestroy {
         this.playerService.playerBan(this.pin, player.username);
     }
 
+    mutePlayer(player: Player) {
+        this.playerService.playerMute(this.pin, player.username);
+    }
+
+    sortPlayers(option: PlayerListSortingOptions) {
+        this.sortingOptions = option;
+        this.trySort();
+    }
+
     private upsertPlayer(player: Player) {
         const index = this.players.findIndex((x) => x.socketId === player.socketId);
 
@@ -78,12 +89,41 @@ export class PlayerListComponent implements OnInit, OnDestroy {
                     return a.username.localeCompare(b.username);
                 }
             });
+        } else {
+            switch (this.sortingOptions) {
+                case PlayerListSortingOptions.NameAscending:
+                    this.players.sort((a, b) => a.username.localeCompare(b.username));
+                    break;
+                case PlayerListSortingOptions.NameDescending:
+                    this.players.sort((a, b) => b.username.localeCompare(a.username));
+                    break;
+                case PlayerListSortingOptions.ScoreAscending:
+                    this.players.sort((a, b) => a.score - b.score);
+                    break;
+                case PlayerListSortingOptions.ScoreDescending:
+                    this.players.sort((a, b) => b.score - a.score);
+                    break;
+                case PlayerListSortingOptions.StatusAscending:
+                    this.players.sort((a, b) => a.username.localeCompare(b.username));
+                    this.players.sort((a, b) => a.state - b.state);
+                    break;
+                case PlayerListSortingOptions.StatusDescending:
+                    this.players.sort((a, b) => a.username.localeCompare(b.username));
+                    this.players.sort((a, b) => b.state - a.state);
+                    break;
+                default:
+                    break;
+            }
         }
     }
 
     private setupSubscription(pin: string) {
         this.eventSubscriptions.push(
             this.gameService.onQcmSubmit(pin, (evaluation) => {
+                this.upsertPlayer(evaluation.player);
+            }),
+
+            this.gameService.onQrlEvaluate(pin, (evaluation) => {
                 this.upsertPlayer(evaluation.player);
             }),
 
@@ -96,6 +136,10 @@ export class PlayerListComponent implements OnInit, OnDestroy {
             }),
 
             this.playerService.onPlayerAbandon(pin, (player) => {
+                this.upsertPlayer(player);
+            }),
+
+            this.playerService.onPlayerMute(pin, (player) => {
                 this.upsertPlayer(player);
             }),
 

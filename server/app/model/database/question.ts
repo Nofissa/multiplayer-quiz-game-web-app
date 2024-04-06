@@ -32,7 +32,7 @@ export class Question {
     text: string;
 
     @ApiProperty()
-    @Prop({ required: true })
+    @Prop({ required: false })
     @ValidateNested({ each: true })
     choices: Choice[];
 

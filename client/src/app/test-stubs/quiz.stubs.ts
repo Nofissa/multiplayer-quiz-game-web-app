@@ -1,4 +1,4 @@
-import { questionStub } from './question.stubs';
+import { qcmQuestionStub } from './question.stubs';
 
 export const quizStub = () => {
     return {
@@ -7,7 +7,7 @@ export const quizStub = () => {
         description: 'Quiz 1 description',
         duration: 40,
         lastModification: new Date('2024-01-20 18:43:27'),
-        questions: questionStub(),
+        questions: qcmQuestionStub(),
         isHidden: true,
         id: '4d5e6f',
     };

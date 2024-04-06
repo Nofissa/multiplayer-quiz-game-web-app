@@ -15,7 +15,7 @@ describe('BarChartComponent', () => {
         fixture = TestBed.createComponent(BarChartComponent);
         component = fixture.componentInstance;
         component.data = {
-            question: questionStub()[0],
+            question: qcmQuestionStub()[0],
             submissions: [submissionStub()[0], submissionStub()[1], submissionStub()[2]],
         };
         fixture.detectChanges();

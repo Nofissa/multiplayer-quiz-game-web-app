@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
@@ -22,10 +23,10 @@ import { PlayerService } from '@app/services/player/player.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
-import { QcmEvaluation } from '@common/qcm-evaluation';
 import { GameEventPayload } from '@common/game-event-payload';
 import { GameState } from '@common/game-state';
 import { Player } from '@common/player';
+import { QcmEvaluation } from '@common/qcm-evaluation';
 import { Question } from '@common/question';
 import { QuestionPayload } from '@common/question-payload';
 import { Submission } from '@common/submission';
@@ -35,6 +36,7 @@ import { Observable, of, throwError } from 'rxjs';
 import { io } from 'socket.io-client';
 import { HostGamePageComponent } from './host-game-page.component';
 import SpyObj = jasmine.SpyObj;
+import { SoundService } from '@app/services/sound/sound.service';
 
 const PIN = '1234';
 const NEXT_QUESTION_DELAY = 5;
@@ -45,12 +47,13 @@ describe('HostGamePageComponent', () => {
     let gameServiceSpy: SpyObj<GameService>;
     let gameHttpServiceSpy: SpyObj<GameHttpService>;
     let timerServiceSpy: SpyObj<TimerService>;
+    let soundServiceSpy: SpyObj<SoundService>;
     let gameServicesProviderSpy: SpyObj<GameServicesProvider>;
     let barChartServiceSpy: SpyObj<BarChartService>;
     let routerSpy: SpyObj<Router>;
     let webSocketServiceSpy: SpyObj<WebSocketService>;
-    let socketServerMock: SocketServerMock;
     let playerServiceSpy: SpyObj<PlayerService>;
+    let socketServerMock: SocketServerMock;
 
     const clearGameServiceSpies = () => {
         (Object.keys(gameServiceSpy) as (keyof typeof gameServiceSpy)[]).forEach((method) => {
@@ -65,7 +68,6 @@ describe('HostGamePageComponent', () => {
         webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', ['emit', 'on'], {
             socketInstance: io(),
         });
-
         barChartServiceSpy = jasmine.createSpyObj<BarChartService>([
             'addQuestion',
             'updateBarChartData',
@@ -74,9 +76,7 @@ describe('HostGamePageComponent', () => {
             'setData',
             'flushData',
         ]);
-
         playerServiceSpy = jasmine.createSpyObj<PlayerService>(['onPlayerAbandon']);
-
         gameServiceSpy = jasmine.createSpyObj<GameService>([
             'startGame',
             'toggleGameLock',
@@ -90,51 +90,42 @@ describe('HostGamePageComponent', () => {
             'onStartGame',
             'onNextQuestion',
             'onEndGame',
+            'onQrlEvaluate',
+            'onQrlSubmit',
         ]);
-
         gameServiceSpy.onToggleGameLock.and.callFake((pin, callback) => {
             return webSocketServiceSpy.on('toggleGameLock', applyIfPinMatches(pin, callback));
         });
-
         gameServiceSpy.onQcmToggleChoice.and.callFake((pin, callback) => {
             return webSocketServiceSpy.on('toggleSelectChoice', applyIfPinMatches(pin, callback));
         });
-
         gameServiceSpy.onQcmSubmit.and.callFake((pin, callback) => {
             return webSocketServiceSpy.on('submitChoices', applyIfPinMatches(pin, callback));
         });
-
         gameServiceSpy.onStartGame.and.callFake((pin, callback) => {
             return webSocketServiceSpy.on('startGame', applyIfPinMatches(pin, callback));
         });
-
         gameServiceSpy.onNextQuestion.and.callFake((pin, callback) => {
             return webSocketServiceSpy.on('nextQuestion', applyIfPinMatches(pin, callback));
         });
-
         playerServiceSpy.onPlayerAbandon.and.callFake((pin, callback) => {
             return webSocketServiceSpy.on('playerAbandon', applyIfPinMatches(pin, callback));
         });
-
         gameServiceSpy.onEndGame.and.callFake((pin, callback) => {
             return webSocketServiceSpy.on('endGame', applyIfPinMatches(pin, callback));
         });
-
         gameServiceSpy.onCancelGame.and.callFake((pin, callback) => {
             return webSocketServiceSpy.on('cancelGame', applyIfPinMatches(pin, callback));
         });
-
         gameHttpServiceSpy = jasmine.createSpyObj<GameHttpService>(['getGameSnapshotByPin']);
-
         gameHttpServiceSpy.getGameSnapshotByPin.and.callFake(() => {
             return of(mockGameSnapshot()[1]);
         });
-
-        timerServiceSpy = jasmine.createSpyObj<TimerService>(['onStartTimer', 'onTimerTick', 'startTimer', 'stopTimer']);
-
+        timerServiceSpy = jasmine.createSpyObj<TimerService>(['onStartTimer', 'onTimerTick', 'startTimer', 'stopTimer', 'onAccelerateTimer']);
         timerServiceSpy.onTimerTick.and.callFake((pin, callback) => {
             return webSocketServiceSpy.on('timerTick', applyIfPinMatches(pin, callback));
         });
+        soundServiceSpy = jasmine.createSpyObj<SoundService>(['loadSound', 'playSound', 'stopSound']);
 
         gameServicesProviderSpy = new GameServicesProvider(
             gameHttpServiceSpy,
@@ -143,6 +134,7 @@ describe('HostGamePageComponent', () => {
             {} as MessageService, // Mock MessageService
             playerServiceSpy, // Mock PlayerService
             {} as KeyBindingService, // Mock KeyBindingService
+            soundServiceSpy,
         );
 
         routerSpy = jasmine.createSpyObj<Router>(['navigate']);
@@ -171,9 +163,7 @@ describe('HostGamePageComponent', () => {
         }).compileComponents();
 
         fixture = TestBed.createComponent(HostGamePageComponent);
-
         webSocketServiceSpy = TestBed.inject(WebSocketService) as SpyObj<WebSocketService>;
-
         webSocketServiceSpy.on.and.callFake(<T>(eventName: string, func: (data: T) => void) => {
             return new Observable<T>((observer) => {
                 webSocketServiceSpy['socketInstance'].on(eventName, (data) => {
@@ -259,7 +249,7 @@ describe('HostGamePageComponent', () => {
 
     it('should startGame start server Game', () => {
         component.startGame();
-        const payload: GameEventPayload<QuestionPayload> = { pin: PIN, data: { question: questionStub()[0], isLast: false } };
+        const payload: GameEventPayload<QuestionPayload> = { pin: PIN, data: { question: qcmQuestionStub()[0], isLast: false } };
         socketServerMock.emit('startGame', payload);
         expect(component.gameState).toEqual(GameState.Running);
         expect(component.isLastQuestion).toBeFalse();
@@ -270,7 +260,7 @@ describe('HostGamePageComponent', () => {
     it('should nextQuestion send nextQuestion signal to server and change gameState and set currentQuestionHasEnded', () => {
         component.nextQuestion();
         expect(gameServiceSpy.nextQuestion).toHaveBeenCalledWith(PIN);
-        const payload: GameEventPayload<Question> = { pin: PIN, data: questionStub()[0] };
+        const payload: GameEventPayload<Question> = { pin: PIN, data: qcmQuestionStub()[0] };
         socketServerMock.emit('nextQuestion', payload);
         expect(barChartServiceSpy.addQuestion).toHaveBeenCalled();
         expect(timerServiceSpy.startTimer).toHaveBeenCalled();

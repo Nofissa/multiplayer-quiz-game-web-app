@@ -43,14 +43,30 @@ describe('Timer', () => {
             const negativeValue = -1;
             const zeroValue = 0;
 
-            expect(() => timer.setTickPerSecond(negativeValue)).toThrow();
-            expect(() => timer.setTickPerSecond(zeroValue)).toThrowError();
+            expect(() => timer.setTicksPerSecond(negativeValue)).toThrow();
+            expect(() => timer.setTicksPerSecond(zeroValue)).toThrowError();
         });
 
         it('should not throw an error for a tick per second value greater than 0', () => {
             const positiveValue = 1;
 
-            expect(() => timer.setTickPerSecond(positiveValue)).not.toThrow();
+            expect(() => timer.setTicksPerSecond(positiveValue)).not.toThrow();
+        });
+
+        it('should restart the timer if tickPerSecond is positive and the timer is running', () => {
+            const intervalMs = 1000;
+            const ticksPerSecond = 5;
+            timer['interval'] = setInterval(() => {
+                return;
+            }, intervalMs);
+            jest.spyOn(timer, 'isRunning', 'get').mockReturnValue(true);
+            const restartSpy = jest.spyOn(timer, 'restart');
+
+            timer.setTicksPerSecond(ticksPerSecond);
+
+            expect(restartSpy).toHaveBeenCalled();
+
+            restartSpy.mockRestore();
         });
     });
 
@@ -66,6 +82,29 @@ describe('Timer', () => {
 
             expect(clearIntervalSpy).toHaveBeenCalledWith(timer['interval']);
             clearIntervalSpy.mockRestore();
+        });
+    });
+
+    describe('restart', () => {
+        it('should clear the interval and start again if the interval exists', () => {
+            jest.useFakeTimers();
+            const clearIntervalSpy = jest.spyOn(global, 'clearInterval');
+            const startSpy = jest.spyOn(timer, 'start');
+            jest.spyOn(timer, 'isRunning', 'get').mockReturnValue(false);
+
+            const intervalMs = 1000;
+
+            timer['interval'] = setInterval(() => {
+                return;
+            }, intervalMs);
+
+            timer.restart();
+
+            expect(clearIntervalSpy).toHaveBeenCalled();
+            expect(startSpy).toHaveBeenCalled();
+
+            clearIntervalSpy.mockRestore();
+            startSpy.mockRestore();
         });
     });
 });
