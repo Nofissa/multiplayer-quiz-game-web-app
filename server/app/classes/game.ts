@@ -2,6 +2,7 @@ import { Question } from '@app/model/database/question';
 import { Quiz } from '@app/model/database/quiz';
 import { Chatlog } from '@common/chatlog';
 import { GameState } from '@common/game-state';
+import { QrlEvaluation } from '@common/qrl-evaluation';
 import { QrlSubmission } from '@common/qrl-submission';
 import { Submission as QcmSubmission } from '@common/submission';
 import { Socket } from 'socket.io';
@@ -13,6 +14,7 @@ export class Game {
     currentQuestionIndex: number = 0;
     qcmSubmissions: Map<string, QcmSubmission>[] = [];
     qrlSubmissions: Map<string, QrlSubmission>[] = [];
+    qrlEvaluations: Map<string, QrlEvaluation>[] = [];
     chatlogs: Chatlog[] = [];
     clientPlayers: Map<string, ClientPlayer> = new Map();
     state: GameState;
@@ -25,6 +27,7 @@ export class Game {
         this.state = GameState.Opened;
         this.qcmSubmissions.push(new Map());
         this.qrlSubmissions.push(new Map());
+        this.qrlEvaluations.push(new Map());
     }
 
     get currentQuestion(): Question | null {
@@ -51,6 +54,7 @@ export class Game {
     loadNextQuestion() {
         this.qcmSubmissions.push(new Map());
         this.qrlSubmissions.push(new Map());
+        this.qrlEvaluations.push(new Map());
         this.currentQuestionIndex++;
     }
 }
