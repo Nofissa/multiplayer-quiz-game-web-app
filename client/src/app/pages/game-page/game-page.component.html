@@ -4,15 +4,13 @@
 <div class="container">
     <app-nav-header></app-nav-header>
     <span *ngIf="isTest" class="test-mode">MODE TEST</span>
-    <div
-        [ngClass]="{
+    <div [ngClass]="{
             'game-container': hasStarted && !isStarting && !isLoadingNextQuestion,
             hidden: !hasStarted || isStarting || isLoadingNextQuestion
-        }"
-    >
+        }">
         <div class="game-area">
             <app-qrl-board [pin]="pin" [isTest]="isTest"></app-qrl-board>
-            <app-game-board [pin]="pin" [isTest]="isTest"></app-game-board>
+            <app-qcm-board [pin]="pin" [isTest]="isTest"></app-qcm-board>
         </div>
         <div *ngIf="!isTest" class="right-panel">
             <app-chat-room [pin]="pin"></app-chat-room>
@@ -23,11 +21,14 @@
     </div>
     <div class="" *ngIf="isTest && !isStarting && !isLoadingNextQuestion">
         <div class="buttons-wrapper">
-            <button class="start-button" *ngIf="!hasStarted" mat-raised-button (click)="startGame()">Commencer la partie</button>
-            <button class="next-button" mat-raised-button *ngIf="currentQuestionHasEnded && !isLastQuestion" (click)="nextQuestion()">
+            <button class="start-button" *ngIf="!hasStarted" mat-raised-button (click)="startGame()">Commencer la
+                partie</button>
+            <button class="next-button" mat-raised-button *ngIf="currentQuestionHasEnded && !isLastQuestion"
+                (click)="nextQuestion()">
                 Question Suivante
             </button>
-            <button class="next-button" mat-raised-button *ngIf="isLastQuestion" (click)="endGame()">Terminer la partie</button>
+            <button class="next-button" mat-raised-button *ngIf="isLastQuestion" (click)="endGame()">Terminer la
+                partie</button>
         </div>
     </div>
 </div>

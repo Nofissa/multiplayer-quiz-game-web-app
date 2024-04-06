@@ -35,7 +35,7 @@ import { JoinGameDialogComponent } from './components/dialogs/join-game-dialog/j
 import { PromptDialogComponent } from './components/dialogs/prompt-dialog/prompt-dialog.component';
 import { QuizDetailsDialogComponent } from './components/dialogs/quiz-details-dialog/quiz-details-dialog.component';
 import { UpsertQuestionDialogComponent } from './components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
-import { GameBoardComponent } from './components/game-board/game-board.component';
+import { QcmBoardComponent } from './components/qcm-board/qcm-board.component';
 import { GameTransitionComponent } from './components/game-transition/game-transition.component';
 import { NavHeaderComponent } from './components/nav-header/nav-header.component';
 import { PanicModeButtonComponent } from './components/panic-mode-button/panic-mode-button.component';
@@ -80,7 +80,7 @@ import { WebSocketService } from './services/web-socket/web-socket.service';
         ConfirmationDialogComponent,
         QuestionBankComponent,
         QuestionBankComponent,
-        GameBoardComponent,
+        QcmBoardComponent,
         WaitingRoomPageComponent,
         LoaderAnimationComponent,
         PromptDialogComponent,
