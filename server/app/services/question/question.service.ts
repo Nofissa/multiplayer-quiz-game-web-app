@@ -59,10 +59,6 @@ export class QuestionService {
         const regex = new RegExp(`^${escapedText}$`, 'i'); // for case unsensitive search
         const question = await this.model.findOne({ text: { $regex: regex } });
 
-        if (question === null) {
-            return true;
-        } else {
-            return question._id === dto._id;
-        }
+        return question === null ? true : question._id === dto._id;
     }
 }

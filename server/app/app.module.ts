@@ -18,6 +18,7 @@ import { GameGateway } from './gateways/game.gateway';
 import { MessageGateway } from './gateways/message.gateway';
 import { PlayerGateway } from './gateways/player.gateway';
 import { TimerGateway } from './gateways/timer.gateway';
+import { AutopilotService } from './services/autopilot/autopilot.service';
 
 @Module({
     imports: [
@@ -41,6 +42,7 @@ import { TimerGateway } from './gateways/timer.gateway';
         PlayerGateway,
         TimerGateway,
         AuthService,
+        AutopilotService,
         GameService,
         MessageService,
         PlayerService,

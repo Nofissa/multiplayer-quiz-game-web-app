@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { qrlQuestionStub } from '@app/test-stubs/question.stubs';
 import { CdkDrag, CdkDragDrop, CdkDropList, DragDropModule } from '@angular/cdk/drag-drop';
 import { QuestionListComponent } from './question-list.component';
 import { Question } from '@common/question';

@@ -6,8 +6,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { UpsertQuestionDialogComponent } from '@app/components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
-import { SNACK_MESSAGE_DURATION } from '@app/constants';
-import { Quiz } from '@app/interfaces/quiz';
+import { SNACK_MESSAGE_DURATION } from '@app/constants/constants';
+import { Quiz } from '@common/quiz';
 import { MaterialServicesProvider } from '@app/providers/material-services.provider';
 import { QuestionInteractionService } from '@app/services/question-interaction/question-interaction.service';
 import { QuestionSharingService } from '@app/services/question-sharing/question-sharing.service';
@@ -19,9 +19,9 @@ const ID_LENGTH = 10;
 const DURATION = 10;
 
 @Component({
-    selector: 'app-qcmcreation-page',
-    templateUrl: './qcmcreation-page.component.html',
-    styleUrls: ['./qcmcreation-page.component.scss'],
+    selector: 'app-qcm-creation-page',
+    templateUrl: './qcm-creation-page.component.html',
+    styleUrls: ['./qcmc-reation-page.component.scss'],
     providers: [QuestionInteractionService],
 })
 export class QCMCreationPageComponent implements OnInit, OnDestroy {

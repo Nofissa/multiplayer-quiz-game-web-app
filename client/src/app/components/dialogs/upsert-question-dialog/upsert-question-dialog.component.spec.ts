@@ -8,7 +8,10 @@ import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { Choice } from '@common/choice';
 import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MAX_CHOICE_COUNT, MIN_CHOICE_COUNT } from '@app/constants';
+import { MAX_CHOICE_COUNT, MIN_CHOICE_COUNT } from '@app/constants/constants';
+import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog-data';
+import { Choice } from '@common/choice';
+import { UpsertQuestionDialogComponent } from './upsert-question-dialog.component';
 
 describe('UpsertQuestionDialogComponent', () => {
     let component: UpsertQuestionDialogComponent;

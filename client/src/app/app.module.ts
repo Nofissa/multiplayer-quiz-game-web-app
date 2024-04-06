@@ -45,7 +45,7 @@ import { AppRoutingModule } from './modules/app-routing.module';
 import { AdminPageComponent } from './pages/admin-page/admin-page.component';
 import { CreateGamePageComponent } from './pages/create-game-page/create-game-page.component';
 import { PlayerResultsPageComponent } from './pages/player-results-page/player-results-page.component';
-import { QCMCreationPageComponent } from './pages/qcmcreation-page/qcmcreation-page.component';
+import { QCMCreationPageComponent } from './pages/qcmcreation-page/qcm-creation-page.component';
 import { WaitingRoomPageComponent } from './pages/waiting-room-page/waiting-room-page.component';
 import { WebSocketService } from './services/web-socket/web-socket.service';
 import { GameTransitionComponent } from './components/game-transition/game-transition.component';

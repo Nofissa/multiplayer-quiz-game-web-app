@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { PromptDialogComponent } from '@app/components/dialogs/prompt-dialog/prompt-dialog.component';
-import { Quiz } from '@app/interfaces/quiz';
+import { Quiz } from '@common/quiz';
 import { QuizHttpService } from '@app/services/quiz-http/quiz-http.service';
 import { Observable } from 'rxjs';
 

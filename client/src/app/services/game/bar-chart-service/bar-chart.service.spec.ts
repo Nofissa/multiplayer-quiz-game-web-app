@@ -1,8 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { BarChartData } from '@app/interfaces/bar-chart-data';
-import { barChartDataStub } from '@app/TestStubs/bar-chart-data.stubs';
-import { questionStub } from '@app/TestStubs/question.stubs';
-import { submissionsStub, submissionStub } from '@app/TestStubs/submission.stubs';
+import { barChartDataStub } from '@app/test-stubs/bar-chart-data.stubs';
+import { qcmQuestionStub } from '@app/test-stubs/question.stubs';
+import { submissionsStub, submissionStub } from '@app/test-stubs/submission.stubs';
 import { Question } from '@common/question';
 import { Submission } from '@common/submission';
 import { BarChartService } from './bar-chart.service';

@@ -6,7 +6,7 @@ import { GamePageComponent } from '@app/pages/game-page/game-page.component';
 import { HostGamePageComponent } from '@app/pages/host-game-page/host-game-page.component';
 import { MainPageComponent } from '@app/pages/main-page/main-page.component';
 import { PlayerResultsPageComponent } from '@app/pages/player-results-page/player-results-page.component';
-import { QCMCreationPageComponent } from '@app/pages/qcmcreation-page/qcmcreation-page.component';
+import { QCMCreationPageComponent } from '@app/pages/qcmcreation-page/qcm-creation-page.component';
 import { WaitingRoomPageComponent } from '@app/pages/waiting-room-page/waiting-room-page.component';
 
 const routes: Routes = [

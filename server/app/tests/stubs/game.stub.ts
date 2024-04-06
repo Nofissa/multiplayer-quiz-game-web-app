@@ -20,6 +20,7 @@ export const gameStub = (): Game => {
         clientPlayers: new Map<string, ClientPlayer>([['playerId', clientPlayerStub()]]),
         qcmSubmissions: [new Map<string, Submission>([['playerId', submissionStub()]])],
         qrlSubmissions: [new Map<string, QrlSubmission>([['playerId', qrlSubmissionStub()]])],
+        isRandom: false,
         loadNextQuestion() {
             this.qcmSubmissions.push(new Map());
             this.qrlSubmissions.push(new Map());

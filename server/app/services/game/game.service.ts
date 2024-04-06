@@ -18,6 +18,7 @@ import { QuestionPayload } from '@common/question-payload';
 import { Submission } from '@common/submission';
 import { Injectable } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
+import { Subject, Subscription } from 'rxjs';
 import { Socket } from 'socket.io';
 
 const PERCENTAGE_DIVIDER = 100;
@@ -30,6 +31,7 @@ const RANDOM_EXPECTATION = 0.5;
 @Injectable()
 export class GameService {
     games: Map<string, Game> = new Map();
+    private lastQcmSubmissionSubjects: Map<string, Subject<void>> = new Map();
 
     constructor(private readonly moduleRef: ModuleRef) {}
 
@@ -74,6 +76,27 @@ export class GameService {
             pin = generateRandomPin();
         }
 
+        let quiz: Quiz;
+        if (quizId) {
+            quiz = await this.quizService.getQuizById(quizId);
+
+            if (!quiz) {
+                throw new Error(`Aucun quiz ne correspond a l'identifiant ${quizId}`);
+            }
+        } else {
+            quiz = new Quiz();
+            quiz.title = 'Mode Aléatoire';
+            const qcmQuestions = (await this.questionService.getAllQuestions()).filter((x) => x.type.trim().toUpperCase() === 'QCM');
+            quiz.duration = 20;
+
+            if (qcmQuestions.length < RANDOM_MODE_QUESTION_COUNT) {
+                throw new Error("Il n'existe pas assez de questions de type QCM dans la banque de questions pour faire une partie en mode aléatoire");
+            }
+
+            const shuffledQuestions = qcmQuestions.slice().sort(() => Math.random() - RANDOM_EXPECTATION); // to have 1/2 chance to be negative
+            quiz.questions = shuffledQuestions.slice(0, RANDOM_MODE_QUESTION_COUNT);
+        }
+
         const game = new Game(pin, quiz, client);
         this.games.set(pin, game);
 
@@ -85,24 +108,34 @@ export class GameService {
         const clientPlayer = new ClientPlayer(client, username);
         const clientPlayers = Array.from(game.clientPlayers.values());
 
-        if (game.state !== GameState.Opened) {
-            throw new Error(`La partie ${pin} n'est pas ouverte`);
-        }
+        if (client.id !== game.organizer.id) {
+            if (game.state !== GameState.Opened) {
+                throw new Error(`La partie ${pin} n'est pas ouverte`);
+            }
 
-        if (game.clientPlayers.has(client.id) && game.clientPlayers.get(client.id)?.player.state === PlayerState.Playing) {
-            throw new Error('Vous êtes déjà dans cette partie');
-        }
+            if (game.clientPlayers.get(client.id)?.player?.state === PlayerState.Playing) {
+                throw new Error('Vous êtes déjà dans cette partie');
+            }
 
-        if (username.toLowerCase() === 'organisateur') {
-            throw new Error('Le nom "Organisateur" est réservé');
-        }
+            if (username.trim().toLowerCase() === 'organisateur') {
+                throw new Error('Le nom "Organisateur" est réservé');
+            }
 
-        if (clientPlayers.some((x) => x.player.username.toLowerCase() === username.toLowerCase() && x.player.state === PlayerState.Banned)) {
-            throw new Error(`Le nom d'utilisateur "${username}" banni`);
-        }
+            if (
+                clientPlayers.some(
+                    (x) => x.player.username.trim().toLowerCase() === username.trim().toLowerCase() && x.player.state === PlayerState.Banned,
+                )
+            ) {
+                throw new Error(`Le nom d'utilisateur "${username}" banni`);
+            }
 
-        if (clientPlayers.some((x) => x.player.username.toLowerCase() === username.toLowerCase() && x.player.state === PlayerState.Playing)) {
-            throw new Error(`Le nom d'utilisateur "${username}" est déjà pris`);
+            if (
+                clientPlayers.some(
+                    (x) => x.player.username.trim().toLowerCase() === username.trim().toLowerCase() && x.player.state === PlayerState.Playing,
+                )
+            ) {
+                throw new Error(`Le nom d'utilisateur "${username}" est déjà pris`);
+            }
         }
 
         game.clientPlayers.set(client.id, clientPlayer);
@@ -143,6 +176,10 @@ export class GameService {
             isFirstCorrect: isFirst && isCorrect,
             isLast,
         };
+
+        if (isLast) {
+            this.lastQcmSubmissionSubjects.get(pin)?.next();
+        }
 
         return evaluation;
     }
@@ -263,6 +300,7 @@ export class GameService {
 
         return qrlEvaluation;
     }
+
     endGame(client: Socket, pin: string): void {
         const game = this.getGame(pin);
 
@@ -338,5 +376,12 @@ export class GameService {
         }
 
         return game.currentQuestionQcmSubmissions.get(client.id);
+    }
+
+    onLastQcmSubmission(pin: string, callback: () => void): Subscription {
+        const subject = new Subject<void>();
+        this.lastQcmSubmissionSubjects.set(pin, subject);
+
+        return subject.subscribe(callback);
     }
 }

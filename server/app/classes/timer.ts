@@ -23,9 +23,11 @@ export class Timer {
     }
 
     start() {
-        this.interval = setInterval(this.decrement.bind(this), ONE_SECOND_MS / this.tickPerSecond);
+        if (this.isRunning) {
+            return;
+        }
 
-        return this.time;
+        this.interval = setInterval(this.decrement.bind(this), ONE_SECOND_MS / this.ticksPerSecond);
     }
 
     pause() {
@@ -43,10 +45,15 @@ export class Timer {
     }
 
     onTick(callback: (remainingTime: number) => void) {
+        if (this.tickSubscription && !this.tickSubscription.closed) {
+            this.tickSubscription.unsubscribe();
+        }
+
         this.tickSubscription = this.tickSubject.subscribe(callback);
     }
 
     private decrement() {
+        console.log(this.time);
         this.time--;
         this.tickSubject.next(this.time);
 
