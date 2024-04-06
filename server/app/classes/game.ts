@@ -10,7 +10,6 @@ import { ClientPlayer } from './client-player';
 
 export class Game {
     pin: string;
-    isRandom: boolean;
     quiz: Quiz;
     currentQuestionIndex: number = 0;
     qcmSubmissions: Map<string, QcmSubmission>[] = [];
@@ -44,6 +43,10 @@ export class Game {
 
     get currentQuestionQrlSubmissions() {
         return this.qrlSubmissions[this.currentQuestionIndex];
+    }
+
+    get currentQuestionQrlEvaluations() {
+        return this.qrlEvaluations[this.currentQuestionIndex];
     }
 
     get isRandom() {

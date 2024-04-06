@@ -1,4 +1,4 @@
-import { AutopilotService } from '@app/services/autopilot/autopilot.service';
+import { GameAutopilotService } from '@app/services/autopilot/game-autopilot.service';
 import { GameService } from '@app/services/game/game.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { GameEventPayload } from '@common/game-event-payload';
@@ -28,7 +28,7 @@ export class GameGateway implements OnGatewayDisconnect {
     constructor(
         private readonly gameService: GameService,
         private readonly timerService: TimerService,
-        private readonly autopilotService: AutopilotService,
+        private readonly gameAutopilotService: GameAutopilotService,
     ) {}
 
     @SubscribeMessage('createGame')
@@ -63,7 +63,7 @@ export class GameGateway implements OnGatewayDisconnect {
 
             if (game?.isRandom) {
                 this.joinGame(client, { pin, username: 'Organisateur' });
-                this.autopilotService.runGame(client, pin);
+                this.gameAutopilotService.runGame(client, pin);
             }
 
             const data = this.gameService.startGame(client, pin);
@@ -191,10 +191,12 @@ export class GameGateway implements OnGatewayDisconnect {
 
             payload.toCancel.forEach((pin) => {
                 this.cancelGame(client, { pin });
+                this.gameAutopilotService.stopGame(pin);
             });
 
             payload.toEnd.forEach((pin) => {
                 this.endGame(client, { pin });
+                this.gameAutopilotService.stopGame(pin);
             });
         } catch (error) {
             client.emit('error', error.message);

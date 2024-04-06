@@ -67,7 +67,6 @@ export class Timer {
     }
 
     private decrement() {
-        console.log(this.time);
         this.time--;
         this.tickSubject.next(this.time);
 

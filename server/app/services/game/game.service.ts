@@ -20,6 +20,7 @@ import { Submission } from '@common/submission';
 import { Injectable } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { Socket } from 'socket.io';
+import { Subject, Subscription } from 'rxjs';
 
 const PERCENTAGE_DIVIDER = 100;
 const NO_POINTS = 0;
@@ -33,7 +34,11 @@ export class GameService {
     games: Map<string, Game> = new Map();
     private lastQcmSubmissionSubjects: Map<string, Subject<void>> = new Map();
 
-    constructor(private readonly quizService: QuizService) {}
+    constructor(private moduleRef: ModuleRef) {}
+
+    get questionService(): QuestionService {
+        return this.moduleRef.get(QuestionService);
+    }
 
     get quizService(): QuizService {
         return this.moduleRef.get(QuizService);
@@ -44,13 +49,13 @@ export class GameService {
     }
 
     async createGame(client: Socket, quizId: string): Promise<string> {
-        const quiz = await this.quizService.getQuizById(quizId);
+        let quiz: Quiz;
 
         if (quizId) {
             quiz = await this.quizService.getQuizById(quizId);
         } else {
             quiz = new Quiz();
-            quiz.title = 'mode aléatoire';
+            quiz.title = 'Mode Aléatoire';
             const qcmQuestions = (await this.questionService.getAllQuestions()).filter((x) => x.type.trim().toUpperCase() === 'QCM');
             quiz.duration = 20;
 
@@ -70,27 +75,6 @@ export class GameService {
 
         while (this.games.has(pin)) {
             pin = generateRandomPin();
-        }
-
-        let quiz: Quiz;
-        if (quizId) {
-            quiz = await this.quizService.getQuizById(quizId);
-
-            if (!quiz) {
-                throw new Error(`Aucun quiz ne correspond a l'identifiant ${quizId}`);
-            }
-        } else {
-            quiz = new Quiz();
-            quiz.title = 'Mode Aléatoire';
-            const qcmQuestions = (await this.questionService.getAllQuestions()).filter((x) => x.type.trim().toUpperCase() === 'QCM');
-            quiz.duration = 20;
-
-            if (qcmQuestions.length < RANDOM_MODE_QUESTION_COUNT) {
-                throw new Error("Il n'existe pas assez de questions de type QCM dans la banque de questions pour faire une partie en mode aléatoire");
-            }
-
-            const shuffledQuestions = qcmQuestions.slice().sort(() => Math.random() - RANDOM_EXPECTATION); // to have 1/2 chance to be negative
-            quiz.questions = shuffledQuestions.slice(0, RANDOM_MODE_QUESTION_COUNT);
         }
 
         const game = new Game(pin, quiz, client);
