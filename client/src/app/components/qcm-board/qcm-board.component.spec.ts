@@ -25,7 +25,7 @@ import { TimerEventType } from '@common/timer-event-type';
 import { TimerPayload } from '@common/timer-payload';
 import { Observable, of } from 'rxjs';
 import { io } from 'socket.io-client';
-import { GameBoardComponent } from './game-board.component';
+import { QcmBoardComponent } from './qcm-board.component';
 
 const gameSnapshotStub: GameSnapshot = {
     players: [],
@@ -40,8 +40,8 @@ const gameSnapshotStub: GameSnapshot = {
 const observableSnapShot = of(gameSnapshotStub);
 
 describe('GameBoardComponent', () => {
-    let component: GameBoardComponent;
-    let fixture: ComponentFixture<GameBoardComponent>;
+    let component: QcmBoardComponent;
+    let fixture: ComponentFixture<QcmBoardComponent>;
     let gameHttpServiceMock: jasmine.SpyObj<GameHttpService>;
     let playerServiceMock: jasmine.SpyObj<PlayerService>;
     let keyBindingServiceMock: jasmine.SpyObj<KeyBindingService>;
@@ -66,7 +66,7 @@ describe('GameBoardComponent', () => {
         timerServiceMock = jasmine.createSpyObj('TimerService', ['onTimerTick']);
 
         TestBed.configureTestingModule({
-            declarations: [GameBoardComponent, ConfirmationDialogComponent],
+            declarations: [QcmBoardComponent, ConfirmationDialogComponent],
             imports: [RouterTestingModule, MatDialogModule],
             providers: [
                 { provide: GameHttpService, useValue: gameHttpServiceMock },
@@ -110,7 +110,7 @@ describe('GameBoardComponent', () => {
     });
 
     beforeEach(() => {
-        fixture = TestBed.createComponent(GameBoardComponent);
+        fixture = TestBed.createComponent(QcmBoardComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
         gameServiceMock.nextQuestion.calls.reset();
