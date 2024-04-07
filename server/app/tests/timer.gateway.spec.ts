@@ -55,13 +55,13 @@ describe('TimerGateway', () => {
             const remainingTime = 60;
             gameService.getGame.mockReturnValue(gameStub());
             // eslint-disable-next-line @typescript-eslint/no-shadow, max-params
-            timerService.startTimer.mockImplementation((socketMock, pin, duration, callback) => {
+            timerService.startTimer.mockImplementation((socketMock, pin, duration, eventType, callback) => {
                 callback(remainingTime);
                 return duration;
             });
             serverMock.to.mockReturnValue(broadcastMock);
             timerGateway.startTimer(socketMock, { pin, eventType, duration });
-            expect(timerService.startTimer).toHaveBeenCalledWith(socketMock, pin, duration, expect.any(Function));
+            expect(timerService.startTimer).toHaveBeenCalledWith(socketMock, pin, duration, eventType, expect.any(Function));
             expect(serverMock.to).toHaveBeenCalledWith(pin);
             expect(broadcastMock.emit).toHaveBeenCalledWith('startTimer', { pin, data: { remainingTime, eventType } });
         });
@@ -74,7 +74,7 @@ describe('TimerGateway', () => {
             gameService.getGame.mockReturnValue(gameStub());
             timerService.startTimer.mockReturnValue(remainingTime);
             timerGateway.startTimer(socketMock, { pin, eventType, duration });
-            expect(timerService.startTimer).toHaveBeenCalledWith(socketMock, pin, duration, expect.any(Function));
+            expect(timerService.startTimer).toHaveBeenCalledWith(socketMock, pin, duration, eventType, expect.any(Function));
             expect(serverMock.to).toHaveBeenCalledWith(pin);
         });
 

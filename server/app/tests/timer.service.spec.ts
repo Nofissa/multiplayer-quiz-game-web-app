@@ -5,6 +5,7 @@ import { ModuleRef } from '@nestjs/core';
 import { Socket } from 'socket.io';
 import { gameStub } from './stubs/game.stub';
 import { Timer } from '@app/classes/timer';
+import { TimerEventType } from '@common/timer-event-type';
 
 describe('TimerService', () => {
     let timerService: TimerService;
@@ -51,7 +52,7 @@ describe('TimerService', () => {
             const TIME = 10;
             socketMock = { id: 'differentId' } as jest.Mocked<Socket>;
             gameServiceMock.getGame.mockReturnValue(gameStub());
-            expect(() => timerService.startTimer(socketMock, 'somePin', TIME, jest.fn())).toThrow(
+            expect(() => timerService.startTimer(socketMock, 'somePin', TIME, TimerEventType.Question, jest.fn())).toThrow(
                 "Seul l'organisateur de la partie somePin peut lancer la minuterie",
             );
         });
@@ -63,8 +64,8 @@ describe('TimerService', () => {
             socketMock = { id: 'organizerId' } as jest.Mocked<Socket>;
             const callback = jest.fn();
             const duration = 10; // Duration in seconds
-            const remainingTime = timerService.startTimer(socketMock, 'somePin', duration, callback);
 
+            const remainingTime = timerService.startTimer(socketMock, 'somePin', duration, TimerEventType.Question, callback);
             // Verify that the timer started and remaining time is returned
             expect(remainingTime).toEqual(duration);
             expect(setIntervalSpy).toHaveBeenCalledTimes(1);

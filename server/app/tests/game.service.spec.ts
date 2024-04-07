@@ -15,10 +15,17 @@ import { qrlSubmissionStub } from './stubs/qrl.submission.stub';
 import { questionStub } from './stubs/question.stubs';
 import { quizStub } from './stubs/quiz.stubs';
 import { submissionStub } from './stubs/submission.stub';
+import { TimerService } from '@app/services/timer/timer.service';
+import { ModuleRef } from '@nestjs/core';
+import { QuestionService } from '@app/services/question/question.service';
+import { Timer } from '@app/classes/timer';
 
 describe('GameService', () => {
     let gameService: GameService;
     let quizServiceMock: jest.Mocked<QuizService>;
+    let questionServiceMock: jest.Mocked<QuestionService>;
+    let timerServiceMock: jest.Mocked<TimerService>;
+    let moduleRefMock: jest.Mocked<ModuleRef>;
     let socketMock: jest.Mocked<Socket>;
 
     beforeEach(async () => {
@@ -26,7 +33,34 @@ describe('GameService', () => {
             getQuizById: jest.fn(),
         } as any;
 
-        gameService = new GameService(quizServiceMock);
+        questionServiceMock = {
+            getAllQuestions: jest.fn(),
+        } as any;
+
+        timerServiceMock = {
+            getTimer: jest.fn(),
+        } as any;
+
+        moduleRefMock = {
+            get: jest.fn(),
+        } as any;
+
+        moduleRefMock.get.mockImplementation((provider: any) => {
+            switch (provider) {
+                case TimerService: {
+                    return timerServiceMock;
+                }
+                case QuizService: {
+                    return quizServiceMock;
+                }
+                case QuestionService: {
+                    return questionServiceMock;
+                }
+            }
+            throw new Error(`Unknown provider: ${provider}`);
+        });
+
+        gameService = new GameService(moduleRefMock);
     });
 
     afterEach(() => {
@@ -98,6 +132,7 @@ describe('GameService', () => {
             gameTest.state = GameState.Opened;
             jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(gameTest);
             jest.spyOn(Map.prototype, 'has').mockReturnValue(false);
+            gameTest.clientPlayers.clear();
             const playerOrganizer = 'Organisateur';
             expect(() => gameService.joinGame(socketMock, gameTest.pin, playerOrganizer)).toThrowError('Le nom "Organisateur" est réservé');
         });
@@ -107,6 +142,7 @@ describe('GameService', () => {
             const playerUsername = 'anotherPlayer';
             jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(gameTest);
             jest.spyOn(Map.prototype, 'has').mockReturnValue(true);
+            gameService.joinGame(socketMock, gameTest.pin, playerUsername);
             expect(() => gameService.joinGame(socketMock, gameTest.pin, playerUsername)).toThrowError('Vous êtes déjà dans cette partie');
         });
 
@@ -152,9 +188,21 @@ describe('GameService', () => {
             jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
             jest.spyOn(GameService.prototype, 'getOrCreateSubmission').mockReturnValue(submission);
             jest.spyOn(GameService.prototype, 'isGoodAnswer').mockReturnValue(true);
-            jest.spyOn(Map.prototype, 'get').mockReturnValue(clientPlayer);
+            timerServiceMock.getTimer.mockReturnValue({ time: 1 } as Timer);
+            jest.spyOn(game['clientPlayers'], 'get').mockReturnValue(clientPlayer);
             const result = gameService.evaluateChoices(socketMock, game.pin);
             expect(result).toEqual(evaluation);
+        });
+
+        it('should not give bonus points if time is zero', () => {
+            submission.isFinal = false;
+            jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
+            jest.spyOn(GameService.prototype, 'getOrCreateSubmission').mockReturnValue(submission);
+            jest.spyOn(GameService.prototype, 'isGoodAnswer').mockReturnValue(true);
+            timerServiceMock.getTimer.mockReturnValue({ time: 0 } as Timer);
+            jest.spyOn(game['clientPlayers'], 'get').mockReturnValue(clientPlayer);
+            const result = gameService.evaluateChoices(socketMock, game.pin);
+            expect(result.isFirstCorrect).toEqual(false);
         });
     });
 

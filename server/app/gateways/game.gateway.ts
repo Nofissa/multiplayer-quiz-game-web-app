@@ -1,4 +1,4 @@
-import { GameAutopilotService } from '@app/services/autopilot/game-autopilot.service';
+import { GameAutopilotService } from '@app/services/game-autopilot/game-autopilot.service';
 import { GameService } from '@app/services/game/game.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { GameEventPayload } from '@common/game-event-payload';

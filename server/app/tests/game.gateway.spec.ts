@@ -15,16 +15,33 @@ import { qrlEvaluationStub } from './stubs/qrl-evaluation.stub';
 import { qrlSubmissionStub } from './stubs/qrl.submission.stub';
 import { questionStub } from './stubs/question.stubs';
 import { submissionStub } from './stubs/submission.stub';
+import { GameAutopilotService } from '@app/services/game-autopilot/game-autopilot.service';
 
 describe('GameGateway', () => {
     let gameGateway: GameGateway;
     let gameServiceMock: jest.Mocked<GameService>;
-    let socketMock: jest.Mocked<Socket>;
     let timerServiceMock: jest.Mocked<TimerService>;
+    let gameAutopilotServiceMock: jest.Mocked<GameAutopilotService>;
+    let socketMock: jest.Mocked<Socket>;
     let serverMock: jest.Mocked<Server>;
     let broadcastMock: any;
 
     beforeEach(() => {
+        socketMock = {
+            id: 'organizerId',
+            emit: jest.fn(),
+            join: jest.fn(),
+            leave: jest.fn(),
+        } as any;
+        serverMock = {
+            emit: jest.fn(),
+            to: jest.fn(),
+            socketsLeave: jest.fn(),
+        } as any;
+        timerServiceMock = {
+            startTimer: jest.fn(),
+            stopTimer: jest.fn(),
+        } as any;
         gameServiceMock = {
             createGame: jest.fn(),
             joinGame: jest.fn(),
@@ -44,25 +61,19 @@ describe('GameGateway', () => {
             qrlSubmit: jest.fn(),
             qrlEvaluate: jest.fn(),
         } as any;
-        socketMock = {
-            id: 'organizerId',
-            emit: jest.fn(),
-            join: jest.fn(),
-            leave: jest.fn(),
-        } as any;
-        serverMock = {
-            emit: jest.fn(),
-            to: jest.fn(),
-            socketsLeave: jest.fn(),
-        } as any;
         timerServiceMock = {
             startTimer: jest.fn(),
             stopTimer: jest.fn(),
         } as any;
+        gameAutopilotServiceMock = {
+            runGame: jest.fn(),
+            stopGame: jest.fn(),
+        } as any;
         broadcastMock = {
             emit: jest.fn(),
         } as any as BroadcastOperator<any, any>;
-        gameGateway = new GameGateway(gameServiceMock, timerServiceMock);
+
+        gameGateway = new GameGateway(gameServiceMock, timerServiceMock, gameAutopilotServiceMock);
         gameGateway.server = serverMock;
     });
 
