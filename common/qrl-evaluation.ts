@@ -1,7 +1,8 @@
 import { Grade } from './grade';
+import { Player } from './player';
 
 export interface QrlEvaluation {
-    clientId: string;
+    player: Player;
     grade: Grade;
     score?: number;
     isLast: boolean;

@@ -123,6 +123,10 @@ export class PlayerListComponent implements OnInit, OnDestroy {
                 this.upsertPlayer(evaluation.player);
             }),
 
+            this.gameService.onQrlEvaluate(pin, (evaluation) => {
+                this.upsertPlayer(evaluation.player);
+            }),
+
             this.gameService.onJoinGame(pin, (player) => {
                 this.upsertPlayer(player);
             }),

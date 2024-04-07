@@ -115,6 +115,28 @@ mat-form-field {
     margin-left: 9%;
 }
 
+.notification-average {
+    position: absolute;
+    transform: translateX(-50%);
+    background-color: rgb(205, 207, 49);
+    color: white;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    margin-left: 9%;
+}
+
+.notification-bad {
+    position: absolute;
+    transform: translateX(-50%);
+    background-color: rgb(175, 46, 46);
+    color: white;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    margin-left: 9%;
+}
+
 textarea.blink {
     animation: blinkAnimation 1.5s 3;
 }
@@ -144,7 +166,7 @@ textarea.blink-yellow {
 }
 
 textarea.blink-red {
-    animation: blinkAnimation 1.5s 3;
+    animation: blinkAnimationRed 1.5s 3;
 }
 
 @keyframes blinkAnimationRed {
