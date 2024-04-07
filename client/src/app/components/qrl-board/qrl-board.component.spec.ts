@@ -8,7 +8,7 @@ import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { lastPlayerEvaluationStub } from '@app/TestStubs/evaluation.stubs';
 import { firstPlayerStub } from '@app/TestStubs/player.stubs';
-import { questionStub } from '@app/TestStubs/question.stubs';
+import { qcmQuestionStub } from '@app/TestStubs/question.stubs';
 import { quizStub } from '@app/TestStubs/quiz.stubs';
 import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
 import { SocketServerMock } from '@app/mocks/socket-server-mock';
@@ -70,7 +70,7 @@ describe('QrlBoardComponent', () => {
         description: 'A test quiz',
         duration: 30,
         lastModification: new Date(),
-        questions: [questionStub()[0]],
+        questions: [qcmQuestionStub()[0]],
         isHidden: false,
         _id: 'quiz1',
     };
@@ -203,7 +203,7 @@ describe('QrlBoardComponent', () => {
     });
 
     it('should setupSubscriptions', () => {
-        const payload: GameEventPayload<Question> = { pin: '123', data: questionStub()[0] };
+        const payload: GameEventPayload<Question> = { pin: '123', data: qcmQuestionStub()[0] };
         const timerPayload: GameEventPayload<TimerPayload> = { pin: '123', data: { remainingTime: 0, eventType: TimerEventType.Question } };
         const qrlPayload: GameEventPayload<QrlEvaluation> = {
             pin: '123',
@@ -313,7 +313,7 @@ describe('QrlBoardComponent', () => {
     });
 
     it('should tell if the question is a qrl', () => {
-        component.question = questionStub()[0];
+        component.question = qcmQuestionStub()[0];
         component.question.type = 'QRL';
         let result = component.isQRL();
         expect(result).toBeTruthy();
