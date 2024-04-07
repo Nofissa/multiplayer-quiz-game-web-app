@@ -40,7 +40,7 @@ const mockGameSnapshot: GameSnapshot = {
     questionQcmSubmissions: [[{ choices: [{ payload: 'testinggg', isSelected: true }], isFinal: true }]],
 };
 
-fdescribe('QrlListComponent', () => {
+describe('QrlListComponent', () => {
     let component: QrlListComponent;
     let fixture: ComponentFixture<QrlListComponent>;
     let mockGameHttpService: jasmine.SpyObj<GameHttpService>;
