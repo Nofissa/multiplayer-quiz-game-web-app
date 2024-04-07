@@ -10,8 +10,8 @@
                 modifier: 1,
                 slideShadows: true
             }" [pagination]="true" [navigation]="true" class="mySwiper">
-                <ng-template swiperSlide>
-                    <div *ngIf="enableRandomMode" class="game-slide" (click)="openRandomGameDetails()">
+                <ng-template *ngIf="enableRandomMode" swiperSlide>
+                    <div class="game-slide" (click)="openRandomGameDetails()">
                         <h2 class="quiz-title">Mode Aléatoire</h2>
                     </div>
                 </ng-template>

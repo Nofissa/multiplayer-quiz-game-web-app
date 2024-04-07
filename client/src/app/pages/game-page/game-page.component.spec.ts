@@ -57,10 +57,10 @@ describe('GamePageComponent', () => {
             'onJoinGame',
             'qcmSubmit',
         ]);
-
         playerServiceSpy = jasmine.createSpyObj<PlayerService>(['onPlayerAbandon', 'onPlayerBan', 'playerBan', 'playerAbandon']);
-
         timerServiceSpy = jasmine.createSpyObj<TimerService>(['onStartTimer', 'onTimerTick', 'startTimer', 'stopTimer', 'onAccelerateTimer']);
+        soundServiceSpy = jasmine.createSpyObj<SoundService>(['loadSound', 'playSound', 'stopSound']);
+
         await TestBed.configureTestingModule({
             declarations: [GamePageComponent],
             imports: [HttpClientTestingModule, RouterTestingModule, BrowserAnimationsModule],
@@ -88,7 +88,6 @@ describe('GamePageComponent', () => {
                 };
             }).subscribe(func);
         });
-        soundServiceSpy = jasmine.createSpyObj<SoundService>(['loadSound', 'playSound', 'stopSound']);
 
         socketServerMock = new SocketServerMock([webSocketServiceSpy['socketInstance']]);
 

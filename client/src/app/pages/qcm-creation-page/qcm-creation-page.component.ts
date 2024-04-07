@@ -21,7 +21,7 @@ const DURATION = 10;
 @Component({
     selector: 'app-qcm-creation-page',
     templateUrl: './qcm-creation-page.component.html',
-    styleUrls: ['./qcmc-reation-page.component.scss'],
+    styleUrls: ['./qcm-creation-page.component.scss'],
     providers: [QuestionInteractionService],
 })
 export class QCMCreationPageComponent implements OnInit, OnDestroy {

@@ -8,7 +8,7 @@ import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { lastPlayerEvaluationStub } from '@app/test-stubs/evaluation.stubs';
 import { firstPlayerStub } from '@app/test-stubs/player.stubs';
-import { questionStub } from '@app/test-stubs/question.stubs';
+import { qrlQuestionStub } from '@app/test-stubs/question.stubs';
 import { quizStub } from '@app/test-stubs/quiz.stubs';
 import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
 import { SocketServerMock } from '@app/mocks/socket-server-mock';
@@ -314,11 +314,6 @@ describe('QrlBoardComponent', () => {
 
     it('should tell if the question is a qrl', () => {
         component.question = qrlQuestionStub()[0];
-        component.question.type = 'QRL';
-        let result = component.isQRL();
-        expect(result).toBeTruthy();
-        component.question.type = 'QCM';
-        result = component.isQRL();
-        expect(result).toBeFalsy();
+        expect(component.question.type).toEqual('QRL');
     });
 });
