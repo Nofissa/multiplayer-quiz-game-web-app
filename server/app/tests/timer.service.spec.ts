@@ -88,13 +88,14 @@ describe('TimerService', () => {
             const timeoutCallback = jest.fn();
             const eventType = TimerEventType.Question;
             const duration = 10; // Duration in seconds
+            const oneSecondInMs = 1000;
 
             jest.useFakeTimers();
             timerService.onTimeout(pin, timeoutCallback);
             timerService.startTimer(socketMock, pin, duration, eventType, () => {
                 return;
             });
-            jest.advanceTimersByTime(duration * 1000);
+            jest.advanceTimersByTime(duration * oneSecondInMs);
 
             expect(timeoutCallback).toHaveBeenCalledWith(eventType);
         });

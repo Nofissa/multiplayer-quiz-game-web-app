@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */ // file simply has a lot of method, we tried splitting functionnalities into multiple servides
 import { ClientPlayer } from '@app/classes/client-player';
 import { Game } from '@app/classes/game';
 import { generateRandomPin } from '@app/helpers/pin';
