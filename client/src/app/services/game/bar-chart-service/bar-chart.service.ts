@@ -1,7 +1,12 @@
 import { Injectable } from '@angular/core';
 import { BarChartData } from '@app/interfaces/bar-chart-data';
 import { BarchartSubmission } from '@common/barchart-submission';
+import { GameSnapshot } from '@common/game-snapshot';
+import { QcmSubmission } from '@common/qcm-submission';
+import { QrlEvaluation } from '@common/qrl-evaluation';
 import { Question } from '@common/question';
+
+const QRL_EVALUATION_INCREMENT = 50;
 
 @Injectable({
     providedIn: 'root',
@@ -13,17 +18,25 @@ export class BarChartService {
         if (!question) {
             return;
         }
-        const chartElements = [];
-        if (question.choices) {
-            for (const choice of question.choices) {
-                chartElements.push({ text: choice.text, isCorrect: choice.isCorrect });
-            }
-        }
         const newBarchartData: BarChartData = {
             text: question.text,
-            chartElements,
+            chartElements: [],
             submissions: [],
         };
+
+        switch (question.type) {
+            case 'QCM':
+                for (const choice of question.choices ? question.choices : []) {
+                    newBarchartData.chartElements.push({ text: choice.text, isCorrect: choice.isCorrect });
+                }
+                break;
+            case 'QRL':
+                for (let i = 0; i < 3; i++) {
+                    newBarchartData.chartElements.push({ text: `${i * QRL_EVALUATION_INCREMENT}` });
+                }
+                break;
+        }
+
         this.barChartData.push(newBarchartData);
     }
 
@@ -50,15 +63,34 @@ export class BarChartService {
         return this.barChartData;
     }
 
-    setData(chartData: { submissions: BarchartSubmission[][]; questions: Question[] }): void {
-        this.barChartData = [];
-        for (let i = 0; i < chartData.questions.length; i++) {
-            const newBarChart: BarChartData = {
-                text: chartData.questions[i].text,
-                chartElements: [],
-                submissions: chartData.submissions[i],
-            };
-            this.barChartData.push(newBarChart);
+    setQcmSubmissions(submissions: QcmSubmission[]) {
+        submissions = [];
+        return;
+    }
+
+    setQrlSubmissions(submissions: QrlEvaluation[]) {
+        submissions = [];
+        return;
+    }
+
+    setData(snapshot: GameSnapshot): void {
+        this.flushData();
+
+        let qcmId = 0;
+        let qrlId = 0;
+        for (const question of snapshot.quiz.questions) {
+            this.addQuestion(question);
+            switch (question.text) {
+                case 'QCM':
+                    this.setQcmSubmissions(snapshot.questionQcmSubmissions[qcmId]);
+                    qcmId++;
+                    break;
+
+                case 'QRL':
+                    // this.setQrlSubmissions(snapshot.questionQrlSubmission[qrlId]);
+                    qrlId++;
+                    break;
+            }
         }
     }
 

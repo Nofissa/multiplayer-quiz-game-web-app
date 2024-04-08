@@ -40,7 +40,7 @@ export class PlayerResultsPageComponent implements OnInit {
 
         this.gameHttpService.getGameSnapshotByPin(this.pin).subscribe({
             next: (snapshot) => {
-                this.barChartService.setData({ submissions: [], questions: snapshot.quiz.questions });
+                this.barChartService.setData(snapshot);
             },
             error: (error: HttpErrorResponse) => {
                 if (error.status === HttpStatusCode.NotFound) {

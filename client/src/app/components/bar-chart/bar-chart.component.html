@@ -18,9 +18,15 @@
             <mat-card-content *ngIf="element.isCorrect" matBadge="✔" matBadgePosition="above after" matBadgeColor="primary" matBadgeSize="large">{{
                 element.text
             }}</mat-card-content>
-            <mat-card-content *ngIf="!element.isCorrect" matBadge="✘" matBadgePosition="above after" matBadgeColor="warn" matBadgeSize="large">{{
-                element.text
-            }}</mat-card-content>
+            <mat-card-content
+                *ngIf="element.isCorrect === false"
+                matBadge="✘"
+                matBadgePosition="above after"
+                matBadgeColor="warn"
+                matBadgeSize="large"
+                >{{ element.text }}</mat-card-content
+            >
+            <mat-card-content *ngIf="element.isCorrect === undefined">{{ element.text }}</mat-card-content>
         </mat-card>
     </div>
 </div>
