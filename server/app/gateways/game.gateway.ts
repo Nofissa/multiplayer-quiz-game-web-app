@@ -2,6 +2,7 @@ import { GameService } from '@app/services/game/game.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { GameEventPayload } from '@common/game-event-payload';
 import { GameState } from '@common/game-state';
+import { Grade } from '@common/grade';
 import { Player } from '@common/player';
 import { QcmEvaluation } from '@common/qcm-evaluation';
 import { QrlEvaluation } from '@common/qrl-evaluation';
@@ -165,9 +166,9 @@ export class GameGateway implements OnGatewayDisconnect {
     }
 
     @SubscribeMessage('qrlEvaluate')
-    qrlEvaluate(@ConnectedSocket() client: Socket, @MessageBody() { pin, qrlEvaluation }: { pin: string; qrlEvaluation: QrlEvaluation }) {
+    qrlEvaluate(@ConnectedSocket() client: Socket, @MessageBody() { socketId, pin, grade }: { socketId: string; pin: string; grade: Grade }) {
         try {
-            qrlEvaluation = this.gameService.qrlEvaluate(client, pin, qrlEvaluation);
+            const qrlEvaluation = this.gameService.qrlEvaluate(socketId, pin, grade);
             const payload: GameEventPayload<QrlEvaluation> = { pin, data: qrlEvaluation };
 
             this.server.to(pin).emit('qrlEvaluate', payload);

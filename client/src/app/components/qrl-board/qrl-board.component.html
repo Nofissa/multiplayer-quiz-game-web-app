@@ -1,5 +1,5 @@
 <div class="container">
-    <div class="question-box font-color">
+    <div *ngIf="question && isQRL()" class="question-box font-color">
         <span id="questionText" class="text-centered">{{ question.text }}</span>
         <span id="value" class="text-centered"
             ><strong>{{ question.points }} points</strong></span
@@ -28,8 +28,10 @@
     <div class="timer-wrapper">
         <app-timer [pin]="pin"></app-timer>
     </div>
-    <span *ngIf="isInEvaluation && !isTest">L'évaluation est en cours...</span>
-    <div *ngIf="showNotification100" [@fadeAnimation] class="notification">Vous avez eu 100% des points!</div>
+    <span *ngIf="isInEvaluation && !isTest">L'ÉVALUATION EST EN COURS...</span>
+    <div *ngIf="showNotification100" class="notification">Vous avez eu 100%! ({{ question.points }} points)</div>
+    <div *ngIf="showNotification50" class="notification-average">Vous avez eu 50% ({{ question.points / 2 }} points)</div>
+    <div *ngIf="showNotification0" class="notification-bad">Vous n'avez eu aucun point</div>
     <div class="buttons-wrapper">
         <button mat-flat-button id="validateButton" class="game-button" [class.disable-click]="hasSubmitted" (click)="submitAnswer()">
             Valider <i class="fas fa-check-circle"></i>

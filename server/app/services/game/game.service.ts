@@ -5,8 +5,8 @@ import { DisconnectPayload } from '@app/interfaces/disconnect-payload';
 import { GameSummary } from '@app/model/database/game-summary';
 import { Question } from '@app/model/database/question';
 import { QuizService } from '@app/services/quiz/quiz.service';
-import { TimerService } from '@app/services/timer/timer.service';
 import { GameState } from '@common/game-state';
+import { Grade } from '@common/grade';
 import { Player } from '@common/player';
 import { PlayerState } from '@common/player-state';
 import { QcmEvaluation } from '@common/qcm-evaluation';
@@ -16,7 +16,6 @@ import { Question as CommonQuestion } from '@common/question';
 import { QuestionPayload } from '@common/question-payload';
 import { Submission } from '@common/submission';
 import { Injectable } from '@nestjs/common';
-import { ModuleRef } from '@nestjs/core';
 import { Socket } from 'socket.io';
 import { GameSummaryService } from './game-summary.service';
 
@@ -30,17 +29,9 @@ export class GameService {
     games: Map<string, Game> = new Map();
 
     constructor(
-        private readonly moduleRef: ModuleRef,
         private gameSummaryService: GameSummaryService,
+        private readonly quizService: QuizService,
     ) {}
-
-    get quizService(): QuizService {
-        return this.moduleRef.get(QuizService);
-    }
-
-    get timerService(): TimerService {
-        return this.moduleRef.get(TimerService);
-    }
 
     async createGame(client: Socket, quizId: string): Promise<string> {
         const quiz = await this.quizService.getQuizById(quizId);
@@ -65,7 +56,6 @@ export class GameService {
         const game = this.getGame(pin);
         const clientPlayer = new ClientPlayer(client, username);
         const clientPlayers = Array.from(game.clientPlayers.values());
-        const trimmedUsername = username.trim().toLowerCase();
 
         if (game.state !== GameState.Opened) {
             throw new Error(`La partie ${pin} n'est pas ouverte`);
@@ -79,8 +69,8 @@ export class GameService {
             throw new Error('Le nom "Organisateur" est réservé');
         }
 
-        if (clientPlayers.some((x) => x.player.username.toLowerCase() === trimmedUsername && x.player.state === PlayerState.Banned)) {
-            throw new Error(`Le nom d'utilisateur "${username}" est banni.`);
+        if (clientPlayers.some((x) => x.player.username.toLowerCase() === username.toLowerCase() && x.player.state === PlayerState.Banned)) {
+            throw new Error(`Le nom d'utilisateur "${username}" banni`);
         }
 
         if (clientPlayers.some((x) => x.player.username.toLowerCase() === username.toLowerCase() && x.player.state === PlayerState.Playing)) {
@@ -106,9 +96,9 @@ export class GameService {
 
         const gameSubmissions = Array.from(game.currentQuestionQcmSubmissions.values());
         const isCorrect = this.isGoodAnswer(question, submission);
-        const isFirst = gameSubmissions.filter((x) => x.isFinal).length === 1 && this.timerService.getTimer(pin)?.time !== 0;
+        const isFirst = gameSubmissions.filter((x) => x.isFinal).length === 1;
         const isLast =
-            gameSubmissions.filter((x) => x.isFinal).length >=
+            gameSubmissions.filter((x) => x.isFinal).length ===
             Array.from(game.clientPlayers.values()).filter((x) => x.player.state === PlayerState.Playing).length;
 
         let score = isCorrect ? question.points : NO_POINTS;
@@ -214,6 +204,12 @@ export class GameService {
         const submission: QrlSubmission = { clientId: client.id, answer };
         game.currentQuestionQrlSubmissions.set(client.id, submission);
 
+        const isLast =
+            Array.from(game.currentQuestionQrlSubmissions.values()).length ===
+            Array.from(game.clientPlayers.values()).filter((x) => x.player.state === PlayerState.Playing).length;
+
+        submission.isLast = isLast;
+
         return submission;
     }
 
@@ -229,22 +225,31 @@ export class GameService {
         return Array.from(clientPlayers.values()).map((x) => x.player.isTyping);
     }
 
-    qrlEvaluate(client: Socket, pin: string, qrlEvaluation: QrlEvaluation): QrlEvaluation {
+    qrlEvaluate(socketId: string, pin: string, grade: Grade): QrlEvaluation {
         const game = this.getGame(pin);
         const question = game.currentQuestion;
+        const player = game.clientPlayers.get(socketId).player;
 
+        const evalQrl: QrlEvaluation = {
+            player,
+            isLast: false,
+            score: 0,
+            grade,
+        };
+        game.currentQuestionQrlEvaluations.set(socketId, evalQrl);
         const isLast =
-            Array.from(game.currentQuestionQrlSubmissions.values()).length ===
+            Array.from(game.currentQuestionQrlEvaluations.values()).length ===
             Array.from(game.clientPlayers.values()).filter((x) => x.player.state === PlayerState.Playing).length;
 
-        qrlEvaluation.score = (question.points * qrlEvaluation.grade) / PERCENTAGE_DIVIDER;
-        qrlEvaluation.isLast = isLast;
+        evalQrl.isLast = isLast;
+        evalQrl.score = (question.points * evalQrl.grade) / PERCENTAGE_DIVIDER;
+        player.score += evalQrl.score;
 
-        const player = game.clientPlayers.get(client.id).player;
-        player.score += qrlEvaluation.score;
+        game.currentQuestionQrlEvaluations.set(socketId, evalQrl);
 
-        return qrlEvaluation;
+        return evalQrl;
     }
+
     endGame(client: Socket, pin: string): void {
         const game = this.getGame(pin);
 
@@ -330,14 +335,12 @@ export class GameService {
         const game = this.getGame(pin);
         const numberOfPlayers = game.clientPlayers.size;
         const bestScore = this.getHighestScore(game);
-
         const gameSummary: GameSummary = {
             title: game.quiz.title,
             startDate: game.startDate,
             numberOfPlayers,
             bestScore,
         };
-
         await this.gameSummaryService.saveGameSummary(gameSummary);
     }
 }

@@ -1,4 +1,4 @@
-<div class="container" *ngIf="player && question">
+<div class="container" *ngIf="player && question && question.type === 'QCM'">
     <div class="question-box font-color">
         <span id="questionText" class="text-centered">{{ question.text }}</span>
         <span id="value" class="text-centered"

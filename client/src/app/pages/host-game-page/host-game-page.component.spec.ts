@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
@@ -89,6 +90,8 @@ describe('HostGamePageComponent', () => {
             'onStartGame',
             'onNextQuestion',
             'onEndGame',
+            'onQrlEvaluate',
+            'onQrlSubmit',
         ]);
         gameServiceSpy.onToggleGameLock.and.callFake((pin, callback) => {
             return webSocketServiceSpy.on('toggleGameLock', applyIfPinMatches(pin, callback));

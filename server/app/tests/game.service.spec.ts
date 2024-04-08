@@ -5,10 +5,8 @@ import { DisconnectPayload } from '@app/interfaces/disconnect-payload';
 import { GameSummaryService } from '@app/services/game/game-summary.service';
 import { GameService } from '@app/services/game/game.service';
 import { QuizService } from '@app/services/quiz/quiz.service';
-import { TimerService } from '@app/services/timer/timer.service';
 import { GameState } from '@common/game-state';
 import { QuestionPayload } from '@common/question-payload';
-import { ModuleRef } from '@nestjs/core';
 import { Socket } from 'socket.io';
 import { clientPlayerStub } from './stubs/client.player.stub';
 import { evaluationStub } from './stubs/evaluation.stubs';
@@ -21,35 +19,20 @@ import { submissionStub } from './stubs/submission.stub';
 
 describe('GameService', () => {
     let gameService: GameService;
-    let moduleRef: ModuleRef;
     let quizServiceMock: jest.Mocked<QuizService>;
-    let timerServiceMock: jest.Mocked<TimerService>;
     let socketMock: jest.Mocked<Socket>;
     let gameSummaryServiceMock: jest.Mocked<GameSummaryService>;
 
     beforeEach(async () => {
-        const moduleRefFactory = {
-            get: jest.fn((service) => {
-                if (service === QuizService) return quizServiceMock;
-                if (service === TimerService) return timerServiceMock;
-            }),
-        } as any;
-
-        moduleRef = moduleRefFactory as ModuleRef;
-
         quizServiceMock = {
             getQuizById: jest.fn(),
-        } as any;
-
-        timerServiceMock = {
-            getTimer: jest.fn(),
         } as any;
 
         gameSummaryServiceMock = {
             saveGameSummary: jest.fn(),
         } as any;
 
-        gameService = new GameService(moduleRef, gameSummaryServiceMock);
+        gameService = new GameService(gameSummaryServiceMock, quizServiceMock);
     });
 
     afterEach(() => {
@@ -419,7 +402,8 @@ describe('GameService', () => {
             jest.spyOn(Map.prototype, 'has').mockReturnValue(false);
             const setSpy = jest.spyOn(Map.prototype, 'set');
             const result = gameService.qrlSubmit(socketMock, game.pin, answer);
-            expect(setSpy).toHaveBeenCalledWith(socketMock.id, qrlSubmissionStub());
+            submission.isLast = false;
+            expect(setSpy).toHaveBeenCalledWith(socketMock.id, submission);
             expect(result).toEqual(submission);
         });
     });
