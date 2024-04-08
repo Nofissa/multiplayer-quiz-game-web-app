@@ -5,7 +5,10 @@ import { SocketServerMock } from '@app/mocks/socket-server-mock';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { GameEventPayload } from '@common/game-event-payload';
 import { GameState } from '@common/game-state';
+import { Grade } from '@common/grade';
 import { QcmEvaluation } from '@common/qcm-evaluation';
+import { QrlEvaluation } from '@common/qrl-evaluation';
+import { QrlSubmission } from '@common/qrl-submission';
 import { Question } from '@common/question';
 import { QuestionPayload } from '@common/question-payload';
 import { Submission } from '@common/submission';
@@ -33,6 +36,9 @@ describe('GameService', () => {
         getCurrentQuestionEventName: 'getCurrentQuestion',
         nextQuestionEventName: 'nextQuestion',
         toggleGameLockEventName: 'toggleGameLock',
+        qrlInputChangeEventName: 'qrlInputChange',
+        qrlSubmitEventName: 'qrlSubmit',
+        qrlEvaluateEventName: 'qrlEvaluate',
         callback: jasmine.createSpy('callback'),
     };
 
@@ -253,6 +259,85 @@ describe('GameService', () => {
         const gameState: GameState = GameState.Closed;
         const payload: GameEventPayload<GameState> = { pin: stubData.pin2, data: gameState };
         socketServerMock.emit(stubData.toggleGameLockEventName, payload);
+
+        expect(stubData.callback).not.toHaveBeenCalled();
+    });
+
+    it('should raise qrlInputChange event', () => {
+        const isTyping = false;
+        gameService.qrlInputChange(stubData.pin1, isTyping);
+        expect(webSocketServiceSpy.emit).toHaveBeenCalledWith(stubData.qrlInputChangeEventName, { pin: stubData.pin1, isTyping });
+    });
+
+    it('should subscribe to qrlInputChange event and call the callback if pin matches', () => {
+        gameService.onQrlInputChange(stubData.pin1, stubData.callback);
+
+        const activePlayers: boolean[] = [];
+        const payload: GameEventPayload<boolean[]> = { pin: stubData.pin1, data: activePlayers };
+        socketServerMock.emit(stubData.qrlInputChangeEventName, payload);
+
+        expect(stubData.callback).toHaveBeenCalledWith(activePlayers);
+    });
+
+    it('should subscribe to qrlInputChange event and not call the callback if pin does not match', () => {
+        gameService.onQrlInputChange(stubData.pin1, stubData.callback);
+
+        const activePlayers: boolean[] = [];
+        const payload: GameEventPayload<boolean[]> = { pin: stubData.pin2, data: activePlayers };
+        socketServerMock.emit(stubData.qrlInputChangeEventName, payload);
+
+        expect(stubData.callback).not.toHaveBeenCalled();
+    });
+
+    it('should raise qrlSubmit event', () => {
+        const answer = 'answer';
+        gameService.qrlSubmit(stubData.pin1, answer);
+        expect(webSocketServiceSpy.emit).toHaveBeenCalledWith(stubData.qrlSubmitEventName, { pin: stubData.pin1, answer });
+    });
+
+    it('should subscribe to qrlSubmit event and call the callback if pin matches', () => {
+        gameService.onQrlSubmit(stubData.pin1, stubData.callback);
+
+        const submission: QrlSubmission = { answer: 'answer', clientId: 'client' };
+        const payload: GameEventPayload<QrlSubmission> = { pin: stubData.pin1, data: submission };
+        socketServerMock.emit(stubData.qrlSubmitEventName, payload);
+
+        expect(stubData.callback).toHaveBeenCalledWith(submission);
+    });
+
+    it('should subscribe to qrlSubmit event and not call the callback if pin does not match', () => {
+        gameService.onQrlSubmit(stubData.pin1, stubData.callback);
+
+        const submission: QrlSubmission = { answer: 'answer', clientId: 'client' };
+        const payload: GameEventPayload<QrlSubmission> = { pin: stubData.pin2, data: submission };
+        socketServerMock.emit(stubData.qrlSubmitEventName, payload);
+
+        expect(stubData.callback).not.toHaveBeenCalled();
+    });
+
+    it('should raise qrlEvaluate event', () => {
+        const socketId = 'id';
+        const grade = Grade.Good;
+        gameService.qrlEvaluate(socketId, stubData.pin1, grade);
+        expect(webSocketServiceSpy.emit).toHaveBeenCalledWith(stubData.qrlEvaluateEventName, { socketId, pin: stubData.pin1, grade });
+    });
+
+    it('should subscribe to qrlEvaluate event and call the callback if pin matches', () => {
+        gameService.onQrlEvaluate(stubData.pin1, stubData.callback);
+
+        const evaluation: QrlEvaluation = { player: firstPlayerStub(), grade: Grade.Good, isLast: true };
+        const payload: GameEventPayload<QrlEvaluation> = { pin: stubData.pin1, data: evaluation };
+        socketServerMock.emit(stubData.qrlEvaluateEventName, payload);
+
+        expect(stubData.callback).toHaveBeenCalledWith(evaluation);
+    });
+
+    it('should subscribe to qrlSubmit event and not call the callback if pin does not match', () => {
+        gameService.onQrlEvaluate(stubData.pin1, stubData.callback);
+
+        const evaluation: QrlEvaluation = { player: firstPlayerStub(), grade: Grade.Good, isLast: true };
+        const payload: GameEventPayload<QrlEvaluation> = { pin: stubData.pin2, data: evaluation };
+        socketServerMock.emit(stubData.qrlEvaluateEventName, payload);
 
         expect(stubData.callback).not.toHaveBeenCalled();
     });
