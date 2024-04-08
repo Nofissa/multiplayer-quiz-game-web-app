@@ -1,4 +1,4 @@
-export interface GameHistory {
+export interface GameSummary {
     _id: string;
     title: string;
     startDate: Date;

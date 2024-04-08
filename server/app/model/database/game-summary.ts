@@ -2,10 +2,10 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { Document } from 'mongoose';
 
-export type GameHistoryDocument = GameHistory & Document;
+export type GameSummaryDocument = GameSummary & Document;
 
 @Schema()
-export class GameHistory {
+export class GameSummary {
     @ApiProperty()
     _id?: string;
 
@@ -26,4 +26,4 @@ export class GameHistory {
     bestScore: number;
 }
 
-export const gameHistorySchema = SchemaFactory.createForClass(GameHistory);
+export const gameSummarySchema = SchemaFactory.createForClass(GameSummary);

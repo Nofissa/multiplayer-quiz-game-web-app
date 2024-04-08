@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */ // used for mocking the socket for instance.
 import * as PinHelper from '@app/helpers/pin';
 import { DisconnectPayload } from '@app/interfaces/disconnect-payload';
-import { GameHistoryService } from '@app/services/game/game-history.service';
+import { GameSummaryService } from '@app/services/game/game-summary.service';
 import { GameService } from '@app/services/game/game.service';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { TimerService } from '@app/services/timer/timer.service';
@@ -25,7 +25,7 @@ describe('GameService', () => {
     let quizServiceMock: jest.Mocked<QuizService>;
     let timerServiceMock: jest.Mocked<TimerService>;
     let socketMock: jest.Mocked<Socket>;
-    let gameHistoryServiceMock: jest.Mocked<GameHistoryService>;
+    let gameSummaryServiceMock: jest.Mocked<GameSummaryService>;
 
     beforeEach(async () => {
         const moduleRefFactory = {
@@ -45,11 +45,11 @@ describe('GameService', () => {
             getTimer: jest.fn(),
         } as any;
 
-        gameHistoryServiceMock = {
-            saveGameHistory: jest.fn(),
+        gameSummaryServiceMock = {
+            saveGameSummary: jest.fn(),
         } as any;
 
-        gameService = new GameService(moduleRef, gameHistoryServiceMock);
+        gameService = new GameService(moduleRef, gameSummaryServiceMock);
     });
 
     afterEach(() => {

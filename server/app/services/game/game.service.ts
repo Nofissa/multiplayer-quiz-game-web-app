@@ -2,7 +2,7 @@ import { ClientPlayer } from '@app/classes/client-player';
 import { Game } from '@app/classes/game';
 import { generateRandomPin } from '@app/helpers/pin';
 import { DisconnectPayload } from '@app/interfaces/disconnect-payload';
-import { GameHistory } from '@app/model/database/game-history';
+import { GameSummary } from '@app/model/database/game-summary';
 import { Question } from '@app/model/database/question';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { TimerService } from '@app/services/timer/timer.service';
@@ -18,7 +18,7 @@ import { Submission } from '@common/submission';
 import { Injectable } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { Socket } from 'socket.io';
-import { GameHistoryService } from './game-history.service';
+import { GameSummaryService } from './game-summary.service';
 
 const PERCENTAGE_DIVIDER = 100;
 const NO_POINTS = 0;
@@ -31,7 +31,7 @@ export class GameService {
 
     constructor(
         private readonly moduleRef: ModuleRef,
-        private gameHistoryService: GameHistoryService,
+        private gameSummaryService: GameSummaryService,
     ) {}
 
     get quizService(): QuizService {
@@ -331,13 +331,13 @@ export class GameService {
         const numberOfPlayers = game.clientPlayers.size;
         const bestScore = this.getHighestScore(game);
 
-        const gameHistory: GameHistory = {
+        const gameSummary: GameSummary = {
             title: game.quiz.title,
             startDate: game.startDate,
             numberOfPlayers,
             bestScore,
         };
 
-        await this.gameHistoryService.saveGameHistory(gameHistory);
+        await this.gameSummaryService.saveGameSummary(gameSummary);
     }
 }

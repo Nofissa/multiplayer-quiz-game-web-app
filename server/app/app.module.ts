@@ -2,7 +2,7 @@ import { Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthController } from './controllers/auth/auth.controller';
-import { GameHistoryController } from './controllers/game/game-history.controller';
+import { GameSummaryController } from './controllers/game/game-summary.controller';
 import { GameController } from './controllers/game/game.controller';
 import { QuestionController } from './controllers/question/question.controller';
 import { QuizController } from './controllers/quiz/quiz.controller';
@@ -10,11 +10,11 @@ import { GameGateway } from './gateways/game.gateway';
 import { MessageGateway } from './gateways/message.gateway';
 import { PlayerGateway } from './gateways/player.gateway';
 import { TimerGateway } from './gateways/timer.gateway';
-import { GameHistory, gameHistorySchema } from './model/database/game-history';
+import { GameSummary, gameSummarySchema } from './model/database/game-summary';
 import { Question, questionSchema } from './model/database/question';
 import { Quiz, quizSchema } from './model/database/quiz';
 import { AuthService } from './services/auth/auth.service';
-import { GameHistoryService } from './services/game/game-history.service';
+import { GameSummaryService } from './services/game/game-summary.service';
 import { GameService } from './services/game/game.service';
 import { MessageService } from './services/message/message.service';
 import { PlayerService } from './services/player/player.service';
@@ -35,10 +35,10 @@ import { TimerService } from './services/timer/timer.service';
         MongooseModule.forFeature([
             { name: Question.name, schema: questionSchema },
             { name: Quiz.name, schema: quizSchema },
-            { name: GameHistory.name, schema: gameHistorySchema },
+            { name: GameSummary.name, schema: gameSummarySchema },
         ]),
     ],
-    controllers: [AuthController, GameController, QuestionController, QuizController, GameHistoryController],
+    controllers: [AuthController, GameController, QuestionController, QuizController, GameSummaryController],
     providers: [
         GameGateway,
         MessageGateway,
@@ -52,7 +52,7 @@ import { TimerService } from './services/timer/timer.service';
         QuizService,
         TimerService,
         Logger,
-        GameHistoryService,
+        GameSummaryService,
     ],
 })
 export class AppModule {}

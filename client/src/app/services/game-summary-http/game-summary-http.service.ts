@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { GameHistory } from '@app/interfaces/game-history';
+import { GameSummary } from '@app/interfaces/game-summary';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
@@ -8,8 +8,8 @@ import { environment } from 'src/environments/environment';
 @Injectable({
     providedIn: 'root',
 })
-export class GameHistoryHttpService {
-    private readonly baseUrl: string = `${environment.apiUrl}/gameHistories`;
+export class GameSummaryHttpService {
+    private readonly baseUrl: string = `${environment.apiUrl}/gameSummaries`;
 
     constructor(private readonly http: HttpClient) {}
 
@@ -17,7 +17,7 @@ export class GameHistoryHttpService {
         return this.baseUrl;
     }
 
-    getAllGameHistories(sortField?: string, orderDirection?: 'asc' | 'desc'): Observable<GameHistory[]> {
+    getAllGameSummaries(sortField?: string, orderDirection?: 'asc' | 'desc'): Observable<GameSummary[]> {
         let params = new HttpParams();
         if (sortField) {
             params = params.append('sortField', sortField);
@@ -26,20 +26,20 @@ export class GameHistoryHttpService {
             params = params.append('orderDirection', orderDirection);
         }
 
-        return this.http.get<GameHistory[]>(this.baseUrl, { params }).pipe(
-            map((gameHistories: GameHistory[]) => this.convertAllStartDateToDate(gameHistories)),
-            catchError(this.handleError<GameHistory[]>()),
+        return this.http.get<GameSummary[]>(this.baseUrl, { params }).pipe(
+            map((gameSummaries: GameSummary[]) => this.convertAllStartDateToDate(gameSummaries)),
+            catchError(this.handleError<GameSummary[]>()),
         );
     }
 
-    private convertstartDateToDate(gameHistory: GameHistory): GameHistory {
+    private convertstartDateToDate(gameSummary: GameSummary): GameSummary {
         return {
-            ...gameHistory,
-            startDate: new Date(gameHistory.startDate),
+            ...gameSummary,
+            startDate: new Date(gameSummary.startDate),
         };
     }
 
-    private convertAllStartDateToDate(gameHistories: GameHistory[]): GameHistory[] {
+    private convertAllStartDateToDate(gameHistories: GameSummary[]): GameSummary[] {
         return gameHistories.map(this.convertstartDateToDate);
     }
 

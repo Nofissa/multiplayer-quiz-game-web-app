@@ -1,24 +1,24 @@
-import { GameHistory } from '@app/model/database/game-history';
-import { GameHistoryService } from '@app/services/game/game-history.service';
+import { GameSummary } from '@app/model/database/game-summary';
+import { GameSummaryService } from '@app/services/game/game-summary.service';
 import { Controller, Delete, Get, HttpStatus, Query, Res } from '@nestjs/common';
 import { ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 
-@ApiTags('GameHistory')
-@Controller('gameHistories')
-export class GameHistoryController {
-    constructor(private readonly gameHistoryService: GameHistoryService) {}
+@ApiTags('GameSummary')
+@Controller('gameSummaries')
+export class GameSummaryController {
+    constructor(private readonly gameSummaryService: GameSummaryService) {}
 
     @ApiOkResponse({
-        description: 'Return all game histories',
-        type: GameHistory,
+        description: 'Return all game summaries',
+        type: GameSummary,
         isArray: true,
     })
     @ApiNotFoundResponse({
         description: 'Return NOT_FOUND http status when request fails',
     })
     @Get('/')
-    async getGameHistories(
+    async getGameSummaries(
         @Res() response: Response,
         @Query('sortField') sortField: string,
         @Query('orderDirection') orderDirection: 'asc' | 'desc',
@@ -26,25 +26,25 @@ export class GameHistoryController {
         try {
             const field = sortField || 'defaultSortField';
             const order = orderDirection || 'asc';
-            const gameHistories = await this.gameHistoryService.getGameHistoriesSorted(field, order);
-            response.status(HttpStatus.OK).json(gameHistories);
+            const gameSummaries = await this.gameSummaryService.getGameSummariesSorted(field, order);
+            response.status(HttpStatus.OK).json(gameSummaries);
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send('Game histories not found');
+            response.status(HttpStatus.NOT_FOUND).send('Game summaries not found');
         }
     }
     @ApiOkResponse({
-        description: 'Delete all game histories',
+        description: 'Delete all game summaries',
     })
     @ApiNotFoundResponse({
         description: 'Return NOT_FOUND http status when request fails',
     })
     @Delete('/deleteAll')
-    async deleteAllGameHistories(@Res() response: Response) {
+    async deleteAllGameSummaries(@Res() response: Response) {
         try {
-            await this.gameHistoryService.deleteAllGameHistories();
+            await this.gameSummaryService.deleteAllGameSummaries();
             response.status(HttpStatus.OK).send();
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send("Can't find game histories to delete");
+            response.status(HttpStatus.NOT_FOUND).send("Can't find game summaries to delete");
         }
     }
 }
