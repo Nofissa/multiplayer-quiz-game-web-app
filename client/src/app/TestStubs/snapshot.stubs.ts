@@ -1,8 +1,8 @@
 import { Chatlog } from '@common/chatlog';
 import { GameSnapshot } from '@common/game-snapshot';
 import { GameState } from '@common/game-state';
+import { QcmSubmission } from '@common/qcm-submission';
 import { QrlSubmission } from '@common/qrl-submission';
-import { Submission } from '@common/submission';
 import { firstPlayerStub, secondPlayerStub } from './player.stubs';
 import { quizStub } from './quiz.stubs';
 
@@ -16,7 +16,7 @@ const mockChatlogs: Chatlog[] = [
 
 const mockState: GameState = GameState.Opened;
 
-const mockQuestionQcmSubmissions: Submission[][] = [[{ choices: [{ payload: 0, isSelected: true }], isFinal: false }]];
+const mockQuestionQcmSubmissions: QcmSubmission[][] = [[{ choices: [{ payload: 0, isSelected: true }], isFinal: false }]];
 const mockQuestionQrlSubmissions: QrlSubmission[][] = [[{ answer: 'hello', clientId: 'playerId' }]];
 
 export const mockGameSnapshot = (): GameSnapshot[] => {

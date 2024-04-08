@@ -2,9 +2,11 @@
 import { ClientPlayer } from '@app/classes/client-player';
 import { Game } from '@app/classes/game';
 import { GameState } from '@common/game-state';
+import { QrlEvaluation } from '@common/qrl-evaluation';
 import { QrlSubmission } from '@common/qrl-submission';
 import { QcmSubmission } from '@common/qcm-submission';
 import { clientPlayerStub } from './client.player.stub';
+import { qrlEvaluationStub } from './qrl-evaluation.stub';
 import { qrlSubmissionStub } from './qrl.submission.stub';
 import { quizStub } from './quiz.stubs';
 import { submissionStub } from './submission.stub';
@@ -20,6 +22,7 @@ export const gameStub = (): Game => {
         clientPlayers: new Map<string, ClientPlayer>([['playerId', clientPlayerStub()]]),
         qcmSubmissions: [new Map<string, QcmSubmission>([['playerId', submissionStub()]])],
         qrlSubmissions: [new Map<string, QrlSubmission>([['playerId', qrlSubmissionStub()]])],
+        qrlEvaluations: [new Map<string, QrlEvaluation>([['playerId', qrlEvaluationStub()]])],
         loadNextQuestion() {
             this.qcmSubmissions.push(new Map());
             this.qrlSubmissions.push(new Map());
@@ -33,6 +36,9 @@ export const gameStub = (): Game => {
         },
         get currentQuestionQrlSubmissions() {
             return this.qrlSubmissions[this.currentQuestionIndex];
+        },
+        get currentQuestionQrlEvaluations() {
+            return this.qrlEvaluations[this.currentQuestionIndex];
         },
     };
 };

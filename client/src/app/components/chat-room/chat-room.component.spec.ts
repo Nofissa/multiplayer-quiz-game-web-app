@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormBuilder } from '@angular/forms';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MAX_MESSAGE_LENGTH } from '@app/constants/constants';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { MessageService } from '@app/services/message/message.service';
@@ -15,8 +16,6 @@ import { Quiz } from '@common/quiz';
 import { QcmSubmission } from '@common/qcm-submission';
 import { Subscription, of } from 'rxjs';
 import { ChatRoomComponent } from './chat-room.component';
-
-const MAX_MESSAGE_LENGTH = 200;
 
 describe('ChatRoomComponent', () => {
     let component: ChatRoomComponent;

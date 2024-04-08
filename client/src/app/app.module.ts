@@ -41,6 +41,7 @@ import { NavHeaderComponent } from './components/nav-header/nav-header.component
 import { PanicModeButtonComponent } from './components/panic-mode-button/panic-mode-button.component';
 import { PlayerListComponent } from './components/player-list/player-list.component';
 import { QrlBoardComponent } from './components/qrl-board/qrl-board.component';
+import { QrlListComponent } from './components/qrl-list/qrl-list.component';
 import { QuestionBankComponent } from './components/question-bank/question-bank.component';
 import { QuestionListComponent } from './components/question-list/question-list.component';
 import { QuizListComponent } from './components/quiz-list/quiz-list.component';
@@ -96,6 +97,7 @@ import { WebSocketService } from './services/web-socket/web-socket.service';
         QrlBoardComponent,
         PanicModeButtonComponent,
         TimerPauseToggleComponent,
+        QrlListComponent,
     ],
     imports: [
         AppRoutingModule,

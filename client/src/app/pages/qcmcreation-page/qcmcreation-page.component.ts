@@ -6,7 +6,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import { UpsertQuestionDialogComponent } from '@app/components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
-import { SNACK_MESSAGE_DURATION } from '@app/constants';
+import { DEFAULT_QUIZ_DURATION, ID_LENGTH, SNACK_MESSAGE_DURATION } from '@app/constants/constants';
 import { Quiz } from '@app/interfaces/quiz';
 import { MaterialServicesProvider } from '@app/providers/material-services.provider';
 import { QuestionInteractionService } from '@app/services/question-interaction/question-interaction.service';
@@ -14,9 +14,6 @@ import { QuestionSharingService } from '@app/services/question-sharing/question-
 import { QuizHttpService } from '@app/services/quiz-http/quiz-http.service';
 import { Question } from '@common/question';
 import { Subscription } from 'rxjs';
-
-const ID_LENGTH = 10;
-const DURATION = 10;
 
 @Component({
     selector: 'app-qcmcreation-page',
@@ -199,7 +196,7 @@ export class QCMCreationPageComponent implements OnInit, OnDestroy {
     private setupForm(quiz?: Quiz) {
         const title = quiz?.title ? quiz.title : '';
         const description = quiz?.description ? quiz.description : '';
-        const duration = quiz?.duration ? quiz.duration : DURATION;
+        const duration = quiz?.duration ? quiz.duration : DEFAULT_QUIZ_DURATION;
 
         this.formGroup = this.formBuilder.group({
             title: [title, Validators.required],

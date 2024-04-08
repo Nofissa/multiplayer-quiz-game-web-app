@@ -4,7 +4,7 @@ import { barChartDataStub } from '@app/TestStubs/bar-chart-data.stubs';
 import { qcmQuestionStub } from '@app/TestStubs/question.stubs';
 import { submissionsStub, submissionStub } from '@app/TestStubs/submission.stubs';
 import { Question } from '@common/question';
-import { Submission } from '@common/submission';
+import { QcmSubmission } from '@common/qcm-submission';
 import { BarChartService } from './bar-chart.service';
 
 describe('BarChartService', () => {
@@ -39,7 +39,7 @@ describe('BarChartService', () => {
     it('should add question when question is valid', () => {
         service.addQuestion(qcmQuestionStub()[0]);
         const mockBarChart: BarChartData = {
-            question: qcmQuestionStub()[0],
+            text: qcmQuestionStub()[0],
             submissions: [],
         };
         expect(service['barChartData']).toEqual([mockBarChart]);
@@ -57,7 +57,7 @@ describe('BarChartService', () => {
 
     it('should not update barChartData when given a bad clientId and submission', () => {
         service['barChartData'] = [{ question: qcmQuestionStub()[0], submissions: [] }];
-        service.updateBarChartData(undefined as unknown as Submission[]);
+        service.updateBarChartData(undefined as unknown as QcmSubmission[]);
         expect(service.getCurrentQuestionData()).toEqual({ question: qcmQuestionStub()[0], submissions: [] });
     });
 

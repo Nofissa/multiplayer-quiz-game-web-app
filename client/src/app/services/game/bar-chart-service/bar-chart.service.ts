@@ -6,7 +6,8 @@ import { QcmSubmission } from '@common/qcm-submission';
 import { QrlEvaluation } from '@common/qrl-evaluation';
 import { Question } from '@common/question';
 
-const QRL_EVALUATION_INCREMENT = 50;
+const QRL_EVALUATION_INCREMENT_50 = 50;
+const QRL_EVALUATION_INCREMENT_100 = 100;
 
 @Injectable({
     providedIn: 'root',
@@ -32,7 +33,7 @@ export class BarChartService {
                 break;
             case 'QRL':
                 for (let i = 0; i < 3; i++) {
-                    newBarchartData.chartElements.push({ text: `${i * QRL_EVALUATION_INCREMENT}` });
+                    newBarchartData.chartElements.push({ text: `${i * QRL_EVALUATION_INCREMENT_50}` });
                 }
                 break;
         }
@@ -63,31 +64,48 @@ export class BarChartService {
         return this.barChartData;
     }
 
-    setQcmSubmissions(submissions: QcmSubmission[]) {
-        submissions = [];
-        return;
+    convertQcmSubmissions(submissions: QcmSubmission[]): BarchartSubmission[] {
+        const newSubmissions = [];
+        for (const submission of submissions) {
+            for (const choice of submission.choices) {
+                newSubmissions.push({ index: choice.payload, isSelected: choice.isSelected });
+            }
+        }
+        return newSubmissions;
     }
 
-    setQrlSubmissions(submissions: QrlEvaluation[]) {
-        submissions = [];
-        return;
+    convertQrlEvaluation(evaluations: QrlEvaluation[]) {
+        const newSubmissions = [];
+        for (const evaluation of evaluations) {
+            switch (evaluation.grade) {
+                case 0:
+                    newSubmissions.push({ index: 0, isSelected: true });
+                    break;
+                case QRL_EVALUATION_INCREMENT_50:
+                    newSubmissions.push({ index: 1, isSelected: true });
+                    break;
+                case QRL_EVALUATION_INCREMENT_100:
+                    newSubmissions.push({ index: 2, isSelected: true });
+                    break;
+            }
+        }
+        return newSubmissions;
     }
 
     setData(snapshot: GameSnapshot): void {
         this.flushData();
-
         let qcmId = 0;
         let qrlId = 0;
         for (const question of snapshot.quiz.questions) {
             this.addQuestion(question);
-            switch (question.text) {
+            switch (question.type) {
                 case 'QCM':
-                    this.setQcmSubmissions(snapshot.questionQcmSubmissions[qcmId]);
+                    this.barChartData[qcmId + qrlId].submissions = this.convertQcmSubmissions(snapshot.questionQcmSubmissions[qcmId]);
                     qcmId++;
                     break;
 
                 case 'QRL':
-                    // this.setQrlSubmissions(snapshot.questionQrlSubmission[qrlId]);
+                    this.barChartData[qcmId + qrlId].submissions = this.convertQrlEvaluation(snapshot.questionQrlEvaluation[qrlId]);
                     qrlId++;
                     break;
             }

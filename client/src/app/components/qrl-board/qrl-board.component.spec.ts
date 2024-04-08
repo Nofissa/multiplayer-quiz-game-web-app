@@ -8,9 +8,10 @@ import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { lastPlayerEvaluationStub } from '@app/TestStubs/evaluation.stubs';
 import { firstPlayerStub } from '@app/TestStubs/player.stubs';
-import { qcmQuestionStub } from '@app/TestStubs/question.stubs';
+import { qrlQuestionStub } from '@app/TestStubs/question.stubs';
 import { quizStub } from '@app/TestStubs/quiz.stubs';
 import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
+import { MAX_MESSAGE_LENGTH } from '@app/constants/constants';
 import { SocketServerMock } from '@app/mocks/socket-server-mock';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
@@ -28,14 +29,12 @@ import { QrlEvaluation } from '@common/qrl-evaluation';
 import { QrlSubmission } from '@common/qrl-submission';
 import { Question } from '@common/question';
 import { Quiz } from '@common/quiz';
-import { Submission } from '@common/submission';
+import { QcmSubmission } from '@common/qcm-submission';
 import { TimerEventType } from '@common/timer-event-type';
 import { TimerPayload } from '@common/timer-payload';
 import { Observable, Subscription, of } from 'rxjs';
 import { io } from 'socket.io-client';
 import { QrlBoardComponent } from './qrl-board.component';
-
-const MAX_MESSAGE_LENGTH = 200;
 
 describe('QrlBoardComponent', () => {
     let component: QrlBoardComponent;
@@ -70,14 +69,14 @@ describe('QrlBoardComponent', () => {
         description: 'A test quiz',
         duration: 30,
         lastModification: new Date(),
-        questions: [qcmQuestionStub()[0]],
+        questions: [qrlQuestionStub()[0]],
         isHidden: false,
         _id: 'quiz1',
     };
 
     const mockState: GameState = GameState.Opened;
 
-    const mockQuestionSubmissions: Submission[][] = [[{ choices: [{ payload: 'testinggg', isSelected: true }], isFinal: true }]];
+    const mockQuestionSubmissions: QcmSubmission[][] = [[{ choices: [{ payload: 1, isSelected: true }], isFinal: true }]];
     const mockQuestionQrlSubmissions: QrlSubmission[][] = [[{ answer: 'hello', clientId: 'playerId' }]];
 
     const mockGameSnapshot: GameSnapshot = {
@@ -203,11 +202,11 @@ describe('QrlBoardComponent', () => {
     });
 
     it('should setupSubscriptions', () => {
-        const payload: GameEventPayload<Question> = { pin: '123', data: qcmQuestionStub()[0] };
+        const payload: GameEventPayload<Question> = { pin: '123', data: qrlQuestionStub()[0] };
         const timerPayload: GameEventPayload<TimerPayload> = { pin: '123', data: { remainingTime: 0, eventType: TimerEventType.Question } };
         const qrlPayload: GameEventPayload<QrlEvaluation> = {
             pin: '123',
-            data: { clientId: 'test', grade: Grade.Good, score: 10, isLast: true },
+            data: { player: firstPlayerStub(), grade: Grade.Good, score: 10, isLast: true },
         };
         const qrlSubmission: GameEventPayload<QrlSubmission> = { pin: '123', data: { answer: 'tesstststs', clientId: 'test' } };
         spyOn(component, 'submitAnswer');
@@ -313,7 +312,7 @@ describe('QrlBoardComponent', () => {
     });
 
     it('should tell if the question is a qrl', () => {
-        component.question = qcmQuestionStub()[0];
+        component.question = qrlQuestionStub()[0];
         component.question.type = 'QRL';
         let result = component.isQRL();
         expect(result).toBeTruthy();
