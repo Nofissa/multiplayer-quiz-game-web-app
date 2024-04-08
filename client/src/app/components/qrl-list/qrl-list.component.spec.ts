@@ -12,6 +12,7 @@ import { applyIfPinMatches } from '@app/utils/conditional-applications/condition
 import { GameEventPayload } from '@common/game-event-payload';
 import { GameSnapshot } from '@common/game-snapshot';
 import { GameState } from '@common/game-state';
+import { Grade } from '@common/grade';
 import { PlayerState } from '@common/player-state';
 import { QrlSubmission } from '@common/qrl-submission';
 import { Observable, of } from 'rxjs';
@@ -111,8 +112,9 @@ describe('QrlListComponent', () => {
     });
 
     it('should setupSubscription', () => {
-        const qrlSubmission: GameEventPayload<QrlSubmission> = { pin: '123', data: { answer: 'tesstststs', clientId: 'test' } };
+        const qrlSubmission: GameEventPayload<QrlSubmission> = { pin: '123', data: { answer: 'tesstststs', clientId: firstPlayerStub().socketId } };
         component.pin = '123';
+        component.players = [firstPlayerStub()];
         component['setupSubscription']('123');
         socketServerMock.emit('qrlSubmit', qrlSubmission);
         socketServerMock.emit('nextQuestion', qrlQuestionStub()[0]);
@@ -128,5 +130,18 @@ describe('QrlListComponent', () => {
         expect(mockGameService.qrlEvaluate).toHaveBeenCalledWith(firstPlayerStub().socketId, '123', 0);
         expect(component.playersButtons.size).toBe(1);
         expect(component.evaluationsDone).toBe(1);
+    });
+
+    it('should call slideNext() on swiperRef when evaluateAnswer() is called', () => {
+        const swiperRefSpy = jasmine.createSpyObj('SwiperComponent', ['slideNext']);
+        component.swiperRef = {
+            swiperRef: swiperRefSpy,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any;
+
+        if (component.swiperRef.swiperRef) {
+            component.evaluateAnswer('socketId', Grade.Good);
+        }
+        expect(component.swiperRef.swiperRef.slideNext).toHaveBeenCalled();
     });
 });
