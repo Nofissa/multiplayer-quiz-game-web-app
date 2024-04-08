@@ -1,5 +1,5 @@
 export interface BarchartSubmission {
-    clientId: string; 
+    clientId?: string; 
     index: number;
     isSelected: boolean;
 }
