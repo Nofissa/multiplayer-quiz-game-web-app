@@ -12,8 +12,8 @@ const NEXT_QUESTION_DELAY_SEC = 3;
 const START_GAME_DELAY_SEC = 5;
 
 export class GameAutopilot {
-    timeoutSubscription: Subscription;
-    lastQcmSubmissionSubscription: Subscription;
+    private timeoutSubscription: Subscription;
+    private lastQcmSubmissionSubscription: Subscription;
 
     constructor(
         private readonly moduleRef: ModuleRef,

@@ -97,10 +97,8 @@ export class TimerService {
     }
 
     onTimeout(pin: string, callback: (eventType: TimerEventType) => void): Subscription {
-        const subject = this.timeoutSubjects.get(pin);
-
-        if (subject && !subject.closed) {
-            subject.unsubscribe();
+        if (this.timeoutSubjects.has(pin)) {
+            this.timeoutSubjects.get(pin).unsubscribe();
             this.timeoutSubjects.delete(pin);
         }
 

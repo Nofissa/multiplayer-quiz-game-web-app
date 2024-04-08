@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */ // disabled for MongoDB _id fields
 /* eslint-disable @typescript-eslint/no-explicit-any */ // useful especially for the socket mocking
 import { Game } from '@app/classes/game';
 import { Quiz } from '@app/model/database/quiz';
@@ -53,5 +54,23 @@ describe('Game', () => {
 
     it('current question Submission should return the right map', () => {
         expect(game.currentQuestionQcmSubmissions).toEqual(new Map());
+    });
+
+    it('should return the current question QRL submissions map', () => {
+        expect(game.currentQuestionQrlSubmissions).toEqual(new Map());
+    });
+
+    it('should return the current question QRL evaluations map', () => {
+        expect(game.currentQuestionQrlEvaluations).toEqual(new Map());
+    });
+
+    it('should be random if the quiz _id is not defined', () => {
+        game.quiz._id = undefined;
+        expect(game.isRandom).toBe(true);
+    });
+
+    it('should not be random if the quiz _id is defined', () => {
+        game.quiz._id = 'someId';
+        expect(game.isRandom).toBe(false);
     });
 });
