@@ -1,15 +1,10 @@
 import { Injectable } from '@angular/core';
+import { ACCELERATE_TIMER_EVENT, START_TIMER_EVENT, STOP_TIMER_EVENT, TIMER_TICK_EVENT, TOGGLE_PAUSE_TIMER_EVENT } from '@app/constants/constants';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
 import { TimerEventType } from '@common/timer-event-type';
 import { TimerPayload } from '@common/timer-payload';
 import { Subscription } from 'rxjs';
-
-const START_TIMER_EVENT = 'startTimer';
-const STOP_TIMER_EVENT = 'stopTimer';
-const TIMER_TICK_EVENT = 'timerTick';
-const TOGGLE_PAUSE_TIMER_EVENT = 'togglePauseTimer';
-const ACCELERATE_TIMER_EVENT = 'accelerateTimer';
 
 @Injectable({
     providedIn: 'root',

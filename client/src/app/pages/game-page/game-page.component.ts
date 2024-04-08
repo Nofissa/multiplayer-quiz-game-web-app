@@ -2,6 +2,7 @@ import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
+import { NEXT_QUESTION_DELAY_SECONDS, NOTICE_DURATION_MS, START_GAME_COUNTDOWN_DURATION_SECONDS } from '@app/constants/constants';
 import { GameServicesProvider } from '@app/providers/game-services.provider';
 import { RoutingDependenciesProvider } from '@app/providers/routing-dependencies.provider';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
@@ -11,9 +12,6 @@ import { TimerService } from '@app/services/timer/timer.service';
 import { TimerEventType } from '@common/timer-event-type';
 import { Subscription } from 'rxjs';
 
-const START_GAME_COUNTDOWN_DURATION_SECONDS = 5;
-const NEXT_QUESTION_DELAY_SECONDS = 3;
-const CANCEL_GAME_NOTICE_DURATION_MS = 5000;
 const PANIC_AUDIO_NAME = 'ticking-timer';
 const PANIC_AUDIO_SRC = 'assets/ticking-timer.wav';
 
@@ -97,7 +95,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
         this.eventSubscriptions.push(
             this.gameService.onCancelGame(pin, (message) => {
                 this.snackBarService.open(message, '', {
-                    duration: CANCEL_GAME_NOTICE_DURATION_MS,
+                    duration: NOTICE_DURATION_MS,
                     verticalPosition: 'top',
                     panelClass: ['base-snackbar'],
                 });

@@ -1,4 +1,5 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { NOT_FOUND_INDEX } from '@app/constants/constants';
 import { GameServicesProvider } from '@app/providers/game-services.provider';
 import { MaterialServicesProvider } from '@app/providers/material-services.provider';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
@@ -7,8 +8,6 @@ import { Grade } from '@common/grade';
 import { Player } from '@common/player';
 import { Subscription } from 'rxjs';
 import { SwiperComponent } from 'swiper/angular';
-
-const NOT_FOUND_INDEX = -1;
 
 @Component({
     selector: 'app-qrl-list',

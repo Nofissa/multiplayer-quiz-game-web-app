@@ -1,13 +1,10 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { PANIC_TICKS_PER_SECOND, QCM_MIN_TIME, QRL_MIN_TIME } from '@app/constants/constants';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { Question } from '@common/question';
 import { TimerEventType } from '@common/timer-event-type';
 import { Subscription } from 'rxjs';
-
-const QCM_MIN_TIME = 10;
-const QRL_MIN_TIME = 20;
-const PANIC_TICKS_PER_SECOND = 4;
 
 @Component({
     selector: 'app-panic-mode-button',

@@ -11,6 +11,7 @@ import { firstPlayerStub } from '@app/TestStubs/player.stubs';
 import { qrlQuestionStub } from '@app/TestStubs/question.stubs';
 import { quizStub } from '@app/TestStubs/quiz.stubs';
 import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
+import { MAX_MESSAGE_LENGTH } from '@app/constants/constants';
 import { SocketServerMock } from '@app/mocks/socket-server-mock';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
@@ -34,8 +35,6 @@ import { TimerPayload } from '@common/timer-payload';
 import { Observable, Subscription, of } from 'rxjs';
 import { io } from 'socket.io-client';
 import { QrlBoardComponent } from './qrl-board.component';
-
-const MAX_MESSAGE_LENGTH = 200;
 
 describe('QrlBoardComponent', () => {
     let component: QrlBoardComponent;
