@@ -4,6 +4,7 @@ import { generateRandomPin } from '@app/helpers/pin';
 import { DisconnectPayload } from '@app/interfaces/disconnect-payload';
 import { Question } from '@app/model/database/question';
 import { QuizService } from '@app/services/quiz/quiz.service';
+import { BarchartSubmission } from '@common/barchart-submission';
 import { GameState } from '@common/game-state';
 import { Grade } from '@common/grade';
 import { Player } from '@common/player';

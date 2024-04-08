@@ -8,7 +8,7 @@ import { GameState } from '@common/game-state';
 import { QcmEvaluation } from '@common/qcm-evaluation';
 import { QrlEvaluation } from '@common/qrl-evaluation';
 import { QuestionPayload } from '@common/question-payload';
-import { Submission } from '@common/submission';
+import { QcmSubmission } from '@common/qcm-submission';
 import { BroadcastOperator, Server, Socket } from 'socket.io';
 import { playerstub } from './stubs/player.stub';
 import { qrlEvaluationStub } from './stubs/qrl-evaluation.stub';
@@ -219,8 +219,8 @@ describe('GameGateway', () => {
         it('should toggle the selected choice for the provided pin and emit the "toggleSelectChoice" event to the organizer', () => {
             const pin = 'mockPin';
             const choiceIndex = 0;
-            const submission: Submission[] = [submissionStub()];
-            gameServiceMock.qcmToggleChoice.mockReturnValue(submission);
+            const submission: QcmSubmission[] = [submissionStub()];
+            // gameServiceMock.qcmToggleChoice.mockReturnValue(submission);
             gameServiceMock.getOrganizer.mockReturnValue(socketMock);
             gameGateway.qcmToggleChoice(socketMock, { pin, choiceIndex });
             expect(socketMock.emit).toHaveBeenCalledWith('qcmToggleChoice', { pin, data: submission });
