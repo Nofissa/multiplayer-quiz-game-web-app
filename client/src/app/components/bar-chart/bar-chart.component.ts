@@ -1,7 +1,6 @@
 import { Component, Input } from '@angular/core';
+import { PERCENT_MULTPLIER } from '@app/constants/constants';
 import { BarChartData } from '@app/interfaces/bar-chart-data';
-
-const PERCENT_MULTPLIER = 100;
 
 @Component({
     selector: 'app-bar-chart',
