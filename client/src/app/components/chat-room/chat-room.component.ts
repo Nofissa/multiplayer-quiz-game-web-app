@@ -1,13 +1,12 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
+import { MAX_MESSAGE_LENGTH } from '@app/constants/constants';
 import { GameServicesProvider } from '@app/providers/game-services.provider';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { MessageService } from '@app/services/message/message.service';
 import { PlayerService } from '@app/services/player/player.service';
 import { Chatlog } from '@common/chatlog';
 import { Subscription } from 'rxjs';
-
-const MAX_MESSAGE_LENGTH = 200;
 
 @Component({
     selector: 'app-chat-room',

@@ -1,9 +1,8 @@
 import { Component } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
+import { PIN_LENGTH } from '@app/constants/constants';
 import { UserService } from '@app/services/user/user-service';
-
-const PIN_LENGTH = 4;
 
 @Component({
     selector: 'app-join-game-dialog',

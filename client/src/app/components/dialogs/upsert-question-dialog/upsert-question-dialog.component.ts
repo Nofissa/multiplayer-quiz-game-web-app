@@ -3,12 +3,10 @@ import { Component, Inject } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { MAX_CHOICE_COUNT, MIN_CHOICE_COUNT, POINT_VALUE_BASE_MULTIPLE, SNACK_MESSAGE_DURATION } from '@app/constants';
+import { ID_LENGTH, MAX_CHOICE_COUNT, MIN_CHOICE_COUNT, POINT_VALUE_BASE_MULTIPLE, SNACK_MESSAGE_DURATION } from '@app/constants/constants';
 import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog-data';
 import { Choice } from '@common/choice';
 import { Question } from '@common/question';
-
-const ID_LENGTH = 10;
 
 @Component({
     selector: 'app-upsert-question-dialog',

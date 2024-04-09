@@ -1,9 +1,8 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { WHEEL_COLOR_COUNT } from '@app/constants/constants';
 import { TimerService } from '@app/services/timer/timer.service';
 import { TimerPayload } from '@common/timer-payload';
 import { Subscription } from 'rxjs';
-
-const WHEEL_COLOR_COUNT = 4;
 
 @Component({
     selector: 'app-timer',
