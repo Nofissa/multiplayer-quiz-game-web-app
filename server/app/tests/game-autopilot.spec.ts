@@ -70,14 +70,10 @@ describe('GameAutopilot', () => {
 
     describe('run', () => {
         it('should start the start game timer and subscribe to last QCM submission', () => {
-            timerServiceMock.onTimeout.mockImplementationOnce((_pin, callback) => {
-                callback(TimerEventType.StartGame);
-                return {} as Subscription;
-            });
-            gameServiceMock.onLastQcmSubmission.mockImplementationOnce((_pin, callback) => {
-                callback();
-                return {} as Subscription;
-            });
+            const timeoutSubject = new Subject<TimerEventType>();
+            timerServiceMock.onTimeout.mockImplementationOnce((_pin, callback) => timeoutSubject.subscribe(callback));
+            const lastQcmSubmissionSubscription = new Subject<TimerEventType>();
+            gameServiceMock.onLastQcmSubmission.mockImplementationOnce((_pin, callback) => lastQcmSubmissionSubscription.subscribe(callback));
 
             gameAutopilot.run();
 

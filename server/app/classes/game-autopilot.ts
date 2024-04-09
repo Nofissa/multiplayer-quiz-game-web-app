@@ -70,7 +70,11 @@ export class GameAutopilot {
 
     stop() {
         clearTimeout(this.questionEndTimeout);
-        this.timeoutSubscription?.unsubscribe();
-        this.lastQcmSubmissionSubscription?.unsubscribe();
+        if (this.timeoutSubscription && !this.timeoutSubscription.closed) {
+            this.timeoutSubscription.unsubscribe();
+        }
+        if (this.lastQcmSubmissionSubscription && !this.lastQcmSubmissionSubscription.closed) {
+            this.lastQcmSubmissionSubscription.unsubscribe();
+        }
     }
 }
