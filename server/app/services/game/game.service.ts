@@ -51,6 +51,7 @@ export class GameService {
         const game = this.getGame(pin);
         const clientPlayer = new ClientPlayer(client, username);
         const clientPlayers = Array.from(game.clientPlayers.values());
+        const trimmedUsername = username.trim().toLowerCase();
 
         if (game.state !== GameState.Opened) {
             throw new Error(`La partie ${pin} n'est pas ouverte`);
@@ -64,8 +65,8 @@ export class GameService {
             throw new Error('Le nom "Organisateur" est réservé');
         }
 
-        if (clientPlayers.some((x) => x.player.username.toLowerCase() === username.toLowerCase() && x.player.state === PlayerState.Banned)) {
-            throw new Error(`Le nom d'utilisateur "${username}" banni`);
+        if (clientPlayers.some((x) => x.player.username.toLowerCase() === trimmedUsername && x.player.state === PlayerState.Banned)) {
+            throw new Error(`Le nom d'utilisateur "${username}" est banni.`);
         }
 
         if (clientPlayers.some((x) => x.player.username.toLowerCase() === username.toLowerCase() && x.player.state === PlayerState.Playing)) {
