@@ -70,7 +70,7 @@ export class GameService {
         }
 
         if (clientPlayers.some((x) => x.player.username.toLowerCase() === username.toLowerCase() && x.player.state === PlayerState.Banned)) {
-            throw new Error(`Le nom d'utilisateur "${username}" banni`);
+            throw new Error(`Le nom d'utilisateur "${username}" est banni`);
         }
 
         if (clientPlayers.some((x) => x.player.username.toLowerCase() === username.toLowerCase() && x.player.state === PlayerState.Playing)) {
