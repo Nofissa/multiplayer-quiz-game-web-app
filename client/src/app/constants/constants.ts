@@ -27,3 +27,4 @@ export const TOGGLE_PAUSE_TIMER_EVENT = 'togglePauseTimer';
 export const ACCELERATE_TIMER_EVENT = 'accelerateTimer';
 export const MAX_PIN_NO = 10000;
 export const PADDING = 4;
+export const SWIPER_SYNC_DELAY_MS = 100;
