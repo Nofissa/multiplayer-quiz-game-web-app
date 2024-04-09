@@ -14,6 +14,7 @@ const START_GAME_DELAY_SEC = 5;
 export class GameAutopilot {
     private timeoutSubscription: Subscription;
     private lastQcmSubmissionSubscription: Subscription;
+    private questionEndTimeout: NodeJS.Timeout;
 
     constructor(
         private readonly moduleRef: ModuleRef,
@@ -47,7 +48,7 @@ export class GameAutopilot {
         this.lastQcmSubmissionSubscription = this.gameService.onLastQcmSubmission(this.pin, () => {
             this.timerGateway.stopTimer(this.client, { pin: this.pin });
 
-            setTimeout(() => {
+            this.questionEndTimeout = setTimeout(() => {
                 const game = this.gameService.getGame(this.pin);
 
                 if (game.currentQuestionIndex < game.quiz.questions.length - 1) {
@@ -68,6 +69,7 @@ export class GameAutopilot {
     }
 
     stop() {
+        clearTimeout(this.questionEndTimeout);
         this.timeoutSubscription?.unsubscribe();
         this.lastQcmSubmissionSubscription?.unsubscribe();
     }
