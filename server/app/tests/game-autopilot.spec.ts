@@ -64,6 +64,10 @@ describe('GameAutopilot', () => {
         gameAutopilot = new GameAutopilot(moduleRefMock, clientMock, 'mockedPin');
     });
 
+    afterEach(() => {
+        gameAutopilot.stop();
+    });
+
     describe('run', () => {
         it('should start the start game timer and subscribe to last QCM submission', () => {
             timerServiceMock.onTimeout.mockImplementationOnce((_pin, callback) => {
