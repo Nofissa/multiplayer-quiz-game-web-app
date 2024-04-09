@@ -327,20 +327,16 @@ export class GameService {
         return game.currentQuestionQcmSubmissions.get(client.id);
     }
 
-    getHighestScore(game: Game) {
-        return Math.max(...Array.from(game.clientPlayers.values()).map((clientPlayer) => clientPlayer.player.score));
-    }
-
     async concludeGame(pin: string): Promise<void> {
         const game = this.getGame(pin);
         const numberOfPlayers = game.clientPlayers.size;
-        const bestScore = this.getHighestScore(game);
+        const bestScore = game.getHighestScore();
         const gameSummary: GameSummary = {
             title: game.quiz.title,
             startDate: game.startDate,
             numberOfPlayers,
             bestScore,
         };
-        await this.gameSummaryService.saveGameSummary(gameSummary);
+        await this.gameSummaryService.addGameSummary(gameSummary);
     }
 }

@@ -24,6 +24,9 @@ export const gameStub = (): Game => {
         qcmSubmissions: [new Map<string, Submission>([['playerId', submissionStub()]])],
         qrlSubmissions: [new Map<string, QrlSubmission>([['playerId', qrlSubmissionStub()]])],
         qrlEvaluations: [new Map<string, QrlEvaluation>([['playerId', qrlEvaluationStub()]])],
+        getHighestScore() {
+            return Math.max(...Array.from(this.clientPlayers.values()).map((clientPlayer: ClientPlayer) => clientPlayer.player.score));
+        },
         loadNextQuestion() {
             this.qcmSubmissions.push(new Map());
             this.qrlSubmissions.push(new Map());

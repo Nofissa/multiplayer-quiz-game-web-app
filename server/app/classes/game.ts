@@ -51,6 +51,10 @@ export class Game {
         return this.qrlEvaluations[this.currentQuestionIndex];
     }
 
+    getHighestScore() {
+        return Math.max(...Array.from(this.clientPlayers.values()).map((clientPlayer) => clientPlayer.player.score));
+    }
+
     loadNextQuestion() {
         this.qcmSubmissions.push(new Map());
         this.qrlSubmissions.push(new Map());

@@ -33,7 +33,7 @@ export class GameSummaryService {
         }
     }
 
-    async saveGameSummary(gameSummary: GameSummary): Promise<GameSummary> {
+    async addGameSummary(gameSummary: GameSummary): Promise<GameSummary> {
         try {
             return await this.model.create(gameSummary);
         } catch (error) {
