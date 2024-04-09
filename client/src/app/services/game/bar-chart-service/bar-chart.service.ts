@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BarChartData } from '@app/interfaces/bar-chart-data';
 import { BarchartSubmission } from '@common/barchart-submission';
+import { BarChartType } from '@common/barchart-type';
 import { GameSnapshot } from '@common/game-snapshot';
 import { QcmSubmission } from '@common/qcm-submission';
 import { QrlEvaluation } from '@common/qrl-evaluation';
@@ -15,17 +16,18 @@ const QRL_EVALUATION_INCREMENT_100 = 100;
 export class BarChartService {
     private barChartData: BarChartData[] = [];
 
-    addQuestion(question: Question): void {
+    addQuestion(question: Question, chartType?: BarChartType): void {
         if (!question) {
             return;
         }
         const newBarchartData: BarChartData = {
-            text: question.text,
+            text: chartType === 'ACTIVITY' ? 'Activité pour la question: ' + question.text : question.text,
+            chartType: chartType ? chartType : question.type,
             chartElements: [],
             submissions: [],
         };
 
-        switch (question.type) {
+        switch (newBarchartData.chartType) {
             case 'QCM':
                 for (const choice of question.choices ? question.choices : []) {
                     newBarchartData.chartElements.push({ text: choice.text, isCorrect: choice.isCorrect });
@@ -36,12 +38,35 @@ export class BarChartService {
                     newBarchartData.chartElements.push({ text: `${i * QRL_EVALUATION_INCREMENT_50}` });
                 }
                 break;
+
+            case 'ACTIVITY':
+                newBarchartData.chartElements.push({ text: 'innactif' });
+                newBarchartData.chartElements.push({ text: 'actif' });
+                break;
         }
 
         this.barChartData.push(newBarchartData);
     }
 
-    updateBarChartData(data: BarchartSubmission): void {
+    updateActivityChartData(data: BarchartSubmission): void {
+        const chartData: BarChartData | undefined = this.getCurrentQuestionData();
+        if (chartData && data) {
+            const submissionIndex = chartData.submissions.findIndex((sub) => sub.clientId === data.clientId && sub.index === data.index);
+            const mirrorSubIndex = chartData.submissions.findIndex(
+                (sub) => sub.clientId === data.clientId && sub.index === (data.index === 1 ? 0 : 1),
+            );
+            if (submissionIndex >= 0) {
+                chartData.submissions[submissionIndex] = data;
+            } else {
+                chartData.submissions.push(data);
+            }
+            if (mirrorSubIndex >= 0) {
+                chartData.submissions[mirrorSubIndex].isSelected = !data.isSelected;
+            }
+        }
+    }
+
+    updateQcmChartData(data: BarchartSubmission): void {
         const chartData: BarChartData | undefined = this.getCurrentQuestionData();
         if (chartData && data) {
             const submissionIndex = chartData.submissions.findIndex((sub) => sub.clientId === data.clientId && sub.index === data.index);
@@ -68,7 +93,7 @@ export class BarChartService {
         const newSubmissions = [];
         for (const submission of submissions) {
             for (const choice of submission.choices) {
-                newSubmissions.push({ index: choice.payload, isSelected: choice.isSelected });
+                newSubmissions.push({ clientId: submission.clientId, index: choice.payload, isSelected: choice.isSelected });
             }
         }
         return newSubmissions;
@@ -79,13 +104,13 @@ export class BarChartService {
         for (const evaluation of evaluations) {
             switch (evaluation.grade) {
                 case 0:
-                    newSubmissions.push({ index: 0, isSelected: true });
+                    newSubmissions.push({ clientId: evaluation.player.socketId, index: 0, isSelected: true });
                     break;
                 case QRL_EVALUATION_INCREMENT_50:
-                    newSubmissions.push({ index: 1, isSelected: true });
+                    newSubmissions.push({ clientId: evaluation.player.socketId, index: 1, isSelected: true });
                     break;
                 case QRL_EVALUATION_INCREMENT_100:
-                    newSubmissions.push({ index: 2, isSelected: true });
+                    newSubmissions.push({ clientId: evaluation.player.socketId, index: 2, isSelected: true });
                     break;
             }
         }

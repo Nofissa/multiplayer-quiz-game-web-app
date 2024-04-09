@@ -69,7 +69,7 @@ export class GameService {
         this.webSocketService.emit('qrlInputChange', { pin, isTyping });
     }
 
-    onQrlInputChange(pin: string, callback: (activePlayers: boolean[]) => void): Subscription {
+    onQrlInputChange(pin: string, callback: (submission: BarchartSubmission) => void): Subscription {
         return this.webSocketService.on('qrlInputChange', applyIfPinMatches(pin, callback));
     }
 

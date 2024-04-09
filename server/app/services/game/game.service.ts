@@ -209,7 +209,7 @@ export class GameService {
         return submission;
     }
 
-    qrlInputChange(client: Socket, pin: string, isTyping: boolean): boolean[] {
+    qrlInputChange(client: Socket, pin: string, isTyping: boolean): BarchartSubmission {
         const game = this.getGame(pin);
         const clientPlayers = game.clientPlayers;
 
@@ -218,7 +218,7 @@ export class GameService {
             clientPlayers.get(client.id).player.hasInteracted = true;
         }
 
-        return Array.from(clientPlayers.values()).map((x) => x.player.isTyping);
+        return { clientId: client.id, index: isTyping ? 1 : 0, isSelected: true };
     }
 
     qrlEvaluate(socketId: string, pin: string, grade: Grade): QrlEvaluation {
@@ -313,6 +313,7 @@ export class GameService {
     getOrCreateSubmission(client: Socket, game: Game) {
         if (!game.currentQuestionQcmSubmissions.has(client.id)) {
             game.currentQuestionQcmSubmissions.set(client.id, {
+                clientId: client.id,
                 choices: game.currentQuestion.choices.map((_, index) => {
                     return { payload: index, isSelected: false };
                 }),

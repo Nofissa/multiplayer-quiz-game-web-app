@@ -3,8 +3,8 @@ import { BarChartData } from '@app/interfaces/bar-chart-data';
 import { barChartDataStub } from '@app/TestStubs/bar-chart-data.stubs';
 import { qcmQuestionStub } from '@app/TestStubs/question.stubs';
 import { submissionsStub, submissionStub } from '@app/TestStubs/submission.stubs';
-import { Question } from '@common/question';
 import { QcmSubmission } from '@common/qcm-submission';
+import { Question } from '@common/question';
 import { BarChartService } from './bar-chart.service';
 
 describe('BarChartService', () => {
@@ -57,14 +57,14 @@ describe('BarChartService', () => {
 
     it('should not update barChartData when given a bad clientId and submission', () => {
         service['barChartData'] = [{ question: qcmQuestionStub()[0], submissions: [] }];
-        service.updateBarChartData(undefined as unknown as QcmSubmission[]);
+        service.updateQcmChartData(undefined as unknown as QcmSubmission[]);
         expect(service.getCurrentQuestionData()).toEqual({ question: qcmQuestionStub()[0], submissions: [] });
     });
 
     it('should contain multiple players submissions', () => {
         service['barChartData'] = [{ question: qcmQuestionStub()[0], submissions: [] }];
 
-        service.updateBarChartData(submissionStub());
+        service.updateQcmChartData(submissionStub());
 
         expect(service.getCurrentQuestionData()).toEqual(barChartDataStub()[0]);
     });
@@ -79,7 +79,7 @@ describe('BarChartService', () => {
             { question: qcmQuestionStub()[0], submissions: [] },
             { question: qcmQuestionStub()[1], submissions: [] },
         ];
-        service.updateBarChartData(submissionStub());
+        service.updateQcmChartData(submissionStub());
         const mockBarChartContainer: BarChartData[] = [
             {
                 question: qcmQuestionStub()[0],

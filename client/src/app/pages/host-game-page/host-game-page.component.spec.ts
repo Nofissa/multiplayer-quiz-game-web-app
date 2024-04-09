@@ -20,6 +20,7 @@ import { GameService } from '@app/services/game/game-service/game.service';
 import { KeyBindingService } from '@app/services/key-binding/key-binding.service';
 import { MessageService } from '@app/services/message/message.service';
 import { PlayerService } from '@app/services/player/player.service';
+import { SoundService } from '@app/services/sound/sound.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
@@ -36,7 +37,6 @@ import { Observable, of, throwError } from 'rxjs';
 import { io } from 'socket.io-client';
 import { HostGamePageComponent } from './host-game-page.component';
 import SpyObj = jasmine.SpyObj;
-import { SoundService } from '@app/services/sound/sound.service';
 
 const PIN = '1234';
 const NEXT_QUESTION_DELAY = 5;
@@ -285,7 +285,7 @@ describe('HostGamePageComponent', () => {
     it('should the server emitting toggleSelectChoice affect the barChartData', () => {
         const payload: GameEventPayload<Submission[]> = { pin: PIN, data: submissionStub() };
         socketServerMock.emit('toggleSelectChoice', payload);
-        expect(barChartServiceSpy.updateBarChartData).toHaveBeenCalledWith(payload.data);
+        expect(barChartServiceSpy.updateQcmChartData).toHaveBeenCalledWith(payload.data);
     });
 
     it('should the server emitting submitChoices do nothing if not last player, or set currentQuestionHasEnded to true', () => {

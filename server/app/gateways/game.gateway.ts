@@ -142,8 +142,8 @@ export class GameGateway implements OnGatewayDisconnect {
     @SubscribeMessage('qrlInputChange')
     qrlInputChange(@ConnectedSocket() client: Socket, @MessageBody() { pin, isTyping }: { pin: string; isTyping: boolean }) {
         try {
-            const typing = this.gameService.qrlInputChange(client, pin, isTyping);
-            const payload: GameEventPayload<boolean[]> = { pin, data: typing };
+            const chartData = this.gameService.qrlInputChange(client, pin, isTyping);
+            const payload: GameEventPayload<BarchartSubmission> = { pin, data: chartData };
 
             this.server.to(pin).emit('qrlInputChange', payload);
         } catch (error) {
