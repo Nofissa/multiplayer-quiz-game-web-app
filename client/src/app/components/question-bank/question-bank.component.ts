@@ -5,6 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
 import { UpsertQuestionDialogComponent } from '@app/components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
+import { NOT_FOUND_INDEX, SNACK_BAR_DURATION_MS } from '@app/constants/constants';
 import { QuestionListOptions } from '@app/interfaces/question-list-options';
 import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog-data';
 import { MaterialServicesProvider } from '@app/providers/material-services.provider';
@@ -14,9 +15,6 @@ import { QuestionInteractionService } from '@app/services/question-interaction/q
 import { QuestionSharingService } from '@app/services/question-sharing/question-sharing.service';
 import { Question } from '@common/question';
 import { Subscription } from 'rxjs';
-
-const NOT_FOUND_INDEX = -1;
-const SNACK_BAR_DURATION_MS = 3000;
 
 @Component({
     selector: 'app-question-bank',

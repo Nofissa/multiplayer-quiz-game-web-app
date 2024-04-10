@@ -1,6 +1,7 @@
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { quizStub } from '@app/TestStubs/quiz.stubs';
+import { ERROR } from '@app/constants/constants';
 import { GameSnapshot } from '@common/game-snapshot';
 import { GameState } from '@common/game-state';
 import { GameHttpService } from './game-http.service';
@@ -14,8 +15,6 @@ const gameSnapshotStub: GameSnapshot = {
     questionQcmSubmissions: [],
     questionQrlSubmission: [],
 };
-
-const ERROR = 404;
 
 describe('GameHttpService', () => {
     let service: GameHttpService;

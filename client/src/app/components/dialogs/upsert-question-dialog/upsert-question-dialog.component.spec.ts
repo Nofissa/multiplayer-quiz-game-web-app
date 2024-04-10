@@ -5,7 +5,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MAX_CHOICE_COUNT, MIN_CHOICE_COUNT } from '@app/constants';
+import { MAX_CHOICE_COUNT, MIN_CHOICE_COUNT } from '@app/constants/constants';
 import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog-data';
 import { Choice } from '@common/choice';
 import { UpsertQuestionDialogComponent } from './upsert-question-dialog.component';
