@@ -37,7 +37,7 @@ describe('GameService', () => {
     };
 
     beforeEach(() => {
-        webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', ['emit', 'on'], {
+        webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', ['emit', 'on', 'getSocketId'], {
             socketInstance: io(),
         });
 

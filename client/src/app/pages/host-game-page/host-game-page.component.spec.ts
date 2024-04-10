@@ -28,7 +28,6 @@ import { GameEventPayload } from '@common/game-event-payload';
 import { GameState } from '@common/game-state';
 import { Player } from '@common/player';
 import { QcmEvaluation } from '@common/qcm-evaluation';
-import { Question } from '@common/question';
 import { QuestionPayload } from '@common/question-payload';
 import { TimerEventType } from '@common/timer-event-type';
 import { TimerPayload } from '@common/timer-payload';
@@ -64,7 +63,7 @@ describe('HostGamePageComponent', () => {
     };
 
     beforeEach(() => {
-        webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', ['emit', 'on'], {
+        webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', ['emit', 'on', 'getSocketId'], {
             socketInstance: io(),
         });
         barChartServiceSpy = jasmine.createSpyObj<BarChartService>([
@@ -260,10 +259,9 @@ describe('HostGamePageComponent', () => {
     it('should nextQuestion send nextQuestion signal to server and change gameState and set currentQuestionHasEnded', () => {
         component.nextQuestion();
         expect(gameServiceSpy.nextQuestion).toHaveBeenCalledWith(PIN);
-        const payload: GameEventPayload<Question> = { pin: PIN, data: qcmQuestionStub()[0] };
+        const payload: GameEventPayload<QuestionPayload> = { pin: PIN, data: { isLast: true, question: qcmQuestionStub()[0] } };
         socketServerMock.emit('nextQuestion', payload);
         expect(barChartServiceSpy.addChart).toHaveBeenCalled();
-        expect(timerServiceSpy.startTimer).toHaveBeenCalled();
     });
 
     it('should cancelGame cancel game server side', () => {

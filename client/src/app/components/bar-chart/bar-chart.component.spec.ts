@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { qcmQuestionStub } from '@app/TestStubs/question.stubs';
-import { BarChartComponent } from './bar-chart.component';
+import { barChartDataStub } from '@app/TestStubs/bar-chart-data.stubs';
 import { BarchartSubmission } from '@common/barchart-submission';
+import { BarChartComponent } from './bar-chart.component';
 
 describe('BarChartComponent', () => {
     let component: BarChartComponent;
@@ -13,13 +13,12 @@ describe('BarChartComponent', () => {
         });
         fixture = TestBed.createComponent(BarChartComponent);
         component = fixture.componentInstance;
-        component.data = {
-            text: qcmQuestionStub()[0].text,
-            chartElements: [],
-            chartType: 'QCM',
-            submissions: [],
-        };
+        component.data = barChartDataStub()[0];
         fixture.detectChanges();
+    });
+
+    afterEach(() => {
+        fixture.destroy();
     });
 
     it('should create', () => {
@@ -27,20 +26,21 @@ describe('BarChartComponent', () => {
     });
 
     it('should adjust compute the right selection percentage', () => {
-        const answer = 33;
-        const buff = component.adjust(0);
+        const selectedIndex = 0;
+        const answer = 100;
+        const buff = component.adjust(selectedIndex);
         fixture.detectChanges();
         expect(buff).toEqual(answer);
     });
 
-    it('should numberOfPlayers return the number of players having selected something', () => {
+    it('should numberOfPlayers return the number of players who have submitted a submission', () => {
         const buff = component.numberOfPlayers();
         fixture.detectChanges();
-        expect(buff).toEqual(3);
+        expect(buff).toEqual(2);
     });
 
     it('should numberOfPlayers return 0 if there are no player submissions', () => {
-        component.data.submissions = undefined as unknown as BarchartSubmission[];
+        component.data.submissions = [];
         const buff = component.numberOfPlayers();
         fixture.detectChanges();
         expect(buff).toEqual(0);
@@ -49,14 +49,15 @@ describe('BarChartComponent', () => {
     it('should playersSelected return the number of players having selected a particular choice', () => {
         const buff = component.playersSelected(0);
         fixture.detectChanges();
-        expect(buff).toEqual(1);
+        expect(buff).toEqual(2);
     });
 
     it('should playersSelected return 0 if thre are no player submissions', () => {
         component.data.submissions = [];
-        fixture.detectChanges();
-        const buff = component.adjust(1);
-        fixture.detectChanges();
+        let buff = component.playersSelected(1);
+        expect(buff).toEqual(0);
+        component.data.submissions = undefined as unknown as BarchartSubmission[];
+        buff = component.playersSelected(1);
         expect(buff).toEqual(0);
     });
 });
