@@ -333,7 +333,7 @@ describe('GameService', () => {
         const game = gameStub();
         const choiceIndex = 1;
         const submission = submissionStub();
-        const submissionTest = submissionStub();
+        const submissionTest = submissionStub()[choiceIndex];
         submissionTest.choices[1].isSelected = false;
         const expectedResult = [submissionTest];
 
@@ -412,14 +412,14 @@ describe('GameService', () => {
             jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
             jest.spyOn(Map.prototype, 'get').mockReturnValue(clientPlayer);
             const result = gameService.qrlInputChange(playerSocketMock, game.pin, false);
-            expect(result).toEqual([false]);
+            expect(result).toEqual({ clientId: playerSocketMock.id, index: 0, isSelected: true });
         });
 
-        // it('should return the right result if isTyping is true', () => {
-        //     jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
-        //     jest.spyOn(Map.prototype, 'get').mockReturnValueOnce(clientPlayer).mockReturnValueOnce(clientPlayerIsTyping);
-        //     const result = gameService.qrlInputChange(playerSocketMock, game.pin, true);
-        //     expect(result).toEqual([true]);
-        // });
+        it('should return the right result if isTyping is true', () => {
+            jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
+            jest.spyOn(Map.prototype, 'get').mockReturnValueOnce(clientPlayer).mockReturnValueOnce(clientPlayerIsTyping);
+            const result = gameService.qrlInputChange(playerSocketMock, game.pin, true);
+            expect(result).toEqual({ clientId: playerSocketMock.id, index: 1, isSelected: true });
+        });
     });
 });

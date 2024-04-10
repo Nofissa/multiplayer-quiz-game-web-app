@@ -3,12 +3,13 @@
 import { GameGateway } from '@app/gateways/game.gateway';
 import { GameService } from '@app/services/game/game.service';
 import { TimerService } from '@app/services/timer/timer.service';
+import { BarchartSubmission } from '@common/barchart-submission';
 import { GameEventPayload } from '@common/game-event-payload';
 import { GameState } from '@common/game-state';
 import { QcmEvaluation } from '@common/qcm-evaluation';
+import { QcmSubmission } from '@common/qcm-submission';
 import { QrlEvaluation } from '@common/qrl-evaluation';
 import { QuestionPayload } from '@common/question-payload';
-import { QcmSubmission } from '@common/qcm-submission';
 import { BroadcastOperator, Server, Socket } from 'socket.io';
 import { playerstub } from './stubs/player.stub';
 import { qrlEvaluationStub } from './stubs/qrl-evaluation.stub';
@@ -219,7 +220,7 @@ describe('GameGateway', () => {
         it('should toggle the selected choice for the provided pin and emit the "toggleSelectChoice" event to the organizer', () => {
             const pin = 'mockPin';
             const choiceIndex = 0;
-            const submission: QcmSubmission[] = [submissionStub()];
+            const submission: QcmSubmission = submissionStub()[choiceIndex];
             // gameServiceMock.qcmToggleChoice.mockReturnValue(submission);
             gameServiceMock.getOrganizer.mockReturnValue(socketMock);
             gameGateway.qcmToggleChoice(socketMock, { pin, choiceIndex });
@@ -267,11 +268,14 @@ describe('GameGateway', () => {
             expect(socketMock.emit).toHaveBeenCalledWith('error', 'Mock error');
         });
         it('should return the right payload', () => {
-            gameServiceMock.qrlInputChange.mockReturnValue([true]);
+            gameServiceMock.qrlInputChange.mockReturnValue({ clientId: socketMock.id, index: 1, isSelected: true });
             serverMock.to.mockReturnValue(broadcastMock);
             gameGateway.qrlInputChange(socketMock, { pin, isTyping: true });
             expect(serverMock.to).toHaveBeenCalledWith(pin);
-            expect(broadcastMock.emit).toHaveBeenCalledWith('qrlInputChange', { data: [true], pin: 'mockPin' } as GameEventPayload<boolean[]>);
+            expect(broadcastMock.emit).toHaveBeenCalledWith('qrlInputChange', {
+                data: { clientId: socketMock.id, index: 1, isSelected: true },
+                pin: 'mockPin',
+            } as GameEventPayload<BarchartSubmission>);
         });
     });
 
