@@ -1,5 +1,5 @@
 import { GameSummary } from '@app/model/database/game-summary';
-import { GameSummaryService } from '@app/services/game/game-summary.service';
+import { GameSummaryService } from '@app/services/game-summary/game-summary.service';
 import { Controller, Delete, Get, HttpStatus, Query, Res } from '@nestjs/common';
 import { ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';

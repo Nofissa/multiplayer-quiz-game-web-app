@@ -2,7 +2,7 @@ import { Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AuthController } from './controllers/auth/auth.controller';
-import { GameSummaryController } from './controllers/game/game-summary.controller';
+import { GameSummaryController } from './controllers/game-summary/game-summary.controller';
 import { GameController } from './controllers/game/game.controller';
 import { QuestionController } from './controllers/question/question.controller';
 import { QuizController } from './controllers/quiz/quiz.controller';
@@ -14,7 +14,7 @@ import { GameSummary, gameSummarySchema } from './model/database/game-summary';
 import { Question, questionSchema } from './model/database/question';
 import { Quiz, quizSchema } from './model/database/quiz';
 import { AuthService } from './services/auth/auth.service';
-import { GameSummaryService } from './services/game/game-summary.service';
+import { GameSummaryService } from './services/game-summary/game-summary.service';
 import { GameService } from './services/game/game.service';
 import { MessageService } from './services/message/message.service';
 import { PlayerService } from './services/player/player.service';
@@ -46,13 +46,13 @@ import { TimerService } from './services/timer/timer.service';
         TimerGateway,
         AuthService,
         GameService,
+        GameSummaryService,
         MessageService,
         PlayerService,
         QuestionService,
         QuizService,
         TimerService,
         Logger,
-        GameSummaryService,
     ],
 })
 export class AppModule {}
