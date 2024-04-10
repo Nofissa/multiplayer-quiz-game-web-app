@@ -17,7 +17,7 @@ import { questionStub } from './stubs/question.stubs';
 import { quizStub } from './stubs/quiz.stubs';
 import { submissionStub } from './stubs/submission.stub';
 
-describe('GameService', () => {
+fdescribe('GameService', () => {
     let gameService: GameService;
     let quizServiceMock: jest.Mocked<QuizService>;
     let socketMock: jest.Mocked<Socket>;
@@ -334,7 +334,6 @@ describe('GameService', () => {
         const game = gameStub();
         const choiceIndex = 1;
         const submission: QcmSubmission = submissionStub();
-        socketMock = { id: 'playerId' } as jest.Mocked<Socket>;
         game.qcmSubmissions = [new Map<string, QcmSubmission>()];
         game.qcmSubmissions[0].set('playerId', submission);
         const submissionTest = submissionStub().choices[choiceIndex];
@@ -342,6 +341,7 @@ describe('GameService', () => {
         const expectedResult = { clientId: submission.clientId, index: submissionTest.payload, isSelected: submissionTest.isSelected };
 
         it('should return the right submission', () => {
+            socketMock = { id: 'playerId' } as jest.Mocked<Socket>;
             jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
             jest.spyOn(GameService.prototype, 'getOrCreateSubmission').mockReturnValue(submission);
             const result = gameService.qcmToggleChoice(socketMock, game.pin, choiceIndex);

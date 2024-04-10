@@ -1,6 +1,7 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
-import { MAX_MESSAGE_LENGTH } from '@app/constants/constants';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MAX_MESSAGE_LENGTH, NOTICE_DURATION_MS } from '@app/constants/constants';
 import { GameServicesProvider } from '@app/providers/game-services.provider';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { MessageService } from '@app/services/message/message.service';
@@ -27,7 +28,11 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     private readonly messageService: MessageService;
     private readonly playerService: PlayerService;
 
-    constructor(formBuilder: FormBuilder, gameServicesProvider: GameServicesProvider) {
+    constructor(
+        formBuilder: FormBuilder,
+        gameServicesProvider: GameServicesProvider,
+        private readonly snackBarService: MatSnackBar,
+    ) {
         this.formGroup = formBuilder.group({
             message: [this.pin, [Validators.required, this.messageValidator()]],
         });
@@ -45,6 +50,25 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
                 this.chatlogs.push(chatlog);
             }),
         );
+        this.playerService.onPlayerMute(this.pin, (player) => {
+            if (player.isMuted) {
+                if (this.playerService.getCurrentPlayer(this.pin)?.socketId === player.socketId) {
+                    this.snackBarService.open('Vous avez été réduit au silence', '', {
+                        duration: NOTICE_DURATION_MS,
+                        verticalPosition: 'top',
+                        panelClass: ['base-snackbar'],
+                    });
+                }
+            } else {
+                if (this.playerService.getCurrentPlayer(this.pin)?.socketId === player.socketId) {
+                    this.snackBarService.open('Vous pouvez parler de nouveau', '', {
+                        duration: NOTICE_DURATION_MS,
+                        verticalPosition: 'top',
+                        panelClass: ['base-snackbar'],
+                    });
+                }
+            }
+        });
     }
 
     ngOnDestroy() {

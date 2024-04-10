@@ -16,12 +16,14 @@ import { qrlEvaluationStub } from './stubs/qrl-evaluation.stub';
 import { qrlSubmissionStub } from './stubs/qrl.submission.stub';
 import { questionStub } from './stubs/question.stubs';
 import { submissionStub } from './stubs/submission.stub';
+import { GameSummaryService } from '@app/services/game-summary/game-summary.service';
 
 describe('GameGateway', () => {
     let gameGateway: GameGateway;
     let gameServiceMock: jest.Mocked<GameService>;
     let socketMock: jest.Mocked<Socket>;
     let timerServiceMock: jest.Mocked<TimerService>;
+    let gameSummaryServiceMock: jest.Mocked<GameSummaryService>;
     let serverMock: jest.Mocked<Server>;
     let broadcastMock: any;
 
@@ -60,10 +62,13 @@ describe('GameGateway', () => {
             startTimer: jest.fn(),
             stopTimer: jest.fn(),
         } as any;
+        gameSummaryServiceMock = {
+            saveGameSummary: jest.fn(),
+        } as any;
         broadcastMock = {
             emit: jest.fn(),
         } as any as BroadcastOperator<any, any>;
-        gameGateway = new GameGateway(gameServiceMock, timerServiceMock);
+        gameGateway = new GameGateway(gameServiceMock, timerServiceMock, gameSummaryServiceMock);
         gameGateway.server = serverMock;
     });
 

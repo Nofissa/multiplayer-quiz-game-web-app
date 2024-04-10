@@ -1,5 +1,6 @@
 import { ClientPlayer } from '@app/classes/client-player';
 import { Game } from '@app/classes/game';
+import { Constant } from '@app/constants/constants';
 import { generateRandomPin } from '@app/helpers/pin';
 import { DisconnectPayload } from '@app/interfaces/disconnect-payload';
 import { Question } from '@app/model/database/question';
@@ -17,11 +18,6 @@ import { Question as CommonQuestion } from '@common/question';
 import { QuestionPayload } from '@common/question-payload';
 import { Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
-
-const PERCENTAGE_DIVIDER = 100;
-const NO_POINTS = 0;
-const NO_BONUS_MULTIPLIER = 1;
-const BONUS_MULTIPLIER = 1.2;
 
 @Injectable()
 export class GameService {
@@ -98,8 +94,8 @@ export class GameService {
             gameSubmissions.filter((x) => x.isFinal).length ===
             Array.from(game.clientPlayers.values()).filter((x) => x.player.state === PlayerState.Playing).length;
 
-        let score = isCorrect ? question.points : NO_POINTS;
-        score *= isFirst ? BONUS_MULTIPLIER : NO_BONUS_MULTIPLIER;
+        let score = isCorrect ? question.points : Constant.NoPoints;
+        score *= isFirst ? Constant.BonusMultiplier : Constant.NoBonusMultiplier;
 
         const player = game.clientPlayers.get(client.id).player;
         player.score += score;
@@ -187,7 +183,6 @@ export class GameService {
         const game = this.getGame(pin);
         const submission = this.getOrCreateSubmission(client, game);
         submission.choices[choiceIndex].isSelected = !submission.choices[choiceIndex].isSelected;
-
         return { clientId: client.id, index: choiceIndex, isSelected: submission.choices[choiceIndex].isSelected };
     }
 
@@ -239,7 +234,7 @@ export class GameService {
             Array.from(game.clientPlayers.values()).filter((x) => x.player.state === PlayerState.Playing).length;
 
         evalQrl.isLast = isLast;
-        evalQrl.score = (question.points * evalQrl.grade) / PERCENTAGE_DIVIDER;
+        evalQrl.score = (question.points * evalQrl.grade) / Constant.PercentageDivider;
         player.score += evalQrl.score;
 
         game.currentQuestionQrlEvaluations.set(socketId, evalQrl);
