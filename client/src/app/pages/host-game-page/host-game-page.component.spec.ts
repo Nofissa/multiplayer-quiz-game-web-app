@@ -23,6 +23,7 @@ import { SoundService } from '@app/services/sound/sound.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
+import { BarchartSubmission } from '@common/barchart-submission';
 import { GameEventPayload } from '@common/game-event-payload';
 import { GameState } from '@common/game-state';
 import { Player } from '@common/player';
@@ -35,7 +36,6 @@ import { Observable, of, throwError } from 'rxjs';
 import { io } from 'socket.io-client';
 import { HostGamePageComponent } from './host-game-page.component';
 import SpyObj = jasmine.SpyObj;
-import { BarchartSubmission } from '@common/barchart-submission';
 
 const PIN = '1234';
 const NEXT_QUESTION_DELAY = 5;
@@ -68,7 +68,7 @@ describe('HostGamePageComponent', () => {
             socketInstance: io(),
         });
         barChartServiceSpy = jasmine.createSpyObj<BarChartService>([
-            'addQuestion',
+            'addChart',
             'updateChartData',
             'getAllBarChart',
             'getCurrentQuestionData',
@@ -252,7 +252,7 @@ describe('HostGamePageComponent', () => {
         socketServerMock.emit('startGame', payload);
         expect(component.gameState).toEqual(GameState.Running);
         expect(component.isLastQuestion).toBeFalse();
-        expect(barChartServiceSpy.addQuestion).toHaveBeenCalled();
+        expect(barChartServiceSpy.addChart).toHaveBeenCalled();
         expect(timerServiceSpy.startTimer).toHaveBeenCalledWith(PIN, TimerEventType.StartGame, NEXT_QUESTION_DELAY);
     });
 
@@ -261,7 +261,7 @@ describe('HostGamePageComponent', () => {
         expect(gameServiceSpy.nextQuestion).toHaveBeenCalledWith(PIN);
         const payload: GameEventPayload<Question> = { pin: PIN, data: qcmQuestionStub()[0] };
         socketServerMock.emit('nextQuestion', payload);
-        expect(barChartServiceSpy.addQuestion).toHaveBeenCalled();
+        expect(barChartServiceSpy.addChart).toHaveBeenCalled();
         expect(timerServiceSpy.startTimer).toHaveBeenCalled();
     });
 

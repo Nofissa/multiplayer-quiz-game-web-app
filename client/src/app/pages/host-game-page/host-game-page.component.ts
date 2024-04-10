@@ -129,9 +129,9 @@ export class HostGamePageComponent implements OnInit {
 
     private addQuestion(question: Question) {
         if (question.type === 'QRL') {
-            this.barChartService.addQuestion(question, 'ACTIVITY');
+            this.barChartService.addChart(question, 'ACTIVITY');
         } else {
-            this.barChartService.addQuestion(question);
+            this.barChartService.addChart(question);
         }
     }
 

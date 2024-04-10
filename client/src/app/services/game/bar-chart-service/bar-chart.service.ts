@@ -16,7 +16,7 @@ const QRL_EVALUATION_INCREMENT_100 = 100;
 export class BarChartService {
     private barChartData: BarChartData[] = [];
 
-    addQuestion(question: Question, chartType?: BarChartType): void {
+    addChart(question: Question, chartType?: BarChartType): void {
         if (!question) {
             return;
         }
@@ -109,7 +109,8 @@ export class BarChartService {
     setData(snapshot: GameSnapshot): void {
         this.flushData();
         for (let i = 0; i < snapshot.quiz.questions.length; i++) {
-            this.addQuestion(snapshot.quiz.questions[i]);
+            this.addChart(snapshot.quiz.questions[i]);
+
             switch (snapshot.quiz.questions[i].type) {
                 case 'QCM':
                     this.barChartData[i].submissions = this.convertQcmSubmissions(snapshot.questionQcmSubmissions[i]);

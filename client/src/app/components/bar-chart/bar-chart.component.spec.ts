@@ -3,7 +3,7 @@ import { qcmQuestionStub } from '@app/TestStubs/question.stubs';
 import { BarChartComponent } from './bar-chart.component';
 import { BarchartSubmission } from '@common/barchart-submission';
 
-fdescribe('BarChartComponent', () => {
+describe('BarChartComponent', () => {
     let component: BarChartComponent;
     let fixture: ComponentFixture<BarChartComponent>;
 
