@@ -1,7 +1,7 @@
 import { QcmSubmission } from '@common/qcm-submission';
 export const submissionStub = (): QcmSubmission => {
     return {
-        clientId: 'testId',
+        clientId: 'playerId',
         choices: [
             { payload: 0, isSelected: false },
             { payload: 1, isSelected: false },

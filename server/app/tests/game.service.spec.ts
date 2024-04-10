@@ -5,6 +5,7 @@ import { DisconnectPayload } from '@app/interfaces/disconnect-payload';
 import { GameService } from '@app/services/game/game.service';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { GameState } from '@common/game-state';
+import { QcmSubmission } from '@common/qcm-submission';
 import { QuestionPayload } from '@common/question-payload';
 import { Socket } from 'socket.io';
 import { clientPlayerStub } from './stubs/client.player.stub';
@@ -332,10 +333,13 @@ describe('GameService', () => {
     describe('toggleSelectChoice', () => {
         const game = gameStub();
         const choiceIndex = 1;
-        const submission = submissionStub();
-        const submissionTest = submissionStub()[choiceIndex];
-        submissionTest.choices[1].isSelected = false;
-        const expectedResult = [submissionTest];
+        const submission: QcmSubmission = submissionStub();
+        socketMock = { id: 'playerId' } as jest.Mocked<Socket>;
+        game.qcmSubmissions = [new Map<string, QcmSubmission>()];
+        game.qcmSubmissions[0].set('playerId', submission);
+        const submissionTest = submissionStub().choices[choiceIndex];
+        submissionTest.isSelected = true;
+        const expectedResult = { clientId: submission.clientId, index: submissionTest.payload, isSelected: submissionTest.isSelected };
 
         it('should return the right submission', () => {
             jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
