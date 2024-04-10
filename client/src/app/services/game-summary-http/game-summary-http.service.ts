@@ -39,8 +39,8 @@ export class GameSummaryHttpService {
         };
     }
 
-    private convertAllStartDateToDate(gameHistories: GameSummary[]): GameSummary[] {
-        return gameHistories.map(this.convertstartDateToDate);
+    private convertAllStartDateToDate(gameSummaries: GameSummary[]): GameSummary[] {
+        return gameSummaries.map(this.convertstartDateToDate);
     }
 
     private handleError<T>(): (error: HttpErrorResponse) => Observable<T> {
