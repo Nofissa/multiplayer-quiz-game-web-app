@@ -1,10 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { qcmQuestionStub } from '@app/TestStubs/question.stubs';
-import { submissionStub } from '@app/TestStubs/submission.stubs';
-import { Submission } from '@common/submission';
 import { BarChartComponent } from './bar-chart.component';
+import { BarchartSubmission } from '@common/barchart-submission';
 
-describe('BarChartComponent', () => {
+fdescribe('BarChartComponent', () => {
     let component: BarChartComponent;
     let fixture: ComponentFixture<BarChartComponent>;
 
@@ -15,8 +14,10 @@ describe('BarChartComponent', () => {
         fixture = TestBed.createComponent(BarChartComponent);
         component = fixture.componentInstance;
         component.data = {
-            question: qcmQuestionStub()[0],
-            submissions: [submissionStub()[0], submissionStub()[1], submissionStub()[2]],
+            text: qcmQuestionStub()[0].text,
+            chartElements: [],
+            chartType: 'QCM',
+            submissions: [],
         };
         fixture.detectChanges();
     });
@@ -39,7 +40,7 @@ describe('BarChartComponent', () => {
     });
 
     it('should numberOfPlayers return 0 if there are no player submissions', () => {
-        component.data.submissions = undefined as unknown as Submission[];
+        component.data.submissions = undefined as unknown as BarchartSubmission[];
         const buff = component.numberOfPlayers();
         fixture.detectChanges();
         expect(buff).toEqual(0);

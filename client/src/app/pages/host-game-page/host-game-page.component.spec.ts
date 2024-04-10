@@ -10,8 +10,7 @@ import { barChartDataStub } from '@app/TestStubs/bar-chart-data.stubs';
 import { firstPlayerEvaluationStub, lastPlayerEvaluationStub } from '@app/TestStubs/evaluation.stubs';
 import { secondPlayerStub } from '@app/TestStubs/player.stubs';
 import { qcmQuestionStub } from '@app/TestStubs/question.stubs';
-import { mockGameSnapshot } from '@app/TestStubs/snapshot.stubs';
-import { submissionStub } from '@app/TestStubs/submission.stubs';
+import { mockSnapshotStubs } from '@app/TestStubs/snapshot.stubs';
 import { SocketServerMock } from '@app/mocks/socket-server-mock';
 import { GameServicesProvider } from '@app/providers/game-services.provider';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
@@ -30,13 +29,13 @@ import { Player } from '@common/player';
 import { QcmEvaluation } from '@common/qcm-evaluation';
 import { Question } from '@common/question';
 import { QuestionPayload } from '@common/question-payload';
-import { Submission } from '@common/submission';
 import { TimerEventType } from '@common/timer-event-type';
 import { TimerPayload } from '@common/timer-payload';
 import { Observable, of, throwError } from 'rxjs';
 import { io } from 'socket.io-client';
 import { HostGamePageComponent } from './host-game-page.component';
 import SpyObj = jasmine.SpyObj;
+import { BarchartSubmission } from '@common/barchart-submission';
 
 const PIN = '1234';
 const NEXT_QUESTION_DELAY = 5;
@@ -70,7 +69,7 @@ describe('HostGamePageComponent', () => {
         });
         barChartServiceSpy = jasmine.createSpyObj<BarChartService>([
             'addQuestion',
-            'updateBarChartData',
+            'updateChartData',
             'getAllBarChart',
             'getCurrentQuestionData',
             'setData',
@@ -119,7 +118,7 @@ describe('HostGamePageComponent', () => {
         });
         gameHttpServiceSpy = jasmine.createSpyObj<GameHttpService>(['getGameSnapshotByPin']);
         gameHttpServiceSpy.getGameSnapshotByPin.and.callFake(() => {
-            return of(mockGameSnapshot()[1]);
+            return of(mockSnapshotStubs()[1]);
         });
         timerServiceSpy = jasmine.createSpyObj<TimerService>(['onStartTimer', 'onTimerTick', 'startTimer', 'stopTimer', 'onAccelerateTimer']);
         timerServiceSpy.onTimerTick.and.callFake((pin, callback) => {
@@ -283,9 +282,9 @@ describe('HostGamePageComponent', () => {
     });
 
     it('should the server emitting toggleSelectChoice affect the barChartData', () => {
-        const payload: GameEventPayload<Submission[]> = { pin: PIN, data: submissionStub() };
+        const payload: GameEventPayload<BarchartSubmission> = { pin: PIN, data: undefined as unknown as BarchartSubmission };
         socketServerMock.emit('toggleSelectChoice', payload);
-        expect(barChartServiceSpy.updateQcmChartData).toHaveBeenCalledWith(payload.data);
+        expect(barChartServiceSpy.updateChartData).toHaveBeenCalledWith(payload.data);
     });
 
     it('should the server emitting submitChoices do nothing if not last player, or set currentQuestionHasEnded to true', () => {
@@ -302,13 +301,13 @@ describe('HostGamePageComponent', () => {
         component.gameState = GameState.Running;
         const payload: GameEventPayload<Player> = { pin: PIN, data: secondPlayerStub() };
         gameHttpServiceSpy.getGameSnapshotByPin.and.callFake(() => {
-            return of(mockGameSnapshot()[0]);
+            return of(mockSnapshotStubs()[0]);
         });
         socketServerMock.emit('playerAbandon', payload);
         expect(gameServiceSpy.cancelGame).toHaveBeenCalled();
         gameServiceSpy.cancelGame.calls.reset();
         gameHttpServiceSpy.getGameSnapshotByPin.and.callFake(() => {
-            return of(mockGameSnapshot()[1]);
+            return of(mockSnapshotStubs()[1]);
         });
         socketServerMock.emit('playerAbandon', payload);
         expect(gameServiceSpy.cancelGame).not.toHaveBeenCalled();

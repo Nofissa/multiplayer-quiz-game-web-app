@@ -6,9 +6,9 @@ import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { GameEventPayload } from '@common/game-event-payload';
 import { GameState } from '@common/game-state';
 import { QcmEvaluation } from '@common/qcm-evaluation';
+import { QcmSubmission } from '@common/qcm-submission';
 import { Question } from '@common/question';
 import { QuestionPayload } from '@common/question-payload';
-import { QcmSubmission } from '@common/qcm-submission';
 import { Observable } from 'rxjs';
 import { io } from 'socket.io-client';
 import { GameService } from './game.service';
@@ -171,7 +171,7 @@ describe('GameService', () => {
     it('should subscribe to toggleSelectChoice event and call the callback if pin matches', () => {
         gameService.onQcmToggleChoice(stubData.pin1, stubData.callback);
 
-        const submission: QcmSubmission = { choices: [], isFinal: false };
+        const submission: QcmSubmission = { clientId: webSocketServiceSpy.getSocketId(), choices: [], isFinal: false };
         const payload: GameEventPayload<QcmSubmission> = { pin: stubData.pin1, data: submission };
         socketServerMock.emit(stubData.toggleSelectChoiceEventName, payload);
 
@@ -181,7 +181,7 @@ describe('GameService', () => {
     it('should subscribe to toggleSelectChoice event and not call the callback if pin does not match', () => {
         gameService.onQcmToggleChoice(stubData.pin1, stubData.callback);
 
-        const submission: QcmSubmission = { choices: [], isFinal: false };
+        const submission: QcmSubmission = { clientId: webSocketServiceSpy.getSocketId(), choices: [], isFinal: false };
         const payload: GameEventPayload<QcmSubmission> = { pin: stubData.pin2, data: submission };
         socketServerMock.emit(stubData.toggleSelectChoiceEventName, payload);
 

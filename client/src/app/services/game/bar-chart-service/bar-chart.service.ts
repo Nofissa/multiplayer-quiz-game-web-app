@@ -48,7 +48,7 @@ export class BarChartService {
         this.barChartData.push(newBarchartData);
     }
 
-    updateActivityChartData(data: BarchartSubmission): void {
+    updateChartData(data: BarchartSubmission): void {
         const chartData: BarChartData | undefined = this.getCurrentQuestionData();
         if (chartData && data) {
             const submissionIndex = chartData.submissions.findIndex((sub) => sub.clientId === data.clientId && sub.index === data.index);
@@ -65,19 +65,6 @@ export class BarChartService {
             }
         }
     }
-
-    updateQcmChartData(data: BarchartSubmission): void {
-        const chartData: BarChartData | undefined = this.getCurrentQuestionData();
-        if (chartData && data) {
-            const submissionIndex = chartData.submissions.findIndex((sub) => sub.clientId === data.clientId && sub.index === data.index);
-            if (submissionIndex >= 0) {
-                chartData.submissions[submissionIndex] = data;
-            } else {
-                chartData.submissions.push(data);
-            }
-        }
-    }
-
     getCurrentQuestionData(): BarChartData | undefined {
         if (this.barChartData.length > 0) {
             return this.barChartData[this.barChartData.length - 1];
@@ -91,15 +78,17 @@ export class BarChartService {
 
     convertQcmSubmissions(submissions: QcmSubmission[]): BarchartSubmission[] {
         const newSubmissions = [];
-        for (const submission of submissions) {
-            for (const choice of submission.choices) {
-                newSubmissions.push({ clientId: submission.clientId, index: choice.payload, isSelected: choice.isSelected });
+        if (submissions) {
+            for (const submission of submissions) {
+                for (const choice of submission.choices) {
+                    newSubmissions.push({ clientId: submission.clientId, index: choice.payload, isSelected: choice.isSelected });
+                }
             }
         }
         return newSubmissions;
     }
 
-    convertQrlEvaluation(evaluations: QrlEvaluation[]) {
+    convertQrlEvaluation(evaluations: QrlEvaluation[]): BarchartSubmission[] {
         const newSubmissions = [];
         for (const evaluation of evaluations) {
             switch (evaluation.grade) {
@@ -119,19 +108,15 @@ export class BarChartService {
 
     setData(snapshot: GameSnapshot): void {
         this.flushData();
-        let qcmId = 0;
-        let qrlId = 0;
-        for (const question of snapshot.quiz.questions) {
-            this.addQuestion(question);
-            switch (question.type) {
+        for (let i = 0; i < snapshot.quiz.questions.length; i++) {
+            this.addQuestion(snapshot.quiz.questions[i]);
+            switch (snapshot.quiz.questions[i].type) {
                 case 'QCM':
-                    this.barChartData[qcmId + qrlId].submissions = this.convertQcmSubmissions(snapshot.questionQcmSubmissions[qcmId]);
-                    qcmId++;
+                    this.barChartData[i].submissions = this.convertQcmSubmissions(snapshot.questionQcmSubmissions[i]);
                     break;
 
                 case 'QRL':
-                    this.barChartData[qcmId + qrlId].submissions = this.convertQrlEvaluation(snapshot.questionQrlEvaluation[qrlId]);
-                    qrlId++;
+                    this.barChartData[i].submissions = this.convertQrlEvaluation(snapshot.questionQrlEvaluation[i]);
                     break;
             }
         }

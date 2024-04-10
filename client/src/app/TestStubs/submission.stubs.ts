@@ -1,8 +1,9 @@
-import { Submission } from '@common/submission';
+import { QcmSubmission } from '@common/qcm-submission';
 
-export const submissionStub = (): Submission[] => {
+export const submissionStub = (): QcmSubmission[] => {
     return [
         {
+            clientId: 'Client 1',
             choices: [
                 { payload: 0, isSelected: false },
                 { payload: 1, isSelected: false },
@@ -13,6 +14,7 @@ export const submissionStub = (): Submission[] => {
         },
 
         {
+            clientId: 'Client 2',
             choices: [
                 { payload: 0, isSelected: true },
                 { payload: 1, isSelected: false },
@@ -23,6 +25,7 @@ export const submissionStub = (): Submission[] => {
         },
 
         {
+            clientId: 'Client 3',
             choices: [
                 { payload: 0, isSelected: false },
                 { payload: 1, isSelected: false },
@@ -33,6 +36,7 @@ export const submissionStub = (): Submission[] => {
         },
 
         {
+            clientId: 'Client 4',
             choices: [
                 { payload: 0, isSelected: true },
                 { payload: 1, isSelected: true },
@@ -44,7 +48,7 @@ export const submissionStub = (): Submission[] => {
     ];
 };
 
-export const submissionsStub = (): Submission[][] => {
+export const submissionsStub = (): QcmSubmission[][] => {
     return [
         [submissionStub()[0], submissionStub()[1], submissionStub()[2], submissionStub()[3]],
         [submissionStub()[1], submissionStub()[1], submissionStub()[1], submissionStub()[1]],

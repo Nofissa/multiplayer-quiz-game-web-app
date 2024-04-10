@@ -152,7 +152,7 @@ export class HostGamePageComponent implements OnInit {
             }),
 
             this.gameService.onQcmToggleChoice(pin, (submissions) => {
-                this.barChartService.updateQcmChartData(submissions);
+                this.barChartService.updateChartData(submissions);
             }),
 
             this.gameService.onToggleGameLock(pin, (gameState) => {
@@ -219,7 +219,7 @@ export class HostGamePageComponent implements OnInit {
             }),
 
             this.gameService.onQrlInputChange(pin, (submission: BarchartSubmission) => {
-                this.barChartService.updateActivityChartData(submission);
+                this.barChartService.updateChartData(submission);
             }),
         );
     }
