@@ -1,3 +1,4 @@
+import { AddGameSummaryOperator } from '@app/classes/add-game-summary-operator';
 import { GameSummary, GameSummaryDocument } from '@app/model/database/game-summary';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
@@ -33,11 +34,7 @@ export class GameSummaryService {
         }
     }
 
-    async addGameSummary(gameSummary: GameSummary): Promise<GameSummary> {
-        try {
-            return await this.model.create(gameSummary);
-        } catch (error) {
-            throw new Error('Error saving game summary');
-        }
+    addGameSummary(): AddGameSummaryOperator {
+        return new AddGameSummaryOperator(this);
     }
 }

@@ -2,7 +2,6 @@ import { ClientPlayer } from '@app/classes/client-player';
 import { Game } from '@app/classes/game';
 import { generateRandomPin } from '@app/helpers/pin';
 import { DisconnectPayload } from '@app/interfaces/disconnect-payload';
-import { GameSummary } from '@app/model/database/game-summary';
 import { Question } from '@app/model/database/question';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { GameState } from '@common/game-state';
@@ -17,7 +16,6 @@ import { QuestionPayload } from '@common/question-payload';
 import { Submission } from '@common/submission';
 import { Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
-import { GameSummaryService } from './game-summary.service';
 
 const PERCENTAGE_DIVIDER = 100;
 const NO_POINTS = 0;
@@ -28,10 +26,7 @@ const BONUS_MULTIPLIER = 1.2;
 export class GameService {
     games: Map<string, Game> = new Map();
 
-    constructor(
-        private gameSummaryService: GameSummaryService,
-        private readonly quizService: QuizService,
-    ) {}
+    constructor(private readonly quizService: QuizService) {}
 
     async createGame(client: Socket, quizId: string): Promise<string> {
         const quiz = await this.quizService.getQuizById(quizId);
@@ -326,18 +321,5 @@ export class GameService {
         }
 
         return game.currentQuestionQcmSubmissions.get(client.id);
-    }
-
-    async concludeGame(pin: string): Promise<void> {
-        const game = this.getGame(pin);
-        const numberOfPlayers = game.clientPlayers.size;
-        const bestScore = game.getHighestScore();
-        const gameSummary: GameSummary = {
-            title: game.quiz.title,
-            startDate: game.startDate,
-            numberOfPlayers,
-            bestScore,
-        };
-        await this.gameSummaryService.addGameSummary(gameSummary);
     }
 }
