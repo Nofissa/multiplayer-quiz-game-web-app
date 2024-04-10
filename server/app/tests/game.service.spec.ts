@@ -17,7 +17,7 @@ import { questionStub } from './stubs/question.stubs';
 import { quizStub } from './stubs/quiz.stubs';
 import { submissionStub } from './stubs/submission.stub';
 
-fdescribe('GameService', () => {
+describe('GameService', () => {
     let gameService: GameService;
     let quizServiceMock: jest.Mocked<QuizService>;
     let socketMock: jest.Mocked<Socket>;
@@ -338,14 +338,15 @@ fdescribe('GameService', () => {
         game.qcmSubmissions[0].set('playerId', submission);
         const submissionTest = submissionStub().choices[choiceIndex];
         submissionTest.isSelected = true;
-        const expectedResult = { clientId: submission.clientId, index: submissionTest.payload, isSelected: submissionTest.isSelected };
 
         it('should return the right submission', () => {
             socketMock = { id: 'playerId' } as jest.Mocked<Socket>;
+            const expectedResult = { clientId: socketMock.id, index: submissionTest.payload, isSelected: submissionTest.isSelected };
             jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
             jest.spyOn(GameService.prototype, 'getOrCreateSubmission').mockReturnValue(submission);
             const result = gameService.qcmToggleChoice(socketMock, game.pin, choiceIndex);
             expect(result).toEqual(expectedResult);
+            expect(GameService.prototype.getGame).toHaveBeenCalled();
         });
     });
 
@@ -395,12 +396,13 @@ fdescribe('GameService', () => {
         });
 
         it('should return the right submission', () => {
+            socketMock = { id: 'playerId' } as jest.Mocked<Socket>;
             const submission = qrlSubmissionStub();
             jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
             jest.spyOn(Map.prototype, 'has').mockReturnValue(false);
             const setSpy = jest.spyOn(Map.prototype, 'set');
             const result = gameService.qrlSubmit(socketMock, game.pin, answer);
-            submission.isLast = false;
+            submission.isLast = true;
             expect(setSpy).toHaveBeenCalledWith(socketMock.id, submission);
             expect(result).toEqual(submission);
         });
