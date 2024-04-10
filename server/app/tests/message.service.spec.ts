@@ -48,5 +48,16 @@ describe('messageService', () => {
             expect(result.author).toEqual(game.clientPlayers.get('playerId').player.username);
             expect(result.message).toEqual(messageTest);
         });
+
+        it('should return an error is the player is muted', () => {
+            const game = gameStub();
+            game.clientPlayers.get('playerId').player.isMuted = true;
+            gameServiceMock.getGame.mockReturnValue(game);
+            jest.spyOn(Map.prototype, 'get').mockReturnValue(game.clientPlayers.get('playerId'));
+            const messageTest = 'Bonjour';
+            expect(() => messageService.sendMessage(socketMock, game.pin, messageTest)).toThrow(
+                'Vous ne pouvez pas écrire dans la zone de clavardage',
+            );
+        });
     });
 });
