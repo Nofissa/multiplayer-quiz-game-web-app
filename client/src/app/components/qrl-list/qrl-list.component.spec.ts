@@ -41,7 +41,7 @@ const mockGameSnapshot: GameSnapshot = {
     questionQrlEvaluation: [],
 };
 
-fdescribe('QrlListComponent', () => {
+describe('QrlListComponent', () => {
     let component: QrlListComponent;
     let fixture: ComponentFixture<QrlListComponent>;
     let mockGameHttpService: jasmine.SpyObj<GameHttpService>;

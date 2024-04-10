@@ -91,6 +91,7 @@ describe('HostGamePageComponent', () => {
             'onEndGame',
             'onQrlEvaluate',
             'onQrlSubmit',
+            'onQrlInputChange',
         ]);
         gameServiceSpy.onToggleGameLock.and.callFake((pin, callback) => {
             return webSocketServiceSpy.on('toggleGameLock', applyIfPinMatches(pin, callback));
