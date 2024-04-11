@@ -6,11 +6,11 @@
         </button>
         <mat-menu #menu="matMenu">
             <button mat-menu-item (click)="sortPlayers(playerListSortingOptions.NameAscending)">
-            <mat-icon>arrow_downward</mat-icon>
-            <span>Alphabetique (a..z)</span>
+                <mat-icon>arrow_downward</mat-icon>
+                <span>Alphabetique (a..z)</span>
             </button>
             <button mat-menu-item (click)="sortPlayers(playerListSortingOptions.ScoreAscending)">
-            <mat-icon>arrow_downward</mat-icon>
+                <mat-icon>arrow_downward</mat-icon>
                 <span>Pointage (9..1)</span>
             </button>
             <button mat-menu-item (click)="sortPlayers(playerListSortingOptions.StatusAscending)">
@@ -56,11 +56,10 @@
                     color="accent"
                     (click)="mutePlayer(player)"
                     [ngClass]="{
-                        hidden: !displayOptions.ban,
-                        invisible: player.state !== playerStates.Playing || !displayOptions.ban
+                        hidden: !displayOptions.mute
                     }"
                 >
-                    <div *ngIf="player.isMuted; then thenBlock else elseBlock"></div>
+                    <div *ngIf="player.isMuted; then thenBlock; else elseBlock"></div>
                     <ng-template #thenBlock>
                         <mat-icon>volume_off</mat-icon>
                     </ng-template>

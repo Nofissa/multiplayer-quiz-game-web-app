@@ -12,7 +12,11 @@
                 <!-- <app-bar-chart-swiper class="bar-chart" *ngIf="isEnded" [data]="barCharts"></app-bar-chart-swiper> -->
                 <app-qrl-list [pin]="pin"></app-qrl-list>
             </div>
-            <app-player-list class="app-component" [pin]="pin" [displayOptions]="{ score: true, ban: true, quitters: true }"></app-player-list>
+            <app-player-list
+                class="app-component"
+                [pin]="pin"
+                [displayOptions]="{ score: true, ban: true, quitters: true, mute: true }"
+            ></app-player-list>
         </div>
         <app-chat-room class="app-component" [pin]="pin"></app-chat-room>
     </div>
