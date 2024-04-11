@@ -25,11 +25,11 @@ import { GameState } from '@common/game-state';
 import { Grade } from '@common/grade';
 import { Player } from '@common/player';
 import { PlayerState } from '@common/player-state';
+import { QcmSubmission } from '@common/qcm-submission';
 import { QrlEvaluation } from '@common/qrl-evaluation';
 import { QrlSubmission } from '@common/qrl-submission';
 import { Question } from '@common/question';
 import { Quiz } from '@common/quiz';
-import { QcmSubmission } from '@common/qcm-submission';
 import { TimerEventType } from '@common/timer-event-type';
 import { TimerPayload } from '@common/timer-payload';
 import { Observable, Subscription, of } from 'rxjs';
@@ -180,7 +180,6 @@ describe('QrlBoardComponent', () => {
         component.ngOnInit();
         expect(mockGameHttpService.getGameSnapshotByPin).toHaveBeenCalled();
         expect(component['setupSubscriptions']).toHaveBeenCalledWith(dummyPin);
-        expect(mockGameService.qrlInputChange).toHaveBeenCalledWith(dummyPin, false);
     });
 
     it('should ngOnDestroy', () => {

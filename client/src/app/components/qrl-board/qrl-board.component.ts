@@ -97,7 +97,6 @@ export class QrlBoardComponent implements OnInit, OnDestroy {
             this.loadNextQuestion(snapshot.quiz.questions[snapshot.currentQuestionIndex]);
         });
         this.setupSubscriptions(this.pin);
-        this.gameService.qrlInputChange(this.pin, false);
     }
 
     ngOnDestroy() {
