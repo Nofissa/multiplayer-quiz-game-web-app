@@ -54,8 +54,8 @@ export class GameSummaryComponent implements OnInit, AfterViewInit {
             },
         });
 
-        dialogRef.afterClosed().subscribe((isSubmited: boolean) => {
-            if (isSubmited) {
+        dialogRef.afterClosed().subscribe((isSubmitted: boolean) => {
+            if (isSubmitted) {
                 this.clearAllGameSummaries();
             }
         });
