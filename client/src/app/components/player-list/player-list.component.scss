@@ -48,7 +48,7 @@ h4 {
 }
 
 .playing .player-name {
-    color: black;
+    color: red;
 }
 
 .playing .player-name-interacted {
@@ -60,6 +60,7 @@ h4 {
 }
 
 .abandoned .player-name {
+    color: #000;
     text-decoration: line-through;
 }
 
