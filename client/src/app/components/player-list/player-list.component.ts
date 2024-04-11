@@ -1,4 +1,5 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { NOT_FOUND_INDEX } from '@app/constants/constants';
 import { PlayerListSortingOptions } from '@app/enums/player-list-sorting-options';
 import { PlayerListDisplayOptions } from '@app/interfaces/player-list-display-options';
 import { GameServicesProvider } from '@app/providers/game-services.provider';
@@ -8,8 +9,6 @@ import { PlayerService } from '@app/services/player/player.service';
 import { Player } from '@common/player';
 import { PlayerState } from '@common/player-state';
 import { Subscription } from 'rxjs';
-
-const NOT_FOUND_INDEX = -1;
 
 @Component({
     selector: 'app-player-list',

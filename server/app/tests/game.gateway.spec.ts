@@ -16,6 +16,7 @@ import { qrlSubmissionStub } from './stubs/qrl.submission.stub';
 import { questionStub } from './stubs/question.stubs';
 import { submissionStub } from './stubs/submission.stub';
 import { GameAutopilotService } from '@app/services/game-autopilot/game-autopilot.service';
+import { GameSummaryService } from '@app/services/game-summary/game-summary.service';
 
 describe('GameGateway', () => {
     let gameGateway: GameGateway;
@@ -23,6 +24,8 @@ describe('GameGateway', () => {
     let timerServiceMock: jest.Mocked<TimerService>;
     let gameAutopilotServiceMock: jest.Mocked<GameAutopilotService>;
     let socketMock: jest.Mocked<Socket>;
+    let timerServiceMock: jest.Mocked<TimerService>;
+    let gameSummaryServiceMock: jest.Mocked<GameSummaryService>;
     let serverMock: jest.Mocked<Server>;
     let broadcastMock: any;
 
@@ -64,6 +67,9 @@ describe('GameGateway', () => {
         timerServiceMock = {
             startTimer: jest.fn(),
             stopTimer: jest.fn(),
+        } as any;
+        gameSummaryServiceMock = {
+            saveGameSummary: jest.fn(),
         } as any;
         gameAutopilotServiceMock = {
             runGame: jest.fn(),

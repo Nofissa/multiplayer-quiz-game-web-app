@@ -5,6 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
+import { ERROR_DURATION, MAX_MESSAGE_LENGTH, THREE_SECONDS_MS } from '@app/constants/constants';
 import { GameServicesProvider } from '@app/providers/game-services.provider';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
@@ -16,10 +17,6 @@ import { QrlEvaluation } from '@common/qrl-evaluation';
 import { Question } from '@common/question';
 import { TimerEventType } from '@common/timer-event-type';
 import { Subscription } from 'rxjs';
-
-const MAX_MESSAGE_LENGTH = 200;
-const THREE_SECONDS_MS = 3000;
-const ERROR_DURATION = 5000;
 
 @Component({
     selector: 'app-qrl-board',

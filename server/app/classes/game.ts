@@ -19,12 +19,14 @@ export class Game {
     clientPlayers: Map<string, ClientPlayer> = new Map();
     state: GameState;
     organizer: Socket;
+    startDate: Date;
 
     constructor(pin: string, quiz: Quiz, organizer: Socket) {
         this.pin = pin;
         this.quiz = quiz;
         this.organizer = organizer;
         this.state = GameState.Opened;
+        this.startDate = new Date();
         this.qcmSubmissions.push(new Map());
         this.qrlSubmissions.push(new Map());
         this.qrlEvaluations.push(new Map());
@@ -53,6 +55,10 @@ export class Game {
         // Deactivated because the dangling comes from MongoDB
         // eslint-disable-next-line no-underscore-dangle
         return !this.quiz._id;
+    }
+
+    getHighestScore() {
+        return Math.max(...Array.from(this.clientPlayers.values()).map((clientPlayer) => clientPlayer.player.score));
     }
 
     loadNextQuestion() {

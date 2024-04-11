@@ -1,8 +1,8 @@
-const serveurUrl = 'http://localhost';
+const serverUrl = 'http://localhost';
 const serverPort = 3000;
 
 export const environment = {
     production: false,
-    serverUrl: `${serveurUrl}:${serverPort}`,
-    apiUrl: `${serveurUrl}:${serverPort}/api`,
+    serverUrl: `${serverUrl}:${serverPort}`,
+    apiUrl: `${serverUrl}:${serverPort}/api`,
 };

@@ -1,7 +1,14 @@
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
+import { BarChartSwiperComponent } from '@app/components/bar-chart-swiper/bar-chart-swiper.component';
+import {
+    NEXT_QUESTION_DELAY_SECONDS,
+    NOTICE_DURATION_MS,
+    START_GAME_COUNTDOWN_DURATION_SECONDS,
+    SWIPER_SYNC_DELAY_MS,
+} from '@app/constants/constants';
 import { BarChartData } from '@app/interfaces/bar-chart-data';
 import { GameServicesProvider } from '@app/providers/game-services.provider';
 import { RoutingDependenciesProvider } from '@app/providers/routing-dependencies.provider';
@@ -17,9 +24,6 @@ import { Question } from '@common/question';
 import { TimerEventType } from '@common/timer-event-type';
 import { Subscription } from 'rxjs';
 
-const START_GAME_COUNTDOWN_DURATION_SECONDS = 5;
-const NEXT_QUESTION_DELAY_SECONDS = 3;
-const CANCEL_GAME_NOTICE_DURATION_MS = 5000;
 const PANIC_AUDIO_NAME = 'ticking-timer';
 const PANIC_AUDIO_SRC = 'assets/ticking-timer.wav';
 
@@ -29,6 +33,7 @@ const PANIC_AUDIO_SRC = 'assets/ticking-timer.wav';
     styleUrls: ['./host-game-page.component.scss'],
 })
 export class HostGamePageComponent implements OnInit {
+    @ViewChild(BarChartSwiperComponent) barChartSwiperComponent: BarChartSwiperComponent;
     pin: string;
     isRandom: boolean;
     gameState: GameState = GameState.Opened;
@@ -108,6 +113,11 @@ export class HostGamePageComponent implements OnInit {
         this.gameState = GameState.Running;
         this.currentQuestionHasEnded = false;
         this.gameService.nextQuestion(this.pin);
+        setTimeout(() => {
+            if (this.barChartSwiperComponent && this.barChartSwiperComponent.swiperComponent) {
+                this.barChartSwiperComponent.goToEndSlide();
+            }
+        }, SWIPER_SYNC_DELAY_MS);
     }
 
     cancelGame() {
@@ -126,7 +136,7 @@ export class HostGamePageComponent implements OnInit {
         this.eventSubscriptions.push(
             this.gameService.onCancelGame(pin, (message) => {
                 this.snackBarService.open(message, '', {
-                    duration: CANCEL_GAME_NOTICE_DURATION_MS,
+                    duration: NOTICE_DURATION_MS,
                     verticalPosition: 'top',
                     panelClass: ['base-snackbar'],
                 });

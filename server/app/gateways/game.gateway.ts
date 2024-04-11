@@ -1,4 +1,5 @@
 import { GameAutopilotService } from '@app/services/game-autopilot/game-autopilot.service';
+import { GameSummaryService } from '@app/services/game-summary/game-summary.service';
 import { GameService } from '@app/services/game/game.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { GameEventPayload } from '@common/game-event-payload';
@@ -28,6 +29,7 @@ export class GameGateway implements OnGatewayDisconnect {
     constructor(
         private readonly gameService: GameService,
         private readonly timerService: TimerService,
+        private readonly gameSummaryService: GameSummaryService,
         private readonly gameAutopilotService: GameAutopilotService,
     ) {}
 
@@ -140,9 +142,11 @@ export class GameGateway implements OnGatewayDisconnect {
     @SubscribeMessage('endGame')
     endGame(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
         try {
+            const game = this.gameService.getGame(pin);
             this.gameService.endGame(client, pin);
             const payload: GameEventPayload<null> = { pin, data: null };
             this.server.to(pin).emit('endGame', payload);
+            this.gameSummaryService.addGameSummary().fromGame(game);
         } catch (error) {
             client.emit('error', error.message);
         }
