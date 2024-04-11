@@ -5,4 +5,6 @@ export enum Constant {
     NoBonusMultiplier = 1,
     BonusMultiplier = 1.2,
     MaxMessageLength = 200,
+    RandomQuestionCount = 5,
+    RandomExpectation = 0.5
 }

@@ -54,12 +54,14 @@ export class GameService {
             const qcmQuestions = (await this.questionService.getAllQuestions()).filter((x) => x.type.trim().toUpperCase() === 'QCM');
             quiz.duration = 20;
 
-            if (qcmQuestions.length < RANDOM_MODE_QUESTION_COUNT) {
+            if (qcmQuestions.length < Constant.RandomQuestionCount) {
                 throw new Error("Il n'existe pas assez de questions de type QCM dans la banque de questions pour faire une partie en mode aléatoire");
             }
 
-            const shuffledQuestions = qcmQuestions.slice().sort(() => Math.random() - RANDOM_EXPECTATION); // to have 1/2 chance to be negative
-            quiz.questions = shuffledQuestions.slice(0, RANDOM_MODE_QUESTION_COUNT);
+            const shuffledQuestions = qcmQuestions.slice().sort(() => {
+                return Math.random() - Constant.RandomExpectation; // to have 1/2 chance to be negative
+            });
+            quiz.questions = shuffledQuestions.slice(0, Constant.RandomQuestionCount);
         }
 
         if (!quiz) {
@@ -97,9 +99,9 @@ export class GameService {
                 throw new Error('Le nom "Organisateur" est réservé');
             }
 
-        if (clientPlayers.some((x) => x.player.username.toLowerCase() === trimmedUsername && x.player.state === PlayerState.Banned)) {
-            throw new Error(`Le nom d'utilisateur "${username}" est banni.`);
-        }
+            if (clientPlayers.some((x) => x.player.username.toLowerCase() === trimmedUsername && x.player.state === PlayerState.Banned)) {
+                throw new Error(`Le nom d'utilisateur "${username}" est banni.`);
+            }
 
             if (
                 clientPlayers.some(

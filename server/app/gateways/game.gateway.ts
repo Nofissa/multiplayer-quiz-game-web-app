@@ -26,6 +26,8 @@ export class GameGateway implements OnGatewayDisconnect {
     @WebSocketServer()
     server: Server;
 
+    // Disabled because the gateway depends on many services
+    // eslint-disable-next-line max-params
     constructor(
         private readonly gameService: GameService,
         private readonly timerService: TimerService,

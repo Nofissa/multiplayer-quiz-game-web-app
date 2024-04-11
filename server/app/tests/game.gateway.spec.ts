@@ -24,7 +24,6 @@ describe('GameGateway', () => {
     let timerServiceMock: jest.Mocked<TimerService>;
     let gameAutopilotServiceMock: jest.Mocked<GameAutopilotService>;
     let socketMock: jest.Mocked<Socket>;
-    let timerServiceMock: jest.Mocked<TimerService>;
     let gameSummaryServiceMock: jest.Mocked<GameSummaryService>;
     let serverMock: jest.Mocked<Server>;
     let broadcastMock: any;
@@ -79,7 +78,7 @@ describe('GameGateway', () => {
             emit: jest.fn(),
         } as any as BroadcastOperator<any, any>;
 
-        gameGateway = new GameGateway(gameServiceMock, timerServiceMock, gameAutopilotServiceMock);
+        gameGateway = new GameGateway(gameServiceMock, timerServiceMock, gameSummaryServiceMock, gameAutopilotServiceMock);
         gameGateway.server = serverMock;
     });
 

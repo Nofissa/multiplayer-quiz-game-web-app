@@ -20,7 +20,7 @@ import { SwiperModule } from 'swiper/angular';
 import { CreateGamePageComponent } from './create-game-page.component';
 import { QuestionHttpService } from '@app/services/question-http/question-http.service';
 import { Question } from '@common/question';
-import { MIN_QCM_COUNT_ENABLE_RANDOM_MODE } from '@app/constants/constants';
+import { MIN_QCM_COUNT_TO_ENABLE_RANDOM_MODE } from '@app/constants/constants';
 
 describe('CreateGamePageComponent', () => {
     let component: CreateGamePageComponent;
@@ -109,7 +109,7 @@ describe('CreateGamePageComponent', () => {
     it('should set enableRandomMode to true  5 or more QCM questions exist', () => {
         questionHttpServiceMock.getAllQuestions.and.returnValue(
             of(
-                Array.from({ length: MIN_QCM_COUNT_ENABLE_RANDOM_MODE }).map(() => {
+                Array.from({ length: MIN_QCM_COUNT_TO_ENABLE_RANDOM_MODE }).map(() => {
                     return { type: 'QCM' } as Question;
                 }),
             ),
@@ -118,7 +118,7 @@ describe('CreateGamePageComponent', () => {
         expect(component.enableRandomMode).toBe(true);
         questionHttpServiceMock.getAllQuestions.and.returnValue(
             of(
-                Array.from({ length: MIN_QCM_COUNT_ENABLE_RANDOM_MODE + 1 }).map(() => {
+                Array.from({ length: MIN_QCM_COUNT_TO_ENABLE_RANDOM_MODE + 1 }).map(() => {
                     return { type: 'QCM' } as Question;
                 }),
             ),
@@ -131,7 +131,7 @@ describe('CreateGamePageComponent', () => {
         questionHttpServiceMock.getAllQuestions.and.returnValue(
             of([
                 { type: 'QRL' } as Question,
-                ...Array.from({ length: MIN_QCM_COUNT_ENABLE_RANDOM_MODE - 1 }).map(() => {
+                ...Array.from({ length: MIN_QCM_COUNT_TO_ENABLE_RANDOM_MODE - 1 }).map(() => {
                     return { type: 'QCM' } as Question;
                 }),
             ]),

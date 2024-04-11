@@ -5,8 +5,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { QuizDetailsDialogComponent } from '@app/components/dialogs/quiz-details-dialog/quiz-details-dialog.component';
-import { SNACK_BAR_DURATION_MS } from '@app/constants/constants';
-import { Quiz } from '@app/interfaces/quiz';
+import { SNACK_BAR_DURATION_MS, MIN_QCM_COUNT_TO_ENABLE_RANDOM_MODE } from '@app/constants/constants';
+import { Quiz } from '@common/quiz';
 import { MaterialServicesProvider } from '@app/providers/material-services.provider';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { PlayerService } from '@app/services/player/player.service';
@@ -15,7 +15,6 @@ import { QuizHttpService } from '@app/services/quiz-http/quiz-http.service';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { Player } from '@common/player';
 import { PlayerState } from '@common/player-state';
-import { MIN_QCM_COUNT_ENABLE_RANDOM_MODE as MIN_QCM_COUNT_TO_ENABLE_RANDOM_MODE } from '@app/constants/constants';
 import { Subscription } from 'rxjs';
 import SwiperCore, { EffectCoverflow, Navigation, Pagination } from 'swiper';
 
