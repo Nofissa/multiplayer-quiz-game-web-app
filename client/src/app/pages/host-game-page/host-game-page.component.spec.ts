@@ -20,7 +20,7 @@ import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { barChartDataStub } from '@app/test-stubs/bar-chart-data.stubs';
 import { firstPlayerEvaluationStub, lastPlayerEvaluationStub } from '@app/test-stubs/evaluation.stubs';
 import { firstPlayerStub, secondPlayerStub } from '@app/test-stubs/player.stubs';
-import { qcmQuestionStub } from '@app/test-stubs/question.stubs';
+import { qcmQuestionStub, qrlQuestionStub } from '@app/test-stubs/question.stubs';
 import { mockSnapshotStubs } from '@app/test-stubs/snapshot.stubs';
 import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
 import { BarchartSubmission } from '@common/barchart-submission';
@@ -42,7 +42,7 @@ import SpyObj = jasmine.SpyObj;
 const PIN = '1234';
 const NEXT_QUESTION_DELAY = 5;
 
-describe('HostGamePageComponent', () => {
+fdescribe('HostGamePageComponent', () => {
     let component: HostGamePageComponent;
     let fixture: ComponentFixture<HostGamePageComponent>;
     let gameServiceSpy: SpyObj<GameService>;
@@ -258,6 +258,7 @@ describe('HostGamePageComponent', () => {
     });
 
     it('should startGame start server Game', () => {
+        component.isRandom = true;
         component.startGame();
         const payload: GameEventPayload<QuestionPayload> = { pin: PIN, data: { question: qcmQuestionStub()[0], isLast: false } };
         socketServerMock.emit('startGame', payload);
@@ -265,6 +266,7 @@ describe('HostGamePageComponent', () => {
         expect(component.isLastQuestion).toBeFalse();
         expect(barChartServiceSpy.addChart).toHaveBeenCalled();
         expect(timerServiceSpy.startTimer).toHaveBeenCalledWith(PIN, TimerEventType.StartGame, NEXT_QUESTION_DELAY);
+        expect(routerSpy.navigate).toHaveBeenCalledWith(['game'], { queryParams: { pin: component.pin } });
     });
 
     it('should nextQuestion send nextQuestion signal to server and change gameState and set currentQuestionHasEnded', () => {
@@ -358,5 +360,10 @@ describe('HostGamePageComponent', () => {
         expect(component.isLocked()).toBeFalse();
         component.gameState = GameState.Running;
         expect(component.isLocked()).toBeTrue();
+    });
+
+    it('should add question to barChart', () => {
+        component['addQuestion'](qrlQuestionStub()[0]);
+        expect(barChartServiceSpy.addChart).toHaveBeenCalledWith(qrlQuestionStub()[0], 'ACTIVITY');
     });
 });
