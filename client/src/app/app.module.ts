@@ -18,6 +18,8 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSortModule } from '@angular/material/sort';
+import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -35,6 +37,7 @@ import { JoinGameDialogComponent } from './components/dialogs/join-game-dialog/j
 import { PromptDialogComponent } from './components/dialogs/prompt-dialog/prompt-dialog.component';
 import { QuizDetailsDialogComponent } from './components/dialogs/quiz-details-dialog/quiz-details-dialog.component';
 import { UpsertQuestionDialogComponent } from './components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
+import { GameSummaryComponent } from './components/game-summary-list/game-summary/game-summary.component';
 import { QcmBoardComponent } from './components/qcm-board/qcm-board.component';
 import { GameTransitionComponent } from './components/game-transition/game-transition.component';
 import { NavHeaderComponent } from './components/nav-header/nav-header.component';
@@ -98,6 +101,7 @@ import { WebSocketService } from './services/web-socket/web-socket.service';
         PanicModeButtonComponent,
         TimerPauseToggleComponent,
         QrlListComponent,
+        GameSummaryComponent,
     ],
     imports: [
         AppRoutingModule,
@@ -131,6 +135,9 @@ import { WebSocketService } from './services/web-socket/web-socket.service';
         MatCardModule,
         MatButtonToggleModule,
         MatMenuModule,
+        MatTableModule,
+        MatListModule,
+        MatSortModule,
     ],
     providers: [],
     bootstrap: [AppComponent],
