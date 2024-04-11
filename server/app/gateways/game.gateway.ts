@@ -195,13 +195,8 @@ export class GameGateway implements OnGatewayDisconnect {
         try {
             const payload = this.gameService.disconnect(client);
 
-            payload.toCancel.forEach((pin) => {
+            payload.forEach((pin) => {
                 this.cancelGame(client, { pin });
-                this.gameAutopilotService.stopGame(pin);
-            });
-
-            payload.toEnd.forEach((pin) => {
-                this.endGame(client, { pin });
                 this.gameAutopilotService.stopGame(pin);
             });
         } catch (error) {

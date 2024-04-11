@@ -150,7 +150,7 @@ describe('CreateGamePageComponent', () => {
     it('should navigate to waiting room page on createGame', () => {
         component['createGame'](mockQuiz);
         socketServerMock.emit('createGame', '1234');
-        expect(routerMock.navigate).toHaveBeenCalledWith(['/host-game'], { queryParams: { pin: '1234' } });
+        expect(routerMock.navigate).toHaveBeenCalledWith(['/host-game'], { queryParams: { pin: '1234', isRandom: false } });
     });
 
     it('should navigate to game page in test mode on testGame', () => {

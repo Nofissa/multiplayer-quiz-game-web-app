@@ -3,7 +3,6 @@ import { ClientPlayer } from '@app/classes/client-player';
 import { Game } from '@app/classes/game';
 import { Constant } from '@app/constants/constants';
 import { generateRandomPin } from '@app/helpers/pin';
-import { DisconnectPayload } from '@app/interfaces/disconnect-payload';
 import { Question } from '@app/model/database/question';
 import { Quiz } from '@app/model/database/quiz';
 import { QuizService } from '@app/services/quiz/quiz.service';
@@ -297,18 +296,11 @@ export class GameService {
         }
     }
 
-    disconnect(client: Socket): DisconnectPayload {
+    disconnect(client: Socket): string[] {
         const games = Array.from(this.games.values());
+        const toCancel = games.filter((game) => game.organizer.id === client.id).map((game) => game.pin);
 
-        const toCancel = games
-            .filter((game) => game.organizer.id === client.id && (game.state === GameState.Opened || game.state === GameState.Closed))
-            .map((game) => game.pin);
-
-        const toEnd = games
-            .filter((game) => game.organizer.id === client.id && (game.state === GameState.Paused || game.state === GameState.Running))
-            .map((game) => game.pin);
-
-        return { toCancel, toEnd };
+        return toCancel;
     }
 
     getGame(pin: string): Game {

@@ -342,19 +342,10 @@ describe('GameGateway', () => {
     describe('handleDisconnect', () => {
         it('should cancel games and abandon players for the disconnected client', () => {
             const canceledPin = 'canceledPin';
-            const abandonedPin = 'abandonedPin';
-            const endPin = 'endPin';
-            const disconnectPayload = {
-                toCancel: [canceledPin],
-                toAbandon: [abandonedPin],
-                toEnd: [endPin],
-            } as any;
-            gameServiceMock.disconnect.mockReturnValue(disconnectPayload);
+            gameServiceMock.disconnect.mockReturnValue([canceledPin]);
             const cancelGameSpy = jest.spyOn(GameGateway.prototype, 'cancelGame');
-            const endGameSpy = jest.spyOn(GameGateway.prototype, 'endGame');
             gameGateway.handleDisconnect(socketMock);
             expect(cancelGameSpy).toHaveBeenCalledWith(socketMock, { pin: canceledPin });
-            expect(endGameSpy).toBeCalledWith(socketMock, { pin: endPin });
         });
 
         it('should throw an error if there is an issue', () => {

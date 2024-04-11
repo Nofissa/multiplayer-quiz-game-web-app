@@ -1,7 +1,6 @@
 /* eslint-disable max-lines */ // to many lines because of many mocks that i had to clear and recreate.
 /* eslint-disable @typescript-eslint/no-explicit-any */ // used for mocking the socket for instance.
 import * as PinHelper from '@app/helpers/pin';
-import { DisconnectPayload } from '@app/interfaces/disconnect-payload';
 import { GameService } from '@app/services/game/game.service';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { GameState } from '@common/game-state';
@@ -287,29 +286,15 @@ describe('GameService', () => {
 
     describe('disconnect', () => {
         const game = gameStub();
-        const disconnectPayloadTest: DisconnectPayload = {
-            toCancel: [game.pin],
-            toEnd: [],
-        };
+        const disconnectPayloadTest = [game.pin];
 
-        const disconnectPayloadEndTest: DisconnectPayload = {
-            toCancel: [],
-            toEnd: [game.pin],
-        };
         const organizerSocket = { id: 'organizerId' } as any;
-        it('should push the game to toCancel if Organizer', () => {
+        it('should push the games to toCancel if Organizer', () => {
             game.state = GameState.Opened;
             gameService.games.set(game.pin, game);
             const result = gameService.disconnect(organizerSocket);
             gameService.games.clear();
             expect(result).toEqual(disconnectPayloadTest);
-        });
-
-        it('should push the game to toEnd', () => {
-            game.state = GameState.Running;
-            gameService.games.set(game.pin, game);
-            const result = gameService.disconnect(organizerSocket);
-            expect(result).toEqual(disconnectPayloadEndTest);
         });
     });
 
