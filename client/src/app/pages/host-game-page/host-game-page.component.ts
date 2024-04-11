@@ -18,6 +18,7 @@ import { GameService } from '@app/services/game/game-service/game.service';
 import { PlayerService } from '@app/services/player/player.service';
 import { SoundService } from '@app/services/sound/sound.service';
 import { TimerService } from '@app/services/timer/timer.service';
+import { BarchartSubmission } from '@common/barchart-submission';
 import { GameState } from '@common/game-state';
 import { PlayerState } from '@common/player-state';
 import { Question } from '@common/question';
@@ -126,6 +127,14 @@ export class HostGamePageComponent implements OnInit {
         this.gameService.endGame(this.pin);
     }
 
+    private addQuestion(question: Question) {
+        if (question.type === 'QRL') {
+            this.barChartService.addChart(question, 'ACTIVITY');
+        } else {
+            this.barChartService.addChart(question);
+        }
+    }
+
     private handleEndGame() {
         this.router.navigate(['results'], { queryParams: { pin: this.pin } });
     }
@@ -143,7 +152,7 @@ export class HostGamePageComponent implements OnInit {
             }),
 
             this.gameService.onQcmToggleChoice(pin, (submissions) => {
-                this.barChartService.updateBarChartData(submissions);
+                this.barChartService.updateChartData(submissions);
             }),
 
             this.gameService.onToggleGameLock(pin, (gameState) => {
@@ -171,15 +180,16 @@ export class HostGamePageComponent implements OnInit {
             }),
 
             this.gameService.onStartGame(pin, (data) => {
+                this.barChartService.flushData();
                 this.isLastQuestion = data.isLast;
                 this.gameState = GameState.Running;
-                this.barChartService.addQuestion(data.question);
+                this.addQuestion(data.question);
                 this.timerService.startTimer(this.pin, TimerEventType.StartGame, START_GAME_COUNTDOWN_DURATION_SECONDS);
             }),
 
             this.gameService.onNextQuestion(pin, (data) => {
                 this.isLastQuestion = data.isLast;
-                this.barChartService.addQuestion(data.question);
+                this.addQuestion(data.question);
                 this.timerService.startTimer(this.pin, TimerEventType.NextQuestion, NEXT_QUESTION_DELAY_SECONDS);
             }),
 
@@ -206,6 +216,10 @@ export class HostGamePageComponent implements OnInit {
 
             this.gameService.onEndGame(pin, () => {
                 this.handleEndGame();
+            }),
+
+            this.gameService.onQrlInputChange(pin, (submission: BarchartSubmission) => {
+                this.barChartService.updateChartData(submission);
             }),
         );
     }

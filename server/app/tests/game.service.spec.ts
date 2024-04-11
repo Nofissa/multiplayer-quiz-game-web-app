@@ -5,6 +5,7 @@ import { DisconnectPayload } from '@app/interfaces/disconnect-payload';
 import { GameService } from '@app/services/game/game.service';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { GameState } from '@common/game-state';
+import { QcmSubmission } from '@common/qcm-submission';
 import { QuestionPayload } from '@common/question-payload';
 import { Socket } from 'socket.io';
 import { clientPlayerStub } from './stubs/client.player.stub';
@@ -332,16 +333,20 @@ describe('GameService', () => {
     describe('toggleSelectChoice', () => {
         const game = gameStub();
         const choiceIndex = 1;
-        const submission = submissionStub();
-        const submissionTest = submissionStub();
-        submissionTest.choices[1].isSelected = false;
-        const expectedResult = [submissionTest];
+        const submission: QcmSubmission = submissionStub();
+        game.qcmSubmissions = [new Map<string, QcmSubmission>()];
+        game.qcmSubmissions[0].set('playerId', submission);
+        const submissionTest = submissionStub().choices[choiceIndex];
+        submissionTest.isSelected = true;
 
         it('should return the right submission', () => {
+            socketMock = { id: 'playerId' } as jest.Mocked<Socket>;
+            const expectedResult = { clientId: socketMock.id, index: submissionTest.payload, isSelected: submissionTest.isSelected };
             jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
             jest.spyOn(GameService.prototype, 'getOrCreateSubmission').mockReturnValue(submission);
             const result = gameService.qcmToggleChoice(socketMock, game.pin, choiceIndex);
             expect(result).toEqual(expectedResult);
+            expect(GameService.prototype.getGame).toHaveBeenCalled();
         });
     });
 
@@ -391,12 +396,13 @@ describe('GameService', () => {
         });
 
         it('should return the right submission', () => {
+            socketMock = { id: 'playerId' } as jest.Mocked<Socket>;
             const submission = qrlSubmissionStub();
             jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
             jest.spyOn(Map.prototype, 'has').mockReturnValue(false);
             const setSpy = jest.spyOn(Map.prototype, 'set');
             const result = gameService.qrlSubmit(socketMock, game.pin, answer);
-            submission.isLast = false;
+            submission.isLast = true;
             expect(setSpy).toHaveBeenCalledWith(socketMock.id, submission);
             expect(result).toEqual(submission);
         });
@@ -412,14 +418,14 @@ describe('GameService', () => {
             jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
             jest.spyOn(Map.prototype, 'get').mockReturnValue(clientPlayer);
             const result = gameService.qrlInputChange(playerSocketMock, game.pin, false);
-            expect(result).toEqual([false]);
+            expect(result).toEqual({ clientId: playerSocketMock.id, index: 0, isSelected: true });
         });
 
-        // it('should return the right result if isTyping is true', () => {
-        //     jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
-        //     jest.spyOn(Map.prototype, 'get').mockReturnValueOnce(clientPlayer).mockReturnValueOnce(clientPlayerIsTyping);
-        //     const result = gameService.qrlInputChange(playerSocketMock, game.pin, true);
-        //     expect(result).toEqual([true]);
-        // });
+        it('should return the right result if isTyping is true', () => {
+            jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
+            jest.spyOn(Map.prototype, 'get').mockReturnValueOnce(clientPlayer).mockReturnValueOnce(clientPlayerIsTyping);
+            const result = gameService.qrlInputChange(playerSocketMock, game.pin, true);
+            expect(result).toEqual({ clientId: playerSocketMock.id, index: 1, isSelected: true });
+        });
     });
 });

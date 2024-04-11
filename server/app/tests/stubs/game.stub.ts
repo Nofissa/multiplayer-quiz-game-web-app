@@ -4,7 +4,7 @@ import { Game } from '@app/classes/game';
 import { GameState } from '@common/game-state';
 import { QrlEvaluation } from '@common/qrl-evaluation';
 import { QrlSubmission } from '@common/qrl-submission';
-import { Submission } from '@common/submission';
+import { QcmSubmission } from '@common/qcm-submission';
 import { clientPlayerStub } from './client.player.stub';
 import { qrlEvaluationStub } from './qrl-evaluation.stub';
 import { qrlSubmissionStub } from './qrl.submission.stub';
@@ -21,7 +21,7 @@ export const gameStub = (): Game => {
         currentQuestionIndex: 0,
         clientPlayers: new Map<string, ClientPlayer>([['playerId', clientPlayerStub()]]),
         startDate: new Date(),
-        qcmSubmissions: [new Map<string, Submission>([['playerId', submissionStub()]])],
+        qcmSubmissions: [new Map<string, QcmSubmission>([['playerId', submissionStub()]])],
         qrlSubmissions: [new Map<string, QrlSubmission>([['playerId', qrlSubmissionStub()]])],
         qrlEvaluations: [new Map<string, QrlEvaluation>([['playerId', qrlEvaluationStub()]])],
         getHighestScore() {

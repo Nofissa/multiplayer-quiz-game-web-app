@@ -37,7 +37,8 @@ const mockGameSnapshot: GameSnapshot = {
     state: GameState.Opened,
     currentQuestionIndex: 0,
     questionQrlSubmission: [[{ answer: 'testinggg', clientId: 'ededwdwedw' }]],
-    questionQcmSubmissions: [[{ choices: [{ payload: 'testinggg', isSelected: true }], isFinal: true }]],
+    questionQcmSubmissions: [[{ clientId: 'Hello', choices: [{ payload: 1, isSelected: true }], isFinal: true }]],
+    questionQrlEvaluation: [],
 };
 
 describe('QrlListComponent', () => {
