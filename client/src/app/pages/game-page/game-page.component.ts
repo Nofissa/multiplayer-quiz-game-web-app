@@ -136,12 +136,22 @@ export class GamePageComponent implements OnInit, OnDestroy {
                 if (payload.isLast) {
                     this.isLastQuestion = true;
                 }
-
                 this.timerService.startTimer(this.pin, TimerEventType.NextQuestion, NEXT_QUESTION_DELAY_SECONDS);
             }),
 
             this.gameService.onQcmSubmit(pin, (evaluation) => {
                 if (evaluation.isLast) {
+                    this.soundService.stopSound(PANIC_AUDIO_NAME);
+
+                    if (this.isTest) {
+                        this.currentQuestionHasEnded = true;
+                        this.timerService.stopTimer(pin);
+                    }
+                }
+            }),
+
+            this.gameService.onQrlSubmit(pin, (submission) => {
+                if (submission.isLast) {
                     this.soundService.stopSound(PANIC_AUDIO_NAME);
 
                     if (this.isTest) {

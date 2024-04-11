@@ -27,7 +27,9 @@
             <button class="next-button" mat-raised-button *ngIf="currentQuestionHasEnded && !isLastQuestion" (click)="nextQuestion()">
                 Question Suivante
             </button>
-            <button class="next-button" mat-raised-button *ngIf="isLastQuestion" (click)="endGame()">Terminer la partie</button>
+            <button class="next-button" mat-raised-button *ngIf="currentQuestionHasEnded && isLastQuestion" (click)="endGame()">
+                Terminer la partie
+            </button>
         </div>
     </div>
 </div>
