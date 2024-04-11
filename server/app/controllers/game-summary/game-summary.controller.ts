@@ -1,6 +1,6 @@
 import { GameSummary } from '@app/model/database/game-summary';
 import { GameSummaryService } from '@app/services/game-summary/game-summary.service';
-import { Controller, Delete, Get, HttpStatus, Query, Res } from '@nestjs/common';
+import { Controller, Delete, Get, HttpStatus, Res } from '@nestjs/common';
 import { ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 
@@ -18,18 +18,12 @@ export class GameSummaryController {
         description: 'Return NOT_FOUND http status when request fails',
     })
     @Get('/')
-    async getGameSummaries(
-        @Res() response: Response,
-        @Query('sortField') sortField: string,
-        @Query('orderDirection') orderDirection: 'asc' | 'desc',
-    ) {
+    async getSummaries(@Res() response: Response) {
         try {
-            const field = sortField || 'defaultSortField';
-            const order = orderDirection || 'asc';
-            const gameSummaries = await this.gameSummaryService.getGameSummariesSorted(field, order);
+            const gameSummaries = await this.gameSummaryService.getGameSummaries();
             response.status(HttpStatus.OK).json(gameSummaries);
         } catch (error) {
-            response.status(HttpStatus.NOT_FOUND).send('Game summaries not found');
+            response.status(HttpStatus.NOT_FOUND).send('Summaries not found');
         }
     }
     @ApiOkResponse({
