@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { bothQuestionStub, qcmQuestionStub, qrlQuestionStub } from '@app/test-stubs/question.stubs';
+import { allQuestionTypeStub, qcmQuestionStub, qrlQuestionStub } from '@app/test-stubs/question.stubs';
 import { MaterialServicesProvider } from '@app/providers/material-services.provider';
 import { QuestionServicesProvider } from '@app/providers/question-services.provider';
 import { QuestionHttpService } from '@app/services/question-http/question-http.service';

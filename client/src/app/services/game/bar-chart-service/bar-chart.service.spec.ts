@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
-import { barChartDataStub } from '@app/TestStubs/bar-chart-data.stubs';
-import { qcmQuestionStub, qrlQuestionStub } from '@app/TestStubs/question.stubs';
-import { mockSnapshotStubs } from '@app/TestStubs/snapshot.stubs';
+import { barChartDataStub } from '@app/test-stubs/bar-chart-data.stubs';
+import { qcmQuestionStub, qrlQuestionStub } from '@app/test-stubs/question.stubs';
+import { mockSnapshotStubs } from '@app/test-stubs/snapshot.stubs';
 import { BarChartData } from '@app/interfaces/bar-chart-data';
 import { BarchartElement } from '@app/interfaces/barchart-element';
 import { BarchartSubmission } from '@common/barchart-submission';
