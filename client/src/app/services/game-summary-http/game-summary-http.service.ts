@@ -1,8 +1,7 @@
-import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { GameSummary } from '@app/interfaces/game-summary';
-import { Observable, throwError } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { Observable, catchError, map, throwError } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -17,19 +16,15 @@ export class GameSummaryHttpService {
         return this.baseUrl;
     }
 
-    getAllGameSummaries(sortField?: string, orderDirection?: 'asc' | 'desc'): Observable<GameSummary[]> {
-        let params = new HttpParams();
-        if (sortField) {
-            params = params.append('sortField', sortField);
-        }
-        if (orderDirection) {
-            params = params.append('orderDirection', orderDirection);
-        }
-
-        return this.http.get<GameSummary[]>(this.baseUrl, { params }).pipe(
+    getAllGameSummaries(): Observable<GameSummary[]> {
+        return this.http.get<GameSummary[]>(this.baseUrl).pipe(
             map((gameSummaries: GameSummary[]) => this.convertAllStartDateToDate(gameSummaries)),
             catchError(this.handleError<GameSummary[]>()),
         );
+    }
+
+    clearAllGameSummaries(): Observable<void> {
+        return this.http.delete<void>(`${this.baseUrl}/deleteAll`);
     }
 
     private convertStartDateToDate(gameSummary: GameSummary): GameSummary {
