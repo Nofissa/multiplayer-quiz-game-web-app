@@ -145,6 +145,28 @@ export class PlayerListComponent implements OnInit, OnDestroy {
             this.gameService.onStartGame(pin, () => {
                 this.displayOptions.ban = false;
             }),
+            this.gameService.onNextQuestion(pin, () => {
+                this.players.forEach((player) => {
+                    player.hasInteracted = false;
+                    player.hasSubmitted = false;
+                });
+            }),
+            this.gameService.onQrlInputChange(pin, (barchartSubmission) => {
+                this.players.forEach((player) => {
+                    if (player.socketId === barchartSubmission.clientId) {
+                        if (barchartSubmission.isSelected) {
+                            player.hasInteracted = true;
+                        }
+                    }
+                });
+            }),
+            this.gameService.onQrlSubmit(pin, (qrlSubmission) => {
+                this.players.forEach((player) => {
+                    if (player.socketId === qrlSubmission.clientId) {
+                        player.hasSubmitted = true;
+                    }
+                });
+            }),
         );
     }
 }

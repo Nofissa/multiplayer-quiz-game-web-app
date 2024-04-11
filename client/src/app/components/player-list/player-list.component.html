@@ -42,11 +42,14 @@
         >
             <div class="row-container">
                 <div class="player-info-wrapper">
-                    <div class="player-name" *ngIf="!player.isMuted">
+                    <div class="player-name" *ngIf="!player.hasInteracted && !player.hasSubmitted">
                         {{ player.username }}
                     </div>
-                    <div class="player-name-muted" *ngIf="player.isMuted">
+                    <div class="player-name-interacted" *ngIf="player.hasInteracted && !player.hasSubmitted">
                         {{ player.username }}
+                    </div>
+                    <div class="player-name-submitted" *ngIf="player.hasSubmitted">
+                        {{ player.username}}
                     </div>
                     <div class="player-score" *ngIf="displayOptions.score">{{ player.score }} points</div>
                     <div class="player-speedAwardCount" *ngIf="displayOptions.speedAwardCount">{{ player.speedAwardCount }} bonus</div>
