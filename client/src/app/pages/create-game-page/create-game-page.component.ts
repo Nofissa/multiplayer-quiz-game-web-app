@@ -112,7 +112,7 @@ export class CreateGamePageComponent implements OnInit, OnDestroy {
 
     private createGame(quiz?: Quiz) {
         this.createGameSubscription = this.gameService.onCreateGame((pin: string) => {
-            this.router.navigate(['/host-game'], { queryParams: { pin } });
+            this.router.navigate(['/host-game'], { queryParams: { pin, isRandom: !quiz?.id } });
             const player: Player = {
                 socketId: this.webSockerService.getSocketId(),
                 username: 'Organisateur',
