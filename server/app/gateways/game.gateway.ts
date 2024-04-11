@@ -137,7 +137,9 @@ export class GameGateway implements OnGatewayDisconnect {
             this.gameService.endGame(client, pin);
             const payload: GameEventPayload<null> = { pin, data: null };
             this.server.to(pin).emit('endGame', payload);
-            this.gameSummaryService.addGameSummary().fromGame(game);
+            if (this.gameService.isOrganizer(game, client.id)) {
+                this.gameSummaryService.addGameSummary().fromGame(game);
+            }
         } catch (error) {
             client.emit('error', error.message);
         }
