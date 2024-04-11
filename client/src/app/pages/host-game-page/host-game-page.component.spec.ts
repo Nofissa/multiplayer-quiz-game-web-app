@@ -42,7 +42,7 @@ import SpyObj = jasmine.SpyObj;
 const PIN = '1234';
 const NEXT_QUESTION_DELAY = 5;
 
-fdescribe('HostGamePageComponent', () => {
+describe('HostGamePageComponent', () => {
     let component: HostGamePageComponent;
     let fixture: ComponentFixture<HostGamePageComponent>;
     let gameServiceSpy: SpyObj<GameService>;
