@@ -1,3 +1,4 @@
+import { GameAutopilotService } from '@app/services/game-autopilot/game-autopilot.service';
 import { GameSummaryService } from '@app/services/game-summary/game-summary.service';
 import { GameService } from '@app/services/game/game.service';
 import { TimerService } from '@app/services/timer/timer.service';
@@ -9,7 +10,7 @@ import { QcmEvaluation } from '@common/qcm-evaluation';
 import { QrlEvaluation } from '@common/qrl-evaluation';
 import { QrlSubmission } from '@common/qrl-submission';
 import { QuestionPayload } from '@common/question-payload';
-import { Submission } from '@common/submission';
+import { BarchartSubmission } from '@common/barchart-submission';
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
@@ -25,14 +26,17 @@ export class GameGateway implements OnGatewayDisconnect {
     @WebSocketServer()
     server: Server;
 
+    // Disabled because the gateway depends on many services
+    // eslint-disable-next-line max-params
     constructor(
         private readonly gameService: GameService,
         private readonly timerService: TimerService,
         private readonly gameSummaryService: GameSummaryService,
+        private readonly gameAutopilotService: GameAutopilotService,
     ) {}
 
     @SubscribeMessage('createGame')
-    async createGame(@ConnectedSocket() client: Socket, @MessageBody() { quizId }: { quizId: string }) {
+    async createGame(@ConnectedSocket() client: Socket, @MessageBody() { quizId }: { quizId?: string }) {
         try {
             const pin = await this.gameService.createGame(client, quizId);
             client.join(pin);
@@ -59,6 +63,13 @@ export class GameGateway implements OnGatewayDisconnect {
     @SubscribeMessage('startGame')
     startGame(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
         try {
+            const game = this.gameService.getGame(pin);
+
+            if (game?.isRandom) {
+                this.joinGame(client, { pin, username: 'Organisateur' });
+                this.gameAutopilotService.runGame(client, pin);
+            }
+
             const data = this.gameService.startGame(client, pin);
             const payload: GameEventPayload<QuestionPayload> = { pin, data };
 
@@ -122,7 +133,7 @@ export class GameGateway implements OnGatewayDisconnect {
         try {
             const submission = this.gameService.qcmToggleChoice(client, pin, choiceIndex);
             const organizer = this.gameService.getOrganizer(pin);
-            const payload: GameEventPayload<Submission[]> = { pin, data: submission };
+            const payload: GameEventPayload<BarchartSubmission> = { pin, data: submission };
 
             organizer.emit('qcmToggleChoice', payload);
         } catch (error) {
@@ -146,8 +157,8 @@ export class GameGateway implements OnGatewayDisconnect {
     @SubscribeMessage('qrlInputChange')
     qrlInputChange(@ConnectedSocket() client: Socket, @MessageBody() { pin, isTyping }: { pin: string; isTyping: boolean }) {
         try {
-            const typing = this.gameService.qrlInputChange(client, pin, isTyping);
-            const payload: GameEventPayload<boolean[]> = { pin, data: typing };
+            const chartData = this.gameService.qrlInputChange(client, pin, isTyping);
+            const payload: GameEventPayload<BarchartSubmission> = { pin, data: chartData };
 
             this.server.to(pin).emit('qrlInputChange', payload);
         } catch (error) {
@@ -184,12 +195,9 @@ export class GameGateway implements OnGatewayDisconnect {
         try {
             const payload = this.gameService.disconnect(client);
 
-            payload.toCancel.forEach((pin) => {
+            payload.forEach((pin) => {
+                this.gameAutopilotService.stopGame(pin);
                 this.cancelGame(client, { pin });
-            });
-
-            payload.toEnd.forEach((pin) => {
-                this.endGame(client, { pin });
             });
         } catch (error) {
             client.emit('error', error.message);

@@ -1,10 +1,10 @@
 /* eslint-disable max-lines */ // to many lines because of many mocks that i had to clear and recreate.
 /* eslint-disable @typescript-eslint/no-explicit-any */ // used for mocking the socket for instance.
 import * as PinHelper from '@app/helpers/pin';
-import { DisconnectPayload } from '@app/interfaces/disconnect-payload';
 import { GameService } from '@app/services/game/game.service';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { GameState } from '@common/game-state';
+import { QcmSubmission } from '@common/qcm-submission';
 import { QuestionPayload } from '@common/question-payload';
 import { Socket } from 'socket.io';
 import { clientPlayerStub } from './stubs/client.player.stub';
@@ -15,10 +15,17 @@ import { qrlSubmissionStub } from './stubs/qrl.submission.stub';
 import { questionStub } from './stubs/question.stubs';
 import { quizStub } from './stubs/quiz.stubs';
 import { submissionStub } from './stubs/submission.stub';
+import { TimerService } from '@app/services/timer/timer.service';
+import { ModuleRef } from '@nestjs/core';
+import { QuestionService } from '@app/services/question/question.service';
+import { Timer } from '@app/classes/timer';
 
 describe('GameService', () => {
     let gameService: GameService;
     let quizServiceMock: jest.Mocked<QuizService>;
+    let questionServiceMock: jest.Mocked<QuestionService>;
+    let timerServiceMock: jest.Mocked<TimerService>;
+    let moduleRefMock: jest.Mocked<ModuleRef>;
     let socketMock: jest.Mocked<Socket>;
 
     beforeEach(async () => {
@@ -26,7 +33,34 @@ describe('GameService', () => {
             getQuizById: jest.fn(),
         } as any;
 
-        gameService = new GameService(quizServiceMock);
+        questionServiceMock = {
+            getAllQuestions: jest.fn(),
+        } as any;
+
+        timerServiceMock = {
+            getTimer: jest.fn(),
+        } as any;
+
+        moduleRefMock = {
+            get: jest.fn(),
+        } as any;
+
+        moduleRefMock.get.mockImplementation((provider: any) => {
+            switch (provider) {
+                case TimerService: {
+                    return timerServiceMock;
+                }
+                case QuizService: {
+                    return quizServiceMock;
+                }
+                case QuestionService: {
+                    return questionServiceMock;
+                }
+            }
+            throw new Error(`Unknown provider: ${provider}`);
+        });
+
+        gameService = new GameService(moduleRefMock);
     });
 
     afterEach(() => {
@@ -98,6 +132,7 @@ describe('GameService', () => {
             gameTest.state = GameState.Opened;
             jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(gameTest);
             jest.spyOn(Map.prototype, 'has').mockReturnValue(false);
+            gameTest.clientPlayers.clear();
             const playerOrganizer = 'Organisateur';
             expect(() => gameService.joinGame(socketMock, gameTest.pin, playerOrganizer)).toThrowError('Le nom "Organisateur" est réservé');
         });
@@ -107,6 +142,7 @@ describe('GameService', () => {
             const playerUsername = 'anotherPlayer';
             jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(gameTest);
             jest.spyOn(Map.prototype, 'has').mockReturnValue(true);
+            gameService.joinGame(socketMock, gameTest.pin, playerUsername);
             expect(() => gameService.joinGame(socketMock, gameTest.pin, playerUsername)).toThrowError('Vous êtes déjà dans cette partie');
         });
 
@@ -152,9 +188,21 @@ describe('GameService', () => {
             jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
             jest.spyOn(GameService.prototype, 'getOrCreateSubmission').mockReturnValue(submission);
             jest.spyOn(GameService.prototype, 'isGoodAnswer').mockReturnValue(true);
-            jest.spyOn(Map.prototype, 'get').mockReturnValue(clientPlayer);
+            timerServiceMock.getTimer.mockReturnValue({ time: 1 } as Timer);
+            jest.spyOn(game['clientPlayers'], 'get').mockReturnValue(clientPlayer);
             const result = gameService.evaluateChoices(socketMock, game.pin);
             expect(result).toEqual(evaluation);
+        });
+
+        it('should not give bonus points if time is zero', () => {
+            submission.isFinal = false;
+            jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
+            jest.spyOn(GameService.prototype, 'getOrCreateSubmission').mockReturnValue(submission);
+            jest.spyOn(GameService.prototype, 'isGoodAnswer').mockReturnValue(true);
+            timerServiceMock.getTimer.mockReturnValue({ time: 0 } as Timer);
+            jest.spyOn(game['clientPlayers'], 'get').mockReturnValue(clientPlayer);
+            const result = gameService.evaluateChoices(socketMock, game.pin);
+            expect(result.isFirstCorrect).toEqual(false);
         });
     });
 
@@ -238,29 +286,15 @@ describe('GameService', () => {
 
     describe('disconnect', () => {
         const game = gameStub();
-        const disconnectPayloadTest: DisconnectPayload = {
-            toCancel: [game.pin],
-            toEnd: [],
-        };
+        const disconnectPayloadTest = [game.pin];
 
-        const disconnectPayloadEndTest: DisconnectPayload = {
-            toCancel: [],
-            toEnd: [game.pin],
-        };
         const organizerSocket = { id: 'organizerId' } as any;
-        it('should push the game to toCancel if Organizer', () => {
+        it('should push the games to toCancel if Organizer', () => {
             game.state = GameState.Opened;
             gameService.games.set(game.pin, game);
             const result = gameService.disconnect(organizerSocket);
             gameService.games.clear();
             expect(result).toEqual(disconnectPayloadTest);
-        });
-
-        it('should push the game to toEnd', () => {
-            game.state = GameState.Running;
-            gameService.games.set(game.pin, game);
-            const result = gameService.disconnect(organizerSocket);
-            expect(result).toEqual(disconnectPayloadEndTest);
         });
     });
 
@@ -332,16 +366,20 @@ describe('GameService', () => {
     describe('toggleSelectChoice', () => {
         const game = gameStub();
         const choiceIndex = 1;
-        const submission = submissionStub();
-        const submissionTest = submissionStub();
-        submissionTest.choices[1].isSelected = false;
-        const expectedResult = [submissionTest];
+        const submission: QcmSubmission = submissionStub();
+        game.qcmSubmissions = [new Map<string, QcmSubmission>()];
+        game.qcmSubmissions[0].set('playerId', submission);
+        const submissionTest = submissionStub().choices[choiceIndex];
+        submissionTest.isSelected = true;
 
         it('should return the right submission', () => {
+            socketMock = { id: 'playerId' } as jest.Mocked<Socket>;
+            const expectedResult = { clientId: socketMock.id, index: submissionTest.payload, isSelected: submissionTest.isSelected };
             jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
             jest.spyOn(GameService.prototype, 'getOrCreateSubmission').mockReturnValue(submission);
             const result = gameService.qcmToggleChoice(socketMock, game.pin, choiceIndex);
             expect(result).toEqual(expectedResult);
+            expect(GameService.prototype.getGame).toHaveBeenCalled();
         });
     });
 
@@ -391,12 +429,13 @@ describe('GameService', () => {
         });
 
         it('should return the right submission', () => {
+            socketMock = { id: 'playerId' } as jest.Mocked<Socket>;
             const submission = qrlSubmissionStub();
             jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
             jest.spyOn(Map.prototype, 'has').mockReturnValue(false);
             const setSpy = jest.spyOn(Map.prototype, 'set');
             const result = gameService.qrlSubmit(socketMock, game.pin, answer);
-            submission.isLast = false;
+            submission.isLast = true;
             expect(setSpy).toHaveBeenCalledWith(socketMock.id, submission);
             expect(result).toEqual(submission);
         });
@@ -412,14 +451,14 @@ describe('GameService', () => {
             jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
             jest.spyOn(Map.prototype, 'get').mockReturnValue(clientPlayer);
             const result = gameService.qrlInputChange(playerSocketMock, game.pin, false);
-            expect(result).toEqual([false]);
+            expect(result).toEqual({ clientId: playerSocketMock.id, index: 0, isSelected: true });
         });
 
-        // it('should return the right result if isTyping is true', () => {
-        //     jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
-        //     jest.spyOn(Map.prototype, 'get').mockReturnValueOnce(clientPlayer).mockReturnValueOnce(clientPlayerIsTyping);
-        //     const result = gameService.qrlInputChange(playerSocketMock, game.pin, true);
-        //     expect(result).toEqual([true]);
-        // });
+        it('should return the right result if isTyping is true', () => {
+            jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
+            jest.spyOn(Map.prototype, 'get').mockReturnValueOnce(clientPlayer).mockReturnValueOnce(clientPlayerIsTyping);
+            const result = gameService.qrlInputChange(playerSocketMock, game.pin, true);
+            expect(result).toEqual({ clientId: playerSocketMock.id, index: 1, isSelected: true });
+        });
     });
 });

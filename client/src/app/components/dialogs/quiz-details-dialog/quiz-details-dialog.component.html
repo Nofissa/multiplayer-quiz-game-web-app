@@ -4,17 +4,17 @@
             <button mat-icon-button class="close-button" (click)="closeDialog()">
                 <span class="material-icons">close</span>
             </button>
-            <h2 class="title">{{ data.quiz.title }}</h2>
-            <p class="estimated-time">Chronomètre: {{ data.quiz.duration }} secondes<span class="time-icon"></span></p>
-            <p class="description">{{ data.quiz.description }}</p>
+            <h2 class="title">{{ data.quiz?.title ?? 'Mode Aléatoire' }}</h2>
+            <p class="estimated-time">Chronomètre: {{ data.quiz?.duration ?? '20' }} secondes par question<span
+                    class="time-icon"></span></p>
+            <p class="description">{{ data.quiz?.description ?? 'Un questionnaire formé de 5 questions QCM aléatoires'
+                }}</p>
         </div>
-        <div class="questions-box">
+        <div *ngIf="data.quiz" class="questions-box">
             <h3 class="questions-title">Liste des Questions</h3>
             <ul>
-                <li *ngFor="let question of data.quiz.questions; let i = index" class="question-item">
-                    <span class="question-number"
-                        ><strong>{{ i + 1 }}.</strong></span
-                    >
+                <li *ngFor="let question of data.quiz?.questions ?? []; let i = index" class="question-item">
+                    <span class="question-number"><strong>{{ i + 1 }}.</strong></span>
                     <div class="question-text-container">
                         <span class="question-text">{{ question.text }}</span>
                     </div>
@@ -23,7 +23,7 @@
         </div>
         <div class="dialog-footer">
             <button (click)="startGame()">Créer une partie</button>
-            <button (click)="testGame()">Tester</button>
+            <button *ngIf="data.quiz" (click)="testGame()">Tester</button>
         </div>
     </div>
 </body>

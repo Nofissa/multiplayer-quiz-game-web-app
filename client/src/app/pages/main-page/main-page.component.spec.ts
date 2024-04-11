@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '@app/services/auth/auth.service';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { SessionService } from '@app/services/session/session.service';
-import { firstPlayerStub } from '@app/TestStubs/player.stubs';
+import { firstPlayerStub } from '@app/test-stubs/player.stubs';
 import { of, Subscription, throwError } from 'rxjs';
 import { MainPageComponent } from './main-page.component';
 

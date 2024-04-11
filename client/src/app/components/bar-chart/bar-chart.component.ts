@@ -18,20 +18,14 @@ export class BarChartComponent {
     }
 
     numberOfPlayers(): number {
-        return this.data.submissions ? this.data.submissions.length : 0;
+        const idArray: string[] = [...new Set(this.data.submissions.map((sub) => sub.clientId))];
+        return idArray.length;
     }
 
     playersSelected(index: number): number {
         if (!this.data.submissions) {
             return 0;
         }
-        let playersSelected = 0;
-
-        Array.from(this.data.submissions.values()).forEach((submission) => {
-            if (submission.choices.some((choice) => choice.payload === index && choice.isSelected)) {
-                playersSelected++;
-            }
-        });
-        return playersSelected;
+        return this.data.submissions.filter((submission) => submission.index === index).reduce((acc, sub) => (sub.isSelected ? acc + 1 : acc), 0);
     }
 }

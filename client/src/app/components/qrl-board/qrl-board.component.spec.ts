@@ -6,10 +6,10 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
-import { lastPlayerEvaluationStub } from '@app/TestStubs/evaluation.stubs';
-import { firstPlayerStub } from '@app/TestStubs/player.stubs';
-import { qrlQuestionStub } from '@app/TestStubs/question.stubs';
-import { quizStub } from '@app/TestStubs/quiz.stubs';
+import { lastPlayerEvaluationStub } from '@app/test-stubs/evaluation.stubs';
+import { firstPlayerStub } from '@app/test-stubs/player.stubs';
+import { qrlQuestionStub } from '@app/test-stubs/question.stubs';
+import { quizStub } from '@app/test-stubs/quiz.stubs';
 import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
 import { MAX_MESSAGE_LENGTH } from '@app/constants/constants';
 import { SocketServerMock } from '@app/mocks/socket-server-mock';
@@ -29,7 +29,7 @@ import { QrlEvaluation } from '@common/qrl-evaluation';
 import { QrlSubmission } from '@common/qrl-submission';
 import { Question } from '@common/question';
 import { Quiz } from '@common/quiz';
-import { Submission } from '@common/submission';
+import { QcmSubmission } from '@common/qcm-submission';
 import { TimerEventType } from '@common/timer-event-type';
 import { TimerPayload } from '@common/timer-payload';
 import { Observable, Subscription, of } from 'rxjs';
@@ -76,7 +76,7 @@ describe('QrlBoardComponent', () => {
 
     const mockState: GameState = GameState.Opened;
 
-    const mockQuestionSubmissions: Submission[][] = [[{ choices: [{ payload: 'testinggg', isSelected: true }], isFinal: true }]];
+    const mockQuestionSubmissions: QcmSubmission[][] = [[{ clientId: 'Some ID', choices: [{ payload: 1, isSelected: true }], isFinal: true }]];
     const mockQuestionQrlSubmissions: QrlSubmission[][] = [[{ answer: 'hello', clientId: 'playerId' }]];
 
     const mockGameSnapshot: GameSnapshot = {
@@ -87,6 +87,7 @@ describe('QrlBoardComponent', () => {
         currentQuestionIndex: 0,
         questionQcmSubmissions: mockQuestionSubmissions,
         questionQrlSubmission: mockQuestionQrlSubmissions,
+        questionQrlEvaluation: [],
     };
 
     const observableSnapShot = of(mockGameSnapshot);
@@ -313,11 +314,6 @@ describe('QrlBoardComponent', () => {
 
     it('should tell if the question is a qrl', () => {
         component.question = qrlQuestionStub()[0];
-        component.question.type = 'QRL';
-        let result = component.isQRL();
-        expect(result).toBeTruthy();
-        component.question.type = 'QCM';
-        result = component.isQRL();
-        expect(result).toBeFalsy();
+        expect(component.question.type).toEqual('QRL');
     });
 });

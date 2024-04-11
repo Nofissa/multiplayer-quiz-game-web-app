@@ -28,3 +28,4 @@ export const ACCELERATE_TIMER_EVENT = 'accelerateTimer';
 export const MAX_PIN_NO = 10000;
 export const PADDING = 4;
 export const SWIPER_SYNC_DELAY_MS = 100;
+export const MIN_QCM_COUNT_TO_ENABLE_RANDOM_MODE = 5;

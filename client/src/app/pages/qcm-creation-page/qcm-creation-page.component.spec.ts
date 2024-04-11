@@ -5,17 +5,17 @@ import { FormBuilder } from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute } from '@angular/router';
-import { qcmQuestionStub } from '@app/TestStubs/question.stubs';
-import { quizStub } from '@app/TestStubs/quiz.stubs';
+import { qcmQuestionStub } from '@app/test-stubs/question.stubs';
+import { quizStub } from '@app/test-stubs/quiz.stubs';
 import { UpsertQuestionDialogComponent } from '@app/components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
-import { Quiz } from '@app/interfaces/quiz';
+import { Quiz } from '@common/quiz';
 import { MaterialServicesProvider } from '@app/providers/material-services.provider';
 import { QuestionInteractionService } from '@app/services/question-interaction/question-interaction.service';
 import { QuestionSharingService } from '@app/services/question-sharing/question-sharing.service';
 import { QuizHttpService } from '@app/services/quiz-http/quiz-http.service';
 import { Question } from '@common/question';
 import { Subject, of, throwError } from 'rxjs';
-import { QCMCreationPageComponent } from './qcmcreation-page.component';
+import { QCMCreationPageComponent } from './qcm-creation-page.component';
 import SpyObj = jasmine.SpyObj;
 
 describe('QCMCreationPageComponent', () => {

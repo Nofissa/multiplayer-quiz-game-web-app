@@ -12,7 +12,7 @@
     >
         <div class="game-area">
             <app-qrl-board [pin]="pin" [isTest]="isTest"></app-qrl-board>
-            <app-game-board [pin]="pin" [isTest]="isTest"></app-game-board>
+            <app-qcm-board [pin]="pin" [isTest]="isTest"></app-qcm-board>
         </div>
         <div *ngIf="!isTest" class="right-panel">
             <app-chat-room [pin]="pin"></app-chat-room>

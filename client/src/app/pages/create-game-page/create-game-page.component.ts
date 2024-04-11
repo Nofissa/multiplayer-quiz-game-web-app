@@ -5,11 +5,12 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { QuizDetailsDialogComponent } from '@app/components/dialogs/quiz-details-dialog/quiz-details-dialog.component';
-import { SNACK_BAR_DURATION_MS } from '@app/constants/constants';
-import { Quiz } from '@app/interfaces/quiz';
+import { SNACK_BAR_DURATION_MS, MIN_QCM_COUNT_TO_ENABLE_RANDOM_MODE } from '@app/constants/constants';
+import { Quiz } from '@common/quiz';
 import { MaterialServicesProvider } from '@app/providers/material-services.provider';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { PlayerService } from '@app/services/player/player.service';
+import { QuestionHttpService } from '@app/services/question-http/question-http.service';
 import { QuizHttpService } from '@app/services/quiz-http/quiz-http.service';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { Player } from '@common/player';
@@ -26,6 +27,7 @@ SwiperCore.use([Navigation, Pagination, EffectCoverflow]);
     encapsulation: ViewEncapsulation.None,
 })
 export class CreateGamePageComponent implements OnInit, OnDestroy {
+    enableRandomMode: boolean = false;
     quizzArray: Quiz[];
 
     createGameSubscription: Subscription = new Subscription();
@@ -38,6 +40,7 @@ export class CreateGamePageComponent implements OnInit, OnDestroy {
     constructor(
         materialServicesProvider: MaterialServicesProvider,
         private readonly router: Router,
+        private readonly questionHttpService: QuestionHttpService,
         private readonly quizHttpService: QuizHttpService,
         private readonly gameService: GameService,
         private readonly playerService: PlayerService,
@@ -48,6 +51,11 @@ export class CreateGamePageComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
+        this.questionHttpService.getAllQuestions().subscribe((questions) => {
+            if (questions.filter((x) => x.type.trim().toUpperCase() === 'QCM').length >= MIN_QCM_COUNT_TO_ENABLE_RANDOM_MODE) {
+                this.enableRandomMode = true;
+            }
+        });
         this.loadQuizzes();
     }
 
@@ -61,6 +69,18 @@ export class CreateGamePageComponent implements OnInit, OnDestroy {
         this.quizHttpService.getVisibleQuizzes().subscribe({
             next: (quizzes) => {
                 this.quizzArray = quizzes;
+            },
+        });
+    }
+
+    openRandomGameDetails(): void {
+        const dialogRef = this.dialogService.open(QuizDetailsDialogComponent, {
+            data: {
+                quiz: null,
+                onCreateGame: () => {
+                    dialogRef.close();
+                    this.createGame();
+                },
             },
         });
     }
@@ -90,9 +110,9 @@ export class CreateGamePageComponent implements OnInit, OnDestroy {
         });
     }
 
-    private createGame(quiz: Quiz) {
+    private createGame(quiz?: Quiz) {
         this.createGameSubscription = this.gameService.onCreateGame((pin: string) => {
-            this.router.navigate(['/host-game'], { queryParams: { pin } });
+            this.router.navigate(['/host-game'], { queryParams: { pin, isRandom: !quiz?.id } });
             const player: Player = {
                 socketId: this.webSockerService.getSocketId(),
                 username: 'Organisateur',
@@ -106,7 +126,8 @@ export class CreateGamePageComponent implements OnInit, OnDestroy {
             };
             this.playerService.setPlayer(pin, player);
         });
-        this.gameService.createGame(quiz._id);
+
+        this.gameService.createGame(quiz?._id ?? undefined);
     }
 
     private testGame(quiz: Quiz) {

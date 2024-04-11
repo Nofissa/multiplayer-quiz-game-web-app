@@ -1,6 +1,6 @@
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { quizStub } from '@app/TestStubs/quiz.stubs';
+import { quizStub } from '@app/test-stubs/quiz.stubs';
 import { ERROR } from '@app/constants/constants';
 import { GameSnapshot } from '@common/game-snapshot';
 import { GameState } from '@common/game-state';
@@ -14,6 +14,7 @@ const gameSnapshotStub: GameSnapshot = {
     currentQuestionIndex: 0,
     questionQcmSubmissions: [],
     questionQrlSubmission: [],
+    questionQrlEvaluation: [],
 };
 
 describe('GameHttpService', () => {

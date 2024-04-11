@@ -4,7 +4,7 @@ import { Chatlog } from '@common/chatlog';
 import { GameState } from '@common/game-state';
 import { QrlEvaluation } from '@common/qrl-evaluation';
 import { QrlSubmission } from '@common/qrl-submission';
-import { Submission as QcmSubmission } from '@common/submission';
+import { QcmSubmission } from '@common/qcm-submission';
 import { Socket } from 'socket.io';
 import { ClientPlayer } from './client-player';
 
@@ -49,6 +49,12 @@ export class Game {
 
     get currentQuestionQrlEvaluations() {
         return this.qrlEvaluations[this.currentQuestionIndex];
+    }
+
+    get isRandom() {
+        // Deactivated because the dangling comes from MongoDB
+        // eslint-disable-next-line no-underscore-dangle
+        return !this.quiz._id;
     }
 
     getHighestScore() {

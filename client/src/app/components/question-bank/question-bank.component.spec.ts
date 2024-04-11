@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { bothQuestionStub, qcmQuestionStub, qrlQuestionStub } from '@app/TestStubs/question.stubs';
+import { allQuestionTypeStub, qcmQuestionStub, qrlQuestionStub } from '@app/test-stubs/question.stubs';
 import { MaterialServicesProvider } from '@app/providers/material-services.provider';
 import { QuestionServicesProvider } from '@app/providers/question-services.provider';
 import { QuestionHttpService } from '@app/services/question-http/question-http.service';
@@ -227,21 +227,21 @@ describe('QuestionBankComponent', () => {
         });
 
         it('should filterQuestions filter only QCM questions', () => {
-            component.questions = bothQuestionStub();
+            component.questions = allQuestionTypeStub();
             component.filterQuestions('QCM');
             expect(component.displayedQuestions).toEqual(qcmQuestionStub());
         });
 
         it('should filterQuestions filter only QRL questions', () => {
-            component.questions = bothQuestionStub();
+            component.questions = allQuestionTypeStub();
             component.filterQuestions('QRL');
             expect(component.displayedQuestions).toEqual(qrlQuestionStub());
         });
 
         it('should filterQuestions filter all questions when both types are selected', () => {
-            component.questions = bothQuestionStub();
+            component.questions = allQuestionTypeStub();
             component.filterQuestions('BOTH');
-            expect(component.displayedQuestions).toEqual(bothQuestionStub());
+            expect(component.displayedQuestions).toEqual(allQuestionTypeStub());
         });
     });
 });

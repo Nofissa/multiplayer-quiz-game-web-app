@@ -21,6 +21,7 @@ import { PlayerService } from './services/player/player.service';
 import { QuestionService } from './services/question/question.service';
 import { QuizService } from './services/quiz/quiz.service';
 import { TimerService } from './services/timer/timer.service';
+import { GameAutopilotService } from './services/game-autopilot/game-autopilot.service';
 
 @Module({
     imports: [
@@ -45,6 +46,7 @@ import { TimerService } from './services/timer/timer.service';
         PlayerGateway,
         TimerGateway,
         AuthService,
+        GameAutopilotService,
         GameService,
         GameSummaryService,
         MessageService,

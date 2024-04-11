@@ -1,12 +1,15 @@
 import { Timer } from '@app/classes/timer';
 import { GameService } from '@app/services/game/game.service';
+import { TimerEventType } from '@common/timer-event-type';
 import { Injectable } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
+import { Subject, Subscription } from 'rxjs';
 import { Socket } from 'socket.io';
 
 @Injectable()
 export class TimerService {
     private timers: Map<string, Timer> = new Map();
+    private timeoutSubjects: Map<string, Subject<TimerEventType>> = new Map();
 
     constructor(private readonly moduleRef: ModuleRef) {}
 
@@ -16,7 +19,7 @@ export class TimerService {
 
     // We need 4 parameters for this method
     // eslint-disable-next-line max-params
-    startTimer(client: Socket, pin: string, duration: number, callback: (remainingTime: number) => void): number {
+    startTimer(client: Socket, pin: string, duration: number, eventType: TimerEventType, callback: (remainingTime: number) => void): number {
         const game = this.gameService.getGame(pin);
 
         if (game.organizer.id !== client.id) {
@@ -30,7 +33,13 @@ export class TimerService {
         const timer = this.timers.get(pin);
 
         timer.time = duration;
-        timer.onTick(callback);
+        timer.onTick((remainingTime) => {
+            callback(remainingTime);
+
+            if (remainingTime === 0) {
+                this.timeoutSubjects.get(pin)?.next(eventType);
+            }
+        });
 
         timer.start();
 
@@ -85,5 +94,16 @@ export class TimerService {
 
     getTimer(pin: string): Timer | null {
         return this.timers.get(pin) || null;
+    }
+
+    onTimeout(pin: string, callback: (eventType: TimerEventType) => void): Subscription {
+        if (this.timeoutSubjects.has(pin)) {
+            this.timeoutSubjects.get(pin).unsubscribe();
+            this.timeoutSubjects.delete(pin);
+        }
+
+        this.timeoutSubjects.set(pin, new Subject<TimerEventType>());
+
+        return this.timeoutSubjects.get(pin).subscribe(callback);
     }
 }

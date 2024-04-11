@@ -30,7 +30,7 @@ export class TimerGateway {
     ) {
         try {
             duration = duration ?? this.gameService.getGame(pin).quiz.duration;
-            const startRemainingTime = this.timerService.startTimer(client, pin, duration, (remainingTime) => {
+            const startRemainingTime = this.timerService.startTimer(client, pin, duration, eventType, (remainingTime) => {
                 const timerTickPayload: GameEventPayload<TimerPayload> = { pin, data: { remainingTime, eventType } };
                 this.server.to(pin).emit('timerTick', timerTickPayload);
             });

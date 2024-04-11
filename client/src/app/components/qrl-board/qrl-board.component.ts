@@ -65,6 +65,7 @@ export class QrlBoardComponent implements OnInit, OnDestroy {
     readonly gameHttpService: GameHttpService;
     readonly gameService: GameService;
     readonly timerService: TimerService;
+    readonly playerService: PlayerService;
 
     private isTyping: boolean = false;
     private interval: ReturnType<typeof setTimeout>;
@@ -75,7 +76,6 @@ export class QrlBoardComponent implements OnInit, OnDestroy {
     constructor(
         gameServicesProvider: GameServicesProvider,
         formBuilder: FormBuilder,
-        private readonly playerService: PlayerService,
         private readonly dialog: MatDialog,
         private readonly router: Router,
         private readonly snackBar: MatSnackBar,
@@ -86,18 +86,21 @@ export class QrlBoardComponent implements OnInit, OnDestroy {
         this.gameHttpService = gameServicesProvider.gameHttpService;
         this.gameService = gameServicesProvider.gameService;
         this.timerService = gameServicesProvider.timerService;
+        this.playerService = gameServicesProvider.playerService;
     }
 
     ngOnInit() {
         const player = this.playerService.getCurrentPlayer(this.pin);
+
         if (player) {
             this.player = player;
         }
+
         this.gameHttpService.getGameSnapshotByPin(this.pin).subscribe((snapshot) => {
             this.loadNextQuestion(snapshot.quiz.questions[snapshot.currentQuestionIndex]);
         });
         this.setupSubscriptions(this.pin);
-        this.gameService.qrlInputChange(this.pin, this.isTyping);
+        this.gameService.qrlInputChange(this.pin, false);
     }
 
     ngOnDestroy() {
@@ -108,10 +111,6 @@ export class QrlBoardComponent implements OnInit, OnDestroy {
         });
     }
 
-    isQRL(): boolean {
-        return this.question.type === 'QRL';
-    }
-
     updateRemainingInputCount() {
         this.remainingInputCount = MAX_MESSAGE_LENGTH - this.input.length;
         const FIVE_SECONDS_MS = 5000;
@@ -119,6 +118,8 @@ export class QrlBoardComponent implements OnInit, OnDestroy {
             this.isTyping = true;
             this.gameService.qrlInputChange(this.pin, this.isTyping);
         }
+
+        clearInterval(this.interval);
 
         this.interval = setInterval(() => {
             this.isTyping = false;
@@ -128,14 +129,11 @@ export class QrlBoardComponent implements OnInit, OnDestroy {
     }
 
     submitAnswer() {
-        const isOnlyWhitespace = /^\s*$/.test(this.input);
-        if (!isOnlyWhitespace && this.input.length <= MAX_MESSAGE_LENGTH) {
+        if (this.input.length <= MAX_MESSAGE_LENGTH) {
             this.gameService.qrlSubmit(this.pin, this.input.trim());
             this.remainingInputCount = MAX_MESSAGE_LENGTH;
             this.hasSubmitted = true;
             this.isInEvaluation = true;
-        } else if (isOnlyWhitespace) {
-            this.openError('La réponse est vide');
         } else if (this.input.length > MAX_MESSAGE_LENGTH) {
             this.openError('La réponse contient plus de 200 caractères');
         }
@@ -248,8 +246,7 @@ export class QrlBoardComponent implements OnInit, OnDestroy {
     private messageValidator(): ValidatorFn {
         return (control: AbstractControl): ValidationErrors | null => {
             const message = control.value as string;
-            const isOnlyWhitespace = /^\s*$/.test(message);
-            return !isOnlyWhitespace && message?.length < MAX_MESSAGE_LENGTH ? null : { invalidMessage: true };
+            return message?.length < MAX_MESSAGE_LENGTH ? null : { invalidMessage: true };
         };
     }
 }
