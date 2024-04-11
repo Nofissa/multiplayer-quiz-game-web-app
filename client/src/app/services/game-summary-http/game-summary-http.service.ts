@@ -27,7 +27,7 @@ export class GameSummaryHttpService {
         return this.http.delete<void>(`${this.baseUrl}/deleteAll`);
     }
 
-    private convertstartDateToDate(gameSummary: GameSummary): GameSummary {
+    private convertStartDateToDate(gameSummary: GameSummary): GameSummary {
         return {
             ...gameSummary,
             startDate: new Date(gameSummary.startDate),
@@ -35,7 +35,7 @@ export class GameSummaryHttpService {
     }
 
     private convertAllStartDateToDate(gameHistories: GameSummary[]): GameSummary[] {
-        return gameHistories.map(this.convertstartDateToDate);
+        return gameHistories.map(this.convertStartDateToDate);
     }
 
     private handleError<T>(): (error: HttpErrorResponse) => Observable<T> {
