@@ -60,7 +60,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
                     });
                 }
                 this.chatlogs.push({
-                    author: 'Serveur',
+                    author: 'Système',
                     message: `${player.username} a été réduit au silence`,
                     date: new Date(),
                 });
@@ -73,7 +73,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
                     });
                 }
                 this.chatlogs.push({
-                    author: 'Serveur',
+                    author: 'Système',
                     message: `${player.username} a été libéré de son silence`,
                     date: new Date(),
                 });
@@ -81,7 +81,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
         });
         this.playerService.onPlayerBan(this.pin, (player) => {
             this.chatlogs.push({
-                author: 'Serveur',
+                author: 'Système',
                 message: `${player.username} a été banni`,
                 date: new Date(),
             });
