@@ -28,7 +28,7 @@
 
     .swiper-slide,
     .game-slide {
-        background-color: transparent !important;
+        background-color: rgb(57, 57, 198) !important;
         pointer-events: none !important;
 
         display: flex;
@@ -37,7 +37,7 @@
         align-items: center;
         cursor: default;
         max-width: 1500px;
-        height: 500px;
+        height: 300px;
         transition:
             transform 0.3s ease,
             box-shadow 0.3s ease,
