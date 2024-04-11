@@ -3,12 +3,10 @@ import { BarChartData } from '@app/interfaces/bar-chart-data';
 import { BarchartSubmission } from '@common/barchart-submission';
 import { BarChartType } from '@common/barchart-type';
 import { GameSnapshot } from '@common/game-snapshot';
+import { Grade } from '@common/grade';
 import { QcmSubmission } from '@common/qcm-submission';
 import { QrlEvaluation } from '@common/qrl-evaluation';
 import { Question } from '@common/question';
-
-const QRL_EVALUATION_INCREMENT_50 = 50;
-const QRL_EVALUATION_INCREMENT_100 = 100;
 
 @Injectable({
     providedIn: 'root',
@@ -26,7 +24,6 @@ export class BarChartService {
             chartElements: [],
             submissions: [],
         };
-
         switch (newBarchartData.chartType) {
             case 'QCM':
                 for (const choice of question.choices ? question.choices : []) {
@@ -34,9 +31,11 @@ export class BarChartService {
                 }
                 break;
             case 'QRL':
-                for (let i = 0; i < 3; i++) {
-                    newBarchartData.chartElements.push({ text: `${i * QRL_EVALUATION_INCREMENT_50}` });
-                }
+                Object.values(Grade)
+                    .filter((x) => !isNaN(Number(x)))
+                    .forEach((grade) => {
+                        newBarchartData.chartElements.push({ text: `${grade}` });
+                    });
                 break;
 
             case 'ACTIVITY':
@@ -95,10 +94,10 @@ export class BarChartService {
                 case 0:
                     newSubmissions.push({ clientId: evaluation.player.socketId, index: 0, isSelected: true });
                     break;
-                case QRL_EVALUATION_INCREMENT_50:
+                case Grade.Average:
                     newSubmissions.push({ clientId: evaluation.player.socketId, index: 1, isSelected: true });
                     break;
-                case QRL_EVALUATION_INCREMENT_100:
+                case Grade.Good:
                     newSubmissions.push({ clientId: evaluation.player.socketId, index: 2, isSelected: true });
                     break;
             }
