@@ -19,12 +19,7 @@ export class BarChartComponent {
 
     numberOfPlayers(): number {
         const idArray: string[] = [...new Set(this.data.submissions.map((sub) => sub.clientId))];
-        return idArray.reduce((acc: string[], item: string) => {
-            if (!acc.includes(item)) {
-                acc.push(item);
-            }
-            return acc;
-        }, []).length;
+        return idArray.length;
     }
 
     playersSelected(index: number): number {
