@@ -21,11 +21,6 @@ import { PlayerService } from './services/player/player.service';
 import { QuestionService } from './services/question/question.service';
 import { QuizService } from './services/quiz/quiz.service';
 import { TimerService } from './services/timer/timer.service';
-import { MessageService } from './services/message/message.service';
-import { GameGateway } from './gateways/game.gateway';
-import { MessageGateway } from './gateways/message.gateway';
-import { PlayerGateway } from './gateways/player.gateway';
-import { TimerGateway } from './gateways/timer.gateway';
 import { GameAutopilotService } from './services/game-autopilot/game-autopilot.service';
 
 @Module({
