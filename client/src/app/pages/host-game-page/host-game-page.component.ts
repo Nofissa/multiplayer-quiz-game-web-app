@@ -36,6 +36,7 @@ const PANIC_AUDIO_SRC = 'assets/ticking-timer.wav';
 export class HostGamePageComponent implements OnInit {
     @ViewChild(BarChartSwiperComponent) barChartSwiperComponent: BarChartSwiperComponent;
     pin: string;
+    isRandom: boolean;
     gameState: GameState = GameState.Opened;
     currentQuestionHasEnded: boolean = false;
     isLastQuestion: boolean = false;
@@ -77,6 +78,7 @@ export class HostGamePageComponent implements OnInit {
 
     ngOnInit() {
         this.pin = this.activatedRoute.snapshot.queryParams['pin'];
+        this.isRandom = this.activatedRoute.snapshot.queryParams['isRandom'] === true;
         this.gameHttpService.getGameSnapshotByPin(this.pin).subscribe({
             error: (error: HttpErrorResponse) => {
                 if (error.status === HttpStatusCode.NotFound) {
@@ -185,6 +187,9 @@ export class HostGamePageComponent implements OnInit {
                 this.gameState = GameState.Running;
                 this.addQuestion(data.question);
                 this.timerService.startTimer(this.pin, TimerEventType.StartGame, START_GAME_COUNTDOWN_DURATION_SECONDS);
+                if (this.isRandom) {
+                    this.router.navigate(['game'], { queryParams: { pin: this.pin } });
+                }
             }),
 
             this.gameService.onNextQuestion(pin, (data) => {

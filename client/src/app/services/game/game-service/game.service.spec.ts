@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { firstPlayerStub } from '@app/TestStubs/player.stubs';
-import { qcmQuestionStub } from '@app/TestStubs/question.stubs';
+import { firstPlayerStub } from '@app/test-stubs/player.stubs';
+import { qcmQuestionStub } from '@app/test-stubs/question.stubs';
 import { SocketServerMock } from '@app/mocks/socket-server-mock';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { GameEventPayload } from '@common/game-event-payload';

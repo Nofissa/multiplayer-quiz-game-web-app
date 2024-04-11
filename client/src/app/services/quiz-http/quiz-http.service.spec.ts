@@ -3,7 +3,7 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { QuizHttpService } from './quiz-http.service';
-import { Quiz } from '@app/interfaces/quiz';
+import { Quiz } from '@common/quiz';
 import { HttpErrorResponse } from '@angular/common/http';
 
 describe('QuizHttpService', () => {

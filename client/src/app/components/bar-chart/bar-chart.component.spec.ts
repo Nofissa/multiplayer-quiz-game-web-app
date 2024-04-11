@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { barChartDataStub } from '@app/TestStubs/bar-chart-data.stubs';
+import { barChartDataStub } from '@app/test-stubs/bar-chart-data.stubs';
 import { BarchartSubmission } from '@common/barchart-submission';
 import { BarChartComponent } from './bar-chart.component';
 

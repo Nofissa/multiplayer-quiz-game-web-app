@@ -51,6 +51,12 @@ export class Game {
         return this.qrlEvaluations[this.currentQuestionIndex];
     }
 
+    get isRandom() {
+        // Deactivated because the dangling comes from MongoDB
+        // eslint-disable-next-line no-underscore-dangle
+        return !this.quiz._id;
+    }
+
     getHighestScore() {
         return Math.max(...Array.from(this.clientPlayers.values()).map((clientPlayer) => clientPlayer.player.score));
     }

@@ -17,7 +17,7 @@ import { Subscription } from 'rxjs';
 export class GameService {
     constructor(private readonly webSocketService: WebSocketService) {}
 
-    createGame(quizId: string) {
+    createGame(quizId?: string) {
         this.webSocketService.emit('createGame', { quizId });
     }
 

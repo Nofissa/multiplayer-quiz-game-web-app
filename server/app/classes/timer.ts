@@ -30,6 +30,9 @@ export class Timer {
     }
 
     start() {
+        if (this.isRunning) {
+            return;
+        }
         this.interval = setInterval(this.decrement.bind(this), Constant.OneSecond / this.ticksPerSecond);
     }
 
@@ -49,6 +52,10 @@ export class Timer {
     }
 
     onTick(callback: (remainingTime: number) => void) {
+        if (this.tickSubscription && !this.tickSubscription.closed) {
+            this.tickSubscription.unsubscribe();
+        }
+
         this.tickSubscription = this.tickSubject.subscribe(callback);
     }
 

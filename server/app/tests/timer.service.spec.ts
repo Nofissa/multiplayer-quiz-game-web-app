@@ -5,6 +5,8 @@ import { ModuleRef } from '@nestjs/core';
 import { Socket } from 'socket.io';
 import { gameStub } from './stubs/game.stub';
 import { Timer } from '@app/classes/timer';
+import { TimerEventType } from '@common/timer-event-type';
+import { Subject } from 'rxjs';
 
 describe('TimerService', () => {
     let timerService: TimerService;
@@ -51,7 +53,7 @@ describe('TimerService', () => {
             const TIME = 10;
             socketMock = { id: 'differentId' } as jest.Mocked<Socket>;
             gameServiceMock.getGame.mockReturnValue(gameStub());
-            expect(() => timerService.startTimer(socketMock, 'somePin', TIME, jest.fn())).toThrow(
+            expect(() => timerService.startTimer(socketMock, 'somePin', TIME, TimerEventType.Question, jest.fn())).toThrow(
                 "Seul l'organisateur de la partie somePin peut lancer la minuterie",
             );
         });
@@ -63,12 +65,39 @@ describe('TimerService', () => {
             socketMock = { id: 'organizerId' } as jest.Mocked<Socket>;
             const callback = jest.fn();
             const duration = 10; // Duration in seconds
-            const remainingTime = timerService.startTimer(socketMock, 'somePin', duration, callback);
 
+            const remainingTime = timerService.startTimer(socketMock, 'somePin', duration, TimerEventType.Question, callback);
             // Verify that the timer started and remaining time is returned
             expect(remainingTime).toEqual(duration);
             expect(setIntervalSpy).toHaveBeenCalledTimes(1);
             timerService.stopTimer(socketMock, 'somePin');
+        });
+
+        it('should call timeout callback on timer tick if remainingTime equals 0', () => {
+            const pin = 'somePin';
+            const timeoutSubject = new Subject<TimerEventType>();
+            const timeoutSubjectsMock = {
+                get: () => timeoutSubject,
+                set: jest.fn(),
+                has: () => false,
+                delete: jest.fn(),
+            } as any as jest.Mocked<Map<string, Subject<TimerEventType>>>;
+            timerService['timeoutSubjects'] = timeoutSubjectsMock;
+            gameServiceMock.getGame.mockReturnValue(gameStub());
+            socketMock = { id: 'organizerId' } as jest.Mocked<Socket>;
+            const timeoutCallback = jest.fn();
+            const eventType = TimerEventType.Question;
+            const duration = 10; // Duration in seconds
+            const oneSecondInMs = 1000;
+
+            jest.useFakeTimers();
+            timerService.onTimeout(pin, timeoutCallback);
+            timerService.startTimer(socketMock, pin, duration, eventType, () => {
+                return;
+            });
+            jest.advanceTimersByTime(duration * oneSecondInMs);
+
+            expect(timeoutCallback).toHaveBeenCalledWith(eventType);
         });
     });
 
@@ -156,10 +185,33 @@ describe('TimerService', () => {
 
         it('should return null if the timer does not exist', () => {
             const pin = 'somePin';
-
             const result = timerService.getTimer(pin);
 
             expect(result).toBeNull();
+        });
+    });
+
+    describe('onTimeout', () => {
+        it('should create a subscription to timeout subject', () => {
+            const timeoutSubject = {
+                subscribe: jest.fn(),
+                unsubscribe: jest.fn(),
+            } as any as jest.Mocked<Subject<TimerEventType>>;
+            const timeoutSubjectsMock = {
+                get: () => timeoutSubject,
+                has: () => true,
+                set: jest.fn(),
+                delete: jest.fn(),
+            } as any as jest.Mocked<Map<string, Subject<TimerEventType>>>;
+            timerService['timeoutSubjects'] = timeoutSubjectsMock;
+
+            timerService.onTimeout('somePin', () => {
+                return;
+            });
+
+            // Disabled because it's only used for testing if it was called
+            // eslint-disable-next-line deprecation/deprecation
+            expect(timeoutSubject.subscribe).toHaveBeenCalled();
         });
     });
 });

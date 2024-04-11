@@ -1,11 +1,11 @@
 import { CdkDrag, CdkDragDrop, CdkDropList, DragDropModule } from '@angular/cdk/drag-drop';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { qrlQuestionStub } from '@app/TestStubs/question.stubs';
+import { qrlQuestionStub } from '@app/test-stubs/question.stubs';
+import { QuestionListComponent } from './question-list.component';
+import { Question } from '@common/question';
 import { QuestionInteractionService } from '@app/services/question-interaction/question-interaction.service';
 import { QuestionSharingService } from '@app/services/question-sharing/question-sharing.service';
-import { Question } from '@common/question';
 import { of } from 'rxjs';
-import { QuestionListComponent } from './question-list.component';
 
 describe('QuestionListComponent', () => {
     let component: QuestionListComponent;

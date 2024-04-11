@@ -16,18 +16,35 @@ import { qrlEvaluationStub } from './stubs/qrl-evaluation.stub';
 import { qrlSubmissionStub } from './stubs/qrl.submission.stub';
 import { questionStub } from './stubs/question.stubs';
 import { submissionStub } from './stubs/submission.stub';
+import { GameAutopilotService } from '@app/services/game-autopilot/game-autopilot.service';
 import { GameSummaryService } from '@app/services/game-summary/game-summary.service';
 
 describe('GameGateway', () => {
     let gameGateway: GameGateway;
     let gameServiceMock: jest.Mocked<GameService>;
-    let socketMock: jest.Mocked<Socket>;
     let timerServiceMock: jest.Mocked<TimerService>;
+    let gameAutopilotServiceMock: jest.Mocked<GameAutopilotService>;
+    let socketMock: jest.Mocked<Socket>;
     let gameSummaryServiceMock: jest.Mocked<GameSummaryService>;
     let serverMock: jest.Mocked<Server>;
     let broadcastMock: any;
 
     beforeEach(() => {
+        socketMock = {
+            id: 'organizerId',
+            emit: jest.fn(),
+            join: jest.fn(),
+            leave: jest.fn(),
+        } as any;
+        serverMock = {
+            emit: jest.fn(),
+            to: jest.fn(),
+            socketsLeave: jest.fn(),
+        } as any;
+        timerServiceMock = {
+            startTimer: jest.fn(),
+            stopTimer: jest.fn(),
+        } as any;
         gameServiceMock = {
             createGame: jest.fn(),
             joinGame: jest.fn(),
@@ -47,17 +64,6 @@ describe('GameGateway', () => {
             qrlSubmit: jest.fn(),
             qrlEvaluate: jest.fn(),
         } as any;
-        socketMock = {
-            id: 'organizerId',
-            emit: jest.fn(),
-            join: jest.fn(),
-            leave: jest.fn(),
-        } as any;
-        serverMock = {
-            emit: jest.fn(),
-            to: jest.fn(),
-            socketsLeave: jest.fn(),
-        } as any;
         timerServiceMock = {
             startTimer: jest.fn(),
             stopTimer: jest.fn(),
@@ -65,10 +71,15 @@ describe('GameGateway', () => {
         gameSummaryServiceMock = {
             saveGameSummary: jest.fn(),
         } as any;
+        gameAutopilotServiceMock = {
+            runGame: jest.fn(),
+            stopGame: jest.fn(),
+        } as any;
         broadcastMock = {
             emit: jest.fn(),
         } as any as BroadcastOperator<any, any>;
-        gameGateway = new GameGateway(gameServiceMock, timerServiceMock, gameSummaryServiceMock);
+
+        gameGateway = new GameGateway(gameServiceMock, timerServiceMock, gameSummaryServiceMock, gameAutopilotServiceMock);
         gameGateway.server = serverMock;
     });
 
@@ -331,19 +342,10 @@ describe('GameGateway', () => {
     describe('handleDisconnect', () => {
         it('should cancel games and abandon players for the disconnected client', () => {
             const canceledPin = 'canceledPin';
-            const abandonedPin = 'abandonedPin';
-            const endPin = 'endPin';
-            const disconnectPayload = {
-                toCancel: [canceledPin],
-                toAbandon: [abandonedPin],
-                toEnd: [endPin],
-            } as any;
-            gameServiceMock.disconnect.mockReturnValue(disconnectPayload);
+            gameServiceMock.disconnect.mockReturnValue([canceledPin]);
             const cancelGameSpy = jest.spyOn(GameGateway.prototype, 'cancelGame');
-            const endGameSpy = jest.spyOn(GameGateway.prototype, 'endGame');
             gameGateway.handleDisconnect(socketMock);
             expect(cancelGameSpy).toHaveBeenCalledWith(socketMock, { pin: canceledPin });
-            expect(endGameSpy).toBeCalledWith(socketMock, { pin: endPin });
         });
 
         it('should throw an error if there is an issue', () => {

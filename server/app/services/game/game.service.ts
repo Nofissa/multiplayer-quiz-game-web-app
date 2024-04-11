@@ -1,11 +1,14 @@
+/* eslint-disable max-lines */ // file simply has a lot of method, we tried splitting functionnalities into multiple servides
 import { ClientPlayer } from '@app/classes/client-player';
 import { Game } from '@app/classes/game';
 import { Constant } from '@app/constants/constants';
 import { generateRandomPin } from '@app/helpers/pin';
-import { DisconnectPayload } from '@app/interfaces/disconnect-payload';
 import { Question } from '@app/model/database/question';
+import { Quiz } from '@app/model/database/quiz';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { BarchartSubmission } from '@common/barchart-submission';
+import { QuestionService } from '@app/services/question/question.service';
+import { TimerService } from '@app/services/timer/timer.service';
 import { GameState } from '@common/game-state';
 import { Grade } from '@common/grade';
 import { Player } from '@common/player';
@@ -17,16 +20,49 @@ import { QrlSubmission } from '@common/qrl-submission';
 import { Question as CommonQuestion } from '@common/question';
 import { QuestionPayload } from '@common/question-payload';
 import { Injectable } from '@nestjs/common';
+import { ModuleRef } from '@nestjs/core';
 import { Socket } from 'socket.io';
+import { Subject, Subscription } from 'rxjs';
 
 @Injectable()
 export class GameService {
     games: Map<string, Game> = new Map();
+    private lastQcmSubmissionSubjects: Map<string, Subject<void>> = new Map();
 
-    constructor(private readonly quizService: QuizService) {}
+    constructor(private moduleRef: ModuleRef) {}
+
+    get questionService(): QuestionService {
+        return this.moduleRef.get(QuestionService);
+    }
+
+    get quizService(): QuizService {
+        return this.moduleRef.get(QuizService);
+    }
+
+    get timerService(): TimerService {
+        return this.moduleRef.get(TimerService);
+    }
 
     async createGame(client: Socket, quizId: string): Promise<string> {
-        const quiz = await this.quizService.getQuizById(quizId);
+        let quiz: Quiz;
+
+        if (quizId) {
+            quiz = await this.quizService.getQuizById(quizId);
+        } else {
+            quiz = new Quiz();
+            quiz.title = 'Mode Aléatoire';
+            const qcmQuestions = (await this.questionService.getAllQuestions()).filter((x) => x.type.trim().toUpperCase() === 'QCM');
+            quiz.duration = 20;
+
+            if (qcmQuestions.length < Constant.RandomQuestionCount) {
+                throw new Error("Il n'existe pas assez de questions de type QCM dans la banque de questions pour faire une partie en mode aléatoire");
+            }
+
+            const shuffledQuestions = qcmQuestions.slice().sort(() => {
+                return Math.random() - Constant.RandomExpectation; // to have 1/2 chance to be negative
+            });
+            quiz.questions = shuffledQuestions.slice(0, Constant.RandomQuestionCount);
+        }
 
         if (!quiz) {
             throw new Error(`Aucun quiz ne correspond a l'identifiant ${quizId}`);
@@ -50,24 +86,30 @@ export class GameService {
         const clientPlayers = Array.from(game.clientPlayers.values());
         const trimmedUsername = username.trim().toLowerCase();
 
-        if (game.state !== GameState.Opened) {
-            throw new Error(`La partie ${pin} n'est pas ouverte`);
-        }
+        if (client.id !== game.organizer.id) {
+            if (game.state !== GameState.Opened) {
+                throw new Error(`La partie ${pin} n'est pas ouverte`);
+            }
 
-        if (game.clientPlayers.has(client.id) && game.clientPlayers.get(client.id)?.player.state === PlayerState.Playing) {
-            throw new Error('Vous êtes déjà dans cette partie');
-        }
+            if (game.clientPlayers.get(client.id)?.player?.state === PlayerState.Playing) {
+                throw new Error('Vous êtes déjà dans cette partie');
+            }
 
-        if (username.toLowerCase() === 'organisateur') {
-            throw new Error('Le nom "Organisateur" est réservé');
-        }
+            if (username.trim().toLowerCase() === 'organisateur') {
+                throw new Error('Le nom "Organisateur" est réservé');
+            }
 
-        if (clientPlayers.some((x) => x.player.username.toLowerCase() === trimmedUsername && x.player.state === PlayerState.Banned)) {
-            throw new Error(`Le nom d'utilisateur "${username}" est banni.`);
-        }
+            if (clientPlayers.some((x) => x.player.username.toLowerCase() === trimmedUsername && x.player.state === PlayerState.Banned)) {
+                throw new Error(`Le nom d'utilisateur "${username}" est banni.`);
+            }
 
-        if (clientPlayers.some((x) => x.player.username.toLowerCase() === username.toLowerCase() && x.player.state === PlayerState.Playing)) {
-            throw new Error(`Le nom d'utilisateur "${username}" est déjà pris`);
+            if (
+                clientPlayers.some(
+                    (x) => x.player.username.trim().toLowerCase() === username.trim().toLowerCase() && x.player.state === PlayerState.Playing,
+                )
+            ) {
+                throw new Error(`Le nom d'utilisateur "${username}" est déjà pris`);
+            }
         }
 
         game.clientPlayers.set(client.id, clientPlayer);
@@ -89,7 +131,7 @@ export class GameService {
 
         const gameSubmissions = Array.from(game.currentQuestionQcmSubmissions.values());
         const isCorrect = this.isGoodAnswer(question, submission);
-        const isFirst = gameSubmissions.filter((x) => x.isFinal).length === 1;
+        const isFirst = gameSubmissions.filter((x) => x.isFinal).length === 1 && this.timerService.getTimer(pin).time !== 0;
         const isLast =
             gameSubmissions.filter((x) => x.isFinal).length ===
             Array.from(game.clientPlayers.values()).filter((x) => x.player.state === PlayerState.Playing).length;
@@ -108,6 +150,10 @@ export class GameService {
             isFirstCorrect: isFirst && isCorrect,
             isLast,
         };
+
+        if (isLast) {
+            this.lastQcmSubmissionSubjects.get(pin)?.next();
+        }
 
         return evaluation;
     }
@@ -250,18 +296,11 @@ export class GameService {
         }
     }
 
-    disconnect(client: Socket): DisconnectPayload {
+    disconnect(client: Socket): string[] {
         const games = Array.from(this.games.values());
+        const toCancel = games.filter((game) => game.organizer.id === client.id).map((game) => game.pin);
 
-        const toCancel = games
-            .filter((game) => game.organizer.id === client.id && (game.state === GameState.Opened || game.state === GameState.Closed))
-            .map((game) => game.pin);
-
-        const toEnd = games
-            .filter((game) => game.organizer.id === client.id && (game.state === GameState.Paused || game.state === GameState.Running))
-            .map((game) => game.pin);
-
-        return { toCancel, toEnd };
+        return toCancel;
     }
 
     getGame(pin: string): Game {
@@ -318,5 +357,12 @@ export class GameService {
         }
 
         return game.currentQuestionQcmSubmissions.get(client.id);
+    }
+
+    onLastQcmSubmission(pin: string, callback: () => void): Subscription {
+        const subject = new Subject<void>();
+        this.lastQcmSubmissionSubjects.set(pin, subject);
+
+        return subject.subscribe(callback);
     }
 }

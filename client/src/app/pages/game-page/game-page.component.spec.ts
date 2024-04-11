@@ -4,8 +4,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
-import { lastPlayerEvaluationStub } from '@app/TestStubs/evaluation.stubs';
-import { qcmQuestionStub } from '@app/TestStubs/question.stubs';
+import { lastPlayerEvaluationStub } from '@app/test-stubs/evaluation.stubs';
+import { qcmQuestionStub } from '@app/test-stubs/question.stubs';
 import { SocketServerMock } from '@app/mocks/socket-server-mock';
 import { GameServicesProvider } from '@app/providers/game-services.provider';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
@@ -57,10 +57,10 @@ describe('GamePageComponent', () => {
             'onJoinGame',
             'qcmSubmit',
         ]);
-
         playerServiceSpy = jasmine.createSpyObj<PlayerService>(['onPlayerAbandon', 'onPlayerBan', 'playerBan', 'playerAbandon']);
-
         timerServiceSpy = jasmine.createSpyObj<TimerService>(['onStartTimer', 'onTimerTick', 'startTimer', 'stopTimer', 'onAccelerateTimer']);
+        soundServiceSpy = jasmine.createSpyObj<SoundService>(['loadSound', 'playSound', 'stopSound']);
+
         await TestBed.configureTestingModule({
             declarations: [GamePageComponent],
             imports: [HttpClientTestingModule, RouterTestingModule, BrowserAnimationsModule],
@@ -88,7 +88,6 @@ describe('GamePageComponent', () => {
                 };
             }).subscribe(func);
         });
-        soundServiceSpy = jasmine.createSpyObj<SoundService>(['loadSound', 'playSound', 'stopSound']);
 
         socketServerMock = new SocketServerMock([webSocketServiceSpy['socketInstance']]);
 

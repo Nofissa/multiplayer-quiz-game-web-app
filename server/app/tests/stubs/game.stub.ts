@@ -23,6 +23,7 @@ export const gameStub = (): Game => {
         startDate: new Date(),
         qcmSubmissions: [new Map<string, QcmSubmission>([['playerId', submissionStub()]])],
         qrlSubmissions: [new Map<string, QrlSubmission>([['playerId', qrlSubmissionStub()]])],
+        isRandom: false,
         qrlEvaluations: [new Map<string, QrlEvaluation>([['playerId', qrlEvaluationStub()]])],
         getHighestScore() {
             return Math.max(...Array.from(this.clientPlayers.values()).map((clientPlayer: ClientPlayer) => clientPlayer.player.score));

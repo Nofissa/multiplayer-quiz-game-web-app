@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { BarChartSwiperComponent } from './bar-chart-swiper.component';
 
 describe('HistogrammeSwiperComponent', () => {

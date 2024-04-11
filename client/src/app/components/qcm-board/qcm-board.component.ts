@@ -16,12 +16,12 @@ import { TimerEventType } from '@common/timer-event-type';
 import { Subscription } from 'rxjs';
 
 @Component({
-    selector: 'app-game-board',
-    templateUrl: './game-board.component.html',
-    styleUrls: ['./game-board.component.scss'],
+    selector: 'app-qcm-board',
+    templateUrl: './qcm-board.component.html',
+    styleUrls: ['./qcm-board.component.scss'],
     providers: [GameServicesProvider],
 })
-export class GameBoardComponent implements OnInit, OnDestroy {
+export class QcmBoardComponent implements OnInit, OnDestroy {
     @Input()
     pin: string;
     @Input()

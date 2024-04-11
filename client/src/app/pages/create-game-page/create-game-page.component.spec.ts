@@ -1,13 +1,15 @@
 // for mongodb id
 /* eslint-disable no-underscore-dangle */
+/// for casting types in testing
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
-import { quizStub } from '@app/TestStubs/quiz.stubs';
+import { quizStub } from '@app/test-stubs/quiz.stubs';
+import { qcmQuestionStub } from '@app/test-stubs/question.stubs';
 import { QuizDetailsDialogComponent } from '@app/components/dialogs/quiz-details-dialog/quiz-details-dialog.component';
-import { Quiz } from '@app/interfaces/quiz';
+import { Quiz } from '@common/quiz';
 import { SocketServerMock } from '@app/mocks/socket-server-mock';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { QuizHttpService } from '@app/services/quiz-http/quiz-http.service';
@@ -16,19 +18,24 @@ import { Observable, of } from 'rxjs';
 import { io } from 'socket.io-client';
 import { SwiperModule } from 'swiper/angular';
 import { CreateGamePageComponent } from './create-game-page.component';
+import { QuestionHttpService } from '@app/services/question-http/question-http.service';
+import { Question } from '@common/question';
+import { MIN_QCM_COUNT_TO_ENABLE_RANDOM_MODE } from '@app/constants/constants';
 
 describe('CreateGamePageComponent', () => {
     let component: CreateGamePageComponent;
     let fixture: ComponentFixture<CreateGamePageComponent>;
     let quizHttpServiceMock: jasmine.SpyObj<QuizHttpService>;
+    let questionHttpServiceMock: jasmine.SpyObj<QuestionHttpService>;
     let dialogMock: jasmine.SpyObj<MatDialog>;
     let snackBarMock: jasmine.SpyObj<MatSnackBar>;
     let routerMock: jasmine.SpyObj<Router>;
-    let mockQuiz: Quiz;
     let dialogRefMock: jasmine.SpyObj<MatDialogRef<QuizDetailsDialogComponent>>;
     let gameServiceSpy: jasmine.SpyObj<GameService>;
     let webSocketServiceSpy: jasmine.SpyObj<WebSocketService>;
     let socketServerMock: SocketServerMock;
+    let mockQuiz: Quiz;
+    let mockQuestions: Question[];
 
     type DialogConfig = {
         quiz: Quiz;
@@ -43,20 +50,19 @@ describe('CreateGamePageComponent', () => {
         webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', ['emit', 'on', 'getSocketId'], {
             socketInstance: io(),
         });
-
         quizHttpServiceMock = jasmine.createSpyObj('QuizHttpService', ['getVisibleQuizzes']);
+        questionHttpServiceMock = jasmine.createSpyObj('QuestionHttpService', ['getAllQuestions']);
         dialogMock = jasmine.createSpyObj('MatDialog', ['open']);
         snackBarMock = jasmine.createSpyObj('MatSnackBar', ['open']);
         routerMock = jasmine.createSpyObj('Router', ['navigate']);
+
         mockQuiz = quizStub();
+        mockQuestions = qcmQuestionStub();
         quizHttpServiceMock.getVisibleQuizzes.and.returnValue(of([mockQuiz]));
+        questionHttpServiceMock.getAllQuestions.and.returnValue(of(mockQuestions));
         dialogRefMock = jasmine.createSpyObj('MatDialogRef', ['close']);
         dialogMock.open.and.returnValue(dialogRefMock);
         gameServiceSpy = jasmine.createSpyObj('GameService', ['onCreateGame', 'createGame', 'joinGame']);
-
-        gameServiceSpy.onCreateGame.and.callFake((callback) => {
-            return webSocketServiceSpy.on('createGame', callback);
-        });
 
         await TestBed.configureTestingModule({
             declarations: [CreateGamePageComponent],
@@ -65,15 +71,12 @@ describe('CreateGamePageComponent', () => {
                 { provide: WebSocketService, useValue: webSocketServiceSpy },
                 { provide: GameService, useValue: gameServiceSpy },
                 { provide: QuizHttpService, useValue: quizHttpServiceMock },
+                { provide: QuestionHttpService, useValue: questionHttpServiceMock },
                 { provide: MatDialog, useValue: dialogMock },
                 { provide: MatSnackBar, useValue: snackBarMock },
                 { provide: Router, useValue: routerMock },
             ],
         }).compileComponents();
-
-        fixture = TestBed.createComponent(CreateGamePageComponent);
-
-        webSocketServiceSpy = TestBed.inject(WebSocketService) as jasmine.SpyObj<WebSocketService>;
 
         webSocketServiceSpy.on.and.callFake(<T>(eventName: string, func: (data: T) => void) => {
             return new Observable<T>((observer) => {
@@ -85,9 +88,13 @@ describe('CreateGamePageComponent', () => {
                 };
             }).subscribe(func);
         });
+        gameServiceSpy.onCreateGame.and.callFake((callback) => {
+            return webSocketServiceSpy.on('createGame', callback);
+        });
 
         socketServerMock = new SocketServerMock([webSocketServiceSpy['socketInstance']]);
 
+        fixture = TestBed.createComponent(CreateGamePageComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });
@@ -97,6 +104,40 @@ describe('CreateGamePageComponent', () => {
         expect(quizHttpServiceMock.getVisibleQuizzes).toHaveBeenCalled();
         expect(component.quizzArray).toEqual([mockQuiz]);
         expect(socketServerMock).toBeTruthy();
+    });
+
+    it('should set enableRandomMode to true  5 or more QCM questions exist', () => {
+        questionHttpServiceMock.getAllQuestions.and.returnValue(
+            of(
+                Array.from({ length: MIN_QCM_COUNT_TO_ENABLE_RANDOM_MODE }).map(() => {
+                    return { type: 'QCM' } as Question;
+                }),
+            ),
+        );
+        component.ngOnInit();
+        expect(component.enableRandomMode).toBe(true);
+        questionHttpServiceMock.getAllQuestions.and.returnValue(
+            of(
+                Array.from({ length: MIN_QCM_COUNT_TO_ENABLE_RANDOM_MODE + 1 }).map(() => {
+                    return { type: 'QCM' } as Question;
+                }),
+            ),
+        );
+        component.ngOnInit();
+        expect(component.enableRandomMode).toBe(true);
+    });
+
+    it('should set enableRandomMode to false if less than 5 QCM questions exist', () => {
+        questionHttpServiceMock.getAllQuestions.and.returnValue(
+            of([
+                { type: 'QRL' } as Question,
+                ...Array.from({ length: MIN_QCM_COUNT_TO_ENABLE_RANDOM_MODE - 1 }).map(() => {
+                    return { type: 'QCM' } as Question;
+                }),
+            ]),
+        );
+        component.ngOnInit();
+        expect(component.enableRandomMode).toBe(false);
     });
 
     it('should open quiz details dialog with correct data', () => {
@@ -109,7 +150,7 @@ describe('CreateGamePageComponent', () => {
     it('should navigate to waiting room page on createGame', () => {
         component['createGame'](mockQuiz);
         socketServerMock.emit('createGame', '1234');
-        expect(routerMock.navigate).toHaveBeenCalledWith(['/host-game'], { queryParams: { pin: '1234' } });
+        expect(routerMock.navigate).toHaveBeenCalledWith(['/host-game'], { queryParams: { pin: '1234', isRandom: false } });
     });
 
     it('should navigate to game page in test mode on testGame', () => {

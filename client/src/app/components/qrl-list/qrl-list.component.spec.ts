@@ -1,9 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { firstPlayerStub } from '@app/TestStubs/player.stubs';
-import { qrlQuestionStub } from '@app/TestStubs/question.stubs';
-import { quizStub } from '@app/TestStubs/quiz.stubs';
+import { firstPlayerStub } from '@app/test-stubs/player.stubs';
+import { qrlQuestionStub } from '@app/test-stubs/question.stubs';
+import { quizStub } from '@app/test-stubs/quiz.stubs';
 import { SocketServerMock } from '@app/mocks/socket-server-mock';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
