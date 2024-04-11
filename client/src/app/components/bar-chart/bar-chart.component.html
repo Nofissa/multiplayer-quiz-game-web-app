@@ -15,9 +15,9 @@
 
     <div class="choice-container">
         <mat-card *ngFor="let choice of data.question.choices; let i = index" class="choice-{{ i }} choice flex-row">
-            <mat-card-content *ngIf="choice.isCorrect" matBadge="✔" matBadgePosition="above after" matBadgeColor="primary" matBadgeSize="large">{{
-                choice.text
-            }}</mat-card-content>
+            <mat-card-content *ngIf="choice.isCorrect" matBadge="✔" matBadgePosition="above after" matBadgeSize="large" class="green-badge">
+                {{ choice.text }}
+            </mat-card-content>
             <mat-card-content *ngIf="!choice.isCorrect" matBadge="✘" matBadgePosition="above after" matBadgeColor="warn" matBadgeSize="large">{{
                 choice.text
             }}</mat-card-content>

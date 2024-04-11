@@ -1,6 +1,7 @@
-import { Component, Input, ViewEncapsulation } from '@angular/core';
+import { Component, Input, ViewChild, ViewEncapsulation } from '@angular/core';
 import { BarChartData } from '@app/interfaces/bar-chart-data';
 import SwiperCore, { EffectCoverflow, Navigation, Pagination } from 'swiper';
+import { SwiperComponent } from 'swiper/angular';
 
 SwiperCore.use([Navigation, Pagination, EffectCoverflow]);
 
@@ -11,9 +12,18 @@ SwiperCore.use([Navigation, Pagination, EffectCoverflow]);
     encapsulation: ViewEncapsulation.None,
 })
 export class BarChartSwiperComponent {
+    @ViewChild(SwiperComponent) swiperComponent: SwiperComponent;
+
     @Input()
     data: BarChartData[];
 
     @Input()
     numberOfPlayers: number;
+
+    goToEndSlide(): void {
+        if (this.swiperComponent && this.swiperComponent.swiperRef) {
+            const lastIndex = this.swiperComponent.swiperRef.slides.length - 1;
+            this.swiperComponent.swiperRef.slideTo(lastIndex);
+        }
+    }
 }

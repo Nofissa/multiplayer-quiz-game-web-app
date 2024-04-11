@@ -1,5 +1,6 @@
 import { ClientPlayer } from '@app/classes/client-player';
 import { Game } from '@app/classes/game';
+import { Constant } from '@app/constants/constants';
 import { generateRandomPin } from '@app/helpers/pin';
 import { DisconnectPayload } from '@app/interfaces/disconnect-payload';
 import { Question } from '@app/model/database/question';
@@ -16,11 +17,6 @@ import { QuestionPayload } from '@common/question-payload';
 import { Submission } from '@common/submission';
 import { Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
-
-const PERCENTAGE_DIVIDER = 100;
-const NO_POINTS = 0;
-const NO_BONUS_MULTIPLIER = 1;
-const BONUS_MULTIPLIER = 1.2;
 
 @Injectable()
 export class GameService {
@@ -51,6 +47,7 @@ export class GameService {
         const game = this.getGame(pin);
         const clientPlayer = new ClientPlayer(client, username);
         const clientPlayers = Array.from(game.clientPlayers.values());
+        const trimmedUsername = username.trim().toLowerCase();
 
         if (game.state !== GameState.Opened) {
             throw new Error(`La partie ${pin} n'est pas ouverte`);
@@ -64,8 +61,8 @@ export class GameService {
             throw new Error('Le nom "Organisateur" est réservé');
         }
 
-        if (clientPlayers.some((x) => x.player.username.toLowerCase() === username.toLowerCase() && x.player.state === PlayerState.Banned)) {
-            throw new Error(`Le nom d'utilisateur "${username}" banni`);
+        if (clientPlayers.some((x) => x.player.username.toLowerCase() === trimmedUsername && x.player.state === PlayerState.Banned)) {
+            throw new Error(`Le nom d'utilisateur "${username}" est banni.`);
         }
 
         if (clientPlayers.some((x) => x.player.username.toLowerCase() === username.toLowerCase() && x.player.state === PlayerState.Playing)) {
@@ -96,8 +93,8 @@ export class GameService {
             gameSubmissions.filter((x) => x.isFinal).length ===
             Array.from(game.clientPlayers.values()).filter((x) => x.player.state === PlayerState.Playing).length;
 
-        let score = isCorrect ? question.points : NO_POINTS;
-        score *= isFirst ? BONUS_MULTIPLIER : NO_BONUS_MULTIPLIER;
+        let score = isCorrect ? question.points : Constant.NoPoints;
+        score *= isFirst ? Constant.BonusMultiplier : Constant.NoBonusMultiplier;
 
         const player = game.clientPlayers.get(client.id).player;
         player.score += score;
@@ -237,7 +234,7 @@ export class GameService {
             Array.from(game.clientPlayers.values()).filter((x) => x.player.state === PlayerState.Playing).length;
 
         evalQrl.isLast = isLast;
-        evalQrl.score = (question.points * evalQrl.grade) / PERCENTAGE_DIVIDER;
+        evalQrl.score = (question.points * evalQrl.grade) / Constant.PercentageDivider;
         player.score += evalQrl.score;
 
         game.currentQuestionQrlEvaluations.set(socketId, evalQrl);
