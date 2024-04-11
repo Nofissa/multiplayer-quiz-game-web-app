@@ -39,7 +39,7 @@ export class BarChartService {
                 break;
 
             case 'ACTIVITY':
-                newBarchartData.chartElements.push({ text: 'innactif' });
+                newBarchartData.chartElements.push({ text: 'inactif' });
                 newBarchartData.chartElements.push({ text: 'actif' });
                 break;
         }
