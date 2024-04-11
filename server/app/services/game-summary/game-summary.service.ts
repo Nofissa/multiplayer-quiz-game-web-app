@@ -9,7 +9,7 @@ export class GameSummaryService {
     constructor(@InjectModel(GameSummary.name) public model: Model<GameSummaryDocument>) {}
 
     async getGameSummaries(): Promise<GameSummary[]> {
-        return this.model.find({});
+        return this.model.find().sort({ startDate: -1 });
     }
 
     async deleteAllGameSummaries(): Promise<void> {
