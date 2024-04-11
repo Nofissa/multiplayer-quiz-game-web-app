@@ -78,7 +78,7 @@ describe('ChatRoomComponent', () => {
         mockGameHttpService = jasmine.createSpyObj('GameHttpService', ['getGameSnapshotByPin']);
         mockMessageService = jasmine.createSpyObj('MessageService', ['onSendMessage']);
         mockGameService = jasmine.createSpyObj('GameService', ['onStartGame']);
-        mockPlayerService = jasmine.createSpyObj('PlayerService', ['getCurrentPlayer', 'onPlayerMute']);
+        mockPlayerService = jasmine.createSpyObj('PlayerService', ['getCurrentPlayer', 'onPlayerMute', 'onPlayerBan']);
 
         TestBed.configureTestingModule({
             declarations: [ChatRoomComponent],

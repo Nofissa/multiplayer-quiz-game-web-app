@@ -4,4 +4,5 @@ export interface PlayerListDisplayOptions {
     speedAwardCount?: boolean;
     ban?: boolean;
     quitters?: boolean;
+    mute?: boolean;
 }
