@@ -127,7 +127,7 @@ export class CreateGamePageComponent implements OnInit, OnDestroy {
             this.playerService.setPlayer(pin, player);
         });
 
-        this.gameService.createGame(quiz?.id ?? undefined);
+        this.gameService.createGame(quiz?._id ?? undefined);
     }
 
     private testGame(quiz: Quiz) {
