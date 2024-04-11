@@ -1,6 +1,7 @@
-import { Submission } from '@common/submission';
-export const submissionStub = (): Submission => {
+import { QcmSubmission } from '@common/qcm-submission';
+export const submissionStub = (): QcmSubmission => {
     return {
+        clientId: 'playerId',
         choices: [
             { payload: 0, isSelected: false },
             { payload: 1, isSelected: false },

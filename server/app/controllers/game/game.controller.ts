@@ -49,6 +49,7 @@ export class GameController {
                 },
                 questionQcmSubmissions: game.qcmSubmissions.map((x) => Array.from(x.values())),
                 questionQrlSubmission: game.qrlSubmissions.map((x) => Array.from(x.values())),
+                questionQrlEvaluation: game.qrlEvaluations.map((x) => Array.from(x.values())),
             };
 
             response.status(HttpStatus.OK).json(snapshot);

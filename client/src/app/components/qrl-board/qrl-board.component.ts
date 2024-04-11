@@ -100,7 +100,7 @@ export class QrlBoardComponent implements OnInit, OnDestroy {
             this.loadNextQuestion(snapshot.quiz.questions[snapshot.currentQuestionIndex]);
         });
         this.setupSubscriptions(this.pin);
-        this.gameService.qrlInputChange(this.pin, this.isTyping);
+        this.gameService.qrlInputChange(this.pin, false);
     }
 
     ngOnDestroy() {
@@ -118,6 +118,8 @@ export class QrlBoardComponent implements OnInit, OnDestroy {
             this.isTyping = true;
             this.gameService.qrlInputChange(this.pin, this.isTyping);
         }
+
+        clearInterval(this.interval);
 
         this.interval = setInterval(() => {
             this.isTyping = false;

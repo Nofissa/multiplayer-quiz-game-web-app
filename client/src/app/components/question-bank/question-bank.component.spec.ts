@@ -227,21 +227,21 @@ describe('QuestionBankComponent', () => {
         });
 
         it('should filterQuestions filter only QCM questions', () => {
-            component.questions = bothQuestionStub();
+            component.questions = allQuestionTypeStub();
             component.filterQuestions('QCM');
             expect(component.displayedQuestions).toEqual(qcmQuestionStub());
         });
 
         it('should filterQuestions filter only QRL questions', () => {
-            component.questions = bothQuestionStub();
+            component.questions = allQuestionTypeStub();
             component.filterQuestions('QRL');
             expect(component.displayedQuestions).toEqual(qrlQuestionStub());
         });
 
         it('should filterQuestions filter all questions when both types are selected', () => {
-            component.questions = bothQuestionStub();
+            component.questions = allQuestionTypeStub();
             component.filterQuestions('BOTH');
-            expect(component.displayedQuestions).toEqual(bothQuestionStub());
+            expect(component.displayedQuestions).toEqual(allQuestionTypeStub());
         });
     });
 });

@@ -7,6 +7,7 @@ import { DisconnectPayload } from '@app/interfaces/disconnect-payload';
 import { Question } from '@app/model/database/question';
 import { Quiz } from '@app/model/database/quiz';
 import { QuizService } from '@app/services/quiz/quiz.service';
+import { BarchartSubmission } from '@common/barchart-submission';
 import { QuestionService } from '@app/services/question/question.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { GameState } from '@common/game-state';
@@ -14,11 +15,11 @@ import { Grade } from '@common/grade';
 import { Player } from '@common/player';
 import { PlayerState } from '@common/player-state';
 import { QcmEvaluation } from '@common/qcm-evaluation';
+import { QcmSubmission } from '@common/qcm-submission';
 import { QrlEvaluation } from '@common/qrl-evaluation';
 import { QrlSubmission } from '@common/qrl-submission';
 import { Question as CommonQuestion } from '@common/question';
 import { QuestionPayload } from '@common/question-payload';
-import { Submission } from '@common/submission';
 import { Injectable } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { Socket } from 'socket.io';
@@ -225,12 +226,11 @@ export class GameService {
         };
     }
 
-    qcmToggleChoice(client: Socket, pin: string, choiceIndex: number): Submission[] {
+    qcmToggleChoice(client: Socket, pin: string, choiceIndex: number): BarchartSubmission {
         const game = this.getGame(pin);
         const submission = this.getOrCreateSubmission(client, game);
         submission.choices[choiceIndex].isSelected = !submission.choices[choiceIndex].isSelected;
-
-        return Array.from(game.currentQuestionQcmSubmissions.values());
+        return { clientId: client.id, index: choiceIndex, isSelected: submission.choices[choiceIndex].isSelected };
     }
 
     qrlSubmit(client: Socket, pin: string, answer: string): QrlSubmission {
@@ -252,7 +252,7 @@ export class GameService {
         return submission;
     }
 
-    qrlInputChange(client: Socket, pin: string, isTyping: boolean): boolean[] {
+    qrlInputChange(client: Socket, pin: string, isTyping: boolean): BarchartSubmission {
         const game = this.getGame(pin);
         const clientPlayers = game.clientPlayers;
 
@@ -261,7 +261,7 @@ export class GameService {
             clientPlayers.get(client.id).player.hasInteracted = true;
         }
 
-        return Array.from(clientPlayers.values()).map((x) => x.player.isTyping);
+        return { clientId: client.id, index: isTyping ? 1 : 0, isSelected: true };
     }
 
     qrlEvaluate(socketId: string, pin: string, grade: Grade): QrlEvaluation {
@@ -335,7 +335,7 @@ export class GameService {
         return game.organizer.id === clientId;
     }
 
-    isGoodAnswer(question: Question, submission: Submission): boolean {
+    isGoodAnswer(question: Question, submission: QcmSubmission): boolean {
         const correctAnswersIndices = new Set(
             question.choices.reduce((indices, choice, index) => {
                 if (choice.isCorrect) {
@@ -356,6 +356,7 @@ export class GameService {
     getOrCreateSubmission(client: Socket, game: Game) {
         if (!game.currentQuestionQcmSubmissions.has(client.id)) {
             game.currentQuestionQcmSubmissions.set(client.id, {
+                clientId: client.id,
                 choices: game.currentQuestion.choices.map((_, index) => {
                     return { payload: index, isSelected: false };
                 }),

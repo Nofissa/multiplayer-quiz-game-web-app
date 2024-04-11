@@ -4,7 +4,7 @@ import { Chatlog } from '@common/chatlog';
 import { GameState } from '@common/game-state';
 import { QrlEvaluation } from '@common/qrl-evaluation';
 import { QrlSubmission } from '@common/qrl-submission';
-import { Submission as QcmSubmission } from '@common/submission';
+import { QcmSubmission } from '@common/qcm-submission';
 import { Socket } from 'socket.io';
 import { ClientPlayer } from './client-player';
 

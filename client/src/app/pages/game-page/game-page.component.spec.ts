@@ -11,6 +11,7 @@ import { GameServicesProvider } from '@app/providers/game-services.provider';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { PlayerService } from '@app/services/player/player.service';
+import { SoundService } from '@app/services/sound/sound.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
@@ -23,7 +24,6 @@ import { TimerPayload } from '@common/timer-payload';
 import { Observable, throwError } from 'rxjs';
 import { io } from 'socket.io-client';
 import { GamePageComponent } from './game-page.component';
-import { SoundService } from '@app/services/sound/sound.service';
 
 describe('GamePageComponent', () => {
     let component: GamePageComponent;
@@ -173,8 +173,9 @@ describe('GamePageComponent', () => {
         expect(component['router'].navigate).toHaveBeenCalled();
     });
 
-    it('should setupSubscriptions', () => {
-        const payload: GameEventPayload<Question> = { pin: '123', data: qcmQuestionStub()[0] };
+    it('should setupSubscriptions if isTest is true', () => {
+        const startPayload: GameEventPayload<Question> = { pin: '123', data: qcmQuestionStub()[0] };
+        const nextQuestionPayload: GameEventPayload<QuestionPayload> = { pin: '123', data: { isLast: true, question: qcmQuestionStub()[0] } };
         const timerPayload: GameEventPayload<TimerPayload> = { pin: '123', data: { remainingTime: 0, eventType: TimerEventType.StartGame } };
         const evaluationPayload: GameEventPayload<QcmEvaluation> = { pin: '123', data: lastPlayerEvaluationStub() };
         const messagePayload: GameEventPayload<string> = { pin: '123', data: 'message' };
@@ -183,12 +184,13 @@ describe('GamePageComponent', () => {
         spyOn(component, 'handleCancelGame');
         spyOn(component['router'], 'navigateByUrl');
         component.isTest = true;
+        fixture.detectChanges();
         component['setupSubscriptions']('123');
         socketServerMock.emit('cancelGame', messagePayload);
         socketServerMock.emit('endGame', voidPayload);
         socketServerMock.emit('startTimer', timerPayload);
-        socketServerMock.emit('startGame', payload);
-        socketServerMock.emit('nextQuestion', payload);
+        socketServerMock.emit('startGame', startPayload);
+        socketServerMock.emit('nextQuestion', nextQuestionPayload);
         socketServerMock.emit('qcmSubmit', evaluationPayload);
         socketServerMock.emit('timerTick', timerPayload);
 
@@ -211,6 +213,7 @@ describe('GamePageComponent', () => {
         spyOn(component, 'handleCancelGame');
         spyOn(component['router'], 'navigateByUrl');
         component.isTest = true;
+        fixture.detectChanges();
         component['setupSubscriptions']('123');
         socketServerMock.emit('cancelGame', messagePayload);
         socketServerMock.emit('endGame', voidPayload);
@@ -239,6 +242,7 @@ describe('GamePageComponent', () => {
         spyOn(component, 'handleCancelGame');
         spyOn(component['router'], 'navigateByUrl');
         component.isTest = false;
+        fixture.detectChanges();
         component['setupSubscriptions']('123');
         socketServerMock.emit('cancelGame', messagePayload);
         socketServerMock.emit('endGame', voidPayload);

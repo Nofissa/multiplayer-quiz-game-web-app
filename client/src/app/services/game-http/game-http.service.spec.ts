@@ -14,6 +14,7 @@ const gameSnapshotStub: GameSnapshot = {
     currentQuestionIndex: 0,
     questionQcmSubmissions: [],
     questionQrlSubmission: [],
+    questionQrlEvaluation: [],
 };
 
 describe('GameHttpService', () => {

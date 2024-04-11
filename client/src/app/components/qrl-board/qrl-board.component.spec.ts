@@ -29,7 +29,7 @@ import { QrlEvaluation } from '@common/qrl-evaluation';
 import { QrlSubmission } from '@common/qrl-submission';
 import { Question } from '@common/question';
 import { Quiz } from '@common/quiz';
-import { Submission } from '@common/submission';
+import { QcmSubmission } from '@common/qcm-submission';
 import { TimerEventType } from '@common/timer-event-type';
 import { TimerPayload } from '@common/timer-payload';
 import { Observable, Subscription, of } from 'rxjs';
@@ -76,7 +76,7 @@ describe('QrlBoardComponent', () => {
 
     const mockState: GameState = GameState.Opened;
 
-    const mockQuestionSubmissions: Submission[][] = [[{ choices: [{ payload: 'testinggg', isSelected: true }], isFinal: true }]];
+    const mockQuestionSubmissions: QcmSubmission[][] = [[{ clientId: 'Some ID', choices: [{ payload: 1, isSelected: true }], isFinal: true }]];
     const mockQuestionQrlSubmissions: QrlSubmission[][] = [[{ answer: 'hello', clientId: 'playerId' }]];
 
     const mockGameSnapshot: GameSnapshot = {
@@ -87,6 +87,7 @@ describe('QrlBoardComponent', () => {
         currentQuestionIndex: 0,
         questionQcmSubmissions: mockQuestionSubmissions,
         questionQrlSubmission: mockQuestionQrlSubmissions,
+        questionQrlEvaluation: [],
     };
 
     const observableSnapShot = of(mockGameSnapshot);

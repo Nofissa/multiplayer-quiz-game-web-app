@@ -6,12 +6,11 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
-import { barChartDataStub } from '@app/test-stubs/bar-chart-data.stubs';
-import { firstPlayerEvaluationStub, lastPlayerEvaluationStub } from '@app/test-stubs/evaluation.stubs';
-import { secondPlayerStub } from '@app/test-stubs/player.stubs';
-import { qcmQuestionStub } from '@app/test-stubs/question.stubs';
-import { mockGameSnapshot } from '@app/test-stubs/snapshot.stubs';
-import { submissionStub } from '@app/test-stubs/submission.stubs';
+import { barChartDataStub } from '@app/TestStubs/bar-chart-data.stubs';
+import { firstPlayerEvaluationStub, lastPlayerEvaluationStub } from '@app/TestStubs/evaluation.stubs';
+import { secondPlayerStub } from '@app/TestStubs/player.stubs';
+import { qcmQuestionStub } from '@app/TestStubs/question.stubs';
+import { mockSnapshotStubs } from '@app/TestStubs/snapshot.stubs';
 import { SocketServerMock } from '@app/mocks/socket-server-mock';
 import { GameServicesProvider } from '@app/providers/game-services.provider';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
@@ -20,23 +19,22 @@ import { GameService } from '@app/services/game/game-service/game.service';
 import { KeyBindingService } from '@app/services/key-binding/key-binding.service';
 import { MessageService } from '@app/services/message/message.service';
 import { PlayerService } from '@app/services/player/player.service';
+import { SoundService } from '@app/services/sound/sound.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
+import { BarchartSubmission } from '@common/barchart-submission';
 import { GameEventPayload } from '@common/game-event-payload';
 import { GameState } from '@common/game-state';
 import { Player } from '@common/player';
 import { QcmEvaluation } from '@common/qcm-evaluation';
-import { Question } from '@common/question';
 import { QuestionPayload } from '@common/question-payload';
-import { Submission } from '@common/submission';
 import { TimerEventType } from '@common/timer-event-type';
 import { TimerPayload } from '@common/timer-payload';
 import { Observable, of, throwError } from 'rxjs';
 import { io } from 'socket.io-client';
 import { HostGamePageComponent } from './host-game-page.component';
 import SpyObj = jasmine.SpyObj;
-import { SoundService } from '@app/services/sound/sound.service';
 
 const PIN = '1234';
 const NEXT_QUESTION_DELAY = 5;
@@ -65,12 +63,12 @@ describe('HostGamePageComponent', () => {
     };
 
     beforeEach(() => {
-        webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', ['emit', 'on'], {
+        webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', ['emit', 'on', 'getSocketId'], {
             socketInstance: io(),
         });
         barChartServiceSpy = jasmine.createSpyObj<BarChartService>([
-            'addQuestion',
-            'updateBarChartData',
+            'addChart',
+            'updateChartData',
             'getAllBarChart',
             'getCurrentQuestionData',
             'setData',
@@ -92,6 +90,7 @@ describe('HostGamePageComponent', () => {
             'onEndGame',
             'onQrlEvaluate',
             'onQrlSubmit',
+            'onQrlInputChange',
         ]);
         gameServiceSpy.onToggleGameLock.and.callFake((pin, callback) => {
             return webSocketServiceSpy.on('toggleGameLock', applyIfPinMatches(pin, callback));
@@ -119,7 +118,7 @@ describe('HostGamePageComponent', () => {
         });
         gameHttpServiceSpy = jasmine.createSpyObj<GameHttpService>(['getGameSnapshotByPin']);
         gameHttpServiceSpy.getGameSnapshotByPin.and.callFake(() => {
-            return of(mockGameSnapshot()[1]);
+            return of(mockSnapshotStubs()[1]);
         });
         timerServiceSpy = jasmine.createSpyObj<TimerService>(['onStartTimer', 'onTimerTick', 'startTimer', 'stopTimer', 'onAccelerateTimer']);
         timerServiceSpy.onTimerTick.and.callFake((pin, callback) => {
@@ -253,17 +252,16 @@ describe('HostGamePageComponent', () => {
         socketServerMock.emit('startGame', payload);
         expect(component.gameState).toEqual(GameState.Running);
         expect(component.isLastQuestion).toBeFalse();
-        expect(barChartServiceSpy.addQuestion).toHaveBeenCalled();
+        expect(barChartServiceSpy.addChart).toHaveBeenCalled();
         expect(timerServiceSpy.startTimer).toHaveBeenCalledWith(PIN, TimerEventType.StartGame, NEXT_QUESTION_DELAY);
     });
 
     it('should nextQuestion send nextQuestion signal to server and change gameState and set currentQuestionHasEnded', () => {
         component.nextQuestion();
         expect(gameServiceSpy.nextQuestion).toHaveBeenCalledWith(PIN);
-        const payload: GameEventPayload<Question> = { pin: PIN, data: qcmQuestionStub()[0] };
+        const payload: GameEventPayload<QuestionPayload> = { pin: PIN, data: { isLast: true, question: qcmQuestionStub()[0] } };
         socketServerMock.emit('nextQuestion', payload);
-        expect(barChartServiceSpy.addQuestion).toHaveBeenCalled();
-        expect(timerServiceSpy.startTimer).toHaveBeenCalled();
+        expect(barChartServiceSpy.addChart).toHaveBeenCalled();
     });
 
     it('should cancelGame cancel game server side', () => {
@@ -283,9 +281,9 @@ describe('HostGamePageComponent', () => {
     });
 
     it('should the server emitting toggleSelectChoice affect the barChartData', () => {
-        const payload: GameEventPayload<Submission[]> = { pin: PIN, data: submissionStub() };
+        const payload: GameEventPayload<BarchartSubmission> = { pin: PIN, data: undefined as unknown as BarchartSubmission };
         socketServerMock.emit('toggleSelectChoice', payload);
-        expect(barChartServiceSpy.updateBarChartData).toHaveBeenCalledWith(payload.data);
+        expect(barChartServiceSpy.updateChartData).toHaveBeenCalledWith(payload.data);
     });
 
     it('should the server emitting submitChoices do nothing if not last player, or set currentQuestionHasEnded to true', () => {
@@ -302,13 +300,13 @@ describe('HostGamePageComponent', () => {
         component.gameState = GameState.Running;
         const payload: GameEventPayload<Player> = { pin: PIN, data: secondPlayerStub() };
         gameHttpServiceSpy.getGameSnapshotByPin.and.callFake(() => {
-            return of(mockGameSnapshot()[0]);
+            return of(mockSnapshotStubs()[0]);
         });
         socketServerMock.emit('playerAbandon', payload);
         expect(gameServiceSpy.cancelGame).toHaveBeenCalled();
         gameServiceSpy.cancelGame.calls.reset();
         gameHttpServiceSpy.getGameSnapshotByPin.and.callFake(() => {
-            return of(mockGameSnapshot()[1]);
+            return of(mockSnapshotStubs()[1]);
         });
         socketServerMock.emit('playerAbandon', payload);
         expect(gameServiceSpy.cancelGame).not.toHaveBeenCalled();
