@@ -1,8 +1,8 @@
 import { ClientPlayer } from '@app/classes/client-player';
 import { Game } from '@app/classes/game';
+import { Constant } from '@app/constants/constants';
 import { generateRandomPin } from '@app/helpers/pin';
 import { DisconnectPayload } from '@app/interfaces/disconnect-payload';
-import { GameSummary } from '@app/model/database/game-summary';
 import { Question } from '@app/model/database/question';
 import { QuizService } from '@app/services/quiz/quiz.service';
 import { GameState } from '@common/game-state';
@@ -17,21 +17,12 @@ import { QuestionPayload } from '@common/question-payload';
 import { Submission } from '@common/submission';
 import { Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
-import { GameSummaryService } from './game-summary.service';
-
-const PERCENTAGE_DIVIDER = 100;
-const NO_POINTS = 0;
-const NO_BONUS_MULTIPLIER = 1;
-const BONUS_MULTIPLIER = 1.2;
 
 @Injectable()
 export class GameService {
     games: Map<string, Game> = new Map();
 
-    constructor(
-        private gameSummaryService: GameSummaryService,
-        private readonly quizService: QuizService,
-    ) {}
+    constructor(private readonly quizService: QuizService) {}
 
     async createGame(client: Socket, quizId: string): Promise<string> {
         const quiz = await this.quizService.getQuizById(quizId);
@@ -102,8 +93,8 @@ export class GameService {
             gameSubmissions.filter((x) => x.isFinal).length ===
             Array.from(game.clientPlayers.values()).filter((x) => x.player.state === PlayerState.Playing).length;
 
-        let score = isCorrect ? question.points : NO_POINTS;
-        score *= isFirst ? BONUS_MULTIPLIER : NO_BONUS_MULTIPLIER;
+        let score = isCorrect ? question.points : Constant.NoPoints;
+        score *= isFirst ? Constant.BonusMultiplier : Constant.NoBonusMultiplier;
 
         const player = game.clientPlayers.get(client.id).player;
         player.score += score;
@@ -243,7 +234,7 @@ export class GameService {
             Array.from(game.clientPlayers.values()).filter((x) => x.player.state === PlayerState.Playing).length;
 
         evalQrl.isLast = isLast;
-        evalQrl.score = (question.points * evalQrl.grade) / PERCENTAGE_DIVIDER;
+        evalQrl.score = (question.points * evalQrl.grade) / Constant.PercentageDivider;
         player.score += evalQrl.score;
 
         game.currentQuestionQrlEvaluations.set(socketId, evalQrl);
@@ -326,18 +317,5 @@ export class GameService {
         }
 
         return game.currentQuestionQcmSubmissions.get(client.id);
-    }
-
-    async concludeGame(pin: string): Promise<void> {
-        const game = this.getGame(pin);
-        const numberOfPlayers = game.clientPlayers.size;
-        const bestScore = game.getHighestScore();
-        const gameSummary: GameSummary = {
-            title: game.quiz.title,
-            startDate: game.startDate,
-            numberOfPlayers,
-            bestScore,
-        };
-        await this.gameSummaryService.addGameSummary(gameSummary);
     }
 }
