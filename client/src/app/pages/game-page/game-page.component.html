@@ -2,7 +2,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
 </head>
 <div class="container">
-    <app-nav-header></app-nav-header>
+    <app-nav-header [isActive]="false"></app-nav-header>
     <span *ngIf="isTest" class="test-mode">MODE TEST</span>
     <div
         [ngClass]="{
