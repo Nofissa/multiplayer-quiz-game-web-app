@@ -78,7 +78,7 @@ export class HostGamePageComponent implements OnInit {
 
     ngOnInit() {
         this.pin = this.activatedRoute.snapshot.queryParams['pin'];
-        this.isRandom = this.activatedRoute.snapshot.queryParams['isRandom'] === true;
+        this.isRandom = this.activatedRoute.snapshot.queryParams['isRandom'] === 'true';
         this.gameHttpService.getGameSnapshotByPin(this.pin).subscribe({
             error: (error: HttpErrorResponse) => {
                 if (error.status === HttpStatusCode.NotFound) {
