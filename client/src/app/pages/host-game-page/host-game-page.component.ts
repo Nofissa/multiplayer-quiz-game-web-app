@@ -22,6 +22,7 @@ import { BarchartSubmission } from '@common/barchart-submission';
 import { GameState } from '@common/game-state';
 import { PlayerState } from '@common/player-state';
 import { Question } from '@common/question';
+import { QuestionType } from '@common/question-type';
 import { TimerEventType } from '@common/timer-event-type';
 import { Subscription } from 'rxjs';
 
@@ -42,6 +43,7 @@ export class HostGamePageComponent implements OnInit {
     isLastQuestion: boolean = false;
     question: Question | undefined;
     nextAvailable: boolean = false;
+    questionType: QuestionType = 'QCM';
     private eventSubscriptions: Subscription[] = [];
     private readonly activatedRoute: ActivatedRoute;
     private readonly router: Router;
@@ -110,6 +112,10 @@ export class HostGamePageComponent implements OnInit {
         this.gameService.startGame(this.pin);
     }
 
+    isQRL() {
+        return this.questionType === 'QRL';
+    }
+
     nextQuestion() {
         this.gameState = GameState.Running;
         this.currentQuestionHasEnded = false;
@@ -130,6 +136,7 @@ export class HostGamePageComponent implements OnInit {
     }
 
     private addQuestion(question: Question) {
+        this.questionType = question.type;
         if (question.type === 'QRL') {
             this.barChartService.addChart(question, 'ACTIVITY');
         } else {

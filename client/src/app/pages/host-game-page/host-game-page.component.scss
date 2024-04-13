@@ -1,5 +1,7 @@
 .container {
     height: 100vh;
+    padding-left: 20px;
+    padding-right: 20px;
 }
 
 .main-container {
@@ -97,7 +99,7 @@
 .bar-chart {
     margin: 10px;
     grid-area: bar-chart;
-    width: 900px;
+    width: 90%;
     justify-self: center;
 }
 
@@ -107,8 +109,14 @@
     align-items: end;
 }
 
-.app-component {
-    display: flex;
+.player-list {
+    align-self: center;
     justify-content: center;
-    padding-left: 40%;
+    width: 90%;
+    display: flex;
+}
+
+.app-component {
+    justify-self: center;
+    width: 70%;
 }

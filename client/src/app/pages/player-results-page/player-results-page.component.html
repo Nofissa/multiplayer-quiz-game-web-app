@@ -1,5 +1,5 @@
 <div class="container flex-column">
-    <app-nav-header class="nav-bar" [backArrow]="false"></app-nav-header>
+    <app-nav-header class="nav-bar" [backArrow]="false" [isActive]="false"></app-nav-header>
     <div class="game-information flex-column">
         <app-bar-chart-swiper class="chart-swiper" *ngIf="chartData" [data]="chartData"></app-bar-chart-swiper>
         <app-player-list
