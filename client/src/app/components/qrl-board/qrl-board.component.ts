@@ -129,14 +129,11 @@ export class QrlBoardComponent implements OnInit, OnDestroy {
     }
 
     submitAnswer() {
-        const isOnlyWhitespace = /^\s*$/.test(this.input);
-        if (!isOnlyWhitespace && this.input.length <= MAX_MESSAGE_LENGTH) {
+        if (this.input.length <= MAX_MESSAGE_LENGTH) {
             this.gameService.qrlSubmit(this.pin, this.input.trim());
             this.remainingInputCount = MAX_MESSAGE_LENGTH;
             this.hasSubmitted = true;
             this.isInEvaluation = true;
-        } else if (isOnlyWhitespace) {
-            this.openError('La réponse est vide');
         } else if (this.input.length > MAX_MESSAGE_LENGTH) {
             this.openError('La réponse contient plus de 200 caractères');
         }
@@ -249,8 +246,7 @@ export class QrlBoardComponent implements OnInit, OnDestroy {
     private messageValidator(): ValidatorFn {
         return (control: AbstractControl): ValidationErrors | null => {
             const message = control.value as string;
-            const isOnlyWhitespace = /^\s*$/.test(message);
-            return !isOnlyWhitespace && message?.length < MAX_MESSAGE_LENGTH ? null : { invalidMessage: true };
+            return message?.length < MAX_MESSAGE_LENGTH ? null : { invalidMessage: true };
         };
     }
 }

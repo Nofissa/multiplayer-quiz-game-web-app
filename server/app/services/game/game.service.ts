@@ -5,10 +5,10 @@ import { Constant } from '@app/constants/constants';
 import { generateRandomPin } from '@app/helpers/pin';
 import { Question } from '@app/model/database/question';
 import { Quiz } from '@app/model/database/quiz';
-import { QuizService } from '@app/services/quiz/quiz.service';
-import { BarchartSubmission } from '@common/barchart-submission';
 import { QuestionService } from '@app/services/question/question.service';
+import { QuizService } from '@app/services/quiz/quiz.service';
 import { TimerService } from '@app/services/timer/timer.service';
+import { BarchartSubmission } from '@common/barchart-submission';
 import { GameState } from '@common/game-state';
 import { Grade } from '@common/grade';
 import { Player } from '@common/player';
@@ -21,8 +21,8 @@ import { Question as CommonQuestion } from '@common/question';
 import { QuestionPayload } from '@common/question-payload';
 import { Injectable } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
-import { Socket } from 'socket.io';
 import { Subject, Subscription } from 'rxjs';
+import { Socket } from 'socket.io';
 
 @Injectable()
 export class GameService {
@@ -119,6 +119,10 @@ export class GameService {
 
     evaluateChoices(client: Socket, pin: string): QcmEvaluation {
         const game = this.getGame(pin);
+        const question = game.currentQuestion;
+        if (question.type !== 'QCM') {
+            return;
+        }
         const submission = this.getOrCreateSubmission(client, game);
 
         if (submission.isFinal) {
@@ -126,8 +130,6 @@ export class GameService {
         }
 
         submission.isFinal = true;
-
-        const question = game.currentQuestion;
 
         const gameSubmissions = Array.from(game.currentQuestionQcmSubmissions.values());
         const isCorrect = this.isGoodAnswer(question, submission);

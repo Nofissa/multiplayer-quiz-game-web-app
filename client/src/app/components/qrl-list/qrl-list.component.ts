@@ -63,6 +63,10 @@ export class QrlListComponent implements OnInit, OnDestroy {
         this.evaluationsDone += 1;
         if (this.evaluationsDone === this.players.length) {
             this.evaluationsSent = true;
+            const button = document.querySelector('mySwiper button-container');
+            if (button) {
+                (button as HTMLElement).style.pointerEvents = 'none';
+            }
         }
     }
 
