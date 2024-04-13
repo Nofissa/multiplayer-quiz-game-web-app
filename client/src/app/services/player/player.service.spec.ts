@@ -29,6 +29,7 @@ describe('PlayerService', () => {
         getCurrentQuestionEventName: 'getCurrentQuestion',
         nextQuestionEventName: 'nextQuestion',
         toggleGameLockEventName: 'toggleGameLock',
+        playerMuteEventName: 'playerMute',
         callback: jasmine.createSpy('callback'),
     };
 
@@ -142,6 +143,34 @@ describe('PlayerService', () => {
         player.state = PlayerState.Banned;
         const payload: GameEventPayload<Player> = { pin: stubData.pin2, data: player };
         socketServerMock.emit('playerBan', payload);
+
+        expect(stubData.callback).not.toHaveBeenCalled();
+    });
+
+    it('should raise playerMute event', () => {
+        const username = 'user123';
+        service.playerMute(stubData.pin1, username);
+        expect(webSocketServiceSpy.emit).toHaveBeenCalledWith(stubData.playerMuteEventName, { pin: stubData.pin1, username });
+    });
+
+    it('should subscribe to playerMute event and call the callback if pin matches', () => {
+        service.onPlayerMute(stubData.pin1, stubData.callback);
+
+        const player: Player = secondPlayerStub();
+        player.state = PlayerState.Banned;
+        const payload: GameEventPayload<Player> = { pin: stubData.pin1, data: player };
+        socketServerMock.emit('playerMute', payload);
+
+        expect(stubData.callback).toHaveBeenCalledWith(player);
+    });
+
+    it('should subscribe to playerMute event and not call the callback if pin does not match', () => {
+        service.onPlayerMute(stubData.pin1, stubData.callback);
+
+        const player: Player = secondPlayerStub();
+        player.state = PlayerState.Banned;
+        const payload: GameEventPayload<Player> = { pin: stubData.pin2, data: player };
+        socketServerMock.emit('playerMute', payload);
 
         expect(stubData.callback).not.toHaveBeenCalled();
     });

@@ -6,21 +6,21 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
-import { quizStub } from '@app/test-stubs/quiz.stubs';
-import { qcmQuestionStub } from '@app/test-stubs/question.stubs';
 import { QuizDetailsDialogComponent } from '@app/components/dialogs/quiz-details-dialog/quiz-details-dialog.component';
-import { Quiz } from '@common/quiz';
+import { MIN_QCM_COUNT_TO_ENABLE_RANDOM_MODE } from '@app/constants/constants';
 import { SocketServerMock } from '@app/mocks/socket-server-mock';
 import { GameService } from '@app/services/game/game-service/game.service';
+import { QuestionHttpService } from '@app/services/question-http/question-http.service';
 import { QuizHttpService } from '@app/services/quiz-http/quiz-http.service';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
+import { qcmQuestionStub } from '@app/test-stubs/question.stubs';
+import { quizStub } from '@app/test-stubs/quiz.stubs';
+import { Question } from '@common/question';
+import { Quiz } from '@common/quiz';
 import { Observable, of } from 'rxjs';
 import { io } from 'socket.io-client';
 import { SwiperModule } from 'swiper/angular';
 import { CreateGamePageComponent } from './create-game-page.component';
-import { QuestionHttpService } from '@app/services/question-http/question-http.service';
-import { Question } from '@common/question';
-import { MIN_QCM_COUNT_TO_ENABLE_RANDOM_MODE } from '@app/constants/constants';
 
 describe('CreateGamePageComponent', () => {
     let component: CreateGamePageComponent;
@@ -209,5 +209,12 @@ describe('CreateGamePageComponent', () => {
         expect(dialogRefMock.close).toHaveBeenCalled();
         expect(snackBarMock.open).toHaveBeenCalledWith("Le quiz n'est plus disponible, veuillez en sélectionner un autre", 'OK', jasmine.any(Object));
         expect(component.loadQuizzes).toHaveBeenCalled();
+    });
+
+    it('should open quiz details dialog with correct data', () => {
+        component.openRandomGameDetails();
+        expect(dialogMock.open).toHaveBeenCalledWith(QuizDetailsDialogComponent, {
+            data: jasmine.any(Object),
+        });
     });
 });

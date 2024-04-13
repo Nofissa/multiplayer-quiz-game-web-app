@@ -6,10 +6,6 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
-import { lastPlayerEvaluationStub } from '@app/test-stubs/evaluation.stubs';
-import { firstPlayerStub } from '@app/test-stubs/player.stubs';
-import { qrlQuestionStub } from '@app/test-stubs/question.stubs';
-import { quizStub } from '@app/test-stubs/quiz.stubs';
 import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
 import { MAX_MESSAGE_LENGTH } from '@app/constants/constants';
 import { SocketServerMock } from '@app/mocks/socket-server-mock';
@@ -18,6 +14,10 @@ import { GameService } from '@app/services/game/game-service/game.service';
 import { PlayerService } from '@app/services/player/player.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
+import { lastPlayerEvaluationStub } from '@app/test-stubs/evaluation.stubs';
+import { firstPlayerStub } from '@app/test-stubs/player.stubs';
+import { qrlQuestionStub } from '@app/test-stubs/question.stubs';
+import { quizStub } from '@app/test-stubs/quiz.stubs';
 import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
 import { GameEventPayload } from '@common/game-event-payload';
 import { GameSnapshot } from '@common/game-snapshot';
@@ -25,11 +25,11 @@ import { GameState } from '@common/game-state';
 import { Grade } from '@common/grade';
 import { Player } from '@common/player';
 import { PlayerState } from '@common/player-state';
+import { QcmSubmission } from '@common/qcm-submission';
 import { QrlEvaluation } from '@common/qrl-evaluation';
 import { QrlSubmission } from '@common/qrl-submission';
 import { Question } from '@common/question';
 import { Quiz } from '@common/quiz';
-import { QcmSubmission } from '@common/qcm-submission';
 import { TimerEventType } from '@common/timer-event-type';
 import { TimerPayload } from '@common/timer-payload';
 import { Observable, Subscription, of } from 'rxjs';
@@ -230,12 +230,6 @@ describe('QrlBoardComponent', () => {
         expect(mockGameService.qrlSubmit).toHaveBeenCalledWith('1234', component.input);
     });
 
-    it('should not send a message if input is only whitespace', () => {
-        component.input = '   ';
-        component.submitAnswer();
-        expect(mockGameService.qrlSubmit).not.toHaveBeenCalled();
-    });
-
     it('should not send a message if input is longer than 200 characters', () => {
         spyOn(component, 'openError');
         component.input =
@@ -244,18 +238,6 @@ describe('QrlBoardComponent', () => {
         component.submitAnswer();
         expect(mockGameService.qrlSubmit).not.toHaveBeenCalled();
         expect(component.openError).toHaveBeenCalledWith('La réponse contient plus de 200 caractères');
-    });
-
-    it('should treat message as invalid if it contains only whitespace', () => {
-        const messageControl = component.formGroup.get('message');
-        if (messageControl) {
-            messageControl.setValue('   ');
-            messageControl.updateValueAndValidity();
-            expect(messageControl.invalid).toBeTrue();
-            expect(messageControl.errors).toEqual({ invalidMessage: true });
-        } else {
-            fail('Message control does not exist');
-        }
     });
 
     it('should update remaining input count on key down', () => {

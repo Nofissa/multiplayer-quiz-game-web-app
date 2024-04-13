@@ -17,6 +17,8 @@ describe('TimerService', () => {
         callback: jasmine.createSpy('callback'),
         startTimerEventName: 'startTimer',
         timerTickEventName: 'timerTick',
+        togglePauseTimerEventName: 'togglePauseTimer',
+        accelerateTimerEvent: 'accelerateTimer',
     };
 
     beforeEach(() => {
@@ -106,5 +108,63 @@ describe('TimerService', () => {
         timerService.stopTimer(pin);
 
         expect(webSocketServiceSpy.emit).toHaveBeenCalledWith('stopTimer', { pin });
+    });
+
+    it('should raise togglePauseTimer event', () => {
+        const pin = '1234';
+        timerService.togglePauseTimer(pin);
+        expect(webSocketServiceSpy.emit).toHaveBeenCalledWith('togglePauseTimer', { pin });
+    });
+
+    it('should subscribe to togglePauseTimer event and not call the callback on server emit if pin does not match', () => {
+        timerService.onTogglePauseTimer(stubData.pin1, stubData.callback);
+
+        const payload: GameEventPayload<number> = { pin: stubData.pin2, data: 60 };
+
+        socketServerMock.emit(stubData.togglePauseTimerEventName, payload);
+
+        expect(webSocketServiceSpy.on).toHaveBeenCalledWith(stubData.togglePauseTimerEventName, jasmine.any(Function));
+        expect(stubData.callback).not.toHaveBeenCalled();
+    });
+
+    it('should subscribe to togglePauseTimer event and call the callback on server emit if pin matches', () => {
+        timerService.onTogglePauseTimer(stubData.pin1, stubData.callback);
+
+        const payload: GameEventPayload<number> = { pin: stubData.pin1, data: 60 };
+
+        socketServerMock.emit(stubData.togglePauseTimerEventName, payload);
+
+        expect(webSocketServiceSpy.on).toHaveBeenCalledWith(stubData.togglePauseTimerEventName, jasmine.any(Function));
+        expect(stubData.callback).toHaveBeenCalledWith(payload.data);
+    });
+
+    it('should raise accelerateTimer event', () => {
+        const pin = '1234';
+        const ticksPerSecond = 4;
+
+        timerService.accelerateTimer(pin, ticksPerSecond);
+        expect(webSocketServiceSpy.emit).toHaveBeenCalledWith('accelerateTimer', { pin, ticksPerSecond });
+    });
+
+    it('should subscribe to accelerateTimer event and not call the callback on server emit if pin does not match', () => {
+        timerService.onAccelerateTimer(stubData.pin1, stubData.callback);
+
+        const payload: GameEventPayload<number> = { pin: stubData.pin2, data: 60 };
+
+        socketServerMock.emit(stubData.accelerateTimerEvent, payload);
+
+        expect(webSocketServiceSpy.on).toHaveBeenCalledWith(stubData.accelerateTimerEvent, jasmine.any(Function));
+        expect(stubData.callback).not.toHaveBeenCalled();
+    });
+
+    it('should subscribe to accelerateTimer event and call the callback on server emit if pin matches', () => {
+        timerService.onAccelerateTimer(stubData.pin1, stubData.callback);
+
+        const payload: GameEventPayload<number> = { pin: stubData.pin1, data: 60 };
+
+        socketServerMock.emit(stubData.accelerateTimerEvent, payload);
+
+        expect(webSocketServiceSpy.on).toHaveBeenCalledWith(stubData.accelerateTimerEvent, jasmine.any(Function));
+        expect(stubData.callback).toHaveBeenCalledWith(payload.data);
     });
 });

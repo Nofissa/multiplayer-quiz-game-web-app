@@ -4,8 +4,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
-import { lastPlayerEvaluationStub } from '@app/test-stubs/evaluation.stubs';
-import { qcmQuestionStub } from '@app/test-stubs/question.stubs';
 import { SocketServerMock } from '@app/mocks/socket-server-mock';
 import { GameServicesProvider } from '@app/providers/game-services.provider';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
@@ -14,9 +12,14 @@ import { PlayerService } from '@app/services/player/player.service';
 import { SoundService } from '@app/services/sound/sound.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
+import { lastPlayerEvaluationStub } from '@app/test-stubs/evaluation.stubs';
+import { firstPlayerStub } from '@app/test-stubs/player.stubs';
+import { qcmQuestionStub } from '@app/test-stubs/question.stubs';
 import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
 import { GameEventPayload } from '@common/game-event-payload';
+import { Grade } from '@common/grade';
 import { QcmEvaluation } from '@common/qcm-evaluation';
+import { QrlEvaluation } from '@common/qrl-evaluation';
 import { Question } from '@common/question';
 import { QuestionPayload } from '@common/question-payload';
 import { TimerEventType } from '@common/timer-event-type';
@@ -51,6 +54,7 @@ describe('GamePageComponent', () => {
             'onQcmToggleChoice',
             'onToggleGameLock',
             'onQcmSubmit',
+            'onQrlSubmit',
             'onStartGame',
             'onNextQuestion',
             'onEndGame',
@@ -124,6 +128,10 @@ describe('GamePageComponent', () => {
         gameServiceSpy.onQcmSubmit.and.callFake((pin, callback) => {
             return webSocketServiceSpy.on('qcmSubmit', applyIfPinMatches(pin, callback));
         });
+
+        gameServiceSpy.onQrlSubmit.and.callFake((pin, callback) => {
+            return webSocketServiceSpy.on('qrlSubmit', applyIfPinMatches(pin, callback));
+        });
     });
 
     it('should create', () => {
@@ -178,6 +186,10 @@ describe('GamePageComponent', () => {
         const nextQuestionPayload: GameEventPayload<QuestionPayload> = { pin: '123', data: { isLast: true, question: qcmQuestionStub()[0] } };
         const timerPayload: GameEventPayload<TimerPayload> = { pin: '123', data: { remainingTime: 0, eventType: TimerEventType.StartGame } };
         const evaluationPayload: GameEventPayload<QcmEvaluation> = { pin: '123', data: lastPlayerEvaluationStub() };
+        const qrlEvaluationPayload: GameEventPayload<QrlEvaluation> = {
+            pin: '123',
+            data: { player: firstPlayerStub(), grade: Grade.Good, score: 5, isLast: true },
+        };
         const messagePayload: GameEventPayload<string> = { pin: '123', data: 'message' };
         const voidPayload: GameEventPayload<void> = { pin: '123', data: undefined };
         spyOn(component['router'], 'navigate');
@@ -192,6 +204,7 @@ describe('GamePageComponent', () => {
         socketServerMock.emit('startGame', startPayload);
         socketServerMock.emit('nextQuestion', nextQuestionPayload);
         socketServerMock.emit('qcmSubmit', evaluationPayload);
+        socketServerMock.emit('qrlSubmit', qrlEvaluationPayload);
         socketServerMock.emit('timerTick', timerPayload);
 
         expect(timerServiceSpy.startTimer).toHaveBeenCalled();

@@ -9,8 +9,8 @@
                 ></app-game-transition>
             </div>
             <div *ngIf="isRunning()">
-                <app-bar-chart-swiper class="bar-chart" *ngIf="isEnded" [data]="barCharts" ></app-bar-chart-swiper>
                 <app-qrl-list *ngIf="isQRL()" [pin]="pin"></app-qrl-list>
+                <app-bar-chart-swiper class="bar-chart" *ngIf="isEnded" [data]="barCharts"></app-bar-chart-swiper>
             </div>
             <app-player-list
                 class="player-list"

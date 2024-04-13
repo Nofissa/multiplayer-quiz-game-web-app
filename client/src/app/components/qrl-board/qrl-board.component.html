@@ -5,6 +5,9 @@
             ><strong>{{ question.points }} points</strong></span
         >
     </div>
+    <div class="timer-wrapper">
+        <app-timer [pin]="pin"></app-timer>
+    </div>
     <form [formGroup]="formGroup" style="margin-top: 4%">
         <mat-form-field appearance="fill">
             <mat-label *ngIf="remainingInputCount < 200">{{ remainingInputCount }}</mat-label>
@@ -16,6 +19,7 @@
                 id="chattingArea"
                 [(ngModel)]="input"
                 (keydown)="updateRemainingInputCount()"
+                (ngModelChange)="updateRemainingInputCount()"
                 formControlName="message"
                 class="write-message"
                 placeholder="Entrez votre réponse ici..."
@@ -24,10 +28,7 @@
             </textarea>
         </mat-form-field>
     </form>
-    <div class="timer-wrapper">
-        <app-timer [pin]="pin"></app-timer>
-    </div>
-    <span *ngIf="isInEvaluation && !isTest">L'ÉVALUATION EST EN COURS...</span>
+    <span *ngIf="isInEvaluation && !isTest" class="loader"></span>
     <div *ngIf="showNotification100" class="notification">Vous avez eu 100%! ({{ question.points }} points)</div>
     <div *ngIf="showNotification50" class="notification-average">Vous avez eu 50% ({{ question.points / 2 }} points)</div>
     <div *ngIf="showNotification0" class="notification-bad">Vous n'avez eu aucun point</div>
