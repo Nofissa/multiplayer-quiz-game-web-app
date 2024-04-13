@@ -190,11 +190,25 @@ export class HostGamePageComponent implements OnInit {
                 if (this.isRandom) {
                     this.router.navigate(['game'], { queryParams: { pin: this.pin } });
                 }
+                if (data.question.type === 'QRL') {
+                    this.gameHttpService.getGameSnapshotByPin(this.pin).subscribe((snapshot) => {
+                        for (const player of snapshot.players) {
+                            this.barChartService.updateChartData({ clientId: player.socketId, index: 0, isSelected: true });
+                        }
+                    });
+                }
             }),
 
             this.gameService.onNextQuestion(pin, (data) => {
                 this.isLastQuestion = data.isLast;
                 this.addQuestion(data.question);
+                if (data.question.type === 'QRL') {
+                    this.gameHttpService.getGameSnapshotByPin(this.pin).subscribe((snapshot) => {
+                        for (const player of snapshot.players) {
+                            this.barChartService.updateChartData({ clientId: player.socketId, index: 0, isSelected: true });
+                        }
+                    });
+                }
                 this.timerService.startTimer(this.pin, TimerEventType.NextQuestion, NEXT_QUESTION_DELAY_SECONDS);
             }),
 
