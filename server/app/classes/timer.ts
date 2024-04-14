@@ -1,4 +1,4 @@
-import { Constant } from '@app/constants/constants';
+import { CONSTANTS } from '@app/constants/constants';
 import { Subject, Subscription } from 'rxjs';
 
 export class Timer {
@@ -33,7 +33,7 @@ export class Timer {
         if (this.isRunning) {
             return;
         }
-        this.interval = setInterval(this.decrement.bind(this), Constant.OneSecond / this.ticksPerSecond);
+        this.interval = setInterval(this.decrement.bind(this), CONSTANTS.oneSecond / this.ticksPerSecond);
     }
 
     pause() {

@@ -67,6 +67,10 @@ describe('GameService', () => {
         jest.restoreAllMocks();
     });
 
+    afterAll(() => {
+        gameService.onModuleDestroy();
+    });
+
     it('should be defined', async () => {
         expect(gameService).toBeDefined();
     });
@@ -175,7 +179,7 @@ describe('GameService', () => {
         const clientPlayer = clientPlayerStub();
         it('should throw an error if the submission is final', () => {
             jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
-            jest.spyOn(GameService.prototype, 'getOrCreateSubmission').mockReturnValue(submission);
+            jest.spyOn<any, string>(GameService.prototype, 'getOrCreateSubmission').mockReturnValue(submission);
             expect(() => gameService.evaluateChoices(socketMock, game.pin)).toThrow('Vous avez déjà soumis vos choix pour cette question');
         });
 
@@ -186,8 +190,8 @@ describe('GameService', () => {
             evaluation.player.speedAwardCount = 1;
             evaluation.player.score = 120;
             jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
-            jest.spyOn(GameService.prototype, 'getOrCreateSubmission').mockReturnValue(submission);
-            jest.spyOn(GameService.prototype, 'isGoodAnswer').mockReturnValue(true);
+            jest.spyOn<any, string>(GameService.prototype, 'getOrCreateSubmission').mockReturnValue(submission);
+            jest.spyOn<any, string>(GameService.prototype, 'isGoodAnswer').mockReturnValue(true);
             timerServiceMock.getTimer.mockReturnValue({ time: 1 } as Timer);
             jest.spyOn(game['clientPlayers'], 'get').mockReturnValue(clientPlayer);
             const result = gameService.evaluateChoices(socketMock, game.pin);
@@ -197,8 +201,8 @@ describe('GameService', () => {
         it('should not give bonus points if time is zero', () => {
             submission.isFinal = false;
             jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
-            jest.spyOn(GameService.prototype, 'getOrCreateSubmission').mockReturnValue(submission);
-            jest.spyOn(GameService.prototype, 'isGoodAnswer').mockReturnValue(true);
+            jest.spyOn<any, string>(GameService.prototype, 'getOrCreateSubmission').mockReturnValue(submission);
+            jest.spyOn<any, string>(GameService.prototype, 'isGoodAnswer').mockReturnValue(true);
             timerServiceMock.getTimer.mockReturnValue({ time: 0 } as Timer);
             jest.spyOn(game['clientPlayers'], 'get').mockReturnValue(clientPlayer);
             const result = gameService.evaluateChoices(socketMock, game.pin);
@@ -333,13 +337,13 @@ describe('GameService', () => {
             const submission = submissionStub();
             submission.choices[3].isSelected = true;
             submission.choices[0].isSelected = false;
-            const result = gameService.isGoodAnswer(question, submission);
+            const result = gameService['isGoodAnswer'](question, submission);
             expect(result).toEqual(true);
         });
         it('should return false if incorrect', () => {
             const submission = submissionStub();
             submission.choices[3].isSelected = false;
-            const result = gameService.isGoodAnswer(question, submission);
+            const result = gameService['isGoodAnswer'](question, submission);
             expect(result).toEqual(false);
         });
     });
@@ -352,13 +356,13 @@ describe('GameService', () => {
             submission.choices[3].isSelected = false;
             submission.isFinal = false;
             jest.spyOn(Map.prototype, 'has').mockReturnValue(false);
-            const result = gameService.getOrCreateSubmission(socketMockPlayer, game);
+            const result = gameService['getOrCreateSubmission'](socketMockPlayer, game);
             expect(result).toEqual(submission);
         });
 
         it("should create a new submission if it doesn't exist already", () => {
             jest.spyOn(Map.prototype, 'has').mockReturnValue(true);
-            const result = gameService.getOrCreateSubmission(socketMockPlayer, game);
+            const result = gameService['getOrCreateSubmission'](socketMockPlayer, game);
             expect(result).toEqual(game.currentQuestionQcmSubmissions.get(socketMockPlayer.id));
         });
     });
@@ -376,7 +380,7 @@ describe('GameService', () => {
             socketMock = { id: 'playerId' } as jest.Mocked<Socket>;
             const expectedResult = { clientId: socketMock.id, index: submissionTest.payload, isSelected: submissionTest.isSelected };
             jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
-            jest.spyOn(GameService.prototype, 'getOrCreateSubmission').mockReturnValue(submission);
+            jest.spyOn<any, string>(GameService.prototype, 'getOrCreateSubmission').mockReturnValue(submission);
             const result = gameService.qcmToggleChoice(socketMock, game.pin, choiceIndex);
             expect(result).toEqual(expectedResult);
             expect(GameService.prototype.getGame).toHaveBeenCalled();

@@ -9,7 +9,7 @@ export class AddGameSummaryOperator {
         try {
             return await this.gameSummaryService.model.create(gameSummary);
         } catch (error) {
-            throw new Error('Error saving game summary');
+            throw new Error('Une erreur est survenue durant la sauvegarde du résumé de partie');
         }
     }
 
@@ -25,7 +25,7 @@ export class AddGameSummaryOperator {
             };
             return await this.fromGameSummary(gameSummary);
         } catch (error) {
-            throw new Error('Error saving game summary');
+            throw new Error('Une erreur est survenue durant la sauvegarde du résumé de partie');
         }
     }
 }

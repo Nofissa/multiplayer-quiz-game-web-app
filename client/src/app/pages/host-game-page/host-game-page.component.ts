@@ -80,6 +80,11 @@ export class HostGamePageComponent implements OnInit {
         this.pin = this.activatedRoute.snapshot.queryParams['pin'];
         this.isRandom = this.activatedRoute.snapshot.queryParams['isRandom'] === 'true';
         this.gameHttpService.getGameSnapshotByPin(this.pin).subscribe({
+            next: (snapshot) => {
+                if (snapshot.state === GameState.Ended) {
+                    this.router.navigate(['home']);
+                }
+            },
             error: (error: HttpErrorResponse) => {
                 if (error.status === HttpStatusCode.NotFound) {
                     this.router.navigate(['home']);
@@ -207,7 +212,7 @@ export class HostGamePageComponent implements OnInit {
             }),
 
             this.timerService.onTimerTick(pin, (payload) => {
-                if (!payload.remainingTime) {
+                if (payload.remainingTime === 0) {
                     if (payload.eventType === TimerEventType.StartGame || payload.eventType === TimerEventType.NextQuestion) {
                         this.timerService.startTimer(pin, TimerEventType.Question);
                     }

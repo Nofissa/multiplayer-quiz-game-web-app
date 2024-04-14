@@ -9,6 +9,7 @@ import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { SoundService } from '@app/services/sound/sound.service';
 import { TimerService } from '@app/services/timer/timer.service';
+import { GameState } from '@common/game-state';
 import { TimerEventType } from '@common/timer-event-type';
 import { Subscription } from 'rxjs';
 
@@ -57,6 +58,11 @@ export class GamePageComponent implements OnInit, OnDestroy {
         this.isTest = this.activatedRoute.snapshot.queryParams['isTest'] === 'true';
 
         this.gameHttpService.getGameSnapshotByPin(this.pin).subscribe({
+            next: (snapshot) => {
+                if (snapshot.state === GameState.Ended) {
+                    this.router.navigate(['home']);
+                }
+            },
             error: (error: HttpErrorResponse) => {
                 if (error.status === HttpStatusCode.NotFound) {
                     this.router.navigateByUrl('/home');

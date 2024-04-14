@@ -84,7 +84,7 @@ export class WaitingRoomPageComponent implements OnInit, OnDestroy {
             }),
 
             this.playerService.onPlayerBan(pin, (player) => {
-                if (this.playerService.getCurrentPlayer(pin)?.socketId === player.socketId) {
+                if (this.playerService.getCurrentPlayer(pin)?.socketId === player?.socketId) {
                     this.snackBarService.open(`Vous avez été banni de la partie ${pin}`, '', {
                         duration: NOTICE_DURATION_MS,
                         verticalPosition: 'top',
@@ -95,7 +95,7 @@ export class WaitingRoomPageComponent implements OnInit, OnDestroy {
             }),
 
             this.playerService.onPlayerAbandon(pin, (player) => {
-                if (this.playerService.getCurrentPlayer(pin)?.socketId === player.socketId) {
+                if (this.playerService.getCurrentPlayer(pin)?.socketId === player?.socketId) {
                     this.router.navigateByUrl('/home');
                 }
             }),

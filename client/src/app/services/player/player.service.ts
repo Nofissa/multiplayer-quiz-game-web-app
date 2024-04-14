@@ -24,7 +24,7 @@ export class PlayerService {
         this.webSocketService.emit('playerAbandon', { pin });
     }
 
-    onPlayerAbandon(pin: string, callback: (quitter: Player) => void): Subscription {
+    onPlayerAbandon(pin: string, callback: (quitter: Player | null) => void): Subscription {
         return this.webSocketService.on('playerAbandon', applyIfPinMatches(pin, callback));
     }
 
@@ -32,7 +32,7 @@ export class PlayerService {
         this.webSocketService.emit('playerBan', { pin, username });
     }
 
-    onPlayerBan(pin: string, callback: (bannedPlayer: Player) => void): Subscription {
+    onPlayerBan(pin: string, callback: (bannedPlayer: Player | null) => void): Subscription {
         return this.webSocketService.on('playerBan', applyIfPinMatches(pin, callback));
     }
 
