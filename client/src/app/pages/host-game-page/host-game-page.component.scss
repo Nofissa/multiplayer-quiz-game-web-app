@@ -12,31 +12,20 @@
 
 .game-information {
     width: 100%;
+    height: 100%;
     grid-area: game-information;
-    display: grid;
-    grid-template-rows: 10% 45% 45%;
-    grid-template-areas:
-        'timer'
-        'charts'
-        'playerList';
-    flex-grow: 1;
     justify-content: center;
 }
 
 .buttons-wrapper {
     width: 100%;
     height: 100px;
-    display: grid;
-    align-items: center;
-    grid-template-columns: 20px 100px 100px auto;
-    grid-template-areas: 'end-button end-button lock-button action-button';
 }
 
 .lock-button {
     height: 75px;
     width: 75px;
     justify-self: center;
-    grid-area: lock-button;
 }
 
 .lock-button.mat-mdc-raised-button.mat-unthemed {
@@ -72,15 +61,10 @@
     margin: 20px;
 }
 
-.action-button {
-    display: grid;
-    grid-area: action-button;
-}
 
 .end-button {
     width: 75px;
     height: 75px;
-    grid-area: end-button;
     margin-left: 20px;
 }
 
@@ -104,25 +88,18 @@
 }
 
 .bar-chart {
-    margin-top: 10%;
-    grid-area: bar-chart;
     width: 90%;
-    justify-self: center;
 }
 
 .chat-room {
-    margin-right: 20px;
     grid-area: chat-room;
     align-items: end;
 }
 
 .player-list {
-    grid-area: playerList;
-    align-self: center;
-    justify-content: center;
-    justify-self: center;
-    width: 90%;
     display: flex;
+    justify-content: center;
+    width: 100%;
 }
 
 .app-component {
@@ -130,11 +107,15 @@
     width: 70%;
 }
 
-.timer {
-    grid-area: timer;
+.half-view {
+    width: 50%;
+    align-content: center;
 }
 
-.charts {
-    grid-area: charts;
-    width: 100%;
+.half-view-container {
+    justify-content: space-between;
+}
+
+.question-headder {
+    
 }

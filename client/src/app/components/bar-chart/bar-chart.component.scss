@@ -38,19 +38,6 @@
     padding: 0px;
 }
 
-::-webkit-scrollbar {
-    width: 5px;
-  }
-  
-  ::-webkit-scrollbar-track {
-    background: none; 
-  }
-   
-  ::-webkit-scrollbar-thumb {
-    border-radius: 20px;
-    background: black; 
-  }
-
 .question-container {
     background-color: var(--answer-color-blue);
     grid-area: question;
@@ -77,11 +64,11 @@
 }
 
 .choice-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-left: 20px;
-    margin-right: 20px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 5%;
+    margin-left: 2%;
+    margin-right: 5%;
     align-items: flex-start;
     justify-content: space-between;
     max-width: 650px;
@@ -89,9 +76,9 @@
 }
 
 .choice {
-    height: 75px;
-    width: calc(45% - 5px);
-    align-self: center;
+    height: auto; /* Allow the height to vary based on content */
+    width: 100%; /* Each item takes up the full width of its grid cell */
+    align-self: flex-start; /* Align items to the start of their grid cells */
     margin: 8px;
     font-size: small;
 }

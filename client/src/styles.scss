@@ -111,4 +111,15 @@ body {
     position: relative;
 }
 
+::-webkit-scrollbar {
+    width: 5px;
+}
 
+::-webkit-scrollbar-track {
+    background: none;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 20px;
+    background: black;
+}

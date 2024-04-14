@@ -2,26 +2,37 @@
     <app-nav-header class="nav-header" [backArrow]="false" [isActive]="false" [pin]="pin"></app-nav-header>
     <div class="main-container">
         <div class="game-information flex-column">
-            <div [ngClass]="{ hidden: !isRunning() }">
+            <div *ngIf="isRunning()" class="question-headder">
                 <app-game-transition
-                class="timer"
                     [pin]="pin"
-                    [displayOptions]="{ hideTimerOnStartingGame: true, hideTimerOnLoadingNextQuestion: true, keepDisplayingCurrentQuestion: true, dontDisplayTextArea: true }"
+                    [displayOptions]="{
+                        hideTimerOnStartingGame: true,
+                        hideTimerOnLoadingNextQuestion: true,
+                        keepDisplayingCurrentQuestion: true,
+                        hostGameComponent: true,
+                    }"
                 ></app-game-transition>
             </div>
-            <div *ngIf="isRunning()" class="charts">
-                <app-qrl-list *ngIf="isQRL()" [pin]="pin"></app-qrl-list>
-                <app-bar-chart-swiper class="bar-chart" *ngIf="isEnded" [data]="barCharts"></app-bar-chart-swiper>
+            <div *ngIf="isRunning()">
+                <div *ngIf="isQRL()" class="flex-row half-view-container">
+                    <app-qrl-list [pin]="pin" class="half-view"></app-qrl-list>
+                    <app-bar-chart-swiper class="bar-chart half-view" *ngIf="isEnded" [data]="barCharts"></app-bar-chart-swiper>
+                </div>
+                <div *ngIf="!isQRL()">
+                    <app-bar-chart-swiper class="bar-chart" *ngIf="isEnded" [data]="barCharts"></app-bar-chart-swiper>
+                </div>
             </div>
-            <app-player-list
-                class="player-list"
-                [pin]="pin"
-                [displayOptions]="{ score: true, ban: true, quitters: true, mute: true }"
-            ></app-player-list>
+            <div class="player-list">
+                <app-player-list
+                    class="player-list"
+                    [pin]="pin"
+                    [displayOptions]="{ score: true, ban: true, quitters: true, mute: true }"
+                ></app-player-list>
+            </div>
         </div>
         <app-chat-room class="app-component" [pin]="pin"></app-chat-room>
     </div>
-    <div class="buttons-wrapper">
+    <div class="buttons-wrapper flex-row">
         <button class="end-button" mat-raised-button (click)="cancelGame()">
             <mat-icon class="icon" fontIcon="logout"></mat-icon>
         </button>
@@ -31,7 +42,7 @@
         </button>
         <app-panic-mode-button [pin]="pin"></app-panic-mode-button>
         <app-timer-pause-toggle [pin]="pin"></app-timer-pause-toggle>
-        <div class="action-button">
+        <div>
             <button class="start-button" mat-raised-button *ngIf="isLocked() && !isRunning()" (click)="startGame()">Commencer</button>
             <button class="next-button" mat-raised-button *ngIf="currentQuestionHasEnded && !isLastQuestion" (click)="nextQuestion()">
                 Question Suivante

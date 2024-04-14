@@ -4,15 +4,33 @@
     justify-content: center;
 }
 
-.timer-wrapper {
+.timer-wrapper-transition {
     position: absolute;
     top: -54px;
     left: 50%;
     transform: translateX(-50%);
 }
 
-.text-wrapper {
+.timer-wrapper-host {
+    position: absolute;
+    top: 0;
+    left: 10%;
+}
+
+.text-wrapper-transition {
     height: 200px;
+    width: 66%;
+    max-width: 600px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--secondary-fg-color);
+    background-color: var(--secondary-bg-color);
+    border-radius: 15px;
+}
+
+.text-wrapper-host {
+    height: 100px;
     width: 66%;
     max-width: 600px;
     display: flex;
