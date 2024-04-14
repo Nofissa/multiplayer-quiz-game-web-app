@@ -7,6 +7,7 @@ import { QrlSubmission } from '@common/qrl-submission';
 import { QcmSubmission } from '@common/qcm-submission';
 import { Socket } from 'socket.io';
 import { ClientPlayer } from './client-player';
+import { PlayerState } from '@common/player-state';
 
 export class Game {
     pin: string;
@@ -59,6 +60,10 @@ export class Game {
 
     getHighestScore() {
         return Math.max(...Array.from(this.clientPlayers.values()).map((clientPlayer) => clientPlayer.player.score));
+    }
+
+    getActivePlayers(): ClientPlayer[] {
+        return Array.from(this.clientPlayers.values()).filter((clientPlayer) => clientPlayer.player.state === PlayerState.Playing);
     }
 
     loadNextQuestion() {
