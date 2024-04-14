@@ -4,11 +4,12 @@
         <div class="game-information flex-column">
             <div [ngClass]="{ hidden: !isRunning() }">
                 <app-game-transition
+                class="timer"
                     [pin]="pin"
-                    [displayOptions]="{ hideTimerOnStartingGame: true, hideTimerOnLoadingNextQuestion: true, keepDisplayingCurrentQuestion: true }"
+                    [displayOptions]="{ hideTimerOnStartingGame: true, hideTimerOnLoadingNextQuestion: true, keepDisplayingCurrentQuestion: true, dontDisplayTextArea: true }"
                 ></app-game-transition>
             </div>
-            <div *ngIf="isRunning()">
+            <div *ngIf="isRunning()" class="charts">
                 <app-qrl-list *ngIf="isQRL()" [pin]="pin"></app-qrl-list>
                 <app-bar-chart-swiper class="bar-chart" *ngIf="isEnded" [data]="barCharts"></app-bar-chart-swiper>
             </div>

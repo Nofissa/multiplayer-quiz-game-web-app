@@ -6,7 +6,7 @@
 .barChartSwiper {
     .slider-effectCoverFlow {
         .swiper {
-            max-width: 1500px;
+            max-width: 700px;
             padding-top: 2%;
             padding-bottom: 5%;
         }
@@ -19,8 +19,7 @@
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            max-width: 1500px;
-            height: 500px;
+            max-width: 700px;
             transition:
                 transform 0.3s ease,
                 box-shadow 0.3s ease,

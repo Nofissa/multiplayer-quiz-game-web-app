@@ -10,7 +10,7 @@
                 }"
             ></app-timer>
         </div>
-        <div class="text-wrapper" *ngIf="snapshot">
+        <div class="text-wrapper" *ngIf="snapshot && !displayOptions.dontDisplayTextArea">
             <h2 *ngIf="isStartingGame && !displayOptions.keepDisplayingCurrentQuestion">
                 {{ snapshot.quiz.title }}
             </h2>
