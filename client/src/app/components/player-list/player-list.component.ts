@@ -131,11 +131,15 @@ export class PlayerListComponent implements OnInit, OnDestroy {
             }),
 
             this.playerService.onPlayerBan(pin, (player) => {
-                this.upsertPlayer(player);
+                if (player) {
+                    this.upsertPlayer(player);
+                }
             }),
 
             this.playerService.onPlayerAbandon(pin, (player) => {
-                this.upsertPlayer(player);
+                if (player) {
+                    this.upsertPlayer(player);
+                }
             }),
 
             this.playerService.onPlayerMute(pin, (player) => {
