@@ -50,7 +50,7 @@ import { QuestionListComponent } from './components/question-list/question-list.
 import { QuizListComponent } from './components/quiz-list/quiz-list.component';
 import { QuizComponent } from './components/quiz/quiz.component';
 import { TimerComponent } from './components/timer/timer.component';
-import { TimerPauseToggleComponent } from './components/toggle-pause-timer-button/timer-pause-toggle.component';
+import { TimerPauseToggleComponent } from './components/timer-pause-toggle/timer-pause-toggle.component';
 import { AppRoutingModule } from './modules/app-routing.module';
 import { AdminPageComponent } from './pages/admin-page/admin-page.component';
 import { CreateGamePageComponent } from './pages/create-game-page/create-game-page.component';
