@@ -344,7 +344,6 @@ export class GameService {
         Array.from(this.games.entries())
             .filter(([pin, game]) => game.state === GameState.Ended && this.games.get(pin).getActivePlayers().length === 0)
             .forEach(([pin]) => {
-                console.log(`deleting ${pin}`);
                 this.games.delete(pin);
             });
     }

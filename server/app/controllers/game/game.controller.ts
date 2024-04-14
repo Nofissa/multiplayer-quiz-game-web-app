@@ -1,7 +1,6 @@
 import { Game } from '@app/classes/game';
 import { GameService } from '@app/services/game/game.service';
 import { GameSnapshot } from '@common/game-snapshot';
-import { GameState } from '@common/game-state';
 import { Controller, Get, HttpStatus, Param, Res } from '@nestjs/common';
 import { ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
