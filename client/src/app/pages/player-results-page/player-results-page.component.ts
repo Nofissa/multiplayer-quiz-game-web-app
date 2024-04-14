@@ -6,6 +6,7 @@ import { GameServicesProvider } from '@app/providers/game-services.provider';
 import { RoutingDependenciesProvider } from '@app/providers/routing-dependencies.provider';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { BarChartService } from '@app/services/game/bar-chart-service/bar-chart.service';
+import { PlayerService } from '@app/services/player/player.service';
 
 @Component({
     selector: 'app-player-results-page',
@@ -18,6 +19,7 @@ export class PlayerResultsPageComponent implements OnInit {
     private readonly activatedRoute: ActivatedRoute;
     private readonly router: Router;
     private readonly gameHttpService: GameHttpService;
+    private readonly playerService: PlayerService;
 
     // Depends on many services
     // eslint-disable-next-line max-params
@@ -29,6 +31,7 @@ export class PlayerResultsPageComponent implements OnInit {
         this.activatedRoute = routingDependenciesProvider.activatedRoute;
         this.router = routingDependenciesProvider.router;
         this.gameHttpService = gameServicesProvider.gameHttpService;
+        this.playerService = gameServicesProvider.playerService;
     }
 
     get chartData(): BarChartData[] | undefined {
@@ -51,6 +54,7 @@ export class PlayerResultsPageComponent implements OnInit {
     }
 
     leaveGame() {
+        this.playerService.playerAbandon(this.pin);
         this.router.navigateByUrl('/home');
     }
 }
