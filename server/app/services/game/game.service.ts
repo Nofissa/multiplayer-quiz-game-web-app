@@ -19,19 +19,18 @@ import { QrlEvaluation } from '@common/qrl-evaluation';
 import { QrlSubmission } from '@common/qrl-submission';
 import { Question as CommonQuestion } from '@common/question';
 import { QuestionPayload } from '@common/question-payload';
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { Subject, Subscription } from 'rxjs';
 import { Socket } from 'socket.io';
 
 @Injectable()
-export class GameService {
+export class GameService implements OnModuleDestroy {
     games: Map<string, Game> = new Map();
     private lastQcmSubmissionSubjects: Map<string, Subject<void>> = new Map();
+    private clearInactiveGamesInterval = setInterval(this.clearInactiveGames.bind(this), CONSTANTS.clearInactiveGamesDelayMs);
 
-    constructor(private moduleRef: ModuleRef) {
-        setInterval(this.clearInactiveGames.bind(this), CONSTANTS.clearInactiveGamesDelayMs);
-    }
+    constructor(private moduleRef: ModuleRef) {}
 
     get questionService(): QuestionService {
         return this.moduleRef.get(QuestionService);
@@ -43,6 +42,10 @@ export class GameService {
 
     get timerService(): TimerService {
         return this.moduleRef.get(TimerService);
+    }
+
+    onModuleDestroy() {
+        clearInterval(this.clearInactiveGamesInterval);
     }
 
     async createGame(client: Socket, quizId: string): Promise<string> {
