@@ -1,5 +1,6 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatMenuModule } from '@angular/material/menu';
 import { RouterTestingModule } from '@angular/router/testing';
 import { lastPlayerEvaluationStub } from '@app/test-stubs/evaluation.stubs';
 import { firstPlayerStub } from '@app/test-stubs/player.stubs';
@@ -19,7 +20,6 @@ import { QcmEvaluation } from '@common/qcm-evaluation';
 import { Observable, of } from 'rxjs';
 import { io } from 'socket.io-client';
 import { PlayerListComponent } from './player-list.component';
-import { MatMenuModule } from '@angular/material/menu';
 
 const gameSnapshotStub: GameSnapshot = {
     players: [],
@@ -61,6 +61,8 @@ describe('PlayerListComponent', () => {
             'onJoinGame',
             'qcmSubmit',
             'onQrlEvaluate',
+            'onQrlInputChange',
+            'onQrlSubmit',
         ]);
 
         playerServiceSpy = jasmine.createSpyObj<PlayerService>(['onPlayerAbandon', 'onPlayerBan', 'onPlayerAbandon', 'playerBan', 'onPlayerMute']);

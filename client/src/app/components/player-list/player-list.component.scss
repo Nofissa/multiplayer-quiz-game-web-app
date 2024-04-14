@@ -48,14 +48,19 @@ h4 {
 }
 
 .playing .player-name {
-    color: green;
-}
-
-.playing .player-name-muted {
     color: red;
 }
 
+.playing .player-name-interacted {
+    color: 	#938200;
+}
+
+.playing .player-name-submitted {
+    color: green;
+}
+
 .abandoned .player-name {
+    color: #000;
     text-decoration: line-through;
 }
 

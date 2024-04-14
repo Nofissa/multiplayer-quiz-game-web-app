@@ -59,11 +59,6 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
                         panelClass: ['base-snackbar'],
                     });
                 }
-                this.chatlogs.push({
-                    author: 'Système',
-                    message: `${player.username} a été réduit au silence`,
-                    date: new Date(),
-                });
             } else {
                 if (this.playerService.getCurrentPlayer(this.pin)?.socketId === player.socketId) {
                     this.snackBarService.open('Vous pouvez parler de nouveau', '', {
@@ -72,17 +67,19 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
                         panelClass: ['base-snackbar'],
                     });
                 }
-                this.chatlogs.push({
-                    author: 'Système',
-                    message: `${player.username} a été libéré de son silence`,
-                    date: new Date(),
-                });
             }
         });
         this.playerService.onPlayerBan(this.pin, (player) => {
             this.chatlogs.push({
                 author: 'Système',
                 message: `${player.username} a été banni`,
+                date: new Date(),
+            });
+        });
+        this.playerService.onPlayerAbandon(this.pin, (player) => {
+            this.chatlogs.push({
+                author: 'Système',
+                message: `${player.username} a abandonné la partie`,
                 date: new Date(),
             });
         });

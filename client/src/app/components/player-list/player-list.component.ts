@@ -6,8 +6,10 @@ import { GameServicesProvider } from '@app/providers/game-services.provider';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { PlayerService } from '@app/services/player/player.service';
+import { TimerService } from '@app/services/timer/timer.service';
 import { Player } from '@common/player';
 import { PlayerState } from '@common/player-state';
+import { TimerEventType } from '@common/timer-event-type';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -22,6 +24,7 @@ export class PlayerListComponent implements OnInit, OnDestroy {
     displayOptions: PlayerListDisplayOptions = {};
     players: Player[] = [];
     sortingOptions = PlayerListSortingOptions.NameAscending;
+    isTimerFinished: boolean = false;
 
     playerStates = PlayerState;
     playerListSortingOptions = PlayerListSortingOptions;
@@ -30,11 +33,13 @@ export class PlayerListComponent implements OnInit, OnDestroy {
     private readonly gameHttpService: GameHttpService;
     private readonly gameService: GameService;
     private readonly playerService: PlayerService;
+    private readonly timerService: TimerService;
 
     constructor(gameServicesProvider: GameServicesProvider) {
         this.gameHttpService = gameServicesProvider.gameHttpService;
         this.gameService = gameServicesProvider.gameService;
         this.playerService = gameServicesProvider.playerService;
+        this.timerService = gameServicesProvider.timerService;
     }
 
     ngOnInit() {
@@ -144,6 +149,54 @@ export class PlayerListComponent implements OnInit, OnDestroy {
 
             this.gameService.onStartGame(pin, () => {
                 this.displayOptions.ban = false;
+            }),
+
+            this.timerService.onTimerTick(pin, (payload) => {
+                if (!payload.remainingTime && payload.eventType === TimerEventType.Question) {
+                    this.isTimerFinished = true;
+                }
+            }),
+
+            this.gameService.onNextQuestion(pin, () => {
+                this.players.forEach((player) => {
+                    player.hasInteracted = false;
+                    player.hasSubmitted = false;
+                    this.isTimerFinished = false;
+                });
+            }),
+            this.gameService.onQcmToggleChoice(pin, (barchartSubmission) => {
+                this.players.forEach((player) => {
+                    if (player.socketId === barchartSubmission.clientId) {
+                        player.hasInteracted = true;
+                    }
+                });
+            }),
+            this.gameService.onQrlInputChange(pin, (barchartSubmission) => {
+                this.players.forEach((player) => {
+                    if (player.socketId === barchartSubmission.clientId) {
+                        if (barchartSubmission.isSelected) {
+                            player.hasInteracted = true;
+                        }
+                    }
+                });
+            }),
+            this.gameService.onQrlSubmit(pin, (qrlSubmission) => {
+                if (!this.isTimerFinished) {
+                    this.players.forEach((player) => {
+                        if (player.socketId === qrlSubmission.clientId) {
+                            player.hasSubmitted = true;
+                        }
+                    });
+                }
+            }),
+            this.gameService.onQcmSubmit(pin, (qcmSubmission) => {
+                if (!this.isTimerFinished) {
+                    this.players.forEach((player) => {
+                        if (player === qcmSubmission.player) {
+                            player.hasSubmitted = true;
+                        }
+                    });
+                }
             }),
         );
     }

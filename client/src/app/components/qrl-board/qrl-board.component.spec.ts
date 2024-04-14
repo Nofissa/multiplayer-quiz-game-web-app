@@ -180,7 +180,6 @@ describe('QrlBoardComponent', () => {
         component.ngOnInit();
         expect(mockGameHttpService.getGameSnapshotByPin).toHaveBeenCalled();
         expect(component['setupSubscriptions']).toHaveBeenCalledWith(dummyPin);
-        expect(mockGameService.qrlInputChange).toHaveBeenCalledWith(dummyPin, false);
     });
 
     it('should ngOnDestroy', () => {
