@@ -3,6 +3,7 @@ import { GameSummaryService } from '@app/services/game-summary/game-summary.serv
 import { GameService } from '@app/services/game/game.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { BarchartSubmission } from '@common/barchart-submission';
+import { CreateGamePayload } from '@common/create-game-payload';
 import { GameEventPayload } from '@common/game-event-payload';
 import { GameState } from '@common/game-state';
 import { JoinGamePayload } from '@common/join-game-payload';
@@ -16,7 +17,6 @@ import { QrlInputChangePayload } from '@common/qrl-input-change-payload';
 import { QrlSubmission } from '@common/qrl-submission';
 import { QrlSubmitPayload } from '@common/qrl-submit-payload';
 import { QuestionPayload } from '@common/question-payload';
-import { QuizIdPayload } from '@common/quiz-id-payload';
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
@@ -42,7 +42,7 @@ export class GameGateway implements OnGatewayDisconnect {
     ) {}
 
     @SubscribeMessage('createGame')
-    async createGame(@ConnectedSocket() client: Socket, @MessageBody() { quizId }: QuizIdPayload) {
+    async createGame(@ConnectedSocket() client: Socket, @MessageBody() { quizId }: CreateGamePayload) {
         try {
             const pin = await this.gameService.createGame(client, quizId);
             client.join(pin);
