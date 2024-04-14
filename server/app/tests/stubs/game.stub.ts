@@ -10,8 +10,10 @@ import { qrlEvaluationStub } from './qrl-evaluation.stub';
 import { qrlSubmissionStub } from './qrl.submission.stub';
 import { quizStub } from './quiz.stubs';
 import { submissionStub } from './submission.stub';
+import { PlayerState } from '@common/player-state';
 
 export const gameStub = (): Game => {
+    const clientPlayers = new Map<string, ClientPlayer>([['playerId', clientPlayerStub()]]);
     return {
         pin: '1234',
         quiz: quizStub(),
@@ -19,7 +21,7 @@ export const gameStub = (): Game => {
         state: GameState.Running,
         chatlogs: [],
         currentQuestionIndex: 0,
-        clientPlayers: new Map<string, ClientPlayer>([['playerId', clientPlayerStub()]]),
+        clientPlayers,
         startDate: new Date(),
         qcmSubmissions: [new Map<string, QcmSubmission>([['playerId', submissionStub()]])],
         qrlSubmissions: [new Map<string, QrlSubmission>([['playerId', qrlSubmissionStub()]])],
@@ -31,7 +33,11 @@ export const gameStub = (): Game => {
         loadNextQuestion() {
             this.qcmSubmissions.push(new Map());
             this.qrlSubmissions.push(new Map());
+            this.qrlEvaluations.push(new Map());
             this.currentQuestionIndex++;
+        },
+        getActivePlayers: () => {
+            return Array.from(clientPlayers.values()).filter((clientPlayer) => clientPlayer.player.state === PlayerState.Playing);
         },
         get currentQuestion() {
             return this.quiz.questions[this.currentQuestionIndex];

@@ -80,6 +80,6 @@ describe('GameController', () => {
         const response = await request(app.getHttpServer()).get('/games/nonExistentPin/snapshot');
 
         expect(response.status).toBe(HttpStatus.NOT_FOUND);
-        expect(response.text).toBe('Cannot find game');
+        expect(response.text).toBe('La partie est introuvable');
     });
 });
