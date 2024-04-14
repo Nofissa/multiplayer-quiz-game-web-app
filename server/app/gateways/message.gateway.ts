@@ -1,6 +1,7 @@
 import { MessageService } from '@app/services/message/message.service';
 import { Chatlog } from '@common/chatlog';
 import { GameEventPayload } from '@common/game-event-payload';
+import { MessagePayload } from '@common/message-payload';
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
@@ -19,7 +20,7 @@ export class MessageGateway {
     constructor(private readonly messageService: MessageService) {}
 
     @SubscribeMessage('sendMessage')
-    sendMessage(@ConnectedSocket() client: Socket, @MessageBody() { pin, message }: { pin: string; message: string }) {
+    sendMessage(@ConnectedSocket() client: Socket, @MessageBody() { pin, message }: MessagePayload) {
         try {
             const chatlog = this.messageService.sendMessage(client, pin, message);
             const payload: GameEventPayload<Chatlog> = { pin, data: chatlog };

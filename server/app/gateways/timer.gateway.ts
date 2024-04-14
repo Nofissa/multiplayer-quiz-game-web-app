@@ -1,6 +1,7 @@
 import { GameService } from '@app/services/game/game.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { GameEventPayload } from '@common/game-event-payload';
+import { PinPayload } from '@common/pin-payload';
 import { TimerEventType } from '@common/timer-event-type';
 import { TimerPayload } from '@common/timer-payload';
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
@@ -43,7 +44,7 @@ export class TimerGateway {
     }
 
     @SubscribeMessage('stopTimer')
-    stopTimer(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
+    stopTimer(@ConnectedSocket() client: Socket, @MessageBody() { pin }: PinPayload) {
         try {
             this.timerService.stopTimer(client, pin);
             const payload: GameEventPayload<null> = { pin, data: null };
@@ -55,7 +56,7 @@ export class TimerGateway {
     }
 
     @SubscribeMessage('togglePauseTimer')
-    togglePauseTimer(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
+    togglePauseTimer(@ConnectedSocket() client: Socket, @MessageBody() { pin }: PinPayload) {
         try {
             const isRunning = this.timerService.togglePauseTimer(client, pin);
             const payload: GameEventPayload<boolean> = { pin, data: isRunning };
