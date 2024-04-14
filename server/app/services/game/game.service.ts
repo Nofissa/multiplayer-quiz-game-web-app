@@ -1,7 +1,7 @@
 /* eslint-disable max-lines */ // file simply has a lot of method, we tried splitting functionnalities into multiple servides
 import { ClientPlayer } from '@app/classes/client-player';
 import { Game } from '@app/classes/game';
-import { Constant } from '@app/constants/constants';
+import { CONSTANTS } from '@app/constants/constants';
 import { generateRandomPin } from '@app/helpers/pin';
 import { Question } from '@app/model/database/question';
 import { Quiz } from '@app/model/database/quiz';
@@ -29,7 +29,9 @@ export class GameService {
     games: Map<string, Game> = new Map();
     private lastQcmSubmissionSubjects: Map<string, Subject<void>> = new Map();
 
-    constructor(private moduleRef: ModuleRef) {}
+    constructor(private moduleRef: ModuleRef) {
+        setInterval(this.clearInactiveGames.bind(this), CONSTANTS.clearInactiveGamesDelayMs);
+    }
 
     get questionService(): QuestionService {
         return this.moduleRef.get(QuestionService);
@@ -54,14 +56,14 @@ export class GameService {
             const qcmQuestions = (await this.questionService.getAllQuestions()).filter((x) => x.type.trim().toUpperCase() === 'QCM');
             quiz.duration = 20;
 
-            if (qcmQuestions.length < Constant.RandomQuestionCount) {
+            if (qcmQuestions.length < CONSTANTS.randomQuestionCount) {
                 throw new Error("Il n'existe pas assez de questions de type QCM dans la banque de questions pour faire une partie en mode aléatoire");
             }
 
             const shuffledQuestions = qcmQuestions.slice().sort(() => {
-                return Math.random() - Constant.RandomExpectation; // to have 1/2 chance to be negative
+                return Math.random() - CONSTANTS.randomExpectation; // to have 1/2 chance to be negative
             });
-            quiz.questions = shuffledQuestions.slice(0, Constant.RandomQuestionCount);
+            quiz.questions = shuffledQuestions.slice(0, CONSTANTS.randomQuestionCount);
         }
 
         if (!quiz) {
@@ -138,8 +140,8 @@ export class GameService {
             gameSubmissions.filter((x) => x.isFinal).length ===
             Array.from(game.clientPlayers.values()).filter((x) => x.player.state === PlayerState.Playing).length;
 
-        let score = isCorrect ? question.points : Constant.NoPoints;
-        score *= isFirst ? Constant.BonusMultiplier : Constant.NoBonusMultiplier;
+        let score = isCorrect ? question.points : CONSTANTS.noPoints;
+        score *= isFirst ? CONSTANTS.bonusMultiplier : CONSTANTS.noBonusMultiplier;
 
         const player = game.clientPlayers.get(client.id).player;
         player.score += score;
@@ -188,6 +190,8 @@ export class GameService {
         if (gameHasPlayersLeft && !isOrganizer) {
             throw new Error(`Vous n'êtes pas organisateur de la partie ${pin}`);
         }
+
+        game.state = GameState.Ended;
 
         return gameHasPlayersLeft ? "L'organisateur a quitté la partie" : 'Tous les joueurs ont quitté la partie';
     }
@@ -277,12 +281,10 @@ export class GameService {
             grade,
         };
         game.currentQuestionQrlEvaluations.set(socketId, evalQrl);
-        const isLast =
-            Array.from(game.currentQuestionQrlEvaluations.values()).length ===
-            Array.from(game.clientPlayers.values()).filter((x) => x.player.state === PlayerState.Playing).length;
+        const isLast = game.currentQuestionQrlEvaluations.size === game.getActivePlayers().length;
 
         evalQrl.isLast = isLast;
-        evalQrl.score = (question.points * evalQrl.grade) / Constant.PercentageDivider;
+        evalQrl.score = (question.points * evalQrl.grade) / CONSTANTS.percentageDivider;
         player.score += evalQrl.score;
 
         game.currentQuestionQrlEvaluations.set(socketId, evalQrl);
@@ -296,16 +298,11 @@ export class GameService {
         if (!this.isOrganizer(game, client.id)) {
             throw new Error(`Vous n'êtes pas organisateur de la partie ${pin}`);
         }
+
+        game.state = GameState.Ended;
     }
 
-    disconnect(client: Socket): string[] {
-        const games = Array.from(this.games.values());
-        const toCancel = games.filter((game) => game.organizer.id === client.id).map((game) => game.pin);
-
-        return toCancel;
-    }
-
-    getGame(pin: string): Game {
+    getGame(pin: string): Game | null {
         const game = this.games.get(pin);
 
         if (!game) {
@@ -329,7 +326,30 @@ export class GameService {
         return game.organizer.id === clientId;
     }
 
-    isGoodAnswer(question: Question, submission: QcmSubmission): boolean {
+    onLastQcmSubmission(pin: string, callback: () => void): Subscription {
+        const subject = new Subject<void>();
+        this.lastQcmSubmissionSubjects.set(pin, subject);
+
+        return subject.subscribe(callback);
+    }
+
+    disconnect(client: Socket): string[] {
+        const games = Array.from(this.games.values());
+        const toCancel = games.filter((game) => game.organizer.id === client.id).map((game) => game.pin);
+
+        return toCancel;
+    }
+
+    private clearInactiveGames() {
+        Array.from(this.games.entries())
+            .filter(([pin, game]) => game.state === GameState.Ended && this.games.get(pin).getActivePlayers().length === 0)
+            .forEach(([pin]) => {
+                console.log(`deleting ${pin}`);
+                this.games.delete(pin);
+            });
+    }
+
+    private isGoodAnswer(question: Question, submission: QcmSubmission): boolean {
         const correctAnswersIndices = new Set(
             question.choices.reduce((indices, choice, index) => {
                 if (choice.isCorrect) {
@@ -347,7 +367,7 @@ export class GameService {
         );
     }
 
-    getOrCreateSubmission(client: Socket, game: Game) {
+    private getOrCreateSubmission(client: Socket, game: Game) {
         if (!game.currentQuestionQcmSubmissions.has(client.id)) {
             game.currentQuestionQcmSubmissions.set(client.id, {
                 clientId: client.id,
@@ -359,12 +379,5 @@ export class GameService {
         }
 
         return game.currentQuestionQcmSubmissions.get(client.id);
-    }
-
-    onLastQcmSubmission(pin: string, callback: () => void): Subscription {
-        const subject = new Subject<void>();
-        this.lastQcmSubmissionSubjects.set(pin, subject);
-
-        return subject.subscribe(callback);
     }
 }
