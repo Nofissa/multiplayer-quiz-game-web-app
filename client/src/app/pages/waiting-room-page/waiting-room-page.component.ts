@@ -95,7 +95,7 @@ export class WaitingRoomPageComponent implements OnInit, OnDestroy {
             }),
 
             this.playerService.onPlayerAbandon(pin, (player) => {
-                if (this.playerService.getCurrentPlayer(pin)?.socketId === player.socketId) {
+                if (this.playerService.getCurrentPlayer(pin)?.socketId === player?.socketId) {
                     this.router.navigateByUrl('/home');
                 }
             }),
