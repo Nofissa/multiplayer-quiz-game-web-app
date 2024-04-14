@@ -80,11 +80,13 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
             }
         });
         this.playerService.onPlayerBan(this.pin, (player) => {
-            this.chatlogs.push({
-                author: 'Système',
-                message: `${player.username} a été banni`,
-                date: new Date(),
-            });
+            if (player) {
+                this.chatlogs.push({
+                    author: 'Système',
+                    message: `${player.username} a été banni`,
+                    date: new Date(),
+                });
+            }
         });
     }
 
