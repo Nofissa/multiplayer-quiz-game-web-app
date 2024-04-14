@@ -19,7 +19,6 @@ export const START_GAME_COUNTDOWN_DURATION_SECONDS = 5;
 export const NEXT_QUESTION_DELAY_SECONDS = 3;
 export const DEFAULT_QUIZ_DURATION = 10;
 export const NOTICE_DURATION_MS = 5000;
-export const ERROR = 404;
 export const START_TIMER_EVENT = 'startTimer';
 export const STOP_TIMER_EVENT = 'stopTimer';
 export const TIMER_TICK_EVENT = 'timerTick';
