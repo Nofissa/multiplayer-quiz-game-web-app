@@ -2,21 +2,26 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatMenuModule } from '@angular/material/menu';
 import { RouterTestingModule } from '@angular/router/testing';
-import { lastPlayerEvaluationStub } from '@app/test-stubs/evaluation.stubs';
-import { firstPlayerStub } from '@app/test-stubs/player.stubs';
-import { quizStub } from '@app/test-stubs/quiz.stubs';
+import { PlayerListSortingOptions } from '@app/enums/player-list-sorting-options';
 import { SocketServerMock } from '@app/mocks/socket-server-mock';
 import { GameServicesProvider } from '@app/providers/game-services.provider';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { PlayerService } from '@app/services/player/player.service';
+import { TimerService } from '@app/services/timer/timer.service';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
+import { lastPlayerEvaluationStub } from '@app/test-stubs/evaluation.stubs';
+import { firstPlayerStub } from '@app/test-stubs/player.stubs';
+import { quizStub } from '@app/test-stubs/quiz.stubs';
 import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
 import { GameEventPayload } from '@common/game-event-payload';
 import { GameSnapshot } from '@common/game-snapshot';
 import { GameState } from '@common/game-state';
 import { Player } from '@common/player';
 import { QcmEvaluation } from '@common/qcm-evaluation';
+import { QrlEvaluation } from '@common/qrl-evaluation';
+import { TimerEventType } from '@common/timer-event-type';
+import { TimerPayload } from '@common/timer-payload';
 import { Observable, of } from 'rxjs';
 import { io } from 'socket.io-client';
 import { PlayerListComponent } from './player-list.component';
@@ -32,7 +37,7 @@ const gameSnapshotStub: GameSnapshot = {
     questionQrlEvaluation: [],
 };
 
-describe('PlayerListComponent', () => {
+fdescribe('PlayerListComponent', () => {
     let component: PlayerListComponent;
     let fixture: ComponentFixture<PlayerListComponent>;
     let gameHttpService: GameHttpService;
@@ -40,6 +45,7 @@ describe('PlayerListComponent', () => {
     let webSocketServiceSpy: jasmine.SpyObj<WebSocketService>;
     let socketServerMock: SocketServerMock;
     let gameServiceSpy: jasmine.SpyObj<GameService>;
+    let timerServiceSpy: jasmine.SpyObj<TimerService>;
 
     beforeEach(async () => {
         webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', ['emit', 'on'], {
@@ -65,7 +71,16 @@ describe('PlayerListComponent', () => {
             'onQrlSubmit',
         ]);
 
-        playerServiceSpy = jasmine.createSpyObj<PlayerService>(['onPlayerAbandon', 'onPlayerBan', 'onPlayerAbandon', 'playerBan', 'onPlayerMute']);
+        timerServiceSpy = jasmine.createSpyObj<TimerService>(['onTimerTick']);
+
+        playerServiceSpy = jasmine.createSpyObj<PlayerService>([
+            'onPlayerAbandon',
+            'onPlayerBan',
+            'onPlayerAbandon',
+            'playerBan',
+            'onPlayerMute',
+            'playerMute',
+        ]);
 
         await TestBed.configureTestingModule({
             declarations: [PlayerListComponent],
@@ -115,6 +130,24 @@ describe('PlayerListComponent', () => {
         });
         playerServiceSpy.onPlayerAbandon.and.callFake((pin, callback) => {
             return webSocketServiceSpy.on('playerAbandon', applyIfPinMatches(pin, callback));
+        });
+        gameServiceSpy.onQcmSubmit.and.callFake((pin, callback) => {
+            return webSocketServiceSpy.on('qcmSubmit', applyIfPinMatches(pin, callback));
+        });
+        gameServiceSpy.onQrlEvaluate.and.callFake((pin, callback) => {
+            return webSocketServiceSpy.on('qrlEvaluate', applyIfPinMatches(pin, callback));
+        });
+        playerServiceSpy.onPlayerMute.and.callFake((pin, callback) => {
+            return webSocketServiceSpy.on('playerMute', applyIfPinMatches(pin, callback));
+        });
+        gameServiceSpy.onNextQuestion.and.callFake((pin, callback) => {
+            return webSocketServiceSpy.on('nextQuestion', applyIfPinMatches(pin, callback));
+        });
+        timerServiceSpy.onTimerTick.and.callFake((pin, callback) => {
+            return webSocketServiceSpy.on('timerTick', applyIfPinMatches(pin, callback));
+        });
+        gameServiceSpy.onQcmToggleChoice.and.callFake((pin, callback) => {
+            return webSocketServiceSpy.on('qcmToggleChoice', applyIfPinMatches(pin, callback));
         });
     });
 
@@ -174,7 +207,7 @@ describe('PlayerListComponent', () => {
         const dummyPlayer1: Player = firstPlayerStub();
         const dummyPlayer2: Player = {
             ...firstPlayerStub(),
-            username: 'a',
+            score: 100,
         };
         component.players = [dummyPlayer1, dummyPlayer2];
         component['trySort']();
@@ -182,8 +215,11 @@ describe('PlayerListComponent', () => {
     });
 
     it('should handle setting up subscriptions', () => {
+        const timerPayload: GameEventPayload<TimerPayload> = { pin: '123', data: { remainingTime: 0, eventType: TimerEventType.Question } };
         const evaluationPayload: GameEventPayload<QcmEvaluation> = { pin: '123', data: lastPlayerEvaluationStub() };
         const playerPayload: GameEventPayload<Player> = { pin: '123', data: firstPlayerStub() };
+        const qrlEvaluationPayload: GameEventPayload<QrlEvaluation> = { pin: '123', data: { player: firstPlayerStub(), grade: 0, isLast: false } };
+        const qcmevaluationPayload: GameEventPayload<QcmEvaluation> = { pin: '123', data: lastPlayerEvaluationStub() };
         spyOn(component, 'upsertPlayer' as never);
         component['setupSubscription']('123');
         socketServerMock.emit('qcmSubmit', evaluationPayload);
@@ -191,6 +227,76 @@ describe('PlayerListComponent', () => {
         socketServerMock.emit('playerBan', playerPayload);
         socketServerMock.emit('playerAbandon', playerPayload);
         socketServerMock.emit('startGame', playerPayload);
+        socketServerMock.emit('qcmSubmit', qcmevaluationPayload);
+        socketServerMock.emit('qrlEvaluate', qrlEvaluationPayload);
+        socketServerMock.emit('playerMute', playerPayload);
+
+        socketServerMock.emit('timerTick', timerPayload);
+        expect(component.isTimerFinished).toBeTrue();
+
+        component.players = [firstPlayerStub()];
+        socketServerMock.emit('nextQuestion', playerPayload);
+        expect(component.isTimerFinished).toBeFalse();
+        expect(component.players[0].hasInteracted).toBeFalse();
+        expect(component.players[0].hasSubmitted).toBeFalse();
+
         expect(component['upsertPlayer']).toHaveBeenCalled();
+    });
+
+    it('should sort players by options', () => {
+        spyOn(component, 'trySort' as never);
+        component.sortPlayers(PlayerListSortingOptions.NameAscending);
+        expect(component['trySort']).toHaveBeenCalled();
+    });
+
+    it('should mute a player', () => {
+        const dummyPlayer: Player = firstPlayerStub();
+        component.pin = '123';
+        component.mutePlayer(dummyPlayer);
+        expect(playerServiceSpy.playerMute).toHaveBeenCalledWith(component.pin, dummyPlayer.username);
+    });
+
+    it('should sort by name if score is the same', () => {
+        component.displayOptions.sorted = true;
+        const dummyPlayer1: Player = firstPlayerStub();
+        const dummyPlayer2: Player = {
+            ...firstPlayerStub(),
+            username: 'a',
+        };
+        component.players = [dummyPlayer1, dummyPlayer2];
+        component['trySort']();
+        expect(component.players).toEqual([dummyPlayer2, dummyPlayer1]);
+    });
+    it('should handle sorting options', () => {
+        const IMPOSSIBLE_SORTING_OPTION = 1000;
+        component.displayOptions.sorted = false;
+        component.sortingOptions = PlayerListSortingOptions.NameAscending;
+        const dummyPlayer1: Player = firstPlayerStub();
+        const dummyPlayer2: Player = {
+            ...firstPlayerStub(),
+            username: 'a',
+            score: 100,
+            state: 1,
+        };
+        component.players = [dummyPlayer1, dummyPlayer2];
+        component['trySort']();
+        expect(component.players).toEqual([dummyPlayer2, dummyPlayer1]);
+        component.sortingOptions = PlayerListSortingOptions.NameDescending;
+        component['trySort']();
+        expect(component.players).toEqual([dummyPlayer1, dummyPlayer2]);
+        component.sortingOptions = PlayerListSortingOptions.ScoreAscending;
+        component['trySort']();
+        expect(component.players).toEqual([dummyPlayer2, dummyPlayer1]);
+        component.sortingOptions = PlayerListSortingOptions.ScoreDescending;
+        component['trySort']();
+        expect(component.players).toEqual([dummyPlayer1, dummyPlayer2]);
+        component.sortingOptions = PlayerListSortingOptions.StatusAscending;
+        component['trySort']();
+        expect(component.players).toEqual([dummyPlayer1, dummyPlayer2]);
+        component.sortingOptions = PlayerListSortingOptions.StatusDescending;
+        component['trySort']();
+        expect(component.players).toEqual([dummyPlayer2, dummyPlayer1]);
+        component.sortingOptions = IMPOSSIBLE_SORTING_OPTION as PlayerListSortingOptions;
+        expect(() => component['trySort']()).toThrowError('Invalid sorting option');
     });
 });
