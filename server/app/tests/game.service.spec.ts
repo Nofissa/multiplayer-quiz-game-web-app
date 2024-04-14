@@ -67,6 +67,10 @@ describe('GameService', () => {
         jest.restoreAllMocks();
     });
 
+    afterAll(() => {
+        gameService.onModuleDestroy();
+    });
+
     it('should be defined', async () => {
         expect(gameService).toBeDefined();
     });
