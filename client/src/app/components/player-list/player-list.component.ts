@@ -124,14 +124,14 @@ export class PlayerListComponent implements OnInit, OnDestroy {
     private setupSubscription(pin: string) {
         this.eventSubscriptions.push(
             this.gameService.onQcmSubmit(pin, (evaluation) => {
+                this.upsertPlayer(evaluation.player);
                 if (!this.isTimerFinished) {
                     this.players.forEach((player) => {
-                        if (player === evaluation.player) {
+                        if (player.socketId === evaluation.player.socketId) {
                             player.hasSubmitted = true;
                         }
                     });
                 }
-                this.upsertPlayer(evaluation.player);
             }),
 
             this.gameService.onQrlEvaluate(pin, (evaluation) => {

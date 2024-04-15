@@ -39,7 +39,7 @@ const gameSnapshotStub: GameSnapshot = {
     questionQrlEvaluation: [],
 };
 
-fdescribe('PlayerListComponent', () => {
+describe('PlayerListComponent', () => {
     let component: PlayerListComponent;
     let fixture: ComponentFixture<PlayerListComponent>;
     let gameHttpService: GameHttpService;
