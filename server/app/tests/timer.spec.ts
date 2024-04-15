@@ -107,4 +107,19 @@ describe('Timer', () => {
             startSpy.mockRestore();
         });
     });
+    // describe('onTick', () => {
+    //     it('should unsubscribe from tickSubject when onTick subscription is unsubscribed', () => {
+    //         const callback = jest.fn();
+    //         timer['tickSubscription'] = timer['tickSubject'].subscribe(callback);
+    //         timer['tickSubscription'].closed = false;
+    //         // Subscribe to tick events with the callback
+    //         timer.onTick(callback);
+
+    //         // Spy on the unsubscribe method of the subscription
+    //         // const unsubscribeSpy = jest.spyOn(Subscription.prototype, 'unsubscribe');
+
+    //         // Verify that unsubscribe was called exactly once
+    //         expect(timer['tickSubscription'].unsubscribe()).toHaveBeenCalled();
+    //     });
+    // });
 });

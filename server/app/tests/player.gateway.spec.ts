@@ -70,6 +70,16 @@ describe('PlayerGateway', () => {
             playerGateway.playerBan(socketMock, { pin, username });
             expect(socketMock.emit).toHaveBeenCalledWith('error', 'Mock error');
         });
+
+        // it('should handle null clientPlayer Value', () => {
+        //     playerService.playerBan.mockReturnValue(null);
+        //     const payload: GameEventPayload<Player> = { pin, data: undefined };
+        //     serverMock.to.mockReturnValue(broadcastMock);
+        //     playerGateway.playerBan(socketMock, { pin, username });
+        //     expect(serverMock.to).toHaveBeenCalledWith(pin);
+        //     expect(broadcastMock.emit).toHaveBeenCalledWith('playerBan', payload);
+        //     expect(clientPlayer.socket.leave);
+        // });
     });
 
     describe('playerAbandon', () => {

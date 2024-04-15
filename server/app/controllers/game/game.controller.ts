@@ -21,9 +21,9 @@ export class GameController {
         try {
             const game = this.gameService.getGame(pin);
 
-            if (!game) {
-                throw new Error(`Aucune partie avec le pin ${pin}`);
-            }
+            // if (!game) {
+            //     throw new Error(`Aucune partie avec le pin ${pin}`);
+            // }
 
             const snapshot = this.generateSnapshot(game);
 
