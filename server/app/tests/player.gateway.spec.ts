@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { ClientPlayer } from '@app/classes/client-player';
 import { PlayerGateway } from '@app/gateways/player.gateway';
 import { PlayerService } from '@app/services/player/player.service';
 import { GameEventPayload } from '@common/game-event-payload';
@@ -53,6 +54,31 @@ describe('PlayerGateway', () => {
             socket: { leave: jest.fn() } as any,
             player: playerstub(),
         };
+
+        it('should handle null clientPlayer Value', () => {
+            playerService.playerBan.mockReturnValue(undefined);
+            const payload: GameEventPayload<Player> = { pin, data: undefined };
+            serverMock.to.mockReturnValue(broadcastMock);
+            playerGateway.playerBan(socketMock, { pin, username });
+            expect(serverMock.to).toHaveBeenCalledWith(pin);
+            expect(broadcastMock.emit).toHaveBeenCalledWith('playerBan', payload);
+            expect(clientPlayer.socket.leave).toHaveBeenCalledTimes(0);
+        });
+
+        it('should handle null socket Value', () => {
+            const clientPlayerNullSocket = {
+                socket: {} as any,
+                player: playerstub(),
+            };
+            playerService.playerBan.mockReturnValue(clientPlayerNullSocket);
+            const payload: GameEventPayload<Player> = { pin, data: clientPlayerNullSocket.player };
+            serverMock.to.mockReturnValue(broadcastMock);
+            playerGateway.playerBan(socketMock, { pin, username });
+            expect(serverMock.to).toHaveBeenCalledWith(pin);
+            expect(broadcastMock.emit).toHaveBeenCalledWith('playerBan', payload);
+            expect(clientPlayer.socket.leave).toHaveBeenCalledTimes(0);
+        });
+
         it('should handle banning a player from the game and emit the "playerBan" event with the correct payload', () => {
             playerService.playerBan.mockReturnValue(clientPlayer);
             const payload: GameEventPayload<Player> = { pin, data: clientPlayer.player };
@@ -70,16 +96,6 @@ describe('PlayerGateway', () => {
             playerGateway.playerBan(socketMock, { pin, username });
             expect(socketMock.emit).toHaveBeenCalledWith('error', 'Mock error');
         });
-
-        // it('should handle null clientPlayer Value', () => {
-        //     playerService.playerBan.mockReturnValue(null);
-        //     const payload: GameEventPayload<Player> = { pin, data: undefined };
-        //     serverMock.to.mockReturnValue(broadcastMock);
-        //     playerGateway.playerBan(socketMock, { pin, username });
-        //     expect(serverMock.to).toHaveBeenCalledWith(pin);
-        //     expect(broadcastMock.emit).toHaveBeenCalledWith('playerBan', payload);
-        //     expect(clientPlayer.socket.leave);
-        // });
     });
 
     describe('playerAbandon', () => {
@@ -108,30 +124,54 @@ describe('PlayerGateway', () => {
         });
     });
 
-    describe('playerAbandon', () => {
-        it('should handle player abandoning the game and emit the "playerAbandon" event with the correct payload', () => {
-            const pin = 'mockPin';
-            const clientPlayer = {
-                socket: { leave: jest.fn() } as any,
-                player: playerstub(),
-            };
-            playerService.playerAbandon.mockReturnValue(clientPlayer);
-            serverMock.to.mockReturnValue(broadcastMock);
-            const payload: GameEventPayload<Player> = { pin, data: clientPlayer.player };
-            playerGateway.playerAbandon(socketMock, { pin });
-            expect(serverMock.to).toHaveBeenCalledWith(pin);
-            expect(broadcastMock.emit).toHaveBeenCalledWith('playerAbandon', payload);
-            expect(clientPlayer.socket.leave).toHaveBeenCalledWith(pin);
-        });
+    it('should handle null clientPlayer Value', () => {
+        const pin = 'mockPin';
+        const clientPlayer = undefined as ClientPlayer;
+        playerService.playerAbandon.mockReturnValue(clientPlayer);
+        serverMock.to.mockReturnValue(broadcastMock);
+        const leaveSpy = jest.spyOn(Socket.prototype, 'leave');
+        const payload: GameEventPayload<Player> = { pin, data: undefined };
+        playerGateway.playerAbandon(socketMock, { pin });
+        expect(serverMock.to).toHaveBeenCalledWith(pin);
+        expect(broadcastMock.emit).toHaveBeenCalledWith('playerAbandon', payload);
+        expect(leaveSpy).toHaveBeenCalledTimes(0);
+    });
 
-        it('should emit "error" event if an error occurs during handling player abandoning the game', () => {
-            const pin = 'mockPin';
-            playerService.playerAbandon.mockImplementation(() => {
-                throw new Error('Mock error');
-            });
-            playerGateway.playerAbandon(socketMock, { pin });
-            expect(socketMock.emit).toHaveBeenCalledWith('error', 'Mock error');
+    it('should handle null Socket Value', () => {
+        const pin = 'mockPin';
+        const clientPlayer = { socket: null as any } as ClientPlayer;
+        playerService.playerAbandon.mockReturnValue(clientPlayer);
+        serverMock.to.mockReturnValue(broadcastMock);
+        const leaveSpy = jest.spyOn(Socket.prototype, 'leave');
+        const payload: GameEventPayload<Player> = { pin, data: undefined };
+        playerGateway.playerAbandon(socketMock, { pin });
+        expect(serverMock.to).toHaveBeenCalledWith(pin);
+        expect(broadcastMock.emit).toHaveBeenCalledWith('playerAbandon', payload);
+        expect(leaveSpy).toHaveBeenCalledTimes(0);
+    });
+
+    it('should handle player abandoning the game and emit the "playerAbandon" event with the correct payload', () => {
+        const pin = 'mockPin';
+        const clientPlayer = {
+            socket: { leave: jest.fn() } as any,
+            player: playerstub(),
+        };
+        playerService.playerAbandon.mockReturnValue(clientPlayer);
+        serverMock.to.mockReturnValue(broadcastMock);
+        const payload: GameEventPayload<Player> = { pin, data: clientPlayer.player };
+        playerGateway.playerAbandon(socketMock, { pin });
+        expect(serverMock.to).toHaveBeenCalledWith(pin);
+        expect(broadcastMock.emit).toHaveBeenCalledWith('playerAbandon', payload);
+        expect(clientPlayer.socket.leave).toHaveBeenCalledWith(pin);
+    });
+
+    it('should emit "error" event if an error occurs during handling player abandoning the game', () => {
+        const pin = 'mockPin';
+        playerService.playerAbandon.mockImplementation(() => {
+            throw new Error('Mock error');
         });
+        playerGateway.playerAbandon(socketMock, { pin });
+        expect(socketMock.emit).toHaveBeenCalledWith('error', 'Mock error');
     });
 
     describe('playerMute', () => {

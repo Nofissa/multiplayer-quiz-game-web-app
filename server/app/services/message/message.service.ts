@@ -12,7 +12,11 @@ export class MessageService {
         const game = this.gameService.getGame(pin);
         const clientPlayer = game.clientPlayers.get(client.id);
 
-        if (clientPlayer?.player?.isMuted) {
+        if (!clientPlayer?.player) {
+            throw new Error("Ce joueur n'existe pas");
+        }
+
+        if (clientPlayer.player.isMuted) {
             throw new Error('Vous ne pouvez pas écrire dans la zone de clavardage');
         }
 

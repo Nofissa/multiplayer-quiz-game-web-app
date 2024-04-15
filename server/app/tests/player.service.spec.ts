@@ -79,6 +79,13 @@ describe('playerService', () => {
             const result = playerService.playerAbandon(socketMock, game.pin);
             expect(result).toEqual(clientPlayerTest);
         });
+
+        it('should return null if no clientPlayer', () => {
+            gameService.getGame.mockReturnValue(game);
+            jest.spyOn(Map.prototype, 'get').mockReturnValue(null);
+            const result = playerService.playerAbandon(socketMock, game.pin);
+            expect(result).toEqual(null);
+        });
     });
 
     describe('playerMute', () => {
