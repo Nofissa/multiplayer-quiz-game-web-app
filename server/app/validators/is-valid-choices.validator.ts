@@ -1,6 +1,7 @@
 import { ChoiceDto } from '@app/model/dto/choice/choice.dto';
 import { ValidationArguments, ValidationOptions, ValidatorConstraint, ValidatorConstraintInterface, registerDecorator } from 'class-validator';
 
+export
 @ValidatorConstraint({ name: 'isValidChoices', async: false })
 class IsValidChoicesConstraint implements ValidatorConstraintInterface {
     // _ could be used, optional parameter
