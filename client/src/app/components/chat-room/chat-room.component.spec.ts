@@ -18,7 +18,7 @@ import { Quiz } from '@common/quiz';
 import { Subscription, of } from 'rxjs';
 import { ChatRoomComponent } from './chat-room.component';
 
-fdescribe('ChatRoomComponent', () => {
+describe('ChatRoomComponent', () => {
     let component: ChatRoomComponent;
     let fixture: ComponentFixture<ChatRoomComponent>;
     let mockGameHttpService: jasmine.SpyObj<GameHttpService>;
