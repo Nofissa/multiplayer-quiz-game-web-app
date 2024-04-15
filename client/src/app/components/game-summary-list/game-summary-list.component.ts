@@ -7,11 +7,11 @@ import { GameSummary } from '@app/interfaces/game-summary';
 import { GameSummaryHttpService } from '@app/services/game-summary-http/game-summary-http.service';
 
 @Component({
-    selector: 'app-game-summary',
-    templateUrl: './game-summary.component.html',
-    styleUrls: ['./game-summary.component.scss'],
+    selector: 'app-game-summary-list',
+    templateUrl: './game-summary-list.component.html',
+    styleUrls: ['./game-summary-list.component.scss'],
 })
-export class GameSummaryComponent implements OnInit, AfterViewInit {
+export class GameSummaryListComponent implements OnInit, AfterViewInit {
     @ViewChild(MatSort) sort: MatSort;
     gameSummaries: MatTableDataSource<GameSummary>;
     displayedColumns: string[] = ['name', 'startDate', 'numberOfPlayers', 'bestScore'];
@@ -35,10 +35,6 @@ export class GameSummaryComponent implements OnInit, AfterViewInit {
                     return item.title.toLowerCase();
                 case 'startDate':
                     return new Date(item.startDate).getTime();
-                case 'numberOfPlayers':
-                    return item.numberOfPlayers;
-                case 'bestScore':
-                    return item.bestScore;
                 default:
                     return '';
             }

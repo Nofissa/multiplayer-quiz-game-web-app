@@ -16,7 +16,7 @@ export class GameSummaryService {
         try {
             await this.model.deleteMany({});
         } catch (error) {
-            return Promise.reject('Failed to delete game summaries');
+            throw new Error('Failed to delete game summaries');
         }
     }
 
