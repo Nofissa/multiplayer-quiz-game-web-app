@@ -21,6 +21,6 @@ export class GameSummaryService {
     }
 
     addGameSummary(): AddGameSummaryOperator {
-        return new AddGameSummaryOperator(this);
+        return new AddGameSummaryOperator(this.model);
     }
 }

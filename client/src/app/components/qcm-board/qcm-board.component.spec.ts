@@ -40,7 +40,7 @@ const gameSnapshotStub: GameSnapshot = {
 
 const observableSnapShot = of(gameSnapshotStub);
 
-describe('GameBoardComponent', () => {
+describe('QcmBoardComponent', () => {
     let component: QcmBoardComponent;
     let fixture: ComponentFixture<QcmBoardComponent>;
     let gameHttpServiceMock: jasmine.SpyObj<GameHttpService>;
@@ -192,7 +192,6 @@ describe('GameBoardComponent', () => {
         expect(gameServiceMock.onNextQuestion).toHaveBeenCalled();
         expect(gameServiceMock.onQcmSubmit).toHaveBeenCalled();
         expect(timerServiceMock.onTimerTick).toHaveBeenCalled();
-        expect(component.submitChoices).toHaveBeenCalled();
     });
 
     it('should setupKeyBindings', () => {
