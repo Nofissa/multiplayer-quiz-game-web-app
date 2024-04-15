@@ -13,8 +13,8 @@
 
 .timer-wrapper-host {
     position: absolute;
-    top: 0;
-    left: 10%;
+    top: -5%;
+    left: 2%;
 }
 
 .text-wrapper-transition {
@@ -30,8 +30,10 @@
 }
 
 .text-wrapper-host {
-    height: 100px;
+    height: fit-content;
+    max-height: 100px;
     width: 66%;
+    overflow: auto;
     max-width: 600px;
     display: flex;
     justify-content: center;
