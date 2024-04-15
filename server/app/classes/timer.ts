@@ -52,7 +52,6 @@ export class Timer {
     }
 
     onTick(callback: (remainingTime: number) => void) {
-        // this.tickSubscription = this.tickSubscription.?unsubscribe();
         if (this.tickSubscription && !this.tickSubscription.closed) {
             this.tickSubscription.unsubscribe();
         }
