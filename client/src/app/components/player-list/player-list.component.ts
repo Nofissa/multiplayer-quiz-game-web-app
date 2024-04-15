@@ -124,6 +124,13 @@ export class PlayerListComponent implements OnInit, OnDestroy {
     private setupSubscription(pin: string) {
         this.eventSubscriptions.push(
             this.gameService.onQcmSubmit(pin, (evaluation) => {
+                if (!this.isTimerFinished) {
+                    this.players.forEach((player) => {
+                        if (player === evaluation.player) {
+                            player.hasSubmitted = true;
+                        }
+                    });
+                }
                 this.upsertPlayer(evaluation.player);
             }),
 
@@ -184,15 +191,6 @@ export class PlayerListComponent implements OnInit, OnDestroy {
                 if (!this.isTimerFinished) {
                     this.players.forEach((player) => {
                         if (player.socketId === qrlSubmission.clientId) {
-                            player.hasSubmitted = true;
-                        }
-                    });
-                }
-            }),
-            this.gameService.onQcmSubmit(pin, (qcmSubmission) => {
-                if (!this.isTimerFinished) {
-                    this.players.forEach((player) => {
-                        if (player === qcmSubmission.player) {
                             player.hasSubmitted = true;
                         }
                     });

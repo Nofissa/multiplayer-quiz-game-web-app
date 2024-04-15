@@ -14,12 +14,14 @@ import { lastPlayerEvaluationStub } from '@app/test-stubs/evaluation.stubs';
 import { firstPlayerStub } from '@app/test-stubs/player.stubs';
 import { quizStub } from '@app/test-stubs/quiz.stubs';
 import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
+import { BarchartSubmission } from '@common/barchart-submission';
 import { GameEventPayload } from '@common/game-event-payload';
 import { GameSnapshot } from '@common/game-snapshot';
 import { GameState } from '@common/game-state';
 import { Player } from '@common/player';
 import { QcmEvaluation } from '@common/qcm-evaluation';
 import { QrlEvaluation } from '@common/qrl-evaluation';
+import { QrlSubmission } from '@common/qrl-submission';
 import { TimerEventType } from '@common/timer-event-type';
 import { TimerPayload } from '@common/timer-payload';
 import { Observable, of } from 'rxjs';
@@ -131,9 +133,6 @@ fdescribe('PlayerListComponent', () => {
         playerServiceSpy.onPlayerAbandon.and.callFake((pin, callback) => {
             return webSocketServiceSpy.on('playerAbandon', applyIfPinMatches(pin, callback));
         });
-        gameServiceSpy.onQcmSubmit.and.callFake((pin, callback) => {
-            return webSocketServiceSpy.on('qcmSubmit', applyIfPinMatches(pin, callback));
-        });
         gameServiceSpy.onQrlEvaluate.and.callFake((pin, callback) => {
             return webSocketServiceSpy.on('qrlEvaluate', applyIfPinMatches(pin, callback));
         });
@@ -148,6 +147,12 @@ fdescribe('PlayerListComponent', () => {
         });
         gameServiceSpy.onQcmToggleChoice.and.callFake((pin, callback) => {
             return webSocketServiceSpy.on('qcmToggleChoice', applyIfPinMatches(pin, callback));
+        });
+        gameServiceSpy.onQrlInputChange.and.callFake((pin, callback) => {
+            return webSocketServiceSpy.on('qrlInputChange', applyIfPinMatches(pin, callback));
+        });
+        gameServiceSpy.onQrlSubmit.and.callFake((pin, callback) => {
+            return webSocketServiceSpy.on('qrlSubmit', applyIfPinMatches(pin, callback));
         });
     });
 
@@ -220,6 +225,11 @@ fdescribe('PlayerListComponent', () => {
         const playerPayload: GameEventPayload<Player> = { pin: '123', data: firstPlayerStub() };
         const qrlEvaluationPayload: GameEventPayload<QrlEvaluation> = { pin: '123', data: { player: firstPlayerStub(), grade: 0, isLast: false } };
         const qcmevaluationPayload: GameEventPayload<QcmEvaluation> = { pin: '123', data: lastPlayerEvaluationStub() };
+        const barchartSubmissionPayload: GameEventPayload<BarchartSubmission> = {
+            pin: '123',
+            data: { clientId: firstPlayerStub().socketId, index: 0, isSelected: true },
+        };
+        const qrlSubmissionPayload: GameEventPayload<QrlSubmission> = { pin: '123', data: { answer: 'test', clientId: firstPlayerStub().socketId } };
         spyOn(component, 'upsertPlayer' as never);
         component['setupSubscription']('123');
         socketServerMock.emit('qcmSubmit', evaluationPayload);
@@ -227,7 +237,10 @@ fdescribe('PlayerListComponent', () => {
         socketServerMock.emit('playerBan', playerPayload);
         socketServerMock.emit('playerAbandon', playerPayload);
         socketServerMock.emit('startGame', playerPayload);
+        component.players = [qcmevaluationPayload.data.player];
+        component.isTimerFinished = false;
         socketServerMock.emit('qcmSubmit', qcmevaluationPayload);
+        expect(component.players[0].hasSubmitted).toBeTrue();
         socketServerMock.emit('qrlEvaluate', qrlEvaluationPayload);
         socketServerMock.emit('playerMute', playerPayload);
 
@@ -239,6 +252,17 @@ fdescribe('PlayerListComponent', () => {
         expect(component.isTimerFinished).toBeFalse();
         expect(component.players[0].hasInteracted).toBeFalse();
         expect(component.players[0].hasSubmitted).toBeFalse();
+        socketServerMock.emit('qcmToggleChoice', barchartSubmissionPayload);
+        expect(component.players[0].hasInteracted).toBeTrue();
+        component.players[0].hasInteracted = false;
+        socketServerMock.emit('qrlInputChange', barchartSubmissionPayload);
+        expect(component.players[0].hasInteracted).toBeTrue();
+
+        component.isTimerFinished = false;
+        component.players = [firstPlayerStub()];
+        component.players[0].hasSubmitted = false;
+        socketServerMock.emit('qrlSubmit', qrlSubmissionPayload);
+        expect(component.players[0].hasSubmitted).toBeTrue();
 
         expect(component['upsertPlayer']).toHaveBeenCalled();
     });
