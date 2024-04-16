@@ -1,5 +1,5 @@
 <div *ngIf="player && question"
-    [ngClass]="{ 'container': true, 'hidden': question?.type?.trim()?.toUpperCase() !== 'QCM' }">
+    [ngClass]="{ 'container': true, 'hidden': question.type.trim().toUpperCase() !== 'QCM' }">
     <div class="question-box font-color">
         <span id="questionText" class="text-centered">{{ question.text }}</span>
         <span id="value" class="text-centered"><strong>{{ question.points }} points</strong></span>
@@ -12,8 +12,8 @@
                 'answer-box2': (i + 1) % 4 === 2,
                 'answer-box3': (i + 1) % 4 === 3,
                 'answer-box4': (i + 1) % 4 === 0
-            }" [class.highlight-validated]="hasSubmited && selectedChoiceIndexes.includes(i)"
-            (click)="toggleSelectChoice(i)" [class.disable-click]="hasSubmited">
+            }" [class.highlight-validated]="hasSubmitted && selectedChoiceIndexes.includes(i)"
+            (click)="toggleSelectChoice(i)" [class.disable-click]="hasSubmitted">
             <div class="box-content-wrapper">
                 <span>{{ i + 1 }}. {{ choice.text }}</span>
                 <div class="icon-wrapper">
@@ -29,7 +29,7 @@
         </div>
     </div>
     <div class="buttons-wrapper">
-        <button mat-flat-button id="validateButton" class="game-button" [class.disable-click]="hasSubmited"
+        <button mat-flat-button id="validateButton" class="game-button" [class.disable-click]="hasSubmitted"
             (click)="submitChoices()">
             Valider <i class="fas fa-check-circle"></i>
         </button>

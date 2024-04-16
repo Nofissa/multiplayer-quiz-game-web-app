@@ -15,6 +15,7 @@ import { KeyBindingService } from '@app/services/key-binding/key-binding.service
 import { MessageService } from '@app/services/message/message.service';
 import { PlayerService } from '@app/services/player/player.service';
 import { SoundService } from '@app/services/sound/sound.service';
+import { SubscriptionService } from '@app/services/subscription/subscription.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { barChartDataStub } from '@app/test-stubs/bar-chart-data.stubs';
@@ -55,6 +56,7 @@ describe('HostGamePageComponent', () => {
     let webSocketServiceSpy: SpyObj<WebSocketService>;
     let playerServiceSpy: SpyObj<PlayerService>;
     let socketServerMock: SocketServerMock;
+    let mockSubscriptionService: jasmine.SpyObj<SubscriptionService>;
 
     const clearGameServiceSpies = () => {
         (Object.keys(gameServiceSpy) as (keyof typeof gameServiceSpy)[]).forEach((method) => {
@@ -147,6 +149,7 @@ describe('HostGamePageComponent', () => {
 
         routerSpy = jasmine.createSpyObj<Router>(['navigate']);
         routerSpy.navigate.and.stub();
+        mockSubscriptionService = jasmine.createSpyObj<SubscriptionService>(['add', 'clear']);
 
         TestBed.configureTestingModule({
             declarations: [HostGamePageComponent],
@@ -166,6 +169,7 @@ describe('HostGamePageComponent', () => {
                         },
                     },
                 },
+                { provide: SubscriptionService, useValue: mockSubscriptionService },
             ],
             imports: [RouterTestingModule, HttpClientTestingModule, BrowserAnimationsModule],
         }).compileComponents();
@@ -189,6 +193,7 @@ describe('HostGamePageComponent', () => {
 
         clearGameServiceSpies();
     });
+
     it('should create', () => {
         expect(component).toBeTruthy();
     });
@@ -197,6 +202,12 @@ describe('HostGamePageComponent', () => {
         expect(component['gameState']).toEqual(GameState.Opened);
         expect(component.currentQuestionHasEnded).toEqual(false);
         expect(component.isLastQuestion).toEqual(false);
+    });
+
+    it('should unsubscribe clear subscriptions on destroy', () => {
+        component.ngOnDestroy();
+
+        expect(mockSubscriptionService.clear).toHaveBeenCalledWith(component['uuid']);
     });
 
     it('should barCharts return all chartData if there is data in the service', () => {

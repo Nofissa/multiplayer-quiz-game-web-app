@@ -28,3 +28,5 @@ export const MAX_PIN_NO = 10000;
 export const PADDING = 4;
 export const SWIPER_SYNC_DELAY_MS = 100;
 export const MIN_QCM_COUNT_TO_ENABLE_RANDOM_MODE = 5;
+export const QRL_INACTIVITY_DELAY_MS = 5000;
+export const PANIC_AUDIO_NAME = 'ticking-timer';

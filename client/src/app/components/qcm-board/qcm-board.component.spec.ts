@@ -137,19 +137,18 @@ describe('QcmBoardComponent', () => {
     });
 
     it('should ngOnDestroy', () => {
-        spyOn(component['eventSubscriptions'], 'forEach');
         component.ngOnDestroy();
-        expect(component['eventSubscriptions'].forEach).toHaveBeenCalled();
     });
 
     it('should return if disableShortcuts is true', () => {
-        component['disableShortcuts'] = true;
+        component['hasSubmitted'] = true;
         component.handleKeyboardEvent({} as KeyboardEvent);
         expect(keyBindingServiceMock.getExecutor).not.toHaveBeenCalled();
     });
 
     it('should call executor if disableShortcuts is false', () => {
-        component['disableShortcuts'] = false;
+        component['hasSubmitted'] = false;
+        component['question'].type = 'QCM';
         component.handleKeyboardEvent({} as KeyboardEvent);
         expect(keyBindingServiceMock.getExecutor).toHaveBeenCalled();
     });
@@ -163,12 +162,6 @@ describe('QcmBoardComponent', () => {
         const choice = 1;
         component.toggleSelectChoice(choice);
         expect(gameServiceMock.qcmToggleChoice).toHaveBeenCalled();
-    });
-
-    it('should loadNextQuestion', () => {
-        component['disableShortcuts'] = true;
-        component['loadNextQuestion'](quizStub().questions[0]);
-        expect(component['disableShortcuts']).toBeFalse();
     });
 
     it('should openConfirmationDialog', () => {

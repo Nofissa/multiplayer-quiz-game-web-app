@@ -7,6 +7,7 @@ import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { MessageService } from '@app/services/message/message.service';
 import { PlayerService } from '@app/services/player/player.service';
+import { SubscriptionService } from '@app/services/subscription/subscription.service';
 import { Chatlog } from '@common/chatlog';
 import { GameSnapshot } from '@common/game-snapshot';
 import { GameState } from '@common/game-state';
@@ -15,7 +16,7 @@ import { PlayerState } from '@common/player-state';
 import { QcmSubmission } from '@common/qcm-submission';
 import { QrlSubmission } from '@common/qrl-submission';
 import { Quiz } from '@common/quiz';
-import { Subscription, of } from 'rxjs';
+import { of } from 'rxjs';
 import { ChatRoomComponent } from './chat-room.component';
 
 describe('ChatRoomComponent', () => {
@@ -25,6 +26,7 @@ describe('ChatRoomComponent', () => {
     let mockMessageService: jasmine.SpyObj<MessageService>;
     let mockGameService: jasmine.SpyObj<GameService>;
     let mockPlayerService: jasmine.SpyObj<PlayerService>;
+    let mockSubscriptionService: jasmine.SpyObj<SubscriptionService>;
 
     const mockChatlogs: Chatlog[] = [
         {
@@ -80,6 +82,7 @@ describe('ChatRoomComponent', () => {
         mockMessageService = jasmine.createSpyObj('MessageService', ['onSendMessage']);
         mockGameService = jasmine.createSpyObj('GameService', ['onStartGame']);
         mockPlayerService = jasmine.createSpyObj('PlayerService', ['getCurrentPlayer', 'onPlayerMute', 'onPlayerBan', 'onPlayerAbandon']);
+        mockSubscriptionService = jasmine.createSpyObj<SubscriptionService>(['add', 'clear']);
 
         TestBed.configureTestingModule({
             declarations: [ChatRoomComponent],
@@ -88,6 +91,7 @@ describe('ChatRoomComponent', () => {
                 { provide: MessageService, useValue: mockMessageService },
                 { provide: GameService, useValue: mockGameService },
                 { provide: PlayerService, useValue: mockPlayerService },
+                { provide: SubscriptionService, useValue: mockSubscriptionService },
                 FormBuilder,
                 MatSnackBar,
             ],
@@ -174,15 +178,10 @@ describe('ChatRoomComponent', () => {
         expect(component.chatlogs).toContain(testChatlog);
     });
 
-    it('should unsubscribe from all subscriptions on destroy', () => {
-        const mockSub1 = new Subscription();
-        const mockSub2 = new Subscription();
-        component['eventSubscriptions'].push(mockSub1, mockSub2);
-        expect(mockSub1.closed).toBeFalse();
-        expect(mockSub2.closed).toBeFalse();
+    it('should unsubscribe clear subscriptions on destroy', () => {
         component.ngOnDestroy();
-        expect(mockSub1.closed).toBeTrue();
-        expect(mockSub2.closed).toBeTrue();
+
+        expect(mockSubscriptionService.clear).toHaveBeenCalledWith(component['uuid']);
     });
 
     it('should notify muted player', () => {

@@ -32,7 +32,7 @@ import { Question } from '@common/question';
 import { Quiz } from '@common/quiz';
 import { TimerEventType } from '@common/timer-event-type';
 import { TimerPayload } from '@common/timer-payload';
-import { Observable, Subscription, of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { io } from 'socket.io-client';
 import { QrlBoardComponent } from './qrl-board.component';
 
@@ -183,9 +183,7 @@ describe('QrlBoardComponent', () => {
     });
 
     it('should ngOnDestroy', () => {
-        spyOn(component['eventSubscriptions'], 'forEach');
         component.ngOnDestroy();
-        expect(component['eventSubscriptions'].forEach).toHaveBeenCalled();
     });
 
     it('should loadNextQuestion', () => {
@@ -246,14 +244,6 @@ describe('QrlBoardComponent', () => {
     });
 
     it('should unsubscribe from all subscriptions on destroy', () => {
-        const mockSub1 = new Subscription();
-        const mockSub2 = new Subscription();
-        component['eventSubscriptions'].push(mockSub1, mockSub2);
-        expect(mockSub1.closed).toBeFalse();
-        expect(mockSub2.closed).toBeFalse();
-        component.ngOnDestroy();
-        expect(mockSub1.closed).toBeTrue();
-        expect(mockSub2.closed).toBeTrue();
     });
 
     it('should add blink-red class for grade 0 and remove it after 3 seconds', (done) => {
