@@ -133,8 +133,8 @@ export class QcmBoardComponent implements OnInit, OnDestroy {
         });
     }
 
-    isQRL(question: Question) {
-        return question.type === QuestionType.QRL;
+    isQCM(question: Question) {
+        return question.type === QuestionType.QCM;
     }
 
     private loadNextQuestion(question: Question) {
