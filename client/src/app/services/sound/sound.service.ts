@@ -6,10 +6,19 @@ import { Injectable } from '@angular/core';
 export class SoundService {
     private audioContext: AudioContext = new AudioContext();
     private audios: Map<string, HTMLAudioElement> = new Map();
+    private source: MediaElementAudioSourceNode;
 
     loadSound(name: string, path: string): void {
-        if (!this.audios.has(name)) {
-            this.audios.set(name, new Audio(path));
+        let audio = this.audios.get(name);
+        if (!audio) {
+            audio = new Audio(path);
+            this.audios.set(name, audio);
+        }
+        audio.crossOrigin = 'anonymous';
+
+        if (!this.source) {
+            this.source = this.audioContext.createMediaElementSource(audio);
+            this.source.connect(this.audioContext.destination);
         }
     }
 
@@ -30,9 +39,6 @@ export class SoundService {
     }
 
     private play(audio: HTMLAudioElement) {
-        const source = this.audioContext.createMediaElementSource(audio);
-
-        source.connect(this.audioContext.destination);
         audio.play();
     }
 
