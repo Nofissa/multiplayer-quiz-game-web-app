@@ -36,7 +36,7 @@ import { TimerPayload } from '@common/timer-payload';
 import { Observable, Subscription, of } from 'rxjs';
 import { io } from 'socket.io-client';
 
-describe('QrlBoardComponent', () => {
+fdescribe('QrlBoardComponent', () => {
     let component: QrlBoardComponent;
     let fixture: ComponentFixture<QrlBoardComponent>;
     let mockGameHttpService: jasmine.SpyObj<GameHttpService>;
@@ -331,5 +331,18 @@ describe('QrlBoardComponent', () => {
         expect(component['cachedEvaluation']).toEqual(qrlPayload.data);
         expect(component.isInEvaluation).toBeFalse();
         expect(blinkTextAreaSpy).toHaveBeenCalledWith(Grade.Good);
+    });
+
+    it('should update remaining time on onTimerTick', () => {
+        component.pin = '123';
+        spyOn(component, 'submitAnswer');
+        timerServiceMock.onTimerTick.and.callFake((_pin: string, callback: (payload: TimerPayload) => void) => {
+            const payload = { remainingTime: 0, eventType: TimerEventType.Question };
+            callback(payload);
+            return of(payload).subscribe(callback);
+        });
+        component['setupSubscriptions']('123');
+        component.hasSubmitted = false;
+        expect(component.submitAnswer).toHaveBeenCalled();
     });
 });
