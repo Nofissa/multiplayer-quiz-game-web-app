@@ -7,7 +7,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
-import { MAX_MESSAGE_LENGTH } from '@app/constants/constants';
+import { QrlBoardComponent } from '@app/components/qrl-board/qrl-board.component';
+import { ERROR_DURATION, MAX_MESSAGE_LENGTH } from '@app/constants/constants';
 import { SocketServerMock } from '@app/mocks/socket-server-mock';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
@@ -34,9 +35,8 @@ import { TimerEventType } from '@common/timer-event-type';
 import { TimerPayload } from '@common/timer-payload';
 import { Observable, Subscription, of } from 'rxjs';
 import { io } from 'socket.io-client';
-import { QrlBoardComponent } from './qrl-board.component';
 
-fdescribe('QrlBoardComponent', () => {
+describe('QrlBoardComponent', () => {
     let component: QrlBoardComponent;
     let fixture: ComponentFixture<QrlBoardComponent>;
     let mockGameHttpService: jasmine.SpyObj<GameHttpService>;
@@ -189,9 +189,9 @@ fdescribe('QrlBoardComponent', () => {
     });
 
     it('should loadNextQuestion', () => {
-        component.questionIsOver = true;
+        component['hasSubmitted'] = true;
         component['loadNextQuestion'](quizStub().questions[0]);
-        expect(component.questionIsOver).toBeFalse();
+        expect(component['hasSubmitted']).toBeFalse();
     });
 
     it('should openConfirmationDialog', () => {
@@ -230,13 +230,11 @@ fdescribe('QrlBoardComponent', () => {
     });
 
     it('should not send a message if input is longer than 200 characters', () => {
-        spyOn(component, 'openError');
-        component.input =
-            // eslint-disable-next-line max-len
-            'cbuwebdwoehduwenduewoudnwicbuwebdwoehduwenduewoudnwicbuwebdwoehduwenduewoudnwicbuwebdwoehduwenduewoudnwicbuwebdwoehduwenduewoudnwicbuwebdwoehduwenduewoudnwicbuwebdwoehduwenduewoudnwicbuwebdwoehduwenduewoudnwi';
+        spyOn<unknown>(component, 'openError' as never);
+        component.input = 'abc'.repeat(MAX_MESSAGE_LENGTH);
         component.submitAnswer();
         expect(mockGameService.qrlSubmit).not.toHaveBeenCalled();
-        expect(component.openError).toHaveBeenCalledWith('La réponse contient plus de 200 caractères');
+        expect(component['openError']).toHaveBeenCalledWith('La réponse contient plus de 200 caractères');
     });
 
     it('should update remaining input count on key down', () => {
@@ -260,7 +258,7 @@ fdescribe('QrlBoardComponent', () => {
 
     it('should add blink-red class for grade 0 and remove it after 3 seconds', (done) => {
         const THREE_SECONDS_MS = 3000;
-        component.blinkTextArea(0);
+        component['blinkTextArea'](0);
         expect(component.textarea.nativeElement.classList.contains('blink-red')).toBeTruthy();
         setTimeout(() => {
             expect(component.textarea.nativeElement.classList.contains('blink-red')).toBeFalsy();
@@ -271,7 +269,7 @@ fdescribe('QrlBoardComponent', () => {
     it('should add blink-yellow class for grade GRADE50 and remove it after 3 seconds', (done) => {
         const THREE_SECONDS_MS = 3000;
         const GRADE50 = 50;
-        component.blinkTextArea(GRADE50);
+        component['blinkTextArea'](GRADE50);
         expect(component.textarea.nativeElement.classList.contains('blink-yellow')).toBeTruthy();
         setTimeout(() => {
             expect(component.textarea.nativeElement.classList.contains('blink-yellow')).toBeFalsy();
@@ -282,7 +280,7 @@ fdescribe('QrlBoardComponent', () => {
     it('should add blink class for grade GRADE100, show notification, and remove classes and notification after 3 seconds', (done) => {
         const THREE_SECONDS_MS = 3000;
         const GRADE100 = 100;
-        component.blinkTextArea(GRADE100);
+        component['blinkTextArea'](GRADE100);
         expect(component.textarea.nativeElement.classList.contains('blink')).toBeTruthy();
         expect(component.showNotification100).toBeTruthy();
         setTimeout(() => {
@@ -297,38 +295,40 @@ fdescribe('QrlBoardComponent', () => {
         expect(component.question.type).toEqual('QRL');
     });
 
-    // it('should handle QrlEvaluation correctly', () => {
-    //     // Mock data
-    //     const evaluation: QrlEvaluation = {
-    //         player: firstPlayerStub(), // Provide necessary properties for Player object
-    //         isLast: false,
-    //         score: 50,
-    //         grade: Grade.Average,
-    //     };
+    it('should open error snackbar', () => {
+        const snackBarSpy = spyOn(TestBed.inject(MatSnackBar), 'open');
 
-    //     // Simulate emission of QrlEvaluation
-    //     const evaluationSubject = new Subject<QrlEvaluation>();
-    //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    //     spyOn(mockGameService, 'onQrlEvaluate').and.callFake((pin: string, callback: (evaluation: QrlEvaluation) => void) => {
-    //         return evaluationSubject.subscribe(callback);
-    //     });
+        const errorMessage = 'Test error message';
 
-    //     // Trigger ngOnInit to set up subscriptions
-    //     component.ngOnInit();
+        component['openError'](errorMessage);
 
-    //     // Emit QrlEvaluation
-    //     evaluationSubject.next(evaluation);
+        expect(snackBarSpy).toHaveBeenCalledWith(
+            errorMessage,
+            undefined,
+            jasmine.objectContaining({
+                verticalPosition: 'top',
+                duration: ERROR_DURATION,
+                panelClass: ['error-snackbar'],
+            }),
+        );
+    });
 
-    //     // Expectations
-    //     expect(component.cachedEvaluation).toEqual(evaluation);
-    //     expect(component.questionIsOver).toBeFalse();
+    it('should handle QrlEvaluate correctly', () => {
+        const qrlPayload: GameEventPayload<QrlEvaluation> = {
+            pin: '123',
+            data: { player: firstPlayerStub(), grade: Grade.Good, score: 10, isLast: true },
+        };
 
-    //     // Simulate emission of last evaluation
-    //     evaluation.isLast = true;
-    //     evaluationSubject.next(evaluation);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const blinkTextAreaSpy = spyOn<any>(component, 'blinkTextArea');
 
-    //     // Expectations after receiving the last evaluation
-    //     expect(component.questionIsOver).toBeTrue();
-    //     expect(component.player?.score).toEqual(50); // Assuming a player object is available
-    // });
+        component['setupSubscriptions']('123');
+        socketServerMock.emit('qrlEvaluate', qrlPayload);
+
+        component['cachedEvaluation'] = qrlPayload.data;
+        component.player = firstPlayerStub();
+        expect(component['cachedEvaluation']).toEqual(qrlPayload.data);
+        expect(component.isInEvaluation).toBeFalse();
+        expect(blinkTextAreaSpy).toHaveBeenCalledWith(Grade.Good);
+    });
 });

@@ -3,10 +3,6 @@ import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dial
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
-import { lastPlayerEvaluationStub } from '@app/test-stubs/evaluation.stubs';
-import { firstPlayerStub } from '@app/test-stubs/player.stubs';
-import { qcmQuestionStub } from '@app/test-stubs/question.stubs';
-import { quizStub } from '@app/test-stubs/quiz.stubs';
 import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
 import { SocketServerMock } from '@app/mocks/socket-server-mock';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
@@ -15,6 +11,10 @@ import { KeyBindingService } from '@app/services/key-binding/key-binding.service
 import { PlayerService } from '@app/services/player/player.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
+import { lastPlayerEvaluationStub } from '@app/test-stubs/evaluation.stubs';
+import { firstPlayerStub } from '@app/test-stubs/player.stubs';
+import { qcmQuestionStub } from '@app/test-stubs/question.stubs';
+import { quizStub } from '@app/test-stubs/quiz.stubs';
 import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
 import { GameEventPayload } from '@common/game-event-payload';
 import { GameSnapshot } from '@common/game-snapshot';
@@ -143,13 +143,13 @@ describe('QcmBoardComponent', () => {
     });
 
     it('should return if disableShortcuts is true', () => {
-        component.disableShortcuts = true;
+        component['disableShortcuts'] = true;
         component.handleKeyboardEvent({} as KeyboardEvent);
         expect(keyBindingServiceMock.getExecutor).not.toHaveBeenCalled();
     });
 
     it('should call executor if disableShortcuts is false', () => {
-        component.disableShortcuts = false;
+        component['disableShortcuts'] = false;
         component.handleKeyboardEvent({} as KeyboardEvent);
         expect(keyBindingServiceMock.getExecutor).toHaveBeenCalled();
     });
@@ -163,12 +163,15 @@ describe('QcmBoardComponent', () => {
         const choice = 1;
         component.toggleSelectChoice(choice);
         expect(gameServiceMock.qcmToggleChoice).toHaveBeenCalled();
+        component.selectedChoiceIndexes = [0, 1];
+        component.toggleSelectChoice(choice);
+        expect(component.selectedChoiceIndexes.length).toBe(1);
     });
 
     it('should loadNextQuestion', () => {
-        component.disableShortcuts = true;
+        component['disableShortcuts'] = true;
         component['loadNextQuestion'](quizStub().questions[0]);
-        expect(component.disableShortcuts).toBeFalse();
+        expect(component['disableShortcuts']).toBeFalse();
     });
 
     it('should openConfirmationDialog', () => {
@@ -201,5 +204,31 @@ describe('QcmBoardComponent', () => {
         spyOn(component, 'toggleSelectChoice');
         component['setupKeyBindings']();
         expect(component.toggleSelectChoice).toHaveBeenCalled();
+    });
+
+    it('should handle QcmSubmit correctly', () => {
+        const qcmEvaluationPayload: GameEventPayload<QcmEvaluation> = { pin: '123', data: lastPlayerEvaluationStub() };
+
+        component['setupSubscriptions']('123');
+        socketServerMock.emit('submitChoices', qcmEvaluationPayload);
+        playerServiceMock.getCurrentPlayer.and.returnValue(firstPlayerStub());
+        component.player = firstPlayerStub();
+
+        expect(component['cachedEvaluation']).toEqual(qcmEvaluationPayload.data);
+        expect(component['disableShortcuts']).toBeTrue();
+        expect(component.questionIsOver).toBeTrue();
+    });
+
+    it('should update remaining time on onTimerTick', () => {
+        component.pin = '123';
+        spyOn(component, 'submitChoices');
+        timerServiceMock.onTimerTick.and.callFake((_pin: string, callback: (payload: TimerPayload) => void) => {
+            const payload = { remainingTime: 0, eventType: TimerEventType.Question };
+            callback(payload);
+            return of(payload).subscribe(callback);
+        });
+        component['setupSubscriptions']('123');
+        component.hasSubmited = false;
+        expect(component.submitChoices).toHaveBeenCalled();
     });
 });

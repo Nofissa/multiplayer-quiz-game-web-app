@@ -33,13 +33,13 @@ export class QcmBoardComponent implements OnInit, OnDestroy {
     questionIsOver: boolean;
     hasSubmited: boolean;
     selectedChoiceIndexes: number[];
-    cachedEvaluation: QcmEvaluation | null = null;
-    disableShortcuts: boolean = false;
+    private cachedEvaluation: QcmEvaluation | null = null;
+    private disableShortcuts: boolean = false;
 
-    readonly gameHttpService: GameHttpService;
-    readonly gameService: GameService;
-    readonly timerService: TimerService;
-    readonly keyBindingService: KeyBindingService;
+    private readonly gameHttpService: GameHttpService;
+    private readonly gameService: GameService;
+    private readonly timerService: TimerService;
+    private readonly keyBindingService: KeyBindingService;
 
     private eventSubscriptions: Subscription[] = [];
 
