@@ -12,6 +12,7 @@ import { SocketServerMock } from '@app/mocks/socket-server-mock';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { PlayerService } from '@app/services/player/player.service';
+import { SubscriptionService } from '@app/services/subscription/subscription.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { lastPlayerEvaluationStub } from '@app/test-stubs/evaluation.stubs';
@@ -48,6 +49,7 @@ describe('QrlBoardComponent', () => {
     let webSocketServiceSpy: jasmine.SpyObj<WebSocketService>;
     let socketServerMock: SocketServerMock;
     let timerServiceMock: jasmine.SpyObj<TimerService>;
+    let subscriptionServiceMock: jasmine.SpyObj<SubscriptionService>;
 
     const mockPlayers: Player[] = [
         {
@@ -109,6 +111,7 @@ describe('QrlBoardComponent', () => {
         routerSpy = jasmine.createSpyObj('Router', ['navigateByUrl']);
         webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', ['emit', 'on'], { socketInstance: io() });
         timerServiceMock = jasmine.createSpyObj('TimerService', ['onTimerTick']);
+        subscriptionServiceMock = jasmine.createSpyObj<SubscriptionService>(['add', 'clear']);
 
         TestBed.configureTestingModule({
             imports: [MatSnackBarModule, RouterTestingModule, MatDialogModule, BrowserAnimationsModule],
@@ -122,6 +125,7 @@ describe('QrlBoardComponent', () => {
                 { provide: Router, useValue: routerSpy },
                 { provide: WebSocketService, useValue: webSocketServiceSpy },
                 { provide: TimerService, useValue: timerServiceMock },
+                { provide: SubscriptionService, useValue: subscriptionServiceMock },
                 MatSnackBar,
                 FormBuilder,
             ],
@@ -244,6 +248,9 @@ describe('QrlBoardComponent', () => {
     });
 
     it('should unsubscribe from all subscriptions on destroy', () => {
+        component.ngOnDestroy();
+
+        expect(subscriptionServiceMock.clear).toHaveBeenCalledWith(component['uuid']);
     });
 
     it('should add blink-red class for grade 0 and remove it after 3 seconds', (done) => {
