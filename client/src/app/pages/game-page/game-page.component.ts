@@ -183,6 +183,13 @@ export class GamePageComponent implements OnInit, OnDestroy {
                 this.soundService.loadSound(PANIC_AUDIO_NAME, environment.panicAudioSrc);
                 this.soundService.playSound(PANIC_AUDIO_NAME);
             }),
+            this.timerService.onTogglePauseTimer(pin, (isRunning) => {
+                if (isRunning) {
+                    this.soundService.playSound(PANIC_AUDIO_NAME);
+                } else {
+                    this.soundService.stopSound(PANIC_AUDIO_NAME);
+                }
+            }),
         );
     }
 
