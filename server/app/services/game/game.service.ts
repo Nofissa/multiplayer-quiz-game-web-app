@@ -67,7 +67,7 @@ export class GameService implements OnModuleInit, OnModuleDestroy {
                 throw new Error("Il n'existe pas assez de questions de type QCM dans la banque de questions pour faire une partie en mode aléatoire");
             }
 
-            const shuffledQuestions = qcmQuestions.slice().sort(() => {
+            const shuffledQuestions = qcmQuestions.sort(() => {
                 return Math.random() - CONSTANTS.randomExpectation; // to have 1/2 chance to be negative
             });
             quiz.questions = shuffledQuestions.slice(0, CONSTANTS.randomQuestionCount);

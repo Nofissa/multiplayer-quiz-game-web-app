@@ -102,10 +102,10 @@ export class PlayerListComponent implements OnInit, OnDestroy {
                     this.players.sort((a, b) => b.username.localeCompare(a.username));
                     break;
                 case PlayerListSortingOptions.ScoreAscending:
-                    this.players.sort((a, b) => a.score - b.score);
+                    this.players.sort((a, b) => b.score - a.score);
                     break;
                 case PlayerListSortingOptions.ScoreDescending:
-                    this.players.sort((a, b) => b.score - a.score);
+                    this.players.sort((a, b) => a.score - b.score);
                     break;
                 case PlayerListSortingOptions.StatusAscending:
                     this.players.sort((a, b) => a.username.localeCompare(b.username));
@@ -116,7 +116,7 @@ export class PlayerListComponent implements OnInit, OnDestroy {
                     this.players.sort((a, b) => b.state - a.state);
                     break;
                 default:
-                    break;
+                    throw new Error('Invalid sorting option');
             }
         }
     }
@@ -125,6 +125,13 @@ export class PlayerListComponent implements OnInit, OnDestroy {
         this.eventSubscriptions.push(
             this.gameService.onQcmSubmit(pin, (evaluation) => {
                 this.upsertPlayer(evaluation.player);
+                if (!this.isTimerFinished) {
+                    this.players.forEach((player) => {
+                        if (player.socketId === evaluation.player.socketId) {
+                            player.hasSubmitted = true;
+                        }
+                    });
+                }
             }),
 
             this.gameService.onQrlEvaluate(pin, (evaluation) => {
@@ -188,15 +195,6 @@ export class PlayerListComponent implements OnInit, OnDestroy {
                 if (!this.isTimerFinished) {
                     this.players.forEach((player) => {
                         if (player.socketId === qrlSubmission.clientId) {
-                            player.hasSubmitted = true;
-                        }
-                    });
-                }
-            }),
-            this.gameService.onQcmSubmit(pin, (qcmSubmission) => {
-                if (!this.isTimerFinished) {
-                    this.players.forEach((player) => {
-                        if (player === qcmSubmission.player) {
                             player.hasSubmitted = true;
                         }
                     });

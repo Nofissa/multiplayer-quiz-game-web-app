@@ -1,5 +1,4 @@
 import { AddGameSummaryOperator } from '@app/classes/add-game-summary-operator';
-import { GameSummaryService } from '@app/services/game-summary/game-summary.service';
 import { gameStub } from './stubs/game.stub';
 import { GameSummary, GameSummaryDocument } from '@app/model/database/game-summary';
 import { Model } from 'mongoose';
@@ -7,17 +6,13 @@ import { Model } from 'mongoose';
 describe('AddGameSummaryOperator', () => {
     let addGameSummaryOperator: AddGameSummaryOperator;
     let modelMock: jest.Mocked<Model<GameSummaryDocument>>;
-    let gameSummaryServiceMock: jest.Mocked<GameSummaryService>;
 
     beforeEach(() => {
         modelMock = {
             create: jest.fn(),
         } as never;
-        gameSummaryServiceMock = {
-            model: modelMock,
-        } as never;
 
-        addGameSummaryOperator = new AddGameSummaryOperator(gameSummaryServiceMock as GameSummaryService);
+        addGameSummaryOperator = new AddGameSummaryOperator(modelMock);
     });
 
     it('should create game summary from GameSummary', async () => {

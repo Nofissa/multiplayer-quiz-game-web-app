@@ -216,12 +216,18 @@ export class QrlBoardComponent implements OnInit, OnDestroy {
                 this.loadNextQuestion(data.question);
             }),
             this.gameService.onQrlSubmit(this.pin, () => {
+                if (this.question?.type?.trim()?.toUpperCase() !== 'QRL') {
+                    return;
+                }
                 if (this.isTest && this.player) {
                     this.blinkTextArea(Grade.Good);
                     this.player.score += this.question.points;
                 }
             }),
             this.gameService.onQrlEvaluate(pin, (evaluation) => {
+                if (this.question?.type?.trim()?.toUpperCase() !== 'QRL') {
+                    return;
+                }
                 if (this.playerService.getCurrentPlayer(pin)?.socketId === evaluation.player.socketId) {
                     this.cachedEvaluation = evaluation;
                 }
@@ -235,6 +241,9 @@ export class QrlBoardComponent implements OnInit, OnDestroy {
                 }
             }),
             this.timerService.onTimerTick(pin, (payload) => {
+                if (this.question?.type?.trim()?.toUpperCase() !== 'QRL') {
+                    return;
+                }
                 if (!payload.remainingTime && payload.eventType === TimerEventType.Question && !this.hasSubmitted) {
                     this.submitAnswer();
                 }

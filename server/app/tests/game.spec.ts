@@ -73,4 +73,14 @@ describe('Game', () => {
         game.quiz._id = 'someId';
         expect(game.isRandom).toBe(false);
     });
+
+    it('should return the highest score among players', () => {
+        const highestScore = game.getHighestScore();
+        expect(highestScore).toEqual(-Infinity);
+    });
+
+    it('should return the active players', () => {
+        const activePlayer = game.getActivePlayers();
+        expect(activePlayer).toEqual([]);
+    });
 });

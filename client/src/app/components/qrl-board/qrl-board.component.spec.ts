@@ -221,7 +221,6 @@ describe('QrlBoardComponent', () => {
         expect(mockGameService.onQrlEvaluate).toHaveBeenCalled();
         expect(mockGameService.onQrlSubmit).toHaveBeenCalled();
         expect(timerServiceMock.onTimerTick).toHaveBeenCalled();
-        expect(component.submitAnswer).toHaveBeenCalled();
     });
 
     it('should send a message when valid', () => {

@@ -37,7 +37,7 @@ import { JoinGameDialogComponent } from './components/dialogs/join-game-dialog/j
 import { PromptDialogComponent } from './components/dialogs/prompt-dialog/prompt-dialog.component';
 import { QuizDetailsDialogComponent } from './components/dialogs/quiz-details-dialog/quiz-details-dialog.component';
 import { UpsertQuestionDialogComponent } from './components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
-import { GameSummaryComponent } from './components/game-summary-list/game-summary/game-summary.component';
+import { GameSummaryListComponent } from './components/game-summary-list/game-summary-list.component';
 import { QcmBoardComponent } from './components/qcm-board/qcm-board.component';
 import { GameTransitionComponent } from './components/game-transition/game-transition.component';
 import { NavHeaderComponent } from './components/nav-header/nav-header.component';
@@ -50,7 +50,7 @@ import { QuestionListComponent } from './components/question-list/question-list.
 import { QuizListComponent } from './components/quiz-list/quiz-list.component';
 import { QuizComponent } from './components/quiz/quiz.component';
 import { TimerComponent } from './components/timer/timer.component';
-import { TimerPauseToggleComponent } from './components/toggle-pause-timer-button/timer-pause-toggle.component';
+import { TimerPauseToggleComponent } from './components/timer-pause-toggle/timer-pause-toggle.component';
 import { AppRoutingModule } from './modules/app-routing.module';
 import { AdminPageComponent } from './pages/admin-page/admin-page.component';
 import { CreateGamePageComponent } from './pages/create-game-page/create-game-page.component';
@@ -101,7 +101,7 @@ import { WebSocketService } from './services/web-socket/web-socket.service';
         PanicModeButtonComponent,
         TimerPauseToggleComponent,
         QrlListComponent,
-        GameSummaryComponent,
+        GameSummaryListComponent,
     ],
     imports: [
         AppRoutingModule,
