@@ -42,8 +42,9 @@
                     <div
                         [ngClass]="{
                             'player-name': !player.hasInteracted && !player.hasSubmitted,
-                            'player-name-interacted': player.hasInteracted && !player.hasSubmitted && !displayOptions.results,
-                            'player-name-submitted': player.hasSubmitted && !displayOptions.results
+                            'player-name-interacted': player.hasInteracted && !player.hasSubmitted,
+                            'player-name-submitted': player.hasSubmitted,
+                            'black' : displayOptions.results || displayOptions.waiting
                         }"
                     >
                         {{ player.username }}

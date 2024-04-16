@@ -6,4 +6,5 @@ export interface PlayerListDisplayOptions {
     quitters?: boolean;
     mute?: boolean;
     results?: boolean;
+    waiting?: boolean;
 }

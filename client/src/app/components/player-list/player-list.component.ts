@@ -148,6 +148,7 @@ export class PlayerListComponent implements OnInit, OnDestroy {
             }),
             this.gameService.onStartGame(pin, () => {
                 this.displayOptions.ban = false;
+                this.displayOptions.waiting = false;
                 this.players.forEach((player) => {
                     player.hasInteracted = false;
                     player.hasSubmitted = false;
