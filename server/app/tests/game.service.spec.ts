@@ -214,7 +214,7 @@ describe('GameService', () => {
     describe('evaluateChoices', () => {
         const game = gameStub();
         const submission = submissionStub();
-        let evaluation = evaluationStub();
+        const evaluation = evaluationStub();
         const clientPlayer = clientPlayerStub();
         it('should throw an error if the submission is final', () => {
             jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
@@ -252,8 +252,7 @@ describe('GameService', () => {
             jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
             game.quiz.questions[0].type = 'QRL';
             game.currentQuestionIndex = 0; // Assuming first question is not QCM
-            evaluation = gameService.evaluateChoices(socketMock, 'testPin');
-            expect(evaluation).toBeUndefined();
+            expect(() => gameService.evaluateChoices(socketMock, 'testPin')).toThrowError("La question n'est pas de type QCM");
         });
     });
 
