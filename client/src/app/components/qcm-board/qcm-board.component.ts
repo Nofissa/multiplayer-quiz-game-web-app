@@ -33,13 +33,13 @@ export class QcmBoardComponent implements OnInit, OnDestroy {
     questionIsOver: boolean;
     hasSubmited: boolean;
     selectedChoiceIndexes: number[];
-    cachedEvaluation: QcmEvaluation | null = null;
-    disableShortcuts: boolean = false;
+    private cachedEvaluation: QcmEvaluation | null = null;
+    private disableShortcuts: boolean = false;
 
-    readonly gameHttpService: GameHttpService;
-    readonly gameService: GameService;
-    readonly timerService: TimerService;
-    readonly keyBindingService: KeyBindingService;
+    private readonly gameHttpService: GameHttpService;
+    private readonly gameService: GameService;
+    private readonly timerService: TimerService;
+    private readonly keyBindingService: KeyBindingService;
 
     private eventSubscriptions: Subscription[] = [];
 
@@ -141,6 +141,9 @@ export class QcmBoardComponent implements OnInit, OnDestroy {
                 this.loadNextQuestion(data.question);
             }),
             this.gameService.onQcmSubmit(pin, (evaluation) => {
+                if (this.question?.type?.trim()?.toUpperCase() !== 'QCM') {
+                    return;
+                }
                 if (this.playerService.getCurrentPlayer(pin)?.socketId === evaluation.player.socketId) {
                     this.disableShortcuts = true;
                     this.cachedEvaluation = evaluation;
@@ -153,6 +156,9 @@ export class QcmBoardComponent implements OnInit, OnDestroy {
                 }
             }),
             this.timerService.onTimerTick(pin, (payload) => {
+                if (this.question?.type?.trim()?.toUpperCase() !== 'QCM') {
+                    return;
+                }
                 if (!payload.remainingTime && payload.eventType === TimerEventType.Question && !this.hasSubmited) {
                     this.submitChoices();
                 }
@@ -163,6 +169,9 @@ export class QcmBoardComponent implements OnInit, OnDestroy {
     private setupKeyBindings() {
         ['1', '2', '3', '4'].forEach((x) => {
             this.keyBindingService.registerKeyBinding(x, () => {
+                if (this.question?.type?.trim()?.toUpperCase() !== 'QCM') {
+                    return;
+                }
                 const choiceIndex = parseInt(x, 10) - 1;
                 this.toggleSelectChoice(choiceIndex);
             });

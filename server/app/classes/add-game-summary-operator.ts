@@ -1,15 +1,15 @@
-import { GameSummary } from '@app/model/database/game-summary';
+import { GameSummary, GameSummaryDocument } from '@app/model/database/game-summary';
 import { Game } from './game';
-import { GameSummaryService } from '@app/services/game-summary/game-summary.service';
+import { Model } from 'mongoose';
 
 export class AddGameSummaryOperator {
-    constructor(private readonly gameSummaryService: GameSummaryService) {}
+    constructor(private readonly model: Model<GameSummaryDocument>) {}
 
     async fromGameSummary(gameSummary: GameSummary) {
         try {
-            return await this.gameSummaryService.model.create(gameSummary);
+            return await this.model.create(gameSummary);
         } catch (error) {
-            throw new Error('Error saving game summary');
+            throw new Error('Une erreur est survenue durant la sauvegarde du résumé de partie');
         }
     }
 
@@ -25,7 +25,7 @@ export class AddGameSummaryOperator {
             };
             return await this.fromGameSummary(gameSummary);
         } catch (error) {
-            throw new Error('Error saving game summary');
+            throw new Error('Une erreur est survenue durant la sauvegarde du résumé de partie');
         }
     }
 }

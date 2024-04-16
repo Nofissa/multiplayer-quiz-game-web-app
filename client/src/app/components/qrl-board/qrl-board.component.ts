@@ -56,17 +56,17 @@ export class QrlBoardComponent implements OnInit, OnDestroy {
     remainingInputCount: number = MAX_MESSAGE_LENGTH;
     input: string = '';
     question: Question;
-    questionIsOver: boolean;
+
     hasSubmitted: boolean;
     isInEvaluation: boolean = false;
-    cachedEvaluation: QrlEvaluation | null = null;
     formGroup: FormGroup;
 
-    readonly gameHttpService: GameHttpService;
-    readonly gameService: GameService;
-    readonly timerService: TimerService;
-    readonly playerService: PlayerService;
+    private readonly gameHttpService: GameHttpService;
+    private readonly gameService: GameService;
+    private readonly timerService: TimerService;
+    private readonly playerService: PlayerService;
 
+    private cachedEvaluation: QrlEvaluation | null = null;
     private isTyping: boolean = false;
     private interval: ReturnType<typeof setTimeout>;
     private eventSubscriptions: Subscription[] = [];
@@ -153,7 +153,7 @@ export class QrlBoardComponent implements OnInit, OnDestroy {
         });
     }
 
-    openError(message: string) {
+    private openError(message: string) {
         this.snackBar.open(message, undefined, {
             verticalPosition: 'top',
             duration: ERROR_DURATION,
@@ -161,7 +161,7 @@ export class QrlBoardComponent implements OnInit, OnDestroy {
         });
     }
 
-    blinkTextArea(grade: Grade) {
+    private blinkTextArea(grade: Grade) {
         switch (grade) {
             case Grade.Bad: {
                 this.textarea.nativeElement.classList.add('blink-red');
@@ -203,7 +203,6 @@ export class QrlBoardComponent implements OnInit, OnDestroy {
     }
 
     private loadNextQuestion(question: Question) {
-        this.questionIsOver = false;
         this.hasSubmitted = false;
         this.cachedEvaluation = null;
         this.input = '';
@@ -216,17 +215,22 @@ export class QrlBoardComponent implements OnInit, OnDestroy {
                 this.loadNextQuestion(data.question);
             }),
             this.gameService.onQrlSubmit(this.pin, () => {
+                if (this.question?.type?.trim()?.toUpperCase() !== 'QRL') {
+                    return;
+                }
                 if (this.isTest && this.player) {
                     this.blinkTextArea(Grade.Good);
                     this.player.score += this.question.points;
                 }
             }),
             this.gameService.onQrlEvaluate(pin, (evaluation) => {
+                if (this.question?.type?.trim()?.toUpperCase() !== 'QRL') {
+                    return;
+                }
                 if (this.playerService.getCurrentPlayer(pin)?.socketId === evaluation.player.socketId) {
                     this.cachedEvaluation = evaluation;
                 }
                 if (evaluation.isLast) {
-                    this.questionIsOver = true;
                     if (this.player && this.cachedEvaluation) {
                         this.isInEvaluation = false;
                         this.player.score += this.cachedEvaluation?.score ?? 0;
@@ -235,6 +239,9 @@ export class QrlBoardComponent implements OnInit, OnDestroy {
                 }
             }),
             this.timerService.onTimerTick(pin, (payload) => {
+                if (this.question?.type?.trim()?.toUpperCase() !== 'QRL') {
+                    return;
+                }
                 if (!payload.remainingTime && payload.eventType === TimerEventType.Question && !this.hasSubmitted) {
                     this.submitAnswer();
                 }

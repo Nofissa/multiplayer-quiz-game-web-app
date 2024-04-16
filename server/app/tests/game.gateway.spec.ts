@@ -1,6 +1,8 @@
 /* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-explicit-any */ // useful especially for the socket mocking
 import { GameGateway } from '@app/gateways/game.gateway';
+import { GameAutopilotService } from '@app/services/game-autopilot/game-autopilot.service';
+import { GameSummaryService } from '@app/services/game-summary/game-summary.service';
 import { GameService } from '@app/services/game/game.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { BarchartSubmission } from '@common/barchart-submission';
@@ -15,9 +17,8 @@ import { playerstub } from './stubs/player.stub';
 import { qrlEvaluationStub } from './stubs/qrl-evaluation.stub';
 import { qrlSubmissionStub } from './stubs/qrl.submission.stub';
 import { questionStub } from './stubs/question.stubs';
+import { randomGameStub } from './stubs/random-game-stub';
 import { submissionStub } from './stubs/submission.stub';
-import { GameAutopilotService } from '@app/services/game-autopilot/game-autopilot.service';
-import { GameSummaryService } from '@app/services/game-summary/game-summary.service';
 
 describe('GameGateway', () => {
     let gameGateway: GameGateway;
@@ -147,6 +148,18 @@ describe('GameGateway', () => {
             });
             gameGateway.startGame(socketMock, { pin });
             expect(socketMock.emit).toHaveBeenCalledWith('error', 'Mock error');
+        });
+
+        it('should call joinGame and RunGame if random Game', () => {
+            const pin = 'mockPin';
+            const game = randomGameStub();
+            const joinGameSpy = jest.spyOn(GameGateway.prototype, 'joinGame').mockReturnValue(null);
+            gameServiceMock.getGame.mockReturnValue(game);
+            gameServiceMock.startGame.mockReturnValue(questionStub[0]);
+            gameGateway.startGame(socketMock, { pin });
+            expect(joinGameSpy).toHaveBeenCalled();
+            expect(gameAutopilotServiceMock.runGame).toHaveBeenCalled();
+            expect(serverMock.to).toHaveBeenCalledWith(pin);
         });
     });
 

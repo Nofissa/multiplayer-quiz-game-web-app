@@ -1,7 +1,9 @@
 import { GameService } from '@app/services/game/game.service';
 import { TimerService } from '@app/services/timer/timer.service';
+import { AccelerateTimerPayload } from '@common/accelerate-timer-payload';
 import { GameEventPayload } from '@common/game-event-payload';
-import { TimerEventType } from '@common/timer-event-type';
+import { PinPayload } from '@common/pin-payload';
+import { StartTimerPayload } from '@common/start-timer-payload';
 import { TimerPayload } from '@common/timer-payload';
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
@@ -24,10 +26,7 @@ export class TimerGateway {
     ) {}
 
     @SubscribeMessage('startTimer')
-    startTimer(
-        @ConnectedSocket() client: Socket,
-        @MessageBody() { pin, eventType, duration }: { pin: string; eventType: TimerEventType; duration?: number },
-    ) {
+    startTimer(@ConnectedSocket() client: Socket, @MessageBody() { pin, eventType, duration }: StartTimerPayload) {
         try {
             duration = duration ?? this.gameService.getGame(pin).quiz.duration;
             const startRemainingTime = this.timerService.startTimer(client, pin, duration, eventType, (remainingTime) => {
@@ -43,7 +42,7 @@ export class TimerGateway {
     }
 
     @SubscribeMessage('stopTimer')
-    stopTimer(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
+    stopTimer(@ConnectedSocket() client: Socket, @MessageBody() { pin }: PinPayload) {
         try {
             this.timerService.stopTimer(client, pin);
             const payload: GameEventPayload<null> = { pin, data: null };
@@ -55,7 +54,7 @@ export class TimerGateway {
     }
 
     @SubscribeMessage('togglePauseTimer')
-    togglePauseTimer(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
+    togglePauseTimer(@ConnectedSocket() client: Socket, @MessageBody() { pin }: PinPayload) {
         try {
             const isRunning = this.timerService.togglePauseTimer(client, pin);
             const payload: GameEventPayload<boolean> = { pin, data: isRunning };
@@ -67,7 +66,7 @@ export class TimerGateway {
     }
 
     @SubscribeMessage('accelerateTimer')
-    accelerateTimer(@ConnectedSocket() client: Socket, @MessageBody() { pin, ticksPerSecond }: { pin: string; ticksPerSecond: number }) {
+    accelerateTimer(@ConnectedSocket() client: Socket, @MessageBody() { pin, ticksPerSecond }: AccelerateTimerPayload) {
         try {
             this.timerService.accelerateTimer(client, pin, ticksPerSecond);
             const payload: GameEventPayload<null> = { pin, data: null };

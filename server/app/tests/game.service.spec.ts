@@ -1,11 +1,19 @@
 /* eslint-disable max-lines */ // to many lines because of many mocks that i had to clear and recreate.
 /* eslint-disable @typescript-eslint/no-explicit-any */ // used for mocking the socket for instance.
+import { Game } from '@app/classes/game';
+import { Timer } from '@app/classes/timer';
+import { CONSTANTS } from '@app/constants/constants';
 import * as PinHelper from '@app/helpers/pin';
 import { GameService } from '@app/services/game/game.service';
+import { QuestionService } from '@app/services/question/question.service';
 import { QuizService } from '@app/services/quiz/quiz.service';
+import { TimerService } from '@app/services/timer/timer.service';
 import { GameState } from '@common/game-state';
+import { Grade } from '@common/grade';
 import { QcmSubmission } from '@common/qcm-submission';
 import { QuestionPayload } from '@common/question-payload';
+import { ModuleRef } from '@nestjs/core';
+import { Subscription } from 'rxjs';
 import { Socket } from 'socket.io';
 import { clientPlayerStub } from './stubs/client.player.stub';
 import { evaluationStub } from './stubs/evaluation.stubs';
@@ -15,10 +23,6 @@ import { qrlSubmissionStub } from './stubs/qrl.submission.stub';
 import { questionStub } from './stubs/question.stubs';
 import { quizStub } from './stubs/quiz.stubs';
 import { submissionStub } from './stubs/submission.stub';
-import { TimerService } from '@app/services/timer/timer.service';
-import { ModuleRef } from '@nestjs/core';
-import { QuestionService } from '@app/services/question/question.service';
-import { Timer } from '@app/classes/timer';
 
 describe('GameService', () => {
     let gameService: GameService;
@@ -67,8 +71,22 @@ describe('GameService', () => {
         jest.restoreAllMocks();
     });
 
+    afterAll(() => {
+        gameService.onModuleDestroy();
+    });
+
     it('should be defined', async () => {
         expect(gameService).toBeDefined();
+    });
+
+    describe('onModuleInit', () => {
+        it('should initialize clearInactiveGamesInterval onModuleInit', () => {
+            const setIntervalSpy = jest.spyOn(global, 'setInterval').mockReturnValue({} as NodeJS.Timer);
+
+            gameService.onModuleInit();
+
+            expect(setIntervalSpy).toHaveBeenCalled();
+        });
     });
 
     describe('getGame', () => {
@@ -90,6 +108,7 @@ describe('GameService', () => {
             const quizId = 'someQuizId';
             const quizExist = quizStub();
             const client = socketMock;
+            jest.spyOn(Map.prototype, 'has').mockReturnValueOnce(true);
             jest.spyOn(PinHelper, 'generateRandomPin').mockReturnValue('mockedPinValue');
             quizServiceMock.getQuizById.mockResolvedValue(quizExist);
             const result = await gameService.createGame(client, quizId);
@@ -105,6 +124,31 @@ describe('GameService', () => {
             const client = socketMock;
             quizServiceMock.getQuizById.mockResolvedValue(null);
             await expect(gameService.createGame(client, quizId)).rejects.toThrow(`Aucun quiz ne correspond a l'identifiant ${quizId}`);
+        });
+
+        it('should throw an error for the random mode if there is not enought question in the question bank', async () => {
+            const quizId = null;
+            const client = socketMock;
+            questionServiceMock.getAllQuestions.mockResolvedValue(questionStub());
+            await expect(gameService.createGame(client, quizId)).rejects.toThrow(
+                "Il n'existe pas assez de questions de type QCM dans la banque de questions pour faire une partie en mode aléatoire",
+            );
+        });
+
+        it('should create a game in random mode if quizId is not provided', async () => {
+            const qcmQuestions = [questionStub()[0], questionStub()[0], questionStub()[0], questionStub()[0], questionStub()[0]];
+
+            questionServiceMock.getAllQuestions.mockResolvedValue(qcmQuestions);
+
+            const result = await gameService.createGame(socketMock, null);
+
+            expect(result).toBeDefined();
+            expect(result).toEqual(expect.any(String));
+            expect(gameService.games.has(result)).toBeTruthy();
+
+            const createdGame = gameService.games.get(result);
+            expect(createdGame.quiz.title).toEqual('Mode Aléatoire');
+            expect(createdGame.quiz.questions.length).toBeLessThanOrEqual(CONSTANTS.randomQuestionCount);
         });
     });
 
@@ -171,11 +215,11 @@ describe('GameService', () => {
     describe('evaluateChoices', () => {
         const game = gameStub();
         const submission = submissionStub();
-        const evaluation = evaluationStub();
+        let evaluation = evaluationStub();
         const clientPlayer = clientPlayerStub();
         it('should throw an error if the submission is final', () => {
             jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
-            jest.spyOn(GameService.prototype, 'getOrCreateSubmission').mockReturnValue(submission);
+            jest.spyOn<any, string>(GameService.prototype, 'getOrCreateSubmission').mockReturnValue(submission);
             expect(() => gameService.evaluateChoices(socketMock, game.pin)).toThrow('Vous avez déjà soumis vos choix pour cette question');
         });
 
@@ -186,8 +230,8 @@ describe('GameService', () => {
             evaluation.player.speedAwardCount = 1;
             evaluation.player.score = 120;
             jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
-            jest.spyOn(GameService.prototype, 'getOrCreateSubmission').mockReturnValue(submission);
-            jest.spyOn(GameService.prototype, 'isGoodAnswer').mockReturnValue(true);
+            jest.spyOn<any, string>(GameService.prototype, 'getOrCreateSubmission').mockReturnValue(submission);
+            jest.spyOn<any, string>(GameService.prototype, 'isGoodAnswer').mockReturnValue(true);
             timerServiceMock.getTimer.mockReturnValue({ time: 1 } as Timer);
             jest.spyOn(game['clientPlayers'], 'get').mockReturnValue(clientPlayer);
             const result = gameService.evaluateChoices(socketMock, game.pin);
@@ -197,12 +241,20 @@ describe('GameService', () => {
         it('should not give bonus points if time is zero', () => {
             submission.isFinal = false;
             jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
-            jest.spyOn(GameService.prototype, 'getOrCreateSubmission').mockReturnValue(submission);
-            jest.spyOn(GameService.prototype, 'isGoodAnswer').mockReturnValue(true);
+            jest.spyOn<any, string>(GameService.prototype, 'getOrCreateSubmission').mockReturnValue(submission);
+            jest.spyOn<any, string>(GameService.prototype, 'isGoodAnswer').mockReturnValue(true);
             timerServiceMock.getTimer.mockReturnValue({ time: 0 } as Timer);
             jest.spyOn(game['clientPlayers'], 'get').mockReturnValue(clientPlayer);
             const result = gameService.evaluateChoices(socketMock, game.pin);
             expect(result.isFirstCorrect).toEqual(false);
+        });
+
+        it('should return undefined if current question is not QCM type', () => {
+            jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
+            game.quiz.questions[0].type = 'QRL';
+            game.currentQuestionIndex = 0; // Assuming first question is not QCM
+            evaluation = gameService.evaluateChoices(socketMock, 'testPin');
+            expect(evaluation).toBeUndefined();
         });
     });
 
@@ -333,13 +385,13 @@ describe('GameService', () => {
             const submission = submissionStub();
             submission.choices[3].isSelected = true;
             submission.choices[0].isSelected = false;
-            const result = gameService.isGoodAnswer(question, submission);
+            const result = gameService['isGoodAnswer'](question, submission);
             expect(result).toEqual(true);
         });
         it('should return false if incorrect', () => {
             const submission = submissionStub();
             submission.choices[3].isSelected = false;
-            const result = gameService.isGoodAnswer(question, submission);
+            const result = gameService['isGoodAnswer'](question, submission);
             expect(result).toEqual(false);
         });
     });
@@ -352,13 +404,13 @@ describe('GameService', () => {
             submission.choices[3].isSelected = false;
             submission.isFinal = false;
             jest.spyOn(Map.prototype, 'has').mockReturnValue(false);
-            const result = gameService.getOrCreateSubmission(socketMockPlayer, game);
+            const result = gameService['getOrCreateSubmission'](socketMockPlayer, game);
             expect(result).toEqual(submission);
         });
 
         it("should create a new submission if it doesn't exist already", () => {
             jest.spyOn(Map.prototype, 'has').mockReturnValue(true);
-            const result = gameService.getOrCreateSubmission(socketMockPlayer, game);
+            const result = gameService['getOrCreateSubmission'](socketMockPlayer, game);
             expect(result).toEqual(game.currentQuestionQcmSubmissions.get(socketMockPlayer.id));
         });
     });
@@ -376,7 +428,7 @@ describe('GameService', () => {
             socketMock = { id: 'playerId' } as jest.Mocked<Socket>;
             const expectedResult = { clientId: socketMock.id, index: submissionTest.payload, isSelected: submissionTest.isSelected };
             jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
-            jest.spyOn(GameService.prototype, 'getOrCreateSubmission').mockReturnValue(submission);
+            jest.spyOn<any, string>(GameService.prototype, 'getOrCreateSubmission').mockReturnValue(submission);
             const result = gameService.qcmToggleChoice(socketMock, game.pin, choiceIndex);
             expect(result).toEqual(expectedResult);
             expect(GameService.prototype.getGame).toHaveBeenCalled();
@@ -389,6 +441,13 @@ describe('GameService', () => {
             jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
             jest.spyOn(GameService.prototype, 'isOrganizer').mockReturnValue(false);
             expect(() => gameService.endGame(socketMock, game.pin)).toThrow(`Vous n'êtes pas organisateur de la partie ${game.pin}`);
+        });
+
+        it('should change the Gamestate to Ended', () => {
+            jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
+            jest.spyOn(GameService.prototype, 'isOrganizer').mockReturnValue(true);
+            gameService.endGame(socketMock, game.pin);
+            expect(game.state).toEqual(GameState.Ended);
         });
     });
 
@@ -459,6 +518,80 @@ describe('GameService', () => {
             jest.spyOn(Map.prototype, 'get').mockReturnValueOnce(clientPlayer).mockReturnValueOnce(clientPlayerIsTyping);
             const result = gameService.qrlInputChange(playerSocketMock, game.pin, true);
             expect(result).toEqual({ clientId: playerSocketMock.id, index: 1, isSelected: true });
+        });
+    });
+
+    describe('qrlEvaluate', () => {
+        const gamePin = 'testGamePin';
+        const game = gameStub();
+
+        it('should evaluate the submission and return the result', () => {
+            jest.spyOn(gameService, 'getGame').mockReturnValue(game);
+            const result = gameService.qrlEvaluate(socketMock.id, gamePin, Grade.Average);
+
+            expect(result).toBeDefined();
+        });
+    });
+
+    describe('onLastQcmSubmission', () => {
+        const pin = 'testGamePin';
+        let callbackMock: jest.Mock<void, []>;
+        let subscription: Subscription;
+
+        beforeEach(() => {
+            callbackMock = jest.fn(); // Mock callback function
+            subscription = gameService.onLastQcmSubmission(pin, callbackMock);
+        });
+
+        afterEach(() => {
+            subscription.unsubscribe();
+        });
+
+        it('should subscribe to lastQcmSubmissionSubjects and invoke callback on event', () => {
+            const subject = gameService['lastQcmSubmissionSubjects'].get(pin);
+            expect(subject).toBeDefined();
+            subject.next();
+            expect(callbackMock).toHaveBeenCalledTimes(1);
+        });
+
+        it('should unsubscribe properly when subscription is unsubscribed', () => {
+            subscription.unsubscribe();
+            const subject = gameService['lastQcmSubmissionSubjects'].get(pin);
+            subject.next();
+            expect(callbackMock).toHaveBeenCalledTimes(0);
+        });
+    });
+
+    describe('clearInactiveGames', () => {
+        it('should remove ended games with no active players', () => {
+            const game1 = gameStub();
+            game1.state = GameState.Ended;
+            game1.getActivePlayers = jest.fn().mockReturnValue([]);
+            const gamesMap = new Map<string, Game>([['game1', game1]]);
+            (gameService as any).games = gamesMap;
+            gameService['clearInactiveGames']();
+            expect((gameService as any).games.size).toBe(0);
+            expect((gameService as any).games.has('game1')).toBe(false);
+        });
+
+        it('should not remove games that are not in "Ended" state', () => {
+            // Mock a game with a state other than Ended
+            const game = gameStub(); // Replace null with appropriate mocks
+            game.state = GameState.Opened;
+            game.getActivePlayers = jest.fn().mockReturnValue([]);
+
+            // Mock the Map entries to simulate games stored in the service
+            const gamesMap = new Map<string, Game>([['game3', game]]);
+
+            // Assign the mocked gamesMap to the service
+            (gameService as any).games = gamesMap;
+
+            // Call the method to clear inactive games
+            gameService['clearInactiveGames']();
+
+            // Expect no games to be removed because game3 is not in "Ended" state
+            expect((gameService as any).games.size).toBe(1);
+            expect((gameService as any).games.has('game3')).toBe(true);
         });
     });
 });

@@ -46,7 +46,7 @@ describe('playerService', () => {
             jest.spyOn(Array.prototype, 'find').mockReturnValue(undefined);
 
             const result = playerService.playerBan(socketMock, game.pin, player.username);
-            expect(result).toEqual(undefined);
+            expect(result).toEqual(null);
         });
 
         it('should return the client player with playerState set on Banned', () => {
@@ -78,6 +78,13 @@ describe('playerService', () => {
             jest.spyOn(Map.prototype, 'get').mockReturnValue(clientPlayerTest);
             const result = playerService.playerAbandon(socketMock, game.pin);
             expect(result).toEqual(clientPlayerTest);
+        });
+
+        it('should return null if no clientPlayer', () => {
+            gameService.getGame.mockReturnValue(game);
+            jest.spyOn(Map.prototype, 'get').mockReturnValue(null);
+            const result = playerService.playerAbandon(socketMock, game.pin);
+            expect(result).toEqual(null);
         });
     });
 

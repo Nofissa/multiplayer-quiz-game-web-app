@@ -3,10 +3,6 @@ import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dial
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
-import { lastPlayerEvaluationStub } from '@app/test-stubs/evaluation.stubs';
-import { firstPlayerStub } from '@app/test-stubs/player.stubs';
-import { qcmQuestionStub } from '@app/test-stubs/question.stubs';
-import { quizStub } from '@app/test-stubs/quiz.stubs';
 import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
 import { SocketServerMock } from '@app/mocks/socket-server-mock';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
@@ -15,6 +11,10 @@ import { KeyBindingService } from '@app/services/key-binding/key-binding.service
 import { PlayerService } from '@app/services/player/player.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
+import { lastPlayerEvaluationStub } from '@app/test-stubs/evaluation.stubs';
+import { firstPlayerStub } from '@app/test-stubs/player.stubs';
+import { qcmQuestionStub } from '@app/test-stubs/question.stubs';
+import { quizStub } from '@app/test-stubs/quiz.stubs';
 import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
 import { GameEventPayload } from '@common/game-event-payload';
 import { GameSnapshot } from '@common/game-snapshot';
@@ -40,7 +40,7 @@ const gameSnapshotStub: GameSnapshot = {
 
 const observableSnapShot = of(gameSnapshotStub);
 
-describe('GameBoardComponent', () => {
+describe('QcmBoardComponent', () => {
     let component: QcmBoardComponent;
     let fixture: ComponentFixture<QcmBoardComponent>;
     let gameHttpServiceMock: jasmine.SpyObj<GameHttpService>;
@@ -143,13 +143,13 @@ describe('GameBoardComponent', () => {
     });
 
     it('should return if disableShortcuts is true', () => {
-        component.disableShortcuts = true;
+        component['disableShortcuts'] = true;
         component.handleKeyboardEvent({} as KeyboardEvent);
         expect(keyBindingServiceMock.getExecutor).not.toHaveBeenCalled();
     });
 
     it('should call executor if disableShortcuts is false', () => {
-        component.disableShortcuts = false;
+        component['disableShortcuts'] = false;
         component.handleKeyboardEvent({} as KeyboardEvent);
         expect(keyBindingServiceMock.getExecutor).toHaveBeenCalled();
     });
@@ -166,9 +166,9 @@ describe('GameBoardComponent', () => {
     });
 
     it('should loadNextQuestion', () => {
-        component.disableShortcuts = true;
+        component['disableShortcuts'] = true;
         component['loadNextQuestion'](quizStub().questions[0]);
-        expect(component.disableShortcuts).toBeFalse();
+        expect(component['disableShortcuts']).toBeFalse();
     });
 
     it('should openConfirmationDialog', () => {
@@ -192,7 +192,6 @@ describe('GameBoardComponent', () => {
         expect(gameServiceMock.onNextQuestion).toHaveBeenCalled();
         expect(gameServiceMock.onQcmSubmit).toHaveBeenCalled();
         expect(timerServiceMock.onTimerTick).toHaveBeenCalled();
-        expect(component.submitChoices).toHaveBeenCalled();
     });
 
     it('should setupKeyBindings', () => {

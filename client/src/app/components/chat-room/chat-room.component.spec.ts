@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormBuilder } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MAX_MESSAGE_LENGTH } from '@app/constants/constants';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
@@ -78,7 +79,7 @@ describe('ChatRoomComponent', () => {
         mockGameHttpService = jasmine.createSpyObj('GameHttpService', ['getGameSnapshotByPin']);
         mockMessageService = jasmine.createSpyObj('MessageService', ['onSendMessage']);
         mockGameService = jasmine.createSpyObj('GameService', ['onStartGame']);
-        mockPlayerService = jasmine.createSpyObj('PlayerService', ['getCurrentPlayer', 'onPlayerMute', 'onPlayerBan']);
+        mockPlayerService = jasmine.createSpyObj('PlayerService', ['getCurrentPlayer', 'onPlayerMute', 'onPlayerBan', 'onPlayerAbandon']);
 
         TestBed.configureTestingModule({
             declarations: [ChatRoomComponent],
@@ -90,6 +91,7 @@ describe('ChatRoomComponent', () => {
                 FormBuilder,
                 MatSnackBar,
             ],
+            imports: [BrowserAnimationsModule],
         });
         fixture = TestBed.createComponent(ChatRoomComponent);
         component = fixture.componentInstance;
@@ -181,5 +183,32 @@ describe('ChatRoomComponent', () => {
         component.ngOnDestroy();
         expect(mockSub1.closed).toBeTrue();
         expect(mockSub2.closed).toBeTrue();
+    });
+
+    it('should notify muted player', () => {
+        spyOn(component['snackBarService'], 'open');
+        mockPlayerService.getCurrentPlayer.and.returnValue(mockPlayers[0]);
+        mockPlayerService.onPlayerMute.calls.mostRecent().args[1](mockPlayers[0]);
+        expect(mockPlayerService.getCurrentPlayer).toHaveBeenCalled();
+        expect(component['snackBarService'].open).toHaveBeenCalled();
+    });
+
+    it('should notify that a player has been banned', () => {
+        const banchatlog: Chatlog = {
+            author: 'Système',
+            message: `${mockPlayers[0].username} a été banni`,
+            date: new Date(),
+        };
+        mockPlayerService.onPlayerBan.calls.mostRecent().args[1](mockPlayers[0]);
+        expect(component.chatlogs).toContain(banchatlog);
+    });
+    it('should notify that a player has abandonned', () => {
+        const banchatlog: Chatlog = {
+            author: 'Système',
+            message: `${mockPlayers[0].username} a abandonné la partie`,
+            date: new Date(),
+        };
+        mockPlayerService.onPlayerAbandon.calls.mostRecent().args[1](mockPlayers[0]);
+        expect(component.chatlogs).toContain(banchatlog);
     });
 });

@@ -1,6 +1,8 @@
 import { PlayerService } from '@app/services/player/player.service';
 import { GameEventPayload } from '@common/game-event-payload';
+import { PinPayload } from '@common/pin-payload';
 import { Player } from '@common/player';
+import { PlayerUsernamePayload } from '@common/player-username-payload';
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
@@ -19,34 +21,34 @@ export class PlayerGateway implements OnGatewayDisconnect {
     constructor(private readonly playerService: PlayerService) {}
 
     @SubscribeMessage('playerAbandon')
-    playerAbandon(@ConnectedSocket() client: Socket, @MessageBody() { pin }: { pin: string }) {
+    playerAbandon(@ConnectedSocket() client: Socket, @MessageBody() { pin }: PinPayload) {
         try {
             const clientPlayer = this.playerService.playerAbandon(client, pin);
-            const payload: GameEventPayload<Player> = { pin, data: clientPlayer.player };
+            const payload: GameEventPayload<Player> = { pin, data: clientPlayer?.player };
 
             this.server.to(pin).emit('playerAbandon', payload);
 
-            clientPlayer.socket.leave(pin);
+            clientPlayer?.socket?.leave(pin);
         } catch (error) {
             client.emit('error', error.message);
         }
     }
 
     @SubscribeMessage('playerBan')
-    playerBan(@ConnectedSocket() client: Socket, @MessageBody() { pin, username }: { pin: string; username: string }) {
+    playerBan(@ConnectedSocket() client: Socket, @MessageBody() { pin, username }: PlayerUsernamePayload) {
         try {
             const clientPlayer = this.playerService.playerBan(client, pin, username);
-            const payload: GameEventPayload<Player> = { pin, data: clientPlayer.player };
+            const payload: GameEventPayload<Player> = { pin, data: clientPlayer?.player };
 
             this.server.to(pin).emit('playerBan', payload);
-            clientPlayer.socket.leave(pin);
+            clientPlayer?.socket?.leave(pin);
         } catch (error) {
             client.emit('error', error.message);
         }
     }
 
     @SubscribeMessage('playerMute')
-    playerMute(@ConnectedSocket() client: Socket, @MessageBody() { pin, username }: { pin: string; username: string }) {
+    playerMute(@ConnectedSocket() client: Socket, @MessageBody() { pin, username }: PlayerUsernamePayload) {
         try {
             const clientPlayer = this.playerService.playerMute(client, pin, username);
             const payload: GameEventPayload<Player> = { pin, data: clientPlayer.player };

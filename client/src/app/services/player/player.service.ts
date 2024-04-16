@@ -32,7 +32,7 @@ export class PlayerService {
         this.webSocketService.emit('playerBan', { pin, username });
     }
 
-    onPlayerBan(pin: string, callback: (bannedPlayer: Player) => void): Subscription {
+    onPlayerBan(pin: string, callback: (bannedPlayer: Player | null) => void): Subscription {
         return this.webSocketService.on('playerBan', applyIfPinMatches(pin, callback));
     }
 

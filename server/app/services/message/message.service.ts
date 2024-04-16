@@ -1,4 +1,4 @@
-import { Constant } from '@app/constants/constants';
+import { CONSTANTS } from '@app/constants/constants';
 import { GameService } from '@app/services/game/game.service';
 import { Chatlog } from '@common/chatlog';
 import { Injectable } from '@nestjs/common';
@@ -12,12 +12,16 @@ export class MessageService {
         const game = this.gameService.getGame(pin);
         const clientPlayer = game.clientPlayers.get(client.id);
 
+        if (!clientPlayer?.player) {
+            throw new Error("Ce joueur n'existe pas");
+        }
+
         if (clientPlayer.player.isMuted) {
             throw new Error('Vous ne pouvez pas écrire dans la zone de clavardage');
         }
 
         const author = client.id === game.organizer.id ? 'Organisateur' : clientPlayer.player.username;
-        const chatlog = { message: message.substring(0, Constant.MaxMessageLength), author, date: new Date() };
+        const chatlog = { message: message.substring(0, CONSTANTS.maxMessageLength), author, date: new Date() };
         game.chatlogs.push(chatlog);
 
         return chatlog;

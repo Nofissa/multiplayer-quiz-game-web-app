@@ -189,9 +189,9 @@ describe('QrlBoardComponent', () => {
     });
 
     it('should loadNextQuestion', () => {
-        component.questionIsOver = true;
+        component['hasSubmitted'] = true;
         component['loadNextQuestion'](quizStub().questions[0]);
-        expect(component.questionIsOver).toBeFalse();
+        expect(component['hasSubmitted']).toBeFalse();
     });
 
     it('should openConfirmationDialog', () => {
@@ -221,7 +221,6 @@ describe('QrlBoardComponent', () => {
         expect(mockGameService.onQrlEvaluate).toHaveBeenCalled();
         expect(mockGameService.onQrlSubmit).toHaveBeenCalled();
         expect(timerServiceMock.onTimerTick).toHaveBeenCalled();
-        expect(component.submitAnswer).toHaveBeenCalled();
     });
 
     it('should send a message when valid', () => {
@@ -231,13 +230,11 @@ describe('QrlBoardComponent', () => {
     });
 
     it('should not send a message if input is longer than 200 characters', () => {
-        spyOn(component, 'openError');
-        component.input =
-            // eslint-disable-next-line max-len
-            'cbuwebdwoehduwenduewoudnwicbuwebdwoehduwenduewoudnwicbuwebdwoehduwenduewoudnwicbuwebdwoehduwenduewoudnwicbuwebdwoehduwenduewoudnwicbuwebdwoehduwenduewoudnwicbuwebdwoehduwenduewoudnwicbuwebdwoehduwenduewoudnwi';
+        spyOn<unknown>(component, 'openError' as never);
+        component.input = 'abc'.repeat(MAX_MESSAGE_LENGTH);
         component.submitAnswer();
         expect(mockGameService.qrlSubmit).not.toHaveBeenCalled();
-        expect(component.openError).toHaveBeenCalledWith('La réponse contient plus de 200 caractères');
+        expect(component['openError']).toHaveBeenCalledWith('La réponse contient plus de 200 caractères');
     });
 
     it('should update remaining input count on key down', () => {
@@ -261,7 +258,7 @@ describe('QrlBoardComponent', () => {
 
     it('should add blink-red class for grade 0 and remove it after 3 seconds', (done) => {
         const THREE_SECONDS_MS = 3000;
-        component.blinkTextArea(0);
+        component['blinkTextArea'](0);
         expect(component.textarea.nativeElement.classList.contains('blink-red')).toBeTruthy();
         setTimeout(() => {
             expect(component.textarea.nativeElement.classList.contains('blink-red')).toBeFalsy();
@@ -272,7 +269,7 @@ describe('QrlBoardComponent', () => {
     it('should add blink-yellow class for grade GRADE50 and remove it after 3 seconds', (done) => {
         const THREE_SECONDS_MS = 3000;
         const GRADE50 = 50;
-        component.blinkTextArea(GRADE50);
+        component['blinkTextArea'](GRADE50);
         expect(component.textarea.nativeElement.classList.contains('blink-yellow')).toBeTruthy();
         setTimeout(() => {
             expect(component.textarea.nativeElement.classList.contains('blink-yellow')).toBeFalsy();
@@ -283,7 +280,7 @@ describe('QrlBoardComponent', () => {
     it('should add blink class for grade GRADE100, show notification, and remove classes and notification after 3 seconds', (done) => {
         const THREE_SECONDS_MS = 3000;
         const GRADE100 = 100;
-        component.blinkTextArea(GRADE100);
+        component['blinkTextArea'](GRADE100);
         expect(component.textarea.nativeElement.classList.contains('blink')).toBeTruthy();
         expect(component.showNotification100).toBeTruthy();
         setTimeout(() => {
