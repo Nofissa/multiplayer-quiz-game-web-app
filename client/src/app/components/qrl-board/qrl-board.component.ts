@@ -162,43 +162,46 @@ export class QrlBoardComponent implements OnInit, OnDestroy {
     }
 
     blinkTextArea(grade: Grade) {
+        let classNameBlink = '';
+
         switch (grade) {
-            case Grade.Bad: {
-                this.textarea.nativeElement.classList.add('blink-red');
-                setTimeout(() => {
-                    this.textarea.nativeElement.classList.remove('blink-red');
-                }, THREE_SECONDS_MS);
+            case Grade.Bad:
+                classNameBlink = 'blink-red';
                 this.showNotification0 = true;
-                setTimeout(() => {
-                    this.showNotification0 = false;
-                }, THREE_SECONDS_MS);
                 break;
-            }
-            case Grade.Average: {
-                this.textarea.nativeElement.classList.add('blink-yellow');
-                setTimeout(() => {
-                    this.textarea.nativeElement.classList.remove('blink-yellow');
-                }, THREE_SECONDS_MS);
+            case Grade.Average:
+                classNameBlink = 'blink-yellow';
                 this.showNotification50 = true;
-                setTimeout(() => {
-                    this.showNotification50 = false;
-                }, THREE_SECONDS_MS);
                 break;
-            }
-            case Grade.Good: {
-                this.textarea.nativeElement.classList.add('blink');
-                setTimeout(() => {
-                    this.textarea.nativeElement.classList.remove('blink');
-                }, THREE_SECONDS_MS);
+            case Grade.Good:
+                classNameBlink = 'blink';
                 this.showNotification100 = true;
-                setTimeout(() => {
-                    this.showNotification100 = false;
-                }, THREE_SECONDS_MS);
                 break;
-            }
-            default: {
+            default:
                 break;
-            }
+        }
+
+        this.textarea.nativeElement.classList.add(classNameBlink);
+
+        setTimeout(() => {
+            this.textarea.nativeElement.classList.remove(classNameBlink);
+            this.resetNotifications(grade);
+        }, THREE_SECONDS_MS);
+    }
+
+    private resetNotifications(grade: Grade) {
+        switch (grade) {
+            case Grade.Bad:
+                this.showNotification0 = false;
+                break;
+            case Grade.Average:
+                this.showNotification50 = false;
+                break;
+            case Grade.Good:
+                this.showNotification100 = false;
+                break;
+            default:
+                break;
         }
     }
 

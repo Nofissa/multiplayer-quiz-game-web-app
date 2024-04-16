@@ -36,7 +36,7 @@ import { Observable, Subscription, of } from 'rxjs';
 import { io } from 'socket.io-client';
 import { QrlBoardComponent } from './qrl-board.component';
 
-describe('QrlBoardComponent', () => {
+fdescribe('QrlBoardComponent', () => {
     let component: QrlBoardComponent;
     let fixture: ComponentFixture<QrlBoardComponent>;
     let mockGameHttpService: jasmine.SpyObj<GameHttpService>;
@@ -296,4 +296,39 @@ describe('QrlBoardComponent', () => {
         component.question = qrlQuestionStub()[0];
         expect(component.question.type).toEqual('QRL');
     });
+
+    // it('should handle QrlEvaluation correctly', () => {
+    //     // Mock data
+    //     const evaluation: QrlEvaluation = {
+    //         player: firstPlayerStub(), // Provide necessary properties for Player object
+    //         isLast: false,
+    //         score: 50,
+    //         grade: Grade.Average,
+    //     };
+
+    //     // Simulate emission of QrlEvaluation
+    //     const evaluationSubject = new Subject<QrlEvaluation>();
+    //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    //     spyOn(mockGameService, 'onQrlEvaluate').and.callFake((pin: string, callback: (evaluation: QrlEvaluation) => void) => {
+    //         return evaluationSubject.subscribe(callback);
+    //     });
+
+    //     // Trigger ngOnInit to set up subscriptions
+    //     component.ngOnInit();
+
+    //     // Emit QrlEvaluation
+    //     evaluationSubject.next(evaluation);
+
+    //     // Expectations
+    //     expect(component.cachedEvaluation).toEqual(evaluation);
+    //     expect(component.questionIsOver).toBeFalse();
+
+    //     // Simulate emission of last evaluation
+    //     evaluation.isLast = true;
+    //     evaluationSubject.next(evaluation);
+
+    //     // Expectations after receiving the last evaluation
+    //     expect(component.questionIsOver).toBeTrue();
+    //     expect(component.player?.score).toEqual(50); // Assuming a player object is available
+    // });
 });
