@@ -1,1 +1,4 @@
-export type QuestionType = 'QCM' | 'QRL';
+export enum QuestionType {
+    QCM = 'QCM',
+    QRL = 'QRL',
+}

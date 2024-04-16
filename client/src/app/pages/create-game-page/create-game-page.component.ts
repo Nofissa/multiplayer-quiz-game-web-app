@@ -17,6 +17,7 @@ import { Player } from '@common/player';
 import { PlayerState } from '@common/player-state';
 import { Subscription } from 'rxjs';
 import SwiperCore, { EffectCoverflow, Navigation, Pagination } from 'swiper';
+import { QuestionType } from '@common/question-type';
 
 SwiperCore.use([Navigation, Pagination, EffectCoverflow]);
 
@@ -52,7 +53,7 @@ export class CreateGamePageComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.questionHttpService.getAllQuestions().subscribe((questions) => {
-            if (questions.filter((x) => x.type.trim().toUpperCase() === 'QCM').length >= MIN_QCM_COUNT_TO_ENABLE_RANDOM_MODE) {
+            if (questions.filter((x) => x.type === QuestionType.QCM).length >= MIN_QCM_COUNT_TO_ENABLE_RANDOM_MODE) {
                 this.enableRandomMode = true;
             }
         });

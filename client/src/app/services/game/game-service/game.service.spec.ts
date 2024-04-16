@@ -15,6 +15,7 @@ import { QuestionPayload } from '@common/question-payload';
 import { Observable } from 'rxjs';
 import { io } from 'socket.io-client';
 import { GameService } from './game.service';
+import { QuestionType } from '@common/question-type';
 
 describe('GameService', () => {
     let gameService: GameService;
@@ -224,7 +225,7 @@ describe('GameService', () => {
 
     it('should subscribe to nextQuestion event and call the callback if pin matches', () => {
         gameService.onNextQuestion(stubData.pin1, stubData.callback);
-        const question: Question = { _id: '', text: 'What is 2+2', type: 'QCM', points: 100, choices: [], lastModification: new Date() };
+        const question: Question = { _id: '', text: 'What is 2+2', type: QuestionType.QCM, points: 100, choices: [], lastModification: new Date() };
         const payload: GameEventPayload<Question> = { pin: stubData.pin1, data: question };
         socketServerMock.emit(stubData.nextQuestionEventName, payload);
 
@@ -233,7 +234,7 @@ describe('GameService', () => {
 
     it('should subscribe to nextQuestion event and not call the callback if pin does not match', () => {
         gameService.onNextQuestion(stubData.pin1, stubData.callback);
-        const question: Question = { _id: '', text: 'What is 2+2', type: 'QCM', points: 100, choices: [], lastModification: new Date() };
+        const question: Question = { _id: '', text: 'What is 2+2', type: QuestionType.QCM, points: 100, choices: [], lastModification: new Date() };
         const payload: GameEventPayload<Question> = { pin: stubData.pin2, data: question };
         socketServerMock.emit(stubData.nextQuestionEventName, payload);
 

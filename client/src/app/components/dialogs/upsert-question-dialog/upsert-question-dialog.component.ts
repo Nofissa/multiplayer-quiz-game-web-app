@@ -7,6 +7,7 @@ import { ID_LENGTH, MAX_CHOICE_COUNT, MIN_CHOICE_COUNT, POINT_VALUE_BASE_MULTIPL
 import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog-data';
 import { Choice } from '@common/choice';
 import { Question } from '@common/question';
+import { QuestionType } from '@common/question-type';
 
 @Component({
     selector: 'app-upsert-question-dialog',
@@ -36,7 +37,7 @@ export class UpsertQuestionDialogComponent {
             [Validators.required, this.oneFalseValidator(), this.oneTrueValidator()],
         ) as FormArray<FormGroup>;
 
-        this.toggle = this.data.question.type === 'QCM' ? false : true;
+        this.toggle = this.data.question.type === QuestionType.QCM ? false : true;
 
         this.formGroup = this.formBuilder.group({
             text: [this.data.question.text, Validators.required],
@@ -110,7 +111,7 @@ export class UpsertQuestionDialogComponent {
     submit() {
         if (this.formGroup.controls.text.valid && this.formGroup.controls.points.valid && this.validateChoices()) {
             const question: Question = {
-                type: this.toggle ? 'QRL' : 'QCM',
+                type: this.toggle ? QuestionType.QRL : QuestionType.QCM,
                 text: this.formGroup.value.text,
                 points: this.formGroup.value.points,
                 choices: this.toggle ? undefined : this.formGroup.value.choices,

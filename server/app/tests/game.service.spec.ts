@@ -23,6 +23,7 @@ import { qrlSubmissionStub } from './stubs/qrl.submission.stub';
 import { questionStub } from './stubs/question.stubs';
 import { quizStub } from './stubs/quiz.stubs';
 import { submissionStub } from './stubs/submission.stub';
+import { QuestionType } from '@common/question-type';
 
 describe('GameService', () => {
     let gameService: GameService;
@@ -251,7 +252,7 @@ describe('GameService', () => {
 
         it('should return undefined if current question is not QCM type', () => {
             jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(game);
-            game.quiz.questions[0].type = 'QRL';
+            game.quiz.questions[0].type = QuestionType.QRL;
             game.currentQuestionIndex = 0; // Assuming first question is not QCM
             evaluation = gameService.evaluateChoices(socketMock, 'testPin');
             expect(evaluation).toBeUndefined();

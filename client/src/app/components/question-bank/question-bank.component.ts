@@ -14,6 +14,7 @@ import { QuestionHttpService } from '@app/services/question-http/question-http.s
 import { QuestionInteractionService } from '@app/services/question-interaction/question-interaction.service';
 import { QuestionSharingService } from '@app/services/question-sharing/question-sharing.service';
 import { Question } from '@common/question';
+import { QuestionType } from '@common/question-type';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -63,7 +64,7 @@ export class QuestionBankComponent implements OnInit, OnDestroy {
             title: 'Ajouter une question',
             question: {
                 _id: '',
-                type: 'QCM',
+                type: QuestionType.QCM,
                 text: '',
                 choices: [
                     { text: '', isCorrect: true },
@@ -127,7 +128,9 @@ export class QuestionBankComponent implements OnInit, OnDestroy {
 
     filterQuestions(type: string) {
         if (type.trim().toUpperCase() === 'QCM' || type.trim().toUpperCase() === 'QRL') {
-            this.displayedQuestions = this.questions.filter((question) => question.type.trim().toUpperCase() === type.trim().toUpperCase());
+            this.displayedQuestions = this.questions.filter(
+                (question) => question.type === (type.trim().toUpperCase() === 'QCM' ? QuestionType.QCM : QuestionType.QRL),
+            );
         } else {
             this.displayedQuestions = this.questions;
         }

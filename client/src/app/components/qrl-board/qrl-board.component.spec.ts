@@ -35,6 +35,7 @@ import { TimerPayload } from '@common/timer-payload';
 import { Observable, Subscription, of } from 'rxjs';
 import { io } from 'socket.io-client';
 import { QrlBoardComponent } from './qrl-board.component';
+import { QuestionType } from '@common/question-type';
 
 describe('QrlBoardComponent', () => {
     let component: QrlBoardComponent;
@@ -292,6 +293,6 @@ describe('QrlBoardComponent', () => {
 
     it('should tell if the question is a qrl', () => {
         component.question = qrlQuestionStub()[0];
-        expect(component.question.type).toEqual('QRL');
+        expect(component.question.type).toEqual(QuestionType.QRL);
     });
 });

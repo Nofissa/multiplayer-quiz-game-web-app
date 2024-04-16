@@ -1,6 +1,6 @@
 import { CdkDrag, CdkDragDrop, CdkDropList, DragDropModule } from '@angular/cdk/drag-drop';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { qrlQuestionStub } from '@app/test-stubs/question.stubs';
+import { qcmQuestionStub, qrlQuestionStub } from '@app/test-stubs/question.stubs';
 import { QuestionListComponent } from './question-list.component';
 import { Question } from '@common/question';
 import { QuestionInteractionService } from '@app/services/question-interaction/question-interaction.service';
@@ -14,32 +14,7 @@ describe('QuestionListComponent', () => {
     let interactionService: QuestionInteractionService;
     let sharingService: QuestionSharingService;
     let questionHttpService: QuestionHttpService;
-    const questionMocks: Question[] = [
-        {
-            _id: '1',
-            text: 'Sample question 1',
-            type: 'QCM',
-            points: 10,
-            choices: [],
-            lastModification: new Date(),
-        },
-        {
-            _id: '2',
-            text: 'Sample question 2',
-            type: 'QCM',
-            points: 10,
-            choices: [],
-            lastModification: new Date(),
-        },
-        {
-            _id: '3',
-            text: 'Sample question 3',
-            type: 'QCM',
-            points: 10,
-            choices: [],
-            lastModification: new Date(),
-        },
-    ];
+    const questionMocks: Question[] = qcmQuestionStub();
 
     beforeEach(async () => {
         const interactionServiceMock = {
@@ -142,7 +117,6 @@ describe('QuestionListComponent', () => {
     it('should move item in array on drop', () => {
         const firstQuestion = questionMocks[0];
         const secondQuestion = questionMocks[1];
-        const thirdQuestion = questionMocks[2];
 
         component.questions = questionMocks;
 
@@ -168,6 +142,5 @@ describe('QuestionListComponent', () => {
         expect(component.drop).toHaveBeenCalledWith(dropEvent);
         expect(questionMocks[0].text).toBe(secondQuestion.text);
         expect(questionMocks[1].text).toBe(firstQuestion.text);
-        expect(questionMocks[2].text).toBe(thirdQuestion.text);
     });
 });

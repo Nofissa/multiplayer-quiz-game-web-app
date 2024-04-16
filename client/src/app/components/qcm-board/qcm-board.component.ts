@@ -13,6 +13,7 @@ import { TimerService } from '@app/services/timer/timer.service';
 import { Player } from '@common/player';
 import { QcmEvaluation } from '@common/qcm-evaluation';
 import { Question } from '@common/question';
+import { QuestionType } from '@common/question-type';
 import { TimerEventType } from '@common/timer-event-type';
 import { Subscription } from 'rxjs';
 
@@ -129,6 +130,10 @@ export class QcmBoardComponent implements OnInit, OnDestroy {
         });
     }
 
+    isQRL(question: Question) {
+        return question.type === QuestionType.QRL;
+    }
+
     private loadNextQuestion(question: Question) {
         this.questionIsOver = false;
         this.hasSubmited = false;
@@ -144,7 +149,7 @@ export class QcmBoardComponent implements OnInit, OnDestroy {
                 this.loadNextQuestion(data.question);
             }),
             this.gameService.onQcmSubmit(pin, (evaluation) => {
-                if (this.question?.type?.trim()?.toUpperCase() !== 'QCM') {
+                if (this.question?.type !== QuestionType.QCM) {
                     return;
                 }
                 if (this.playerService.getCurrentPlayer(pin)?.socketId === evaluation.player.socketId) {
@@ -159,7 +164,7 @@ export class QcmBoardComponent implements OnInit, OnDestroy {
                 }
             }),
             this.timerService.onTimerTick(pin, (payload) => {
-                if (this.question?.type?.trim()?.toUpperCase() !== 'QCM') {
+                if (this.question?.type !== QuestionType.QCM) {
                     return;
                 }
                 if (!payload.remainingTime && payload.eventType === TimerEventType.Question && !this.hasSubmited) {
@@ -172,7 +177,7 @@ export class QcmBoardComponent implements OnInit, OnDestroy {
     private setupKeyBindings() {
         ['1', '2', '3', '4'].forEach((x) => {
             this.keyBindingService.registerKeyBinding(x, () => {
-                if (this.question?.type?.trim()?.toUpperCase() !== 'QCM') {
+                if (this.question.type !== QuestionType.QCM) {
                     return;
                 }
                 const choiceIndex = parseInt(x, 10) - 1;

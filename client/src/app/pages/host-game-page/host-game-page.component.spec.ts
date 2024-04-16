@@ -40,6 +40,7 @@ import { io } from 'socket.io-client';
 import { HostGamePageComponent } from './host-game-page.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import SpyObj = jasmine.SpyObj;
+import { BarChartType } from '@common/barchart-type';
 
 const PIN = '1234';
 const NEXT_QUESTION_DELAY = 5;
@@ -372,6 +373,6 @@ describe('HostGamePageComponent', () => {
 
     it('should add question to barChart', () => {
         component['addQuestion'](qrlQuestionStub()[0]);
-        expect(barChartServiceSpy.addChart).toHaveBeenCalledWith(qrlQuestionStub()[0], 'ACTIVITY');
+        expect(barChartServiceSpy.addChart).toHaveBeenCalledWith(qrlQuestionStub()[0], BarChartType.ACTIVITY);
     });
 });

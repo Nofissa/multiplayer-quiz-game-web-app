@@ -9,6 +9,7 @@ import { MAX_CHOICE_COUNT, MIN_CHOICE_COUNT } from '@app/constants/constants';
 import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog-data';
 import { Choice } from '@common/choice';
 import { UpsertQuestionDialogComponent } from './upsert-question-dialog.component';
+import { QuestionType } from '@common/question-type';
 
 describe('UpsertQuestionDialogComponent', () => {
     let component: UpsertQuestionDialogComponent;
@@ -55,7 +56,7 @@ describe('UpsertQuestionDialogComponent', () => {
         correctUpsertValues = {
             title: 'some title',
             question: {
-                type: 'QCM',
+                type: QuestionType.QCM,
                 text: 'some question ?',
                 points: 10,
                 choices: [

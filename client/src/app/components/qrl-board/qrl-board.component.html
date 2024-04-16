@@ -1,4 +1,4 @@
-<div *ngIf="player && question" [ngClass]="{ container: true, hidden: question.type.trim().toUpperCase() !== 'QRL' }">
+<div *ngIf="player && question" [ngClass]="{ container: true, hidden: isQRL(question) }">
     <div class="question-box font-color">
         <span id="questionText" class="text-centered">{{ question.text }}</span>
         <span id="value" class="text-centered"
