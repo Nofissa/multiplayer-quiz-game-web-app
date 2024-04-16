@@ -135,7 +135,14 @@ describe('HostGamePageComponent', () => {
         gameHttpServiceSpy.getGameSnapshotByPin.and.callFake(() => {
             return of(mockSnapshotStubs()[1]);
         });
-        timerServiceSpy = jasmine.createSpyObj<TimerService>(['onStartTimer', 'onTimerTick', 'startTimer', 'stopTimer', 'onAccelerateTimer']);
+        timerServiceSpy = jasmine.createSpyObj<TimerService>([
+            'onStartTimer',
+            'onTimerTick',
+            'startTimer',
+            'stopTimer',
+            'onAccelerateTimer',
+            'onTogglePauseTimer',
+        ]);
         timerServiceSpy.onTimerTick.and.callFake((pin, callback) => {
             return webSocketServiceSpy.on('timerTick', applyIfPinMatches(pin, callback));
         });

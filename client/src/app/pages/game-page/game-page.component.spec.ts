@@ -64,7 +64,14 @@ describe('GamePageComponent', () => {
             'qcmSubmit',
         ]);
         playerServiceSpy = jasmine.createSpyObj<PlayerService>(['onPlayerAbandon', 'onPlayerBan', 'playerBan', 'playerAbandon']);
-        timerServiceSpy = jasmine.createSpyObj<TimerService>(['onStartTimer', 'onTimerTick', 'startTimer', 'stopTimer', 'onAccelerateTimer']);
+        timerServiceSpy = jasmine.createSpyObj<TimerService>([
+            'onStartTimer',
+            'onTimerTick',
+            'startTimer',
+            'stopTimer',
+            'onAccelerateTimer',
+            'onTogglePauseTimer',
+        ]);
         soundServiceSpy = jasmine.createSpyObj<SoundService>(['loadSound', 'playSound', 'stopSound']);
         mockSubscriptionService = jasmine.createSpyObj<SubscriptionService>(['add', 'clear']);
 
