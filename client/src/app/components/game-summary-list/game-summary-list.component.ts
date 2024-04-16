@@ -57,13 +57,14 @@ export class GameSummaryListComponent implements OnInit, AfterViewInit {
         });
     }
 
-    clearAllGameSummaries() {
+    private clearAllGameSummaries() {
         this.gameSummaryHttpService.clearAllGameSummaries().subscribe({
             next: () => {
                 this.fetchGameSummaries();
             },
         });
     }
+
     private fetchGameSummaries() {
         this.gameSummaryHttpService.getAllGameSummaries().subscribe((data: GameSummary[]) => {
             this.gameSummaries.data = data;

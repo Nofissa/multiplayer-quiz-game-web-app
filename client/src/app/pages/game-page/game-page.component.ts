@@ -146,6 +146,9 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
                 this.router.navigateByUrl('/home');
             }),
+            this.gameService.onEndGame(pin, () => {
+                this.handleEndGame();
+            }),
         );
     }
 
@@ -181,5 +184,9 @@ export class GamePageComponent implements OnInit, OnDestroy {
                 this.soundService.playSound(PANIC_AUDIO_NAME);
             }),
         );
+    }
+
+    private handleEndGame() {
+        this.router.navigate(['results'], { queryParams: { pin: this.pin } });
     }
 }

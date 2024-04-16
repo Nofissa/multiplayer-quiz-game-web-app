@@ -361,7 +361,8 @@ export class GameService implements OnModuleInit, OnModuleDestroy {
     }
 
     private ensureNotAlreadyInGame(game: Game, client: Socket) {
-        if (game.clientPlayers.has(client.id)) {
+        const clientPlayer = game.clientPlayers.get(client.id);
+        if (clientPlayer?.player?.state === PlayerState.Playing) {
             throw new Error('Vous êtes déjà dans cette partie');
         }
     }
@@ -379,7 +380,9 @@ export class GameService implements OnModuleInit, OnModuleDestroy {
     }
 
     private ensureUniqueUsername(clientPlayers: ClientPlayer[], username: string) {
-        const usernameExists = clientPlayers.some((x) => x.player.username.toLowerCase() === username.trim().toLowerCase());
+        const usernameExists = clientPlayers.some(
+            (x) => x.player.username.toLowerCase() === username.trim().toLowerCase() && x.player.state === PlayerState.Playing,
+        );
         if (usernameExists) {
             throw new Error(`Le nom d'utilisateur "${username}" est déjà pris`);
         }
