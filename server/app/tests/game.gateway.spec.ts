@@ -321,9 +321,10 @@ describe('GameGateway', () => {
 
         it('should return the right payload', () => {
             gameServiceMock.qrlSubmit.mockReturnValue(qrlSubmissionStub());
-            gameServiceMock.getOrganizer.mockReturnValue(socketMock);
+            serverMock.to.mockReturnValue(broadcastMock);
             gameGateway.qrlSubmit(socketMock, { pin, answer });
-            expect(socketMock.emit).toHaveBeenCalledWith('qrlSubmit', { data: qrlSubmissionStub(), pin: 'mockPin' });
+            expect(serverMock.to).toHaveBeenCalledWith(pin);
+            expect(broadcastMock.emit).toHaveBeenCalledWith('qrlSubmit', { data: qrlSubmissionStub(), pin: 'mockPin' });
         });
     });
 

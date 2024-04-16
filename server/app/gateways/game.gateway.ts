@@ -176,10 +176,9 @@ export class GameGateway implements OnGatewayDisconnect {
     qrlSubmit(@ConnectedSocket() client: Socket, @MessageBody() { pin, answer }: QrlSubmitPayload) {
         try {
             const submission = this.gameService.qrlSubmit(client, pin, answer);
-            const organizer = this.gameService.getOrganizer(pin);
             const payload: GameEventPayload<QrlSubmission> = { pin, data: submission };
 
-            organizer.emit('qrlSubmit', payload);
+            this.server.to(pin).emit('qrlSubmit', payload);
         } catch (error) {
             client.emit('error', error.message);
         }
