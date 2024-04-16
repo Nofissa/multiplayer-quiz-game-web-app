@@ -1,4 +1,4 @@
-import { ValidationValues } from '@app/enums/validation-values';
+import { VALIDATION_VALUES } from '@app/constants/validation-values';
 import { ChoiceDto } from '@app/model/dto/choice/choice.dto';
 import { IsMultipleOf } from '@app/validators/is-multiple-of.validator';
 import { IsQuestionType } from '@app/validators/is-question-type.validator';
@@ -23,18 +23,18 @@ export class QuestionDto {
     text: string;
 
     @IsNumber({}, { message: "le champ 'points' de question devrait être un nombre" })
-    @Min(ValidationValues.MinPoints, { message: `le champ 'points' de question devrait être plus grand ou égal à ${ValidationValues.MinPoints}` })
-    @Max(ValidationValues.MaxPoints, { message: `le champ 'points' de question devrait être plus petit ou égal à ${ValidationValues.MaxPoints}` })
-    @IsMultipleOf(ValidationValues.MultipleOfPoints)
+    @Min(VALIDATION_VALUES.minPoints, { message: `le champ 'points' de question devrait être plus grand ou égal à ${VALIDATION_VALUES.minPoints}` })
+    @Max(VALIDATION_VALUES.maxPoints, { message: `le champ 'points' de question devrait être plus petit ou égal à ${VALIDATION_VALUES.maxPoints}` })
+    @IsMultipleOf(VALIDATION_VALUES.multipleOfPoints)
     points: number;
 
     @IsArray({ message: "le champ 'choices' de question devrait être un tableau" })
     @IsOptional()
-    @ArrayMinSize(ValidationValues.MinAnswersSize, {
-        message: `le champ 'choices' de question devrait être de taille plus grande ou égale à ${ValidationValues.MinAnswersSize}`,
+    @ArrayMinSize(VALIDATION_VALUES.minAnswersSize, {
+        message: `le champ 'choices' de question devrait être de taille plus grande ou égale à ${VALIDATION_VALUES.minAnswersSize}`,
     })
-    @ArrayMaxSize(ValidationValues.MaxAnswersSize, {
-        message: `le champ 'choices' de question devrait être de taille plus petite ou égale ${ValidationValues.MaxAnswersSize}`,
+    @ArrayMaxSize(VALIDATION_VALUES.maxAnswersSize, {
+        message: `le champ 'choices' de question devrait être de taille plus petite ou égale ${VALIDATION_VALUES.maxAnswersSize}`,
     })
     @Type(() => ChoiceDto)
     @IsValidChoices({
