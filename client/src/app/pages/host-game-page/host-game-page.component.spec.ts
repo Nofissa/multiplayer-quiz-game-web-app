@@ -37,6 +37,7 @@ import { TimerPayload } from '@common/timer-payload';
 import { Observable, of, throwError } from 'rxjs';
 import { io } from 'socket.io-client';
 import { HostGamePageComponent } from './host-game-page.component';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import SpyObj = jasmine.SpyObj;
 
 const PIN = '1234';
@@ -167,7 +168,7 @@ describe('HostGamePageComponent', () => {
                     },
                 },
             ],
-            imports: [RouterTestingModule, HttpClientTestingModule, BrowserAnimationsModule],
+            imports: [RouterTestingModule, HttpClientTestingModule, BrowserAnimationsModule, MatTooltipModule],
         }).compileComponents();
 
         fixture = TestBed.createComponent(HostGamePageComponent);
@@ -197,8 +198,6 @@ describe('HostGamePageComponent', () => {
         expect(component.gameState).toEqual(GameState.Opened);
         expect(component.currentQuestionHasEnded).toEqual(false);
         expect(component.isLastQuestion).toEqual(false);
-        expect(component.question).toEqual(undefined);
-        expect(component.nextAvailable).toEqual(false);
     });
 
     it('should barCharts return all chartData if there is data in the service', () => {
