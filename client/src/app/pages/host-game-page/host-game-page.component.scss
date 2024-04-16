@@ -13,7 +13,7 @@
 .game-information {
     width: 100%;
     grid-area: game-information;
-    justify-content: center;
+    justify-content: flex-start;
 }
 
 .buttons-wrapper {
@@ -64,6 +64,7 @@
 .end-button {
     width: 75px;
     height: 75px;
+    margin-left: 20px;
 }
 
 .end-button.mat-mdc-raised-button.mat-unthemed {
@@ -90,7 +91,7 @@
 }
 
 .chat-room {
-    height: 50%;
+    height: 65%;
     grid-area: chat-room;
     align-items: end;
 }
@@ -98,6 +99,12 @@
 .player-list-container {
     display: flex;
     width: 100%;
+}
+
+.qrl-list-container {
+    height: 35%;
+    width: auto;
+    margin-bottom: 20px;
 }
 
 .player-list {
@@ -113,12 +120,15 @@
 }
 
 .half-view {
-    width: 50%;
+    width: 45%;
     align-content: center;
 }
 
 .half-view-container {
-    justify-content: space-between;
+    margin-top: 5%;
+    justify-content: space-evenly;
+    display: flex;
+    align-content: center;
 }
 
 .waiting-period-container {

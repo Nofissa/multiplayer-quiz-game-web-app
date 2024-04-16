@@ -1,27 +1,82 @@
 <div class="container flex-column">
-    <app-nav-header class="nav-header" [backArrow]="false" [isActive]="false" [pin]="pin"></app-nav-header>
+    <app-nav-header class="nav-header" [backArrow]="false" [pin]="pin"></app-nav-header>
     <div class="buttons-wrapper flex-row">
-        <button class="end-button" mat-raised-button (click)="cancelGame()">
+        <button
+            class="end-button"
+            mat-raised-button
+            (click)="cancelGame()"
+            #tooltip="matTooltip"
+            matTooltip="Quitter"
+            [matTooltipPosition]="'below'"
+            matTooltipShowDelay="1000"
+            matTooltipHideDelay="300"
+        >
             <mat-icon class="icon" fontIcon="logout"></mat-icon>
         </button>
-        <button *ngIf="!isRunning()" class="lock-button" mat-raised-button (click)="toggleLock()">
+        <button
+            *ngIf="!isRunning()"
+            class="lock-button"
+            mat-raised-button
+            (click)="toggleLock()"
+            #tooltip="matTooltip"
+            matTooltip="État d'accès"
+            [matTooltipPosition]="'below'"
+            matTooltipShowDelay="1000"
+            matTooltipHideDelay="300"
+        >
             <mat-icon class="icon blink" *ngIf="!isLocked()" fontIcon="lock_open"></mat-icon>
             <mat-icon class="icon" *ngIf="isLocked()" fontIcon="lock"></mat-icon>
         </button>
         <app-panic-mode-button [pin]="pin"></app-panic-mode-button>
         <app-timer-pause-toggle [pin]="pin"></app-timer-pause-toggle>
         <div>
-            <button class="start-button" mat-raised-button *ngIf="isLocked() && !isRunning()" (click)="startGame()">Commencer</button>
-            <button class="next-button" mat-raised-button *ngIf="currentQuestionHasEnded && !isLastQuestion" (click)="nextQuestion()">
+            <button
+                class="start-button"
+                mat-raised-button
+                *ngIf="isLocked() && !isRunning()"
+                (click)="startGame()"
+                #tooltip="matTooltip"
+                matTooltip="Démarrer la partie"
+                [matTooltipPosition]="'below'"
+                matTooltipShowDelay="1000"
+                matTooltipHideDelay="300"
+            >
+                Commencer
+            </button>
+            <button
+                class="next-button"
+                mat-raised-button
+                *ngIf="currentQuestionHasEnded && !isLastQuestion"
+                (click)="nextQuestion()"
+                #tooltip="matTooltip"
+                matTooltip="Prochaine Question"
+                [matTooltipPosition]="'below'"
+                matTooltipShowDelay="1000"
+                matTooltipHideDelay="300"
+            >
                 Question Suivante
             </button>
-            <button class="next-button" mat-raised-button *ngIf="currentQuestionHasEnded && isLastQuestion" (click)="endGame()">Résultats</button>
+            <button
+                class="next-button"
+                mat-raised-button
+                *ngIf="currentQuestionHasEnded && isLastQuestion"
+                (click)="endGame()"
+                #tooltip="matTooltip"
+                matTooltip="Naviguer vers les résultats"
+                [matTooltipPosition]="'below'"
+                matTooltipShowDelay="1000"
+                matTooltipHideDelay="300"
+            >
+                Résultats
+            </button>
         </div>
     </div>
+
     <div class="main-container">
         <div class="game-information flex-column">
-            <div *ngIf="isRunning()" class="question-headder">
+            <div>
                 <app-game-transition
+                    *ngIf="isRunning()"
                     [pin]="pin"
                     [displayOptions]="{
                         hideTimerOnStartingGame: true,
@@ -30,28 +85,17 @@
                         hostGameComponent: true
                     }"
                 ></app-game-transition>
-            </div>
-            <div *ngIf="!isRunning()" class="waiting-period-container">
-                <div class="player-list-container">
-                    <app-player-list
-                        class="player-list"
-                        [pin]="pin"
-                        [displayOptions]="{ score: true, ban: true, quitters: true, mute: true }"
-                    ></app-player-list>
-                </div>
-            </div>
-            <div *ngIf="isRunning()">
                 <div class="flex-row half-view-container">
-                    <app-bar-chart-swiper class="bar-chart half-view" *ngIf="isEnded" [data]="barCharts"></app-bar-chart-swiper>
-                    <div class="player-list-container">
+                    <div [ngClass]="isRunning() ? 'half-view' : 'player-list-container'">
                         <app-player-list
-                            class="player-list"
+                            class='player-list'
                             [pin]="pin"
                             [displayOptions]="{ score: true, ban: true, quitters: true, mute: true }"
                         ></app-player-list>
                     </div>
+                    <app-bar-chart-swiper *ngIf="isRunning()" class="bar-chart half-view" [data]="barCharts"></app-bar-chart-swiper>
                 </div>
-                <app-qrl-list *ngIf="isQRL()" [pin]="pin" class="half-view"></app-qrl-list>
+                <app-qrl-list *ngIf="isQRL()" [pin]="pin" class="qrl-list-container"></app-qrl-list>
             </div>
         </div>
         <app-chat-room class="app-component" [pin]="pin"></app-chat-room>

@@ -21,6 +21,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppComponent } from '@app/pages/app/app.component';
@@ -38,11 +39,11 @@ import { PromptDialogComponent } from './components/dialogs/prompt-dialog/prompt
 import { QuizDetailsDialogComponent } from './components/dialogs/quiz-details-dialog/quiz-details-dialog.component';
 import { UpsertQuestionDialogComponent } from './components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
 import { GameSummaryComponent } from './components/game-summary-list/game-summary/game-summary.component';
-import { QcmBoardComponent } from './components/qcm-board/qcm-board.component';
 import { GameTransitionComponent } from './components/game-transition/game-transition.component';
 import { NavHeaderComponent } from './components/nav-header/nav-header.component';
 import { PanicModeButtonComponent } from './components/panic-mode-button/panic-mode-button.component';
 import { PlayerListComponent } from './components/player-list/player-list.component';
+import { QcmBoardComponent } from './components/qcm-board/qcm-board.component';
 import { QrlBoardComponent } from './components/qrl-board/qrl-board.component';
 import { QrlListComponent } from './components/qrl-list/qrl-list.component';
 import { QuestionBankComponent } from './components/question-bank/question-bank.component';
@@ -58,7 +59,6 @@ import { PlayerResultsPageComponent } from './pages/player-results-page/player-r
 import { QCMCreationPageComponent } from './pages/qcm-creation-page/qcm-creation-page.component';
 import { WaitingRoomPageComponent } from './pages/waiting-room-page/waiting-room-page.component';
 import { WebSocketService } from './services/web-socket/web-socket.service';
-
 /**
  * Main module that is used in main.ts.
  * All automatically generated components will appear in this module.
@@ -138,6 +138,7 @@ import { WebSocketService } from './services/web-socket/web-socket.service';
         MatTableModule,
         MatListModule,
         MatSortModule,
+        MatTooltipModule,
     ],
     providers: [],
     bootstrap: [AppComponent],

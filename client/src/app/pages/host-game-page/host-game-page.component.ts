@@ -41,9 +41,7 @@ export class HostGamePageComponent implements OnInit {
     gameState: GameState = GameState.Opened;
     currentQuestionHasEnded: boolean = false;
     isLastQuestion: boolean = false;
-    question: Question | undefined;
-    nextAvailable: boolean = false;
-    questionType: QuestionType = 'QCM';
+    private questionType: QuestionType = 'QCM';
     private eventSubscriptions: Subscription[] = [];
     private readonly activatedRoute: ActivatedRoute;
     private readonly router: Router;
