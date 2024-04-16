@@ -126,11 +126,7 @@ export class UpsertQuestionDialogComponent {
     }
 
     private isFormValid(): boolean {
-        return (
-            this.formGroup.controls.text.valid &&
-            this.formGroup.controls.points.valid &&
-            this.validateChoices()
-        );
+        return this.formGroup.controls.text.valid && this.formGroup.controls.points.valid && this.validateChoices();
     }
 
     private showValidationErrors() {
