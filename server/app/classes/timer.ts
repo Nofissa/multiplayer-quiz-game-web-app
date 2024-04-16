@@ -6,7 +6,7 @@ export class Timer {
 
     private tickSubject: Subject<number>;
     private tickSubscription: Subscription | null;
-    private interval: NodeJS.Timer | undefined;
+    private interval: NodeJS.Timer | null;
     private ticksPerSecond: number = 1;
 
     constructor() {
@@ -14,7 +14,7 @@ export class Timer {
     }
 
     get isRunning(): boolean {
-        return this.interval && !this.interval['_destroyed'];
+        return !!this.interval;
     }
 
     setTicksPerSecond(tickPerSecond: number) {
@@ -38,10 +38,12 @@ export class Timer {
 
     pause() {
         clearInterval(this.interval);
+        this.interval = null;
     }
 
     stop() {
         clearInterval(this.interval);
+        this.interval = null;
 
         this.time = 0;
         this.ticksPerSecond = 1;
@@ -52,9 +54,7 @@ export class Timer {
     }
 
     onTick(callback: (remainingTime: number) => void) {
-        if (this.tickSubscription && !this.tickSubscription.closed) {
-            this.tickSubscription.unsubscribe();
-        }
+        this.tickSubscription?.unsubscribe();
 
         this.tickSubscription = this.tickSubject.subscribe(callback);
     }
