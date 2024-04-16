@@ -41,6 +41,7 @@ import { Observable, Subject, of, throwError } from 'rxjs';
 import { io } from 'socket.io-client';
 import { HostGamePageComponent } from './host-game-page.component';
 import SpyObj = jasmine.SpyObj;
+import { BarChartType } from '@common/barchart-type';
 
 const PIN = '1234';
 const NEXT_QUESTION_DELAY = 5;
@@ -134,7 +135,14 @@ describe('HostGamePageComponent', () => {
         gameHttpServiceSpy.getGameSnapshotByPin.and.callFake(() => {
             return of(mockSnapshotStubs()[1]);
         });
-        timerServiceSpy = jasmine.createSpyObj<TimerService>(['onStartTimer', 'onTimerTick', 'startTimer', 'stopTimer', 'onAccelerateTimer']);
+        timerServiceSpy = jasmine.createSpyObj<TimerService>([
+            'onStartTimer',
+            'onTimerTick',
+            'startTimer',
+            'stopTimer',
+            'onAccelerateTimer',
+            'onTogglePauseTimer',
+        ]);
         timerServiceSpy.onTimerTick.and.callFake((pin, callback) => {
             return webSocketServiceSpy.on('timerTick', applyIfPinMatches(pin, callback));
         });
@@ -393,6 +401,6 @@ describe('HostGamePageComponent', () => {
 
     it('should add question to barChart', () => {
         component['addQuestion'](qrlQuestionStub()[0]);
-        expect(barChartServiceSpy.addChart).toHaveBeenCalledWith(qrlQuestionStub()[0], 'ACTIVITY');
+        expect(barChartServiceSpy.addChart).toHaveBeenCalledWith(qrlQuestionStub()[0], BarChartType.ACTIVITY);
     });
 });

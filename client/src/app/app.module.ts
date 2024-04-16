@@ -15,6 +15,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatRadioModule } from '@angular/material/radio';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
@@ -38,6 +39,7 @@ import { JoinGameDialogComponent } from './components/dialogs/join-game-dialog/j
 import { PromptDialogComponent } from './components/dialogs/prompt-dialog/prompt-dialog.component';
 import { QuizDetailsDialogComponent } from './components/dialogs/quiz-details-dialog/quiz-details-dialog.component';
 import { UpsertQuestionDialogComponent } from './components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
+import { GameSummaryListComponent } from './components/game-summary-list/game-summary-list.component';
 import { GameTransitionComponent } from './components/game-transition/game-transition.component';
 import { NavHeaderComponent } from './components/nav-header/nav-header.component';
 import { PanicModeButtonComponent } from './components/panic-mode-button/panic-mode-button.component';
@@ -49,8 +51,8 @@ import { QuestionBankComponent } from './components/question-bank/question-bank.
 import { QuestionListComponent } from './components/question-list/question-list.component';
 import { QuizListComponent } from './components/quiz-list/quiz-list.component';
 import { QuizComponent } from './components/quiz/quiz.component';
-import { TimerComponent } from './components/timer/timer.component';
 import { TimerPauseToggleComponent } from './components/timer-pause-toggle/timer-pause-toggle.component';
+import { TimerComponent } from './components/timer/timer.component';
 import { AppRoutingModule } from './modules/app-routing.module';
 import { AdminPageComponent } from './pages/admin-page/admin-page.component';
 import { CreateGamePageComponent } from './pages/create-game-page/create-game-page.component';
@@ -58,7 +60,6 @@ import { PlayerResultsPageComponent } from './pages/player-results-page/player-r
 import { QCMCreationPageComponent } from './pages/qcm-creation-page/qcm-creation-page.component';
 import { WaitingRoomPageComponent } from './pages/waiting-room-page/waiting-room-page.component';
 import { WebSocketService } from './services/web-socket/web-socket.service';
-import { GameSummaryListComponent } from './components/game-summary-list/game-summary-list.component';
 /**
  * Main module that is used in main.ts.
  * All automatically generated components will appear in this module.
@@ -139,6 +140,7 @@ import { GameSummaryListComponent } from './components/game-summary-list/game-su
         MatListModule,
         MatSortModule,
         MatTooltipModule,
+        MatRadioModule,
     ],
     providers: [],
     bootstrap: [AppComponent],

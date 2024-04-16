@@ -28,6 +28,7 @@ import { Observable, of } from 'rxjs';
 import { io } from 'socket.io-client';
 import { QcmBoardComponent } from './qcm-board.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { QuestionType } from '@common/question-type';
 
 const gameSnapshotStub: GameSnapshot = {
     players: [],
@@ -155,7 +156,7 @@ describe('QcmBoardComponent', () => {
 
     it('should call executor if disableShortcuts is false', () => {
         component['hasSubmitted'] = false;
-        component['question'].type = 'QCM';
+        component['question'].type = QuestionType.QCM;
         component.handleKeyboardEvent({} as KeyboardEvent);
         expect(keyBindingServiceMock.getExecutor).toHaveBeenCalled();
     });

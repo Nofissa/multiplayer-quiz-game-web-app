@@ -14,6 +14,7 @@ import { QuestionSharingService } from '@app/services/question-sharing/question-
 import { QuizHttpService } from '@app/services/quiz-http/quiz-http.service';
 import { Question } from '@common/question';
 import { Subscription } from 'rxjs';
+import { QuestionType } from '@common/question-type';
 
 @Component({
     selector: 'app-qcm-creation-page',
@@ -113,7 +114,7 @@ export class QCMCreationPageComponent implements OnInit, OnDestroy {
             data: {
                 title: 'Créer une Question',
                 question: {
-                    type: 'QCM',
+                    type: QuestionType.QCM,
                     text: '',
                     choices: [
                         {

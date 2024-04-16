@@ -3,6 +3,7 @@ import { PANIC_TICKS_PER_SECOND, QCM_MIN_TIME, QRL_MIN_TIME } from '@app/constan
 import { GameService } from '@app/services/game/game-service/game.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { Question } from '@common/question';
+import { QuestionType } from '@common/question-type';
 import { TimerEventType } from '@common/timer-event-type';
 import { Subscription } from 'rxjs';
 
@@ -75,8 +76,8 @@ export class PanicModeButtonComponent implements OnInit, OnDestroy {
     private updateVisibility(eventType: TimerEventType, remainingTime: number) {
         if (eventType === TimerEventType.Question && this.currentQuestion) {
             if (
-                (this.currentQuestion.type === 'QCM' && remainingTime <= QCM_MIN_TIME) ||
-                (this.currentQuestion.type === 'QRL' && remainingTime <= QRL_MIN_TIME)
+                (this.currentQuestion.type === QuestionType.QCM && remainingTime <= QCM_MIN_TIME) ||
+                (this.currentQuestion.type === QuestionType.QRL && remainingTime <= QRL_MIN_TIME)
             ) {
                 this.isVisible = false;
             } else {

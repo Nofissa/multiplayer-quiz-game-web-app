@@ -31,6 +31,7 @@ import { QcmSubmission } from '@common/qcm-submission';
 import { QrlEvaluation } from '@common/qrl-evaluation';
 import { QrlSubmission } from '@common/qrl-submission';
 import { Question } from '@common/question';
+import { QuestionType } from '@common/question-type';
 import { Quiz } from '@common/quiz';
 import { TimerEventType } from '@common/timer-event-type';
 import { TimerPayload } from '@common/timer-payload';
@@ -290,7 +291,58 @@ describe('QrlBoardComponent', () => {
 
     it('should tell if the question is a qrl', () => {
         component.question = qrlQuestionStub()[0];
-        expect(component.question.type).toEqual('QRL');
+        expect(component.question.type).toEqual(QuestionType.QRL);
+    });
+
+    it('should open error snackbar', () => {
+        const snackBarSpy = spyOn(TestBed.inject(MatSnackBar), 'open');
+
+        const errorMessage = 'Test error message';
+
+        component['openError'](errorMessage);
+
+        expect(snackBarSpy).toHaveBeenCalledWith(
+            errorMessage,
+            undefined,
+            jasmine.objectContaining({
+                verticalPosition: 'top',
+                duration: NOTICE_DURATION_MS,
+                panelClass: ['error-snackbar'],
+            }),
+        );
+    });
+
+    it('should handle QrlEvaluate correctly', () => {
+        const qrlPayload: GameEventPayload<QrlEvaluation> = {
+            pin: '123',
+            data: { player: firstPlayerStub(), grade: Grade.Good, score: 10, isLast: true },
+        };
+
+        // I have to use any to be able to spy on private method blinktextArea, can't use never because I expect a call with a parameter
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const blinkTextAreaSpy = spyOn<any>(component, 'blinkTextArea');
+
+        component['setupSubscriptions']('123');
+        socketServerMock.emit('qrlEvaluate', qrlPayload);
+
+        component['cachedEvaluation'] = qrlPayload.data;
+        component.player = firstPlayerStub();
+        expect(component['cachedEvaluation']).toEqual(qrlPayload.data);
+        expect(component.isInEvaluation).toBeFalse();
+        expect(blinkTextAreaSpy).toHaveBeenCalledWith(Grade.Good);
+    });
+
+    it('should update remaining time on onTimerTick', () => {
+        component.pin = '123';
+        spyOn(component, 'submitAnswer');
+        timerServiceMock.onTimerTick.and.callFake((_pin: string, callback: (payload: TimerPayload) => void) => {
+            const payload = { remainingTime: 0, eventType: TimerEventType.Question };
+            callback(payload);
+            return of(payload).subscribe(callback);
+        });
+        component['setupSubscriptions']('123');
+        component.hasSubmitted = false;
+        expect(component.submitAnswer).toHaveBeenCalled();
     });
 
     it('should open error snackbar', () => {

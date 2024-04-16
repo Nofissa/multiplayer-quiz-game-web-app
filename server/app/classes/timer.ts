@@ -61,7 +61,7 @@ export class Timer {
 
     restart() {
         clearInterval(this.interval);
-        this.start();
+        this.interval = setInterval(this.decrement.bind(this), CONSTANTS.oneSecond / this.ticksPerSecond);
     }
 
     private decrement() {

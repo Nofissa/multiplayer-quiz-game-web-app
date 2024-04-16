@@ -16,6 +16,7 @@ import { Grade } from '@common/grade';
 import { Player } from '@common/player';
 import { QrlEvaluation } from '@common/qrl-evaluation';
 import { Question } from '@common/question';
+import { QuestionType } from '@common/question-type';
 import { TimerEventType } from '@common/timer-event-type';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -105,6 +106,10 @@ export class QrlBoardComponent implements OnInit, OnDestroy {
 
     ngOnDestroy() {
         this.subscriptionService.clear(this.uuid);
+    }
+
+    isQRL(question: Question) {
+        return question.type === QuestionType.QRL;
     }
 
     updateRemainingInputCount() {
@@ -216,7 +221,7 @@ export class QrlBoardComponent implements OnInit, OnDestroy {
                 this.loadNextQuestion(data.question);
             }),
             this.gameService.onQrlSubmit(this.pin, () => {
-                if (this.question?.type?.trim()?.toUpperCase() !== 'QRL') {
+                if (this.question?.type !== QuestionType.QRL) {
                     return;
                 }
                 if (this.isTest && this.player) {
@@ -225,7 +230,7 @@ export class QrlBoardComponent implements OnInit, OnDestroy {
                 }
             }),
             this.gameService.onQrlEvaluate(pin, (evaluation) => {
-                if (this.question?.type?.trim()?.toUpperCase() !== 'QRL') {
+                if (this.question?.type !== QuestionType.QRL) {
                     return;
                 }
                 if (this.playerService.getCurrentPlayer(pin)?.socketId === evaluation.player.socketId) {
@@ -240,7 +245,7 @@ export class QrlBoardComponent implements OnInit, OnDestroy {
                 }
             }),
             this.timerService.onTimerTick(pin, (payload) => {
-                if (this.question?.type?.trim()?.toUpperCase() !== 'QRL') {
+                if (this.question?.type !== QuestionType.QRL) {
                     return;
                 }
                 if (!payload.remainingTime && payload.eventType === TimerEventType.Question && !this.hasSubmitted) {

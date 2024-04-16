@@ -6,7 +6,7 @@ import 'reflect-metadata';
 
 describe('QuestionDto', () => {
     it('should validate a valid QuestionDto instance', async () => {
-        const type: QuestionType = 'QCM';
+        const type: QuestionType = QuestionType.QCM;
         const validDtoData = {
             type,
             text: 'Valid question text',

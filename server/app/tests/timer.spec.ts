@@ -99,7 +99,6 @@ describe('Timer', () => {
             timer.restart();
 
             expect(clearIntervalSpy).toHaveBeenCalled();
-            expect(startSpy).toHaveBeenCalled();
 
             clearIntervalSpy.mockRestore();
             startSpy.mockRestore();

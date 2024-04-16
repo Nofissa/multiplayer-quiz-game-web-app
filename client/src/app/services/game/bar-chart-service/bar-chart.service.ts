@@ -7,6 +7,7 @@ import { Grade } from '@common/grade';
 import { QcmSubmission } from '@common/qcm-submission';
 import { QrlEvaluation } from '@common/qrl-evaluation';
 import { Question } from '@common/question';
+import { QuestionType } from '@common/question-type';
 
 @Injectable({
     providedIn: 'root',
@@ -20,18 +21,23 @@ export class BarChartService {
         }
 
         const newBarchartData: BarChartData = {
-            text: chartType === 'ACTIVITY' ? 'Activité pour la question: ' + question.text : question.text,
-            chartType: chartType ? chartType : question.type,
+            text: chartType === BarChartType.ACTIVITY ? 'Activité pour la question: ' + question.text : question.text,
+            chartType:
+                chartType === BarChartType.ACTIVITY
+                    ? BarChartType.ACTIVITY
+                    : question.type === QuestionType.QCM
+                    ? BarChartType.QCM
+                    : BarChartType.QRL,
             chartElements: [],
             submissions: [],
         };
         switch (newBarchartData.chartType) {
-            case 'QCM':
+            case BarChartType.QCM:
                 for (const choice of question.choices ? question.choices : []) {
                     newBarchartData.chartElements.push({ text: choice.text, isCorrect: choice.isCorrect });
                 }
                 break;
-            case 'QRL':
+            case BarChartType.QRL:
                 Object.values(Grade)
                     .filter((x) => !isNaN(Number(x)))
                     .forEach((grade) => {
@@ -39,7 +45,7 @@ export class BarChartService {
                     });
                 break;
 
-            case 'ACTIVITY':
+            case BarChartType.ACTIVITY:
                 newBarchartData.chartElements.push({ text: 'inactif' });
                 newBarchartData.chartElements.push({ text: 'actif' });
                 break;
@@ -52,15 +58,16 @@ export class BarChartService {
         const chartData: BarChartData | undefined = this.getCurrentQuestionData();
         if (chartData && data) {
             const submissionIndex = chartData.submissions.findIndex((sub) => sub.clientId === data.clientId && sub.index === data.index);
-            let mirrorSubIndex;
-            if (chartData.chartType === 'ACTIVITY')
+            let mirrorSubIndex = -1;
+            if (chartData.chartType === BarChartType.ACTIVITY) {
                 mirrorSubIndex = chartData.submissions.findIndex((sub) => sub.clientId === data.clientId && sub.index === (data.index === 1 ? 0 : 1));
+            }
             if (submissionIndex >= 0) {
                 chartData.submissions[submissionIndex] = data;
             } else {
                 chartData.submissions.push(data);
             }
-            if (mirrorSubIndex && mirrorSubIndex >= 0) {
+            if (mirrorSubIndex >= 0) {
                 chartData.submissions[mirrorSubIndex].isSelected = !data.isSelected;
             }
         }
@@ -112,11 +119,11 @@ export class BarChartService {
             this.addChart(snapshot.quiz.questions[i]);
 
             switch (snapshot.quiz.questions[i].type) {
-                case 'QCM':
+                case QuestionType.QCM:
                     this.barChartData[i].submissions = this.convertQcmSubmissions(snapshot.questionQcmSubmissions[i]);
                     break;
 
-                case 'QRL':
+                case QuestionType.QRL:
                     this.barChartData[i].submissions = this.convertQrlEvaluation(snapshot.questionQrlEvaluation[i]);
                     break;
             }
