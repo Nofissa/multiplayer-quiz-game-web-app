@@ -8,11 +8,12 @@ import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
 import { QrlBoardComponent } from '@app/components/qrl-board/qrl-board.component';
-import { ERROR_DURATION, MAX_MESSAGE_LENGTH } from '@app/constants/constants';
+import { MAX_MESSAGE_LENGTH, NOTICE_DURATION_MS } from '@app/constants/constants';
 import { SocketServerMock } from '@app/mocks/socket-server-mock';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { PlayerService } from '@app/services/player/player.service';
+import { SubscriptionService } from '@app/services/subscription/subscription.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { lastPlayerEvaluationStub } from '@app/test-stubs/evaluation.stubs';
@@ -33,7 +34,7 @@ import { Question } from '@common/question';
 import { Quiz } from '@common/quiz';
 import { TimerEventType } from '@common/timer-event-type';
 import { TimerPayload } from '@common/timer-payload';
-import { Observable, Subscription, of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { io } from 'socket.io-client';
 
 describe('QrlBoardComponent', () => {
@@ -48,6 +49,7 @@ describe('QrlBoardComponent', () => {
     let webSocketServiceSpy: jasmine.SpyObj<WebSocketService>;
     let socketServerMock: SocketServerMock;
     let timerServiceMock: jasmine.SpyObj<TimerService>;
+    let subscriptionServiceMock: jasmine.SpyObj<SubscriptionService>;
 
     const mockPlayers: Player[] = [
         {
@@ -109,6 +111,7 @@ describe('QrlBoardComponent', () => {
         routerSpy = jasmine.createSpyObj('Router', ['navigateByUrl']);
         webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', ['emit', 'on'], { socketInstance: io() });
         timerServiceMock = jasmine.createSpyObj('TimerService', ['onTimerTick']);
+        subscriptionServiceMock = jasmine.createSpyObj<SubscriptionService>(['add', 'clear']);
 
         TestBed.configureTestingModule({
             imports: [MatSnackBarModule, RouterTestingModule, MatDialogModule, BrowserAnimationsModule],
@@ -122,6 +125,7 @@ describe('QrlBoardComponent', () => {
                 { provide: Router, useValue: routerSpy },
                 { provide: WebSocketService, useValue: webSocketServiceSpy },
                 { provide: TimerService, useValue: timerServiceMock },
+                { provide: SubscriptionService, useValue: subscriptionServiceMock },
                 MatSnackBar,
                 FormBuilder,
             ],
@@ -183,9 +187,7 @@ describe('QrlBoardComponent', () => {
     });
 
     it('should ngOnDestroy', () => {
-        spyOn(component['eventSubscriptions'], 'forEach');
         component.ngOnDestroy();
-        expect(component['eventSubscriptions'].forEach).toHaveBeenCalled();
     });
 
     it('should loadNextQuestion', () => {
@@ -246,14 +248,9 @@ describe('QrlBoardComponent', () => {
     });
 
     it('should unsubscribe from all subscriptions on destroy', () => {
-        const mockSub1 = new Subscription();
-        const mockSub2 = new Subscription();
-        component['eventSubscriptions'].push(mockSub1, mockSub2);
-        expect(mockSub1.closed).toBeFalse();
-        expect(mockSub2.closed).toBeFalse();
         component.ngOnDestroy();
-        expect(mockSub1.closed).toBeTrue();
-        expect(mockSub2.closed).toBeTrue();
+
+        expect(subscriptionServiceMock.clear).toHaveBeenCalledWith(component['uuid']);
     });
 
     it('should add blink-red class for grade 0 and remove it after 3 seconds', (done) => {
@@ -307,7 +304,7 @@ describe('QrlBoardComponent', () => {
             undefined,
             jasmine.objectContaining({
                 verticalPosition: 'top',
-                duration: ERROR_DURATION,
+                duration: NOTICE_DURATION_MS,
                 panelClass: ['error-snackbar'],
             }),
         );

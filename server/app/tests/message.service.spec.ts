@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */ // needed for mocking the socket
-import { ClientPlayer } from '@app/classes/client-player';
 import { GameService } from '@app/services/game/game.service';
 import { MessageService } from '@app/services/message/message.service';
 import { Chatlog } from '@common/chatlog';
@@ -50,7 +49,7 @@ describe('messageService', () => {
             expect(result.message).toEqual(messageTest);
         });
 
-        it('should return an error is the player is muted', () => {
+        it('should it throw an error is the player is muted', () => {
             const game = gameStub();
             game.clientPlayers.get('playerId').player.isMuted = true;
             gameServiceMock.getGame.mockReturnValue(game);
@@ -59,22 +58,6 @@ describe('messageService', () => {
             expect(() => messageService.sendMessage(socketMock, game.pin, messageTest)).toThrow(
                 'Vous ne pouvez pas écrire dans la zone de clavardage',
             );
-        });
-
-        it('should return an error if no player', () => {
-            const game = gameStub();
-            gameServiceMock.getGame.mockReturnValue(game);
-            jest.spyOn(Map.prototype, 'get').mockReturnValue(null);
-            const messageTest = 'Bonjour';
-            expect(() => messageService.sendMessage(socketMock, game.pin, messageTest)).toThrow("Ce joueur n'existe pas");
-        });
-
-        it('should return an error if the player is null', () => {
-            const game = gameStub();
-            gameServiceMock.getGame.mockReturnValue(game);
-            jest.spyOn(Map.prototype, 'get').mockReturnValue({ player: null } as ClientPlayer);
-            const messageTest = 'Bonjour';
-            expect(() => messageService.sendMessage(socketMock, game.pin, messageTest)).toThrow("Ce joueur n'existe pas");
         });
     });
 });

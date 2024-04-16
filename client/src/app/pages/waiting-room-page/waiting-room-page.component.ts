@@ -8,7 +8,8 @@ import { RoutingDependenciesProvider } from '@app/providers/routing-dependencies
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { PlayerService } from '@app/services/player/player.service';
-import { Subscription } from 'rxjs';
+import { SubscriptionService } from '@app/services/subscription/subscription.service';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
     selector: 'app-waiting-room-page',
@@ -19,15 +20,17 @@ export class WaitingRoomPageComponent implements OnInit, OnDestroy {
     pin: string;
     isStarting: boolean = false;
 
-    private eventSubscriptions: Subscription[] = [];
-
+    private readonly uuid = uuidv4();
     private readonly activatedRoute: ActivatedRoute;
     private readonly router: Router;
     private readonly gameHttpService: GameHttpService;
     private readonly gameService: GameService;
     private readonly playerService: PlayerService;
 
+    // Depends on many services
+    // eslint-disable-next-line max-params
     constructor(
+        private readonly subscriptionService: SubscriptionService,
         private readonly snackBarService: MatSnackBar,
         routingDependenciesProvider: RoutingDependenciesProvider,
         gameServicesProvider: GameServicesProvider,
@@ -43,23 +46,11 @@ export class WaitingRoomPageComponent implements OnInit, OnDestroy {
     ngOnInit() {
         this.pin = this.activatedRoute.snapshot.queryParams['pin'];
 
-        this.gameHttpService.getGameSnapshotByPin(this.pin).subscribe({
-            error: (error: HttpErrorResponse) => {
-                if (error.status === HttpStatusCode.NotFound) {
-                    this.router.navigateByUrl('/home');
-                }
-            },
-        });
-
         this.setupSubscriptions(this.pin);
     }
 
     ngOnDestroy() {
-        this.eventSubscriptions.forEach((sub) => {
-            if (!sub.closed) {
-                sub.unsubscribe();
-            }
-        });
+        this.subscriptionService.clear(this.uuid);
     }
 
     leaveGame() {
@@ -72,7 +63,15 @@ export class WaitingRoomPageComponent implements OnInit, OnDestroy {
     }
 
     private setupSubscriptions(pin: string) {
-        this.eventSubscriptions.push(
+        this.subscriptionService.add(
+            this.pin,
+            this.gameHttpService.getGameSnapshotByPin(this.pin).subscribe({
+                error: (error: HttpErrorResponse) => {
+                    if (error.status === HttpStatusCode.NotFound) {
+                        this.router.navigateByUrl('/home');
+                    }
+                },
+            }),
             this.gameService.onCancelGame(pin, (message) => {
                 this.snackBarService.open(message, '', {
                     duration: NOTICE_DURATION_MS,
@@ -82,7 +81,6 @@ export class WaitingRoomPageComponent implements OnInit, OnDestroy {
 
                 this.router.navigateByUrl('/home');
             }),
-
             this.playerService.onPlayerBan(pin, (player) => {
                 if (this.playerService.getCurrentPlayer(pin)?.socketId === player?.socketId) {
                     this.snackBarService.open(`Vous avez été banni de la partie ${pin}`, '', {
@@ -93,13 +91,11 @@ export class WaitingRoomPageComponent implements OnInit, OnDestroy {
                     this.router.navigateByUrl('/home');
                 }
             }),
-
             this.playerService.onPlayerAbandon(pin, (player) => {
                 if (this.playerService.getCurrentPlayer(pin)?.socketId === player?.socketId) {
                     this.router.navigateByUrl('/home');
                 }
             }),
-
             this.gameService.onStartGame(pin, () => {
                 this.router.navigate(['/game'], { queryParams: { pin } });
             }),

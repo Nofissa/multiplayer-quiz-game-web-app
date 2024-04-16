@@ -3,18 +3,19 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
-import { NOT_FOUND_INDEX, SNACK_BAR_DURATION_MS } from '@app/constants/constants';
+import { NOTICE_DURATION_MS, NOT_FOUND_INDEX } from '@app/constants/constants';
 import { GameServicesProvider } from '@app/providers/game-services.provider';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { KeyBindingService } from '@app/services/key-binding/key-binding.service';
 import { PlayerService } from '@app/services/player/player.service';
+import { SubscriptionService } from '@app/services/subscription/subscription.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { Player } from '@common/player';
 import { QcmEvaluation } from '@common/qcm-evaluation';
 import { Question } from '@common/question';
 import { TimerEventType } from '@common/timer-event-type';
-import { Subscription } from 'rxjs';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
     selector: 'app-qcm-board',
@@ -29,26 +30,24 @@ export class QcmBoardComponent implements OnInit, OnDestroy {
     isTest: boolean;
 
     player: Player | null;
-
     question: Question;
     questionIsOver: boolean;
-    hasSubmited: boolean;
+    hasSubmitted: boolean;
     selectedChoiceIndexes: number[];
-    private cachedEvaluation: QcmEvaluation | null = null;
-    private disableShortcuts: boolean = false;
 
+    private cachedEvaluation: QcmEvaluation | null = null;
+    private readonly uuid = uuidv4();
     private readonly gameHttpService: GameHttpService;
     private readonly gameService: GameService;
     private readonly timerService: TimerService;
+    private readonly playerService: PlayerService;
     private readonly keyBindingService: KeyBindingService;
-
-    private eventSubscriptions: Subscription[] = [];
 
     // Depends on many services
     // eslint-disable-next-line max-params
     constructor(
         gameServicesProvider: GameServicesProvider,
-        private readonly playerService: PlayerService,
+        private readonly subscriptionService: SubscriptionService,
         private readonly dialog: MatDialog,
         private readonly router: Router,
         private readonly snackBar: MatSnackBar,
@@ -56,7 +55,12 @@ export class QcmBoardComponent implements OnInit, OnDestroy {
         this.gameHttpService = gameServicesProvider.gameHttpService;
         this.gameService = gameServicesProvider.gameService;
         this.timerService = gameServicesProvider.timerService;
+        this.playerService = gameServicesProvider.playerService;
         this.keyBindingService = gameServicesProvider.keyBindingService;
+    }
+
+    private get disableShortcuts(): boolean {
+        return this.hasSubmitted || this.question?.type?.trim()?.toUpperCase() !== 'QCM';
     }
 
     @HostListener('window:keydown', ['$event'])
@@ -88,21 +92,19 @@ export class QcmBoardComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
-        this.eventSubscriptions.forEach((sub) => {
-            if (sub && !sub.closed) {
-                sub.unsubscribe();
-            }
-        });
+        this.subscriptionService.clear(this.uuid);
     }
 
     submitChoices() {
-        this.hasSubmited = true;
+        this.hasSubmitted = true;
         this.gameService.qcmSubmit(this.pin);
-        this.disableShortcuts = true;
-        this.snackBar.open('Réponse soumise ✔', '', { duration: SNACK_BAR_DURATION_MS, panelClass: ['submit-snackbar'] });
+        this.snackBar.open('Réponse soumise ✔', '', { duration: NOTICE_DURATION_MS, panelClass: ['submit-snackbar'] });
     }
 
     toggleSelectChoice(choiceIndex: number) {
+        if (this.question?.type?.trim()?.toUpperCase() !== 'QCM') {
+            return;
+        }
         const foundIndex = this.selectedChoiceIndexes.indexOf(choiceIndex);
 
         if (foundIndex !== NOT_FOUND_INDEX) {
@@ -131,15 +133,15 @@ export class QcmBoardComponent implements OnInit, OnDestroy {
 
     private loadNextQuestion(question: Question) {
         this.questionIsOver = false;
-        this.hasSubmited = false;
+        this.hasSubmitted = false;
         this.selectedChoiceIndexes = [];
         this.cachedEvaluation = null;
         this.question = question;
-        this.disableShortcuts = false;
     }
 
     private setupSubscriptions(pin: string) {
-        this.eventSubscriptions.push(
+        this.subscriptionService.add(
+            this.uuid,
             this.gameService.onNextQuestion(pin, (data) => {
                 this.loadNextQuestion(data.question);
             }),
@@ -148,7 +150,6 @@ export class QcmBoardComponent implements OnInit, OnDestroy {
                     return;
                 }
                 if (this.playerService.getCurrentPlayer(pin)?.socketId === evaluation.player.socketId) {
-                    this.disableShortcuts = true;
                     this.cachedEvaluation = evaluation;
                 }
                 if (evaluation.isLast) {
@@ -162,7 +163,7 @@ export class QcmBoardComponent implements OnInit, OnDestroy {
                 if (this.question?.type?.trim()?.toUpperCase() !== 'QCM') {
                     return;
                 }
-                if (!payload.remainingTime && payload.eventType === TimerEventType.Question && !this.hasSubmited) {
+                if (!payload.remainingTime && payload.eventType === TimerEventType.Question && !this.hasSubmitted) {
                     this.submitChoices();
                 }
             }),
@@ -172,9 +173,6 @@ export class QcmBoardComponent implements OnInit, OnDestroy {
     private setupKeyBindings() {
         ['1', '2', '3', '4'].forEach((x) => {
             this.keyBindingService.registerKeyBinding(x, () => {
-                if (this.question?.type?.trim()?.toUpperCase() !== 'QCM') {
-                    return;
-                }
                 const choiceIndex = parseInt(x, 10) - 1;
                 this.toggleSelectChoice(choiceIndex);
             });

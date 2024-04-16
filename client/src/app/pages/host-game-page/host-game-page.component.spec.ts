@@ -17,6 +17,7 @@ import { KeyBindingService } from '@app/services/key-binding/key-binding.service
 import { MessageService } from '@app/services/message/message.service';
 import { PlayerService } from '@app/services/player/player.service';
 import { SoundService } from '@app/services/sound/sound.service';
+import { SubscriptionService } from '@app/services/subscription/subscription.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { barChartDataStub } from '@app/test-stubs/bar-chart-data.stubs';
@@ -58,6 +59,7 @@ describe('HostGamePageComponent', () => {
     let playerServiceSpy: SpyObj<PlayerService>;
     let dialogSpy: jasmine.SpyObj<MatDialog>;
     let socketServerMock: SocketServerMock;
+    let mockSubscriptionService: jasmine.SpyObj<SubscriptionService>;
 
     const clearGameServiceSpies = () => {
         (Object.keys(gameServiceSpy) as (keyof typeof gameServiceSpy)[]).forEach((method) => {
@@ -151,6 +153,7 @@ describe('HostGamePageComponent', () => {
         dialogSpy = jasmine.createSpyObj<MatDialog>(['open']);
         routerSpy = jasmine.createSpyObj<Router>(['navigate', 'navigateByUrl']);
         routerSpy.navigate.and.stub();
+        mockSubscriptionService = jasmine.createSpyObj<SubscriptionService>(['add', 'clear']);
 
         TestBed.configureTestingModule({
             declarations: [HostGamePageComponent],
@@ -170,6 +173,7 @@ describe('HostGamePageComponent', () => {
                         },
                     },
                 },
+                { provide: SubscriptionService, useValue: mockSubscriptionService },
                 { provide: MatDialog, useValue: dialogSpy },
             ],
             imports: [RouterTestingModule, HttpClientTestingModule, BrowserAnimationsModule, MatTooltipModule],
@@ -194,14 +198,21 @@ describe('HostGamePageComponent', () => {
 
         clearGameServiceSpies();
     });
+
     it('should create', () => {
         expect(component).toBeTruthy();
     });
 
     it('should component be initialized correctly', () => {
-        expect(component.gameState).toEqual(GameState.Opened);
+        expect(component['gameState']).toEqual(GameState.Opened);
         expect(component.currentQuestionHasEnded).toEqual(false);
         expect(component.isLastQuestion).toEqual(false);
+    });
+
+    it('should unsubscribe clear subscriptions on destroy', () => {
+        component.ngOnDestroy();
+
+        expect(mockSubscriptionService.clear).toHaveBeenCalledWith(component['uuid']);
     });
 
     it('should barCharts return all chartData if there is data in the service', () => {
@@ -267,15 +278,15 @@ describe('HostGamePageComponent', () => {
         component.toggleLock();
         const payload: GameEventPayload<GameState> = { pin: PIN, data: GameState.Closed };
         socketServerMock.emit('toggleGameLock', payload);
-        expect(component.gameState).toEqual(GameState.Closed);
+        expect(component['gameState']).toEqual(GameState.Closed);
     });
 
     it('should startGame start server Game', () => {
-        component.isRandom = true;
+        component['isRandom'] = true;
         component.startGame();
         const payload: GameEventPayload<QuestionPayload> = { pin: PIN, data: { question: qcmQuestionStub()[0], isLast: false } };
         socketServerMock.emit('startGame', payload);
-        expect(component.gameState).toEqual(GameState.Running);
+        expect(component['gameState']).toEqual(GameState.Running);
         expect(component.isLastQuestion).toBeFalse();
         expect(barChartServiceSpy.addChart).toHaveBeenCalled();
         expect(timerServiceSpy.startTimer).toHaveBeenCalledWith(PIN, TimerEventType.StartGame, NEXT_QUESTION_DELAY);
@@ -341,7 +352,7 @@ describe('HostGamePageComponent', () => {
     });
 
     it('should playerAbandon should cancelGame if no players are left, do nothing otherwise', () => {
-        component.gameState = GameState.Running;
+        component['gameState'] = GameState.Running;
         const payload: GameEventPayload<Player> = { pin: PIN, data: secondPlayerStub() };
         gameHttpServiceSpy.getGameSnapshotByPin.and.callFake(() => {
             return of(mockSnapshotStubs()[0]);
@@ -357,7 +368,7 @@ describe('HostGamePageComponent', () => {
     });
 
     it('should onTimerTick start timer when ', () => {
-        component.gameState = GameState.Running;
+        component['gameState'] = GameState.Running;
         const payload: GameEventPayload<TimerPayload> = { pin: PIN, data: { remainingTime: 0, eventType: TimerEventType.NextQuestion } };
 
         socketServerMock.emit('timerTick', payload);
@@ -370,13 +381,13 @@ describe('HostGamePageComponent', () => {
 
     it('should set isEnded return true if Game is ended, false otherwise', () => {
         expect(component.isEnded()).toBeFalse();
-        component.gameState = GameState.Ended;
+        component['gameState'] = GameState.Ended;
         expect(component.isEnded()).toBeTrue();
     });
 
     it('should set isLocked return false if game is Openned, false otherwise', () => {
         expect(component.isLocked()).toBeFalse();
-        component.gameState = GameState.Running;
+        component['gameState'] = GameState.Running;
         expect(component.isLocked()).toBeTrue();
     });
 

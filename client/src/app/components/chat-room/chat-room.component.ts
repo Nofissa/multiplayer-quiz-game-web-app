@@ -6,8 +6,9 @@ import { GameServicesProvider } from '@app/providers/game-services.provider';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { MessageService } from '@app/services/message/message.service';
 import { PlayerService } from '@app/services/player/player.service';
+import { SubscriptionService } from '@app/services/subscription/subscription.service';
 import { Chatlog } from '@common/chatlog';
-import { Subscription } from 'rxjs';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
     selector: 'app-chat-room',
@@ -20,18 +21,20 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     input: string = '';
     remainigInputCount: number = MAX_MESSAGE_LENGTH;
     chatlogs: Chatlog[] = [];
-
     formGroup: FormGroup;
-    private eventSubscriptions: Subscription[] = [];
 
+    private readonly uuid = uuidv4();
     private readonly gameHttpService: GameHttpService;
     private readonly messageService: MessageService;
     private readonly playerService: PlayerService;
 
+    // Depends on many services
+    // eslint-disable-next-line max-params
     constructor(
         formBuilder: FormBuilder,
         gameServicesProvider: GameServicesProvider,
         private readonly snackBarService: MatSnackBar,
+        private readonly subscriptionService: SubscriptionService,
     ) {
         this.formGroup = formBuilder.group({
             message: [this.pin, [Validators.required, this.messageValidator()]],
@@ -42,59 +45,11 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
-        this.gameHttpService.getGameSnapshotByPin(this.pin).subscribe((snapshot) => {
-            this.chatlogs = snapshot.chatlogs;
-        });
-        this.eventSubscriptions.push(
-            this.messageService.onSendMessage(this.pin, (chatlog: Chatlog) => {
-                this.chatlogs.push(chatlog);
-            }),
-        );
-        this.playerService.onPlayerMute(this.pin, (player) => {
-            if (player.isMuted) {
-                if (this.playerService.getCurrentPlayer(this.pin)?.socketId === player.socketId) {
-                    this.snackBarService.open('Vous avez été réduit au silence', '', {
-                        duration: NOTICE_DURATION_MS,
-                        verticalPosition: 'top',
-                        panelClass: ['base-snackbar'],
-                    });
-                }
-            } else {
-                if (this.playerService.getCurrentPlayer(this.pin)?.socketId === player.socketId) {
-                    this.snackBarService.open('Vous pouvez parler de nouveau', '', {
-                        duration: NOTICE_DURATION_MS,
-                        verticalPosition: 'top',
-                        panelClass: ['base-snackbar'],
-                    });
-                }
-            }
-        });
-        this.playerService.onPlayerBan(this.pin, (player) => {
-            if (player) {
-                this.chatlogs.push({
-                    author: 'Système',
-                    message: `${player.username} a été banni`,
-                    date: new Date(),
-                });
-            }
-        });
-        this.playerService.onPlayerAbandon(this.pin, (player) => {
-            if (player) {
-                this.chatlogs.push({
-                    author: 'Système',
-                    message: `${player.username} a abandonné la partie`,
-                    date: new Date(),
-                });
-            }
-        });
+        this.setupSubscriptions(this.pin);
     }
 
     ngOnDestroy() {
-        this.eventSubscriptions.forEach((sub) => {
-            if (sub && !sub.closed) {
-                sub.unsubscribe();
-            }
-        });
+        this.subscriptionService.clear(this.uuid);
     }
 
     isCurrentUser(author: string): boolean {
@@ -129,5 +84,54 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
             const isOnlyWhitespace = /^\s*$/.test(message);
             return !isOnlyWhitespace && message?.length < MAX_MESSAGE_LENGTH ? null : { invalidMessage: true };
         };
+    }
+
+    private setupSubscriptions(pin: string) {
+        this.subscriptionService.add(
+            this.uuid,
+            this.messageService.onSendMessage(pin, (chatlog: Chatlog) => {
+                this.chatlogs.push(chatlog);
+            }),
+            this.gameHttpService.getGameSnapshotByPin(pin).subscribe((snapshot) => {
+                this.chatlogs = snapshot.chatlogs;
+            }),
+            this.playerService.onPlayerMute(this.pin, (player) => {
+                if (player.isMuted) {
+                    if (this.playerService.getCurrentPlayer(pin)?.socketId === player.socketId) {
+                        this.snackBarService.open('Vous avez été réduit au silence', '', {
+                            duration: NOTICE_DURATION_MS,
+                            verticalPosition: 'top',
+                            panelClass: ['base-snackbar'],
+                        });
+                    }
+                } else {
+                    if (this.playerService.getCurrentPlayer(pin)?.socketId === player.socketId) {
+                        this.snackBarService.open('Vous pouvez parler de nouveau', '', {
+                            duration: NOTICE_DURATION_MS,
+                            verticalPosition: 'top',
+                            panelClass: ['base-snackbar'],
+                        });
+                    }
+                }
+            }),
+            this.playerService.onPlayerBan(pin, (player) => {
+                if (player) {
+                    this.chatlogs.push({
+                        author: 'Système',
+                        message: `${player.username} a été banni`,
+                        date: new Date(),
+                    });
+                }
+            }),
+            this.playerService.onPlayerAbandon(pin, (player) => {
+                if (player) {
+                    this.chatlogs.push({
+                        author: 'Système',
+                        message: `${player.username} a abandonné la partie`,
+                        date: new Date(),
+                    });
+                }
+            }),
+        );
     }
 }

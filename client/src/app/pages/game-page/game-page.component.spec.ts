@@ -10,6 +10,7 @@ import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { PlayerService } from '@app/services/player/player.service';
 import { SoundService } from '@app/services/sound/sound.service';
+import { SubscriptionService } from '@app/services/subscription/subscription.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { lastPlayerEvaluationStub } from '@app/test-stubs/evaluation.stubs';
@@ -39,6 +40,7 @@ describe('GamePageComponent', () => {
     let gameServiceSpy: jasmine.SpyObj<GameService>;
     let playerServiceSpy: jasmine.SpyObj<PlayerService>;
     let soundServiceSpy: jasmine.SpyObj<SoundService>;
+    let mockSubscriptionService: jasmine.SpyObj<SubscriptionService>;
 
     beforeEach(async () => {
         webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', ['emit', 'on'], {
@@ -64,6 +66,7 @@ describe('GamePageComponent', () => {
         playerServiceSpy = jasmine.createSpyObj<PlayerService>(['onPlayerAbandon', 'onPlayerBan', 'playerBan', 'playerAbandon']);
         timerServiceSpy = jasmine.createSpyObj<TimerService>(['onStartTimer', 'onTimerTick', 'startTimer', 'stopTimer', 'onAccelerateTimer']);
         soundServiceSpy = jasmine.createSpyObj<SoundService>(['loadSound', 'playSound', 'stopSound']);
+        mockSubscriptionService = jasmine.createSpyObj<SubscriptionService>(['add', 'clear']);
 
         await TestBed.configureTestingModule({
             declarations: [GamePageComponent],
@@ -76,6 +79,7 @@ describe('GamePageComponent', () => {
                 { provide: GameService, useValue: gameServiceSpy },
                 { provide: TimerService, useValue: timerServiceSpy },
                 { provide: SoundService, useValue: soundServiceSpy },
+                { provide: SubscriptionService, useValue: mockSubscriptionService },
             ],
         }).compileComponents();
 
@@ -154,10 +158,10 @@ describe('GamePageComponent', () => {
         expect(component['router'].navigateByUrl).toHaveBeenCalled();
     });
 
-    it('should ngOnDestroy', () => {
-        spyOn(component['eventSubscriptions'], 'forEach');
+    it('should unsubscribe clear subscriptions on destroy', () => {
         component.ngOnDestroy();
-        expect(component['eventSubscriptions'].forEach).toHaveBeenCalled();
+
+        expect(mockSubscriptionService.clear).toHaveBeenCalledWith(component['uuid']);
     });
 
     it('should startGame', () => {
@@ -175,12 +179,6 @@ describe('GamePageComponent', () => {
         expect(gameService.endGame).toHaveBeenCalled();
     });
 
-    it('should handleCancelGame', () => {
-        spyOn(component['router'], 'navigate');
-        component.handleCancelGame();
-        expect(component['router'].navigate).toHaveBeenCalled();
-    });
-
     it('should setupSubscriptions if isTest is true', () => {
         const startPayload: GameEventPayload<Question> = { pin: '123', data: qcmQuestionStub()[0] };
         const nextQuestionPayload: GameEventPayload<QuestionPayload> = { pin: '123', data: { isLast: true, question: qcmQuestionStub()[0] } };
@@ -192,8 +190,6 @@ describe('GamePageComponent', () => {
         };
         const messagePayload: GameEventPayload<string> = { pin: '123', data: 'message' };
         const voidPayload: GameEventPayload<void> = { pin: '123', data: undefined };
-        spyOn(component['router'], 'navigate');
-        spyOn(component, 'handleCancelGame');
         spyOn(component['router'], 'navigateByUrl');
         component.isTest = true;
         fixture.detectChanges();
@@ -208,8 +204,6 @@ describe('GamePageComponent', () => {
         socketServerMock.emit('timerTick', timerPayload);
 
         expect(timerServiceSpy.startTimer).toHaveBeenCalled();
-        expect(component['router'].navigate).toHaveBeenCalled();
-        expect(component.handleCancelGame).toHaveBeenCalled();
         expect(component.isStarting).toBeFalse();
         expect(timerServiceSpy.stopTimer).toHaveBeenCalled();
         expect(component['router'].navigateByUrl).toHaveBeenCalled();
@@ -222,8 +216,6 @@ describe('GamePageComponent', () => {
         const evaluationPayload: GameEventPayload<QcmEvaluation> = { pin: '123', data: lastPlayerEvaluationStub() };
         const messagePayload: GameEventPayload<string> = { pin: '123', data: 'message' };
         const voidPayload: GameEventPayload<void> = { pin: '123', data: undefined };
-        spyOn(component['router'], 'navigate');
-        spyOn(component, 'handleCancelGame');
         spyOn(component['router'], 'navigateByUrl');
         component.isTest = true;
         fixture.detectChanges();
@@ -237,8 +229,6 @@ describe('GamePageComponent', () => {
         socketServerMock.emit('timerTick', timerPayload);
 
         expect(timerServiceSpy.startTimer).toHaveBeenCalled();
-        expect(component['router'].navigate).toHaveBeenCalled();
-        expect(component.handleCancelGame).toHaveBeenCalled();
         expect(component.isStarting).toBeFalse();
         expect(timerServiceSpy.stopTimer).toHaveBeenCalled();
         expect(component['router'].navigateByUrl).toHaveBeenCalled();
@@ -251,8 +241,6 @@ describe('GamePageComponent', () => {
         const evaluationPayload: GameEventPayload<QcmEvaluation> = { pin: '123', data: lastPlayerEvaluationStub() };
         const messagePayload: GameEventPayload<string> = { pin: '123', data: 'message' };
         const voidPayload: GameEventPayload<void> = { pin: '123', data: undefined };
-        spyOn(component['router'], 'navigate');
-        spyOn(component, 'handleCancelGame');
         spyOn(component['router'], 'navigateByUrl');
         component.isTest = false;
         fixture.detectChanges();
@@ -265,8 +253,6 @@ describe('GamePageComponent', () => {
         socketServerMock.emit('qcmSubmit', evaluationPayload);
         socketServerMock.emit('timerTick', timerPayload);
 
-        expect(component['router'].navigate).toHaveBeenCalled();
-        expect(component.handleCancelGame).toHaveBeenCalled();
         expect(component.isStarting).toBeFalse();
         expect(component['router'].navigateByUrl).toHaveBeenCalled();
     });

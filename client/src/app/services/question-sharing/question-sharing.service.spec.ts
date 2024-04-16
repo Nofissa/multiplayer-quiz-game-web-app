@@ -27,9 +27,9 @@ describe('QuestionSharingService', () => {
         };
 
         // eslint-disable-next-line @typescript-eslint/no-empty-function, no-unused-vars
-        const firstCallbackSpy = jasmine.createSpy('firstCallback', (_: Question) => {});
+        const firstCallbackSpy = jasmine.createSpy('firstCallback', (_question: Question) => {});
         // eslint-disable-next-line @typescript-eslint/no-empty-function, no-unused-vars
-        const secondCallbackSpy = jasmine.createSpy('secondCallback', (_: Question) => {});
+        const secondCallbackSpy = jasmine.createSpy('secondCallback', (_question: Question) => {});
 
         service.subscribe(firstCallbackSpy);
         service.subscribe(secondCallbackSpy);

@@ -1,8 +1,10 @@
-const serverUrl = 'http://ec2-15-157-59-57.ca-central-1.compute.amazonaws.com';
-const serverPort = 3000;
+import { IEnvironment } from './ienvironment';
+import { PROD_ENVIRONMENT } from '@app/constants/prod-environment';
 
-export const environment = {
+export const environment: IEnvironment = {
     production: true,
-    serverUrl: `${serverUrl}:${serverPort}`,
-    apiUrl: `${serverUrl}:${serverPort}/api`,
+    serverPort: PROD_ENVIRONMENT.serverPort,
+    serverUrl: `${PROD_ENVIRONMENT.serverUrl}:${PROD_ENVIRONMENT.serverPort}`,
+    apiUrl: `${PROD_ENVIRONMENT.serverUrl}:${PROD_ENVIRONMENT.serverPort}/api`,
+    panicAudioSrc: 'https://imed-bennour.github.io/sound-for-LOG2990/ticking-timer.wav',
 };

@@ -5,7 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
 import { UpsertQuestionDialogComponent } from '@app/components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
-import { NOT_FOUND_INDEX, SNACK_BAR_DURATION_MS } from '@app/constants/constants';
+import { NOTICE_DURATION_MS, NOT_FOUND_INDEX } from '@app/constants/constants';
 import { QuestionListOptions } from '@app/interfaces/question-list-options';
 import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog-data';
 import { MaterialServicesProvider } from '@app/providers/material-services.provider';
@@ -173,7 +173,7 @@ export class QuestionBankComponent implements OnInit, OnDestroy {
                 this.snackBarService.open("Échec de l'ajout de la question à la Banque de Questions", 'OK', {
                     verticalPosition: 'top',
                     panelClass: ['base-snackbar'],
-                    duration: SNACK_BAR_DURATION_MS,
+                    duration: NOTICE_DURATION_MS,
                 });
             },
         });
