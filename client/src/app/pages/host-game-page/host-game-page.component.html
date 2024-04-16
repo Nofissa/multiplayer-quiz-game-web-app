@@ -4,7 +4,7 @@
         <button
             class="end-button"
             mat-raised-button
-            (click)="cancelGame()"
+            (click)="leaveGame()"
             #tooltip="matTooltip"
             matTooltip="Quitter"
             [matTooltipPosition]="'below'"
@@ -29,46 +29,12 @@
         </button>
         <app-panic-mode-button [pin]="pin"></app-panic-mode-button>
         <app-timer-pause-toggle [pin]="pin"></app-timer-pause-toggle>
-        <div>
-            <button
-                class="start-button"
-                mat-raised-button
-                *ngIf="isLocked() && !isRunning()"
-                (click)="startGame()"
-                #tooltip="matTooltip"
-                matTooltip="Démarrer la partie"
-                [matTooltipPosition]="'below'"
-                matTooltipShowDelay="1000"
-                matTooltipHideDelay="300"
-            >
-                Commencer
-            </button>
-            <button
-                class="next-button"
-                mat-raised-button
-                *ngIf="currentQuestionHasEnded && !isLastQuestion"
-                (click)="nextQuestion()"
-                #tooltip="matTooltip"
-                matTooltip="Prochaine Question"
-                [matTooltipPosition]="'below'"
-                matTooltipShowDelay="1000"
-                matTooltipHideDelay="300"
-            >
+        <div class="action-button">
+            <button class="start-button" mat-raised-button *ngIf="isLocked() && !isRunning()" (click)="startGame()">Commencer</button>
+            <button class="next-button" mat-raised-button *ngIf="currentQuestionHasEnded && !isLastQuestion" (click)="nextQuestion()">
                 Question Suivante
             </button>
-            <button
-                class="next-button"
-                mat-raised-button
-                *ngIf="currentQuestionHasEnded && isLastQuestion"
-                (click)="endGame()"
-                #tooltip="matTooltip"
-                matTooltip="Naviguer vers les résultats"
-                [matTooltipPosition]="'below'"
-                matTooltipShowDelay="1000"
-                matTooltipHideDelay="300"
-            >
-                Résultats
-            </button>
+            <button class="next-button" mat-raised-button *ngIf="currentQuestionHasEnded && isLastQuestion" (click)="endGame()">Résultats</button>
         </div>
     </div>
 
