@@ -60,7 +60,7 @@ export class QcmBoardComponent implements OnInit, OnDestroy {
     }
 
     private get disableShortcuts(): boolean {
-        return this.hasSubmitted || this?.question?.type?.trim()?.toUpperCase() !== 'QCM';
+        return this.hasSubmitted || this.question?.type?.trim()?.toUpperCase() !== 'QCM';
     }
 
     @HostListener('window:keydown', ['$event'])

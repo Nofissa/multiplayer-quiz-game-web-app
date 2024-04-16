@@ -8,7 +8,7 @@ import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
 import { QrlBoardComponent } from '@app/components/qrl-board/qrl-board.component';
-import { ERROR_DURATION, MAX_MESSAGE_LENGTH } from '@app/constants/constants';
+import { MAX_MESSAGE_LENGTH, NOTICE_DURATION_MS } from '@app/constants/constants';
 import { SocketServerMock } from '@app/mocks/socket-server-mock';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
@@ -304,7 +304,7 @@ describe('QrlBoardComponent', () => {
             undefined,
             jasmine.objectContaining({
                 verticalPosition: 'top',
-                duration: ERROR_DURATION,
+                duration: NOTICE_DURATION_MS,
                 panelClass: ['error-snackbar'],
             }),
         );

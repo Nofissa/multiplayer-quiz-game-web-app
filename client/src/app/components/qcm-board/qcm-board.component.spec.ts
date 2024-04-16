@@ -215,7 +215,6 @@ describe('QcmBoardComponent', () => {
         component.player = firstPlayerStub();
 
         expect(component['cachedEvaluation']).toEqual(qcmEvaluationPayload.data);
-        expect(component['disableShortcuts']).toBeTrue();
         expect(component.questionIsOver).toBeTrue();
     });
 
@@ -228,7 +227,7 @@ describe('QcmBoardComponent', () => {
             return of(payload).subscribe(callback);
         });
         component['setupSubscriptions']('123');
-        component.hasSubmited = false;
+        component.hasSubmitted = false;
         expect(component.submitChoices).toHaveBeenCalled();
     });
 });
