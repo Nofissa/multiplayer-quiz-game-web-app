@@ -29,8 +29,7 @@
         </div>
     </div>
     <div class="buttons-wrapper">
-        <button mat-flat-button id="validateButton" class="game-button" *ngIf="!hasSubmited"
-            (click)="submitChoices()">
+        <button mat-flat-button id="validateButton" class="game-button" *ngIf="!hasSubmitted" (click)="submitChoices()">
             Valider <i class="fas fa-check-circle"></i>
         </button>
         <button button mat-flat-button color="warn" id="giveUpButton" class="game-button"
