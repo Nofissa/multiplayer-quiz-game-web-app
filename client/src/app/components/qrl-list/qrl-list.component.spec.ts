@@ -1,13 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { firstPlayerStub } from '@app/test-stubs/player.stubs';
-import { qrlQuestionStub } from '@app/test-stubs/question.stubs';
-import { quizStub } from '@app/test-stubs/quiz.stubs';
 import { SocketServerMock } from '@app/mocks/socket-server-mock';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
+import { firstPlayerStub } from '@app/test-stubs/player.stubs';
+import { qrlQuestionStub } from '@app/test-stubs/question.stubs';
+import { quizStub } from '@app/test-stubs/quiz.stubs';
 import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
 import { GameEventPayload } from '@common/game-event-payload';
 import { GameSnapshot } from '@common/game-snapshot';
@@ -107,7 +107,9 @@ describe('QrlListComponent', () => {
     });
 
     it('should ngOnDestroy', () => {
+        spyOn(component['subscriptionService'], 'clear');
         component.ngOnDestroy();
+        expect(component['subscriptionService'].clear).toHaveBeenCalled();
     });
 
     it('should setupSubscription', () => {

@@ -169,7 +169,6 @@ export class PlayerListComponent implements OnInit, OnDestroy {
                 });
             }),
             this.gameService.onQrlInputChange(pin, (barchartSubmission) => {
-                console.log("BUUGGGGs");
                 this.players.forEach((player) => {
                     if (player.socketId === barchartSubmission.clientId) {
                         if (barchartSubmission.isSelected) {

@@ -188,6 +188,7 @@ describe('QrlBoardComponent', () => {
 
     it('should ngOnDestroy', () => {
         component.ngOnDestroy();
+        expect(subscriptionServiceMock.clear).toHaveBeenCalled();
     });
 
     it('should loadNextQuestion', () => {
