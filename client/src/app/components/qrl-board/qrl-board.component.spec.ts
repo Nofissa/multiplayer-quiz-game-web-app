@@ -319,6 +319,7 @@ describe('QrlBoardComponent', () => {
             data: { player: firstPlayerStub(), grade: Grade.Good, score: 10, isLast: true },
         };
 
+        // I have to use any to be able to spy on private method blinktextArea, can't use never because I expect a call with a parameter
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const blinkTextAreaSpy = spyOn<any>(component, 'blinkTextArea');
 

@@ -25,8 +25,8 @@ describe('HistogrammeSwiperComponent', () => {
             slides: [{}, {}, {}],
             slideTo: jasmine.createSpy('slideTo'),
         };
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        component.swiperComponent = { swiperRef: mockSwiperRef } as any;
+
+        component.swiperComponent = { swiperRef: mockSwiperRef } as never;
         expect(component.swiperComponent).toBeDefined();
     });
 
@@ -35,8 +35,8 @@ describe('HistogrammeSwiperComponent', () => {
             slides: [{}, {}, {}],
             slideTo: jasmine.createSpy('slideTo'),
         };
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        component.swiperComponent = { swiperRef: mockSwiperRef } as any;
+
+        component.swiperComponent = { swiperRef: mockSwiperRef } as never;
 
         component.goToEndSlide();
 

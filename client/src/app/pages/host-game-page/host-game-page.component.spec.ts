@@ -376,19 +376,4 @@ describe('HostGamePageComponent', () => {
         component['addQuestion'](qrlQuestionStub()[0]);
         expect(barChartServiceSpy.addChart).toHaveBeenCalledWith(qrlQuestionStub()[0], 'ACTIVITY');
     });
-
-    // it('should load and play sound on accelerateTimer', () => {
-    //     component.gameState = GameState.Running;
-    //     const payload: GameEventPayload<TimerPayload> = { pin: PIN, data: { remainingTime: 30, eventType: TimerEventType.Question } };
-    //     component['setupSubscriptions'](PIN);
-    //     socketServerMock.emit('accelerateTimer', payload);
-    //     expect(soundServiceSpy.loadSound).toHaveBeenCalled();
-    //     expect(soundServiceSpy.playSound).toHaveBeenCalled();
-    // });
-
-    // it('should endGame end game server side', () => {
-    //     const payload: GameEventPayload<BarchartSubmission> = { pin: PIN, data: { clientId: '123', index: 2, isSelected: true } };
-    //     socketServerMock.emit('qrlInputChange', payload);
-    //     expect(barChartServiceSpy.updateChartData).toHaveBeenCalled();
-    // });
 });
