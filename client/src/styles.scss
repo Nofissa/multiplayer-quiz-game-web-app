@@ -107,6 +107,12 @@ body {
     height: auto !important;
 }
 
+.submit-snackbar * {
+    background-color: var(--answer-color-green) !important;
+    color: white !important;
+    text-align: center;
+}
+
 .header {
     position: relative;
 }

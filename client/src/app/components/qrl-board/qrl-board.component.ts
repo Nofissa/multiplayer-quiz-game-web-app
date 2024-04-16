@@ -5,7 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
-import { ERROR_DURATION, MAX_MESSAGE_LENGTH, THREE_SECONDS_MS } from '@app/constants/constants';
+import { ERROR_DURATION, MAX_MESSAGE_LENGTH, SNACK_BAR_DURATION_MS, THREE_SECONDS_MS } from '@app/constants/constants';
 import { GameServicesProvider } from '@app/providers/game-services.provider';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
@@ -133,6 +133,7 @@ export class QrlBoardComponent implements OnInit, OnDestroy {
             this.remainingInputCount = MAX_MESSAGE_LENGTH;
             this.hasSubmitted = true;
             this.isInEvaluation = true;
+            this.snackBar.open('Réponse soumise ✔', '', { duration: SNACK_BAR_DURATION_MS, panelClass: ['submit-snackbar'] });
         } else if (this.input.length > MAX_MESSAGE_LENGTH) {
             this.openError('La réponse contient plus de 200 caractères');
         }
