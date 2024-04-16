@@ -25,6 +25,7 @@ import { BarchartSubmission } from '@common/barchart-submission';
 import { GameState } from '@common/game-state';
 import { PlayerState } from '@common/player-state';
 import { Question } from '@common/question';
+import { QuestionType } from '@common/question-type';
 import { TimerEventType } from '@common/timer-event-type';
 import { Subscription } from 'rxjs';
 
@@ -43,8 +44,7 @@ export class HostGamePageComponent implements OnInit {
     gameState: GameState = GameState.Opened;
     currentQuestionHasEnded: boolean = false;
     isLastQuestion: boolean = false;
-    question: Question | undefined;
-    nextAvailable: boolean = false;
+    private questionType: QuestionType = 'QCM';
     private eventSubscriptions: Subscription[] = [];
     private readonly activatedRoute: ActivatedRoute;
     private readonly router: Router;
@@ -122,6 +122,10 @@ export class HostGamePageComponent implements OnInit {
         this.gameService.startGame(this.pin);
     }
 
+    isQRL() {
+        return this.questionType === 'QRL';
+    }
+
     leaveGame() {
         const dialogRef = this.dialogService.open(ConfirmationDialogComponent, {
             width: '300px',
@@ -152,6 +156,7 @@ export class HostGamePageComponent implements OnInit {
     }
 
     private addQuestion(question: Question) {
+        this.questionType = question.type;
         if (question.type === 'QRL') {
             this.barChartService.addChart(question, 'ACTIVITY');
         } else {
@@ -212,11 +217,25 @@ export class HostGamePageComponent implements OnInit {
                 if (this.isRandom) {
                     this.router.navigate(['game'], { queryParams: { pin: this.pin } });
                 }
+                if (data.question.type === 'QRL') {
+                    this.gameHttpService.getGameSnapshotByPin(this.pin).subscribe((snapshot) => {
+                        for (const player of snapshot.players) {
+                            this.barChartService.updateChartData({ clientId: player.socketId, index: 0, isSelected: true });
+                        }
+                    });
+                }
             }),
 
             this.gameService.onNextQuestion(pin, (data) => {
                 this.isLastQuestion = data.isLast;
                 this.addQuestion(data.question);
+                if (data.question.type === 'QRL') {
+                    this.gameHttpService.getGameSnapshotByPin(this.pin).subscribe((snapshot) => {
+                        for (const player of snapshot.players) {
+                            this.barChartService.updateChartData({ clientId: player.socketId, index: 0, isSelected: true });
+                        }
+                    });
+                }
                 this.timerService.startTimer(this.pin, TimerEventType.NextQuestion, NEXT_QUESTION_DELAY_SECONDS);
             }),
 

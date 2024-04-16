@@ -1,5 +1,5 @@
 <div *ngIf="player && question"
-    [ngClass]="{ 'container': true, 'hidden': question?.type?.trim()?.toUpperCase() !== 'QCM' }">
+    [ngClass]="{ 'container': true, 'hidden': question.type.trim().toUpperCase() !== 'QCM' }">
     <div class="question-box font-color">
         <span id="questionText" class="text-centered">{{ question.text }}</span>
         <span id="value" class="text-centered"><strong>{{ question.points }} points</strong></span>
@@ -29,7 +29,7 @@
         </div>
     </div>
     <div class="buttons-wrapper">
-        <button mat-flat-button id="validateButton" class="game-button" [class.disable-click]="hasSubmited"
+        <button mat-flat-button id="validateButton" class="game-button" *ngIf="!hasSubmited"
             (click)="submitChoices()">
             Valider <i class="fas fa-check-circle"></i>
         </button>

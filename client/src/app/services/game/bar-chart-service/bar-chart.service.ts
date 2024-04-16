@@ -18,6 +18,7 @@ export class BarChartService {
         if (!question) {
             return;
         }
+
         const newBarchartData: BarChartData = {
             text: chartType === 'ACTIVITY' ? 'Activité pour la question: ' + question.text : question.text,
             chartType: chartType ? chartType : question.type,
@@ -51,15 +52,15 @@ export class BarChartService {
         const chartData: BarChartData | undefined = this.getCurrentQuestionData();
         if (chartData && data) {
             const submissionIndex = chartData.submissions.findIndex((sub) => sub.clientId === data.clientId && sub.index === data.index);
-            const mirrorSubIndex = chartData.submissions.findIndex(
-                (sub) => sub.clientId === data.clientId && sub.index === (data.index === 1 ? 0 : 1),
-            );
+            let mirrorSubIndex;
+            if (chartData.chartType === 'ACTIVITY')
+                mirrorSubIndex = chartData.submissions.findIndex((sub) => sub.clientId === data.clientId && sub.index === (data.index === 1 ? 0 : 1));
             if (submissionIndex >= 0) {
                 chartData.submissions[submissionIndex] = data;
             } else {
                 chartData.submissions.push(data);
             }
-            if (mirrorSubIndex >= 0) {
+            if (mirrorSubIndex && mirrorSubIndex >= 0) {
                 chartData.submissions[mirrorSubIndex].isSelected = !data.isSelected;
             }
         }
