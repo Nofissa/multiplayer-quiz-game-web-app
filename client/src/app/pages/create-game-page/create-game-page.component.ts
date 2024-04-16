@@ -5,7 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { QuizDetailsDialogComponent } from '@app/components/dialogs/quiz-details-dialog/quiz-details-dialog.component';
-import { SNACK_BAR_DURATION_MS, MIN_QCM_COUNT_TO_ENABLE_RANDOM_MODE } from '@app/constants/constants';
+import { MIN_QCM_COUNT_TO_ENABLE_RANDOM_MODE, NOTICE_DURATION_MS } from '@app/constants/constants';
 import { Quiz } from '@common/quiz';
 import { MaterialServicesProvider } from '@app/providers/material-services.provider';
 import { GameService } from '@app/services/game/game-service/game.service';
@@ -100,7 +100,7 @@ export class CreateGamePageComponent implements OnInit, OnDestroy {
                 onNotFound: () => {
                     dialogRef.close();
                     this.snackBarService.open("Le quiz n'est plus disponible, veuillez en sélectionner un autre", 'OK', {
-                        duration: SNACK_BAR_DURATION_MS,
+                        duration: NOTICE_DURATION_MS,
                         verticalPosition: 'top',
                         panelClass: ['base-snackbar'],
                     });

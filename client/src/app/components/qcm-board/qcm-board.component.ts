@@ -3,7 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
-import { NOT_FOUND_INDEX, SNACK_BAR_DURATION_MS } from '@app/constants/constants';
+import { NOTICE_DURATION_MS, NOT_FOUND_INDEX } from '@app/constants/constants';
 import { GameServicesProvider } from '@app/providers/game-services.provider';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
@@ -98,7 +98,7 @@ export class QcmBoardComponent implements OnInit, OnDestroy {
     submitChoices() {
         this.hasSubmitted = true;
         this.gameService.qcmSubmit(this.pin);
-        this.snackBar.open('Réponse soumise ✔', '', { duration: SNACK_BAR_DURATION_MS, panelClass: ['submit-snackbar'] });
+        this.snackBar.open('Réponse soumise ✔', '', { duration: NOTICE_DURATION_MS, panelClass: ['submit-snackbar'] });
     }
 
     toggleSelectChoice(choiceIndex: number) {
