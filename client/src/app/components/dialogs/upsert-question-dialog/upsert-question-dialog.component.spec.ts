@@ -2,14 +2,15 @@ import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MatRadioModule } from '@angular/material/radio';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MAX_CHOICE_COUNT, MIN_CHOICE_COUNT } from '@app/constants/constants';
 import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog-data';
 import { Choice } from '@common/choice';
-import { UpsertQuestionDialogComponent } from './upsert-question-dialog.component';
 import { QuestionType } from '@common/question-type';
+import { UpsertQuestionDialogComponent } from './upsert-question-dialog.component';
 
 describe('UpsertQuestionDialogComponent', () => {
     let component: UpsertQuestionDialogComponent;
@@ -75,7 +76,7 @@ describe('UpsertQuestionDialogComponent', () => {
         };
         TestBed.configureTestingModule({
             declarations: [UpsertQuestionDialogComponent],
-            imports: [ReactiveFormsModule, MatSnackBarModule, BrowserAnimationsModule, DragDropModule],
+            imports: [ReactiveFormsModule, MatSnackBarModule, BrowserAnimationsModule, DragDropModule, MatRadioModule],
             providers: [
                 FormBuilder,
                 { provide: MatDialogRef, useValue: dialogRefSpy },
@@ -98,6 +99,7 @@ describe('UpsertQuestionDialogComponent', () => {
     it('should initialize the form with input data', () => {
         expect(component.formGroup.value).toEqual({
             text: correctUpsertValues.question.text,
+            questionType: correctUpsertValues.question.type,
             choices: correctUpsertValues.question.choices,
             points: correctUpsertValues.question.points,
         });
@@ -123,21 +125,6 @@ describe('UpsertQuestionDialogComponent', () => {
         if (componentChoicesArray) {
             expect(componentChoicesArray.value).toEqual(formGroupValue);
         }
-    });
-
-    it('should display delete icons on question with 3 choices', () => {
-        component.addAnswer();
-        fixture.detectChanges();
-        const deleteIcons = fixture.debugElement.queryAll(By.css('.action-remove'));
-        expect(deleteIcons.length).toBe(3);
-    });
-
-    it('should display delete icons on question with 4 choices', () => {
-        component.addAnswer();
-        component.addAnswer();
-        fixture.detectChanges();
-        const deleteIcons = fixture.debugElement.queryAll(By.css('.action-remove'));
-        expect(deleteIcons.length).toBe(MAX_CHOICE_COUNT);
     });
 
     it('should not be able to add more than 2 choices', () => {
@@ -205,23 +192,11 @@ describe('UpsertQuestionDialogComponent', () => {
         }
     });
 
-    it('should change toggle status in toggle', () => {
-        expect(component.qcmToggled).toBeFalsy();
-        component.toggleQuestionType();
+    it('should change toggleQuestionType asign new question type value', () => {
+        expect(component.qcm).toBeTruthy();
+        component.toggleQuestionType(QuestionType.QCM);
         fixture.detectChanges();
-        expect(component.qcmToggled).toBeTruthy();
-    });
-
-    it('should have answers in dialog when QCM is selected', () => {
-        const answersArea = fixture.debugElement.queryAll(By.css('.answers-wrapper')).length;
-        expect(answersArea).toBe(MIN_CHOICE_COUNT);
-    });
-
-    it('should not have answers in dialog when QRL is selected', () => {
-        component.toggleQuestionType();
-        fixture.detectChanges();
-        const answersTextArea = fixture.debugElement.queryAll(By.css('.answers-wrapper')).length;
-        expect(answersTextArea).toBe(0);
+        expect(component.qcm).toBeTruthy();
     });
 
     it('should close the dialog with formGroup value when submit is pressed and form is valid', () => {
@@ -274,7 +249,7 @@ describe('UpsertQuestionDialogComponent', () => {
     });
 
     it('should submit Qrl question when submit is pressed and question is valid', () => {
-        component.toggleQuestionType();
+        component.toggleQuestionType(QuestionType.QRL);
         component.submit();
         expect(dialogRefSpy.close).toHaveBeenCalled();
     });

@@ -19,7 +19,8 @@ export class UpsertQuestionDialogComponent {
     formBuilder: FormBuilder = new FormBuilder();
     formGroup: FormGroup;
     choicesArray: FormArray;
-    toggle: boolean;
+    questionTypes: QuestionType[] = [QuestionType.QCM, QuestionType.QRL];
+    questionType: QuestionType = QuestionType.QCM;
 
     constructor(
         @Inject(MAT_DIALOG_DATA) readonly data: UpsertQuestionDialogData,
@@ -37,10 +38,9 @@ export class UpsertQuestionDialogComponent {
             [Validators.required, this.oneFalseValidator(), this.oneTrueValidator()],
         ) as FormArray<FormGroup>;
 
-        this.toggle = this.data.question.type === QuestionType.QCM ? false : true;
-
         this.formGroup = this.formBuilder.group({
             text: [this.data.question.text, Validators.required],
+            questionType: [this.data.question.type, Validators.required],
             choices: this.choicesArray,
             points: [this.data.question.points, [Validators.required, this.multipleOfTenValidator()]],
         });
@@ -54,8 +54,11 @@ export class UpsertQuestionDialogComponent {
         return this.formGroup.controls['choices'] as FormArray<FormGroup>;
     }
 
-    get qcmToggled() {
-        return this.toggle;
+    get qcm() {
+        return this.questionType === QuestionType.QCM;
+    }
+    toggleQuestionType(question: QuestionType) {
+        this.questionType = question;
     }
 
     // needs to be able to work with different types of data
@@ -87,10 +90,6 @@ export class UpsertQuestionDialogComponent {
         }
     }
 
-    toggleQuestionType() {
-        this.toggle = !this.toggle;
-    }
-
     removeAnswerAt(index: number) {
         if (this.choicesArray.length > MIN_CHOICE_COUNT) {
             this.choicesArray.removeAt(index);
@@ -102,7 +101,7 @@ export class UpsertQuestionDialogComponent {
     }
 
     validateChoices() {
-        if (this.toggle) {
+        if (this.questionType === QuestionType.QRL) {
             return true;
         }
         return this.formGroup.controls.choices.valid;
@@ -111,10 +110,10 @@ export class UpsertQuestionDialogComponent {
     submit() {
         if (this.isFormValid()) {
             const question: Question = {
-                type: this.toggle ? QuestionType.QRL : QuestionType.QCM,
+                type: this.questionType === QuestionType.QRL ? QuestionType.QRL : QuestionType.QCM,
                 text: this.formGroup.value.text,
                 points: this.formGroup.value.points,
-                choices: this.toggle ? undefined : this.formGroup.value.choices,
+                choices: this.questionType === QuestionType.QRL ? undefined : this.formGroup.value.choices,
                 lastModification: new Date(),
                 // For MongoDB _id field
                 // eslint-disable-next-line no-underscore-dangle
@@ -148,7 +147,7 @@ export class UpsertQuestionDialogComponent {
 
     private oneTrueValidator(): ValidatorFn {
         return (control: AbstractControl): ValidationErrors | null => {
-            if (this.toggle) return null;
+            if (this.questionType === QuestionType.QRL) return null;
             const answerArray: Choice[] = control.value;
             const hasTrueAnswer = answerArray.some((answer) => answer.isCorrect);
             return hasTrueAnswer ? null : { noTrueAnswer: true };
@@ -157,7 +156,7 @@ export class UpsertQuestionDialogComponent {
 
     private oneFalseValidator(): ValidatorFn {
         return (control: AbstractControl): ValidationErrors | null => {
-            if (this.toggle) return null;
+            if (this.questionType === QuestionType.QRL) return null;
             const answerArray: Choice[] = control.value;
             const hasFalseAnswer = answerArray.some((answer) => !answer.isCorrect);
             return hasFalseAnswer ? null : { noFalseAnswer: true };
