@@ -1,6 +1,6 @@
+import { Location } from '@angular/common';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NavHeaderComponent } from './nav-header.component';
-import { Location } from '@angular/common';
 
 describe('NavHeaderComponent', () => {
     let component: NavHeaderComponent;
@@ -27,5 +27,11 @@ describe('NavHeaderComponent', () => {
     it('should call location.back() in back', () => {
         component.back();
         expect(locationSpy.back).toHaveBeenCalled();
+    });
+
+    it('should call navigation.emit() in emitNavigationEvent', () => {
+        const emitSpy = spyOn(component.navigation, 'emit');
+        component.emitNavigationEvent();
+        expect(emitSpy).toHaveBeenCalled();
     });
 });
