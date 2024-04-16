@@ -36,7 +36,7 @@ import { TimerPayload } from '@common/timer-payload';
 import { Observable, Subscription, of } from 'rxjs';
 import { io } from 'socket.io-client';
 
-fdescribe('QrlBoardComponent', () => {
+describe('QrlBoardComponent', () => {
     let component: QrlBoardComponent;
     let fixture: ComponentFixture<QrlBoardComponent>;
     let mockGameHttpService: jasmine.SpyObj<GameHttpService>;
