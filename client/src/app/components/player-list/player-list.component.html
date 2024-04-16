@@ -32,36 +32,27 @@
         </mat-menu>
     </div>
     <mat-list class="list-item-container">
-        <mat-list-item
-            *ngFor="let player of players"
-            [ngClass]="{
+        <mat-list-item *ngFor="let player of players" [ngClass]="{
                 hidden: player.state === playerStates.Banned || (player.state === playerStates.Abandonned && !displayOptions.quitters),
                 playing: player.state === playerStates.Playing,
                 abandoned: player.state === playerStates.Abandonned
-            }"
-        >
+            }">
             <div class="row-container">
                 <div class="player-info-wrapper">
-                    <div 
-                        [ngClass]="{
+                    <div [ngClass]="{
                             'player-name': !player.hasInteracted && !player.hasSubmitted,
                             'player-name-interacted': player.hasInteracted && !player.hasSubmitted,
                             'player-name-submitted': player.hasSubmitted,
-                        }"
-                    >
+                        }">
                         {{ player.username }}
                     </div>
                     <div class="player-score" *ngIf="displayOptions.score">{{ player.score }} points</div>
-                    <div class="player-speedAwardCount" *ngIf="displayOptions.speedAwardCount">{{ player.speedAwardCount }} bonus</div>
+                    <div class="player-speedAwardCount" *ngIf="displayOptions.speedAwardCount">{{ player.speedAwardCount
+                        }} bonus</div>
                 </div>
-                <button
-                    mat-flat-button
-                    color="accent"
-                    (click)="mutePlayer(player)"
-                    [ngClass]="{
-                        hidden: !displayOptions.mute
-                    }"
-                >
+                <button mat-flat-button color="accent" (click)="mutePlayer(player)" [ngClass]="{
+                        invisible: player.state !== playerStates.Playing || !displayOptions.mute
+                    }">
                     <div *ngIf="player.isMuted; then thenBlock; else elseBlock"></div>
                     <ng-template #thenBlock>
                         <mat-icon>volume_off</mat-icon>
@@ -70,15 +61,10 @@
                         <mat-icon>volume_up</mat-icon>
                     </ng-template>
                 </button>
-                <button
-                    mat-flat-button
-                    color="warn"
-                    (click)="banPlayer(player)"
-                    [ngClass]="{
+                <button mat-flat-button color="warn" (click)="banPlayer(player)" [ngClass]="{
                         hidden: !displayOptions.ban,
                         invisible: player.state !== playerStates.Playing || !displayOptions.ban
-                    }"
-                >
+                    }">
                     Bannir
                 </button>
             </div>

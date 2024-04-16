@@ -26,5 +26,6 @@
         </table>
     </div>
 
-    <button *ngIf="gameSummaries.data.length > 0" mat-raised-button color="warn" (click)="clearAllGameSummaries()">Effacer l'Historique</button>
+    <button *ngIf="gameSummaries.data.length > 0" mat-raised-button color="warn"
+        (click)="openClearAllSummariesDialog()">Effacer l'Historique</button>
 </div>
