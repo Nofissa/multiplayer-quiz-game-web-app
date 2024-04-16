@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { TimerEvent } from '@common/timer-event-enum'
+import { TimerEvent } from '@common/timer-event-enum';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
 import { TimerEventType } from '@common/timer-event-type';
