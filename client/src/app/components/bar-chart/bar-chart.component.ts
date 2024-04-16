@@ -13,8 +13,7 @@ export class BarChartComponent {
 
     adjust(index: number): number {
         const playersSelected = this.playersSelected(index);
-        if (playersSelected === 0) return 0;
-        return Math.round((playersSelected / this.numberOfPlayers()) * PERCENT_MULTPLIER);
+        return playersSelected === 0 ? 0 : Math.round((playersSelected / this.numberOfPlayers()) * PERCENT_MULTPLIER);
     }
 
     numberOfPlayers(): number {

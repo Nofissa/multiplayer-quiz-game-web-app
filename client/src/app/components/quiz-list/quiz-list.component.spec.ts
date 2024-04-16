@@ -56,6 +56,7 @@ describe('QuizListComponent', () => {
         component = fixture.componentInstance;
         fixture.detectChanges();
         component.quizzes = mockQuizzes;
+        // To spy on method
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         parseQuizSpy = spyOn<any>(component, 'parseQuiz').and.callThrough();
         handleImportSubscriptionSpy = spyOn(component, 'handleImportSubscription').and.callThrough();

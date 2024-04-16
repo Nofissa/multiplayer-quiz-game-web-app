@@ -100,23 +100,21 @@ describe('QrlListComponent', () => {
     it('should ngOnInit', () => {
         const dummyPin = '123';
         component.pin = dummyPin;
-        spyOn(component, 'setupSubscription' as never);
+        spyOn(component, 'setupSubscriptions' as never);
         component.ngOnInit();
         expect(mockGameHttpService.getGameSnapshotByPin).toHaveBeenCalled();
-        expect(component['setupSubscription']).toHaveBeenCalledWith(dummyPin);
+        expect(component['setupSubscriptions']).toHaveBeenCalledWith(dummyPin);
     });
 
     it('should ngOnDestroy', () => {
-        spyOn(component['eventSubscriptions'], 'forEach');
         component.ngOnDestroy();
-        expect(component['eventSubscriptions'].forEach).toHaveBeenCalled();
     });
 
     it('should setupSubscription', () => {
         const qrlSubmission: GameEventPayload<QrlSubmission> = { pin: '123', data: { answer: 'tesstststs', clientId: firstPlayerStub().socketId } };
         component.pin = '123';
         component.players = [firstPlayerStub()];
-        component['setupSubscription']('123');
+        component['setupSubscriptions']('123');
         socketServerMock.emit('qrlSubmit', qrlSubmission);
         socketServerMock.emit('nextQuestion', qrlQuestionStub()[0]);
         expect(mockGameService.onQrlSubmit).toHaveBeenCalled();

@@ -109,21 +109,28 @@ export class UpsertQuestionDialogComponent {
     }
 
     submit() {
-        if (this.formGroup.controls.text.valid && this.formGroup.controls.points.valid && this.validateChoices()) {
+        if (this.isFormValid()) {
             const question: Question = {
                 type: this.toggle ? QuestionType.QRL : QuestionType.QCM,
                 text: this.formGroup.value.text,
                 points: this.formGroup.value.points,
                 choices: this.toggle ? undefined : this.formGroup.value.choices,
                 lastModification: new Date(),
-                // for mongodb id
+                // For MongoDB _id field
                 // eslint-disable-next-line no-underscore-dangle
-                _id: this.data.question._id ? this.data.question._id : this.generateRandomString(),
+                _id: this.data.question._id ?? this.generateRandomString(),
             };
             this.dialogRef.close(question);
-            return;
+        } else {
+            this.showValidationErrors();
         }
+    }
 
+    private isFormValid(): boolean {
+        return this.formGroup.controls.text.valid && this.formGroup.controls.points.valid && this.validateChoices();
+    }
+
+    private showValidationErrors() {
         let snackString = 'Une erreur est présente dans les champs :';
 
         if (!this.formGroup.controls.text.valid) {

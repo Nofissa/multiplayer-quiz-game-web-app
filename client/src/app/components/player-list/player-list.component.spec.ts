@@ -8,6 +8,7 @@ import { GameServicesProvider } from '@app/providers/game-services.provider';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { PlayerService } from '@app/services/player/player.service';
+import { SubscriptionService } from '@app/services/subscription/subscription.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { lastPlayerEvaluationStub } from '@app/test-stubs/evaluation.stubs';
@@ -48,6 +49,7 @@ describe('PlayerListComponent', () => {
     let socketServerMock: SocketServerMock;
     let gameServiceSpy: jasmine.SpyObj<GameService>;
     let timerServiceSpy: jasmine.SpyObj<TimerService>;
+    let mockSubscriptionService: jasmine.SpyObj<SubscriptionService>;
 
     beforeEach(async () => {
         webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', ['emit', 'on'], {
@@ -84,6 +86,8 @@ describe('PlayerListComponent', () => {
             'playerMute',
         ]);
 
+        mockSubscriptionService = jasmine.createSpyObj<SubscriptionService>(['add', 'clear']);
+
         await TestBed.configureTestingModule({
             declarations: [PlayerListComponent],
             imports: [HttpClientTestingModule, RouterTestingModule, MatMenuModule],
@@ -92,6 +96,7 @@ describe('PlayerListComponent', () => {
                 { provide: PlayerService, useValue: playerServiceSpy },
                 { provide: WebSocketService, useValue: webSocketServiceSpy },
                 { provide: GameService, useValue: gameServiceSpy },
+                { provide: SubscriptionService, useValue: mockSubscriptionService },
             ],
         }).compileComponents();
 
@@ -177,9 +182,7 @@ describe('PlayerListComponent', () => {
     });
 
     it('should destroy subscriptions', () => {
-        spyOn(component['eventSubscriptions'], 'forEach');
         component.ngOnDestroy();
-        expect(component['eventSubscriptions'].forEach).toHaveBeenCalled();
     });
 
     it('should ban player', () => {
@@ -231,7 +234,7 @@ describe('PlayerListComponent', () => {
         };
         const qrlSubmissionPayload: GameEventPayload<QrlSubmission> = { pin: '123', data: { answer: 'test', clientId: firstPlayerStub().socketId } };
         spyOn(component, 'upsertPlayer' as never);
-        component['setupSubscription']('123');
+        component['setupSubscriptions']('123');
         socketServerMock.emit('qcmSubmit', evaluationPayload);
         socketServerMock.emit('joinGame', playerPayload);
         socketServerMock.emit('playerBan', playerPayload);
@@ -265,6 +268,12 @@ describe('PlayerListComponent', () => {
         expect(component.players[0].hasSubmitted).toBeTrue();
 
         expect(component['upsertPlayer']).toHaveBeenCalled();
+    });
+
+    it('should unsubscribe clear subscriptions on destroy', () => {
+        component.ngOnDestroy();
+
+        expect(mockSubscriptionService.clear).toHaveBeenCalledWith(component['uuid']);
     });
 
     it('should sort players by options', () => {

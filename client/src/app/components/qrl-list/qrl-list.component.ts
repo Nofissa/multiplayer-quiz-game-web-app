@@ -1,13 +1,13 @@
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NOT_FOUND_INDEX } from '@app/constants/constants';
 import { GameServicesProvider } from '@app/providers/game-services.provider';
-import { MaterialServicesProvider } from '@app/providers/material-services.provider';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
+import { SubscriptionService } from '@app/services/subscription/subscription.service';
 import { Grade } from '@common/grade';
 import { Player } from '@common/player';
-import { Subscription } from 'rxjs';
 import { SwiperComponent } from 'swiper/angular';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
     selector: 'app-qrl-list',
@@ -24,33 +24,25 @@ export class QrlListComponent implements OnInit, OnDestroy {
     submissionsReceived: number = 0;
     evaluationsDone: number = 0;
     evaluationsSent: boolean = false;
-    private eventSubscriptions: Subscription[] = [];
 
+    private readonly uuid = uuidv4();
     private readonly gameHttpService: GameHttpService;
     private readonly gameService: GameService;
 
-    constructor(materialServicesProvider: MaterialServicesProvider, gameServicesProvider: GameServicesProvider) {
+    constructor(
+        gameServicesProvider: GameServicesProvider,
+        private readonly subscriptionService: SubscriptionService,
+    ) {
         this.gameHttpService = gameServicesProvider.gameHttpService;
         this.gameService = gameServicesProvider.gameService;
     }
 
     ngOnInit() {
-        this.gameHttpService.getGameSnapshotByPin(this.pin).subscribe((snapshot) => {
-            this.players = snapshot.players;
-            this.players.sort((a, b) => a.username.localeCompare(b.username));
-            this.players.forEach((player) => {
-                this.playersMap.set(player, undefined);
-            });
-        });
-        this.setupSubscription(this.pin);
+        this.setupSubscriptions(this.pin);
     }
 
     ngOnDestroy() {
-        this.eventSubscriptions.forEach((sub) => {
-            if (sub && !sub.closed) {
-                sub.unsubscribe();
-            }
-        });
+        this.subscriptionService.clear(this.uuid);
     }
 
     evaluateAnswer(socketId: string, grade: Grade) {
@@ -70,8 +62,16 @@ export class QrlListComponent implements OnInit, OnDestroy {
         }
     }
 
-    private setupSubscription(pin: string) {
-        this.eventSubscriptions.push(
+    private setupSubscriptions(pin: string) {
+        this.subscriptionService.add(
+            this.uuid,
+            this.gameHttpService.getGameSnapshotByPin(this.pin).subscribe((snapshot) => {
+                this.players = snapshot.players;
+                this.players.sort((a, b) => a.username.localeCompare(b.username));
+                this.players.forEach((player) => {
+                    this.playersMap.set(player, undefined);
+                });
+            }),
             this.gameService.onQrlSubmit(pin, (submission) => {
                 const index = this.players.findIndex((x) => x.socketId === submission.clientId);
                 if (index !== NOT_FOUND_INDEX) {
@@ -80,7 +80,6 @@ export class QrlListComponent implements OnInit, OnDestroy {
                     this.playersButtons.set(this.players[index], false);
                 }
             }),
-
             this.gameService.onNextQuestion(pin, () => {
                 this.evaluationsSent = false;
                 this.evaluationsDone = 0;

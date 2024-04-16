@@ -1,5 +1,5 @@
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -8,6 +8,7 @@ import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmatio
 import {
     NEXT_QUESTION_DELAY_SECONDS,
     NOTICE_DURATION_MS,
+    PANIC_AUDIO_NAME,
     START_GAME_COUNTDOWN_DURATION_SECONDS,
     SWIPER_SYNC_DELAY_MS,
 } from '@app/constants/constants';
@@ -20,6 +21,7 @@ import { BarChartService } from '@app/services/game/bar-chart-service/bar-chart.
 import { GameService } from '@app/services/game/game-service/game.service';
 import { PlayerService } from '@app/services/player/player.service';
 import { SoundService } from '@app/services/sound/sound.service';
+import { SubscriptionService } from '@app/services/subscription/subscription.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { BarchartSubmission } from '@common/barchart-submission';
 import { BarChartType } from '@common/barchart-type';
@@ -28,25 +30,24 @@ import { PlayerState } from '@common/player-state';
 import { Question } from '@common/question';
 import { QuestionType } from '@common/question-type';
 import { TimerEventType } from '@common/timer-event-type';
-import { Subscription } from 'rxjs';
-
-const PANIC_AUDIO_NAME = 'ticking-timer';
-const PANIC_AUDIO_SRC = 'assets/ticking-timer.wav';
+import { environment } from 'src/environments/environment';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
     selector: 'app-host-game-page',
     templateUrl: './host-game-page.component.html',
     styleUrls: ['./host-game-page.component.scss'],
 })
-export class HostGamePageComponent implements OnInit {
+export class HostGamePageComponent implements OnInit, OnDestroy {
     @ViewChild(BarChartSwiperComponent) barChartSwiperComponent: BarChartSwiperComponent;
     pin: string;
-    isRandom: boolean;
-    gameState: GameState = GameState.Opened;
     currentQuestionHasEnded: boolean = false;
     isLastQuestion: boolean = false;
+    private isRandom: boolean;
+    private gameState: GameState = GameState.Opened;
+
+    private readonly uuid: string = uuidv4();
     private questionType: QuestionType;
-    private eventSubscriptions: Subscription[] = [];
     private readonly activatedRoute: ActivatedRoute;
     private readonly router: Router;
     private readonly gameHttpService: GameHttpService;
@@ -60,6 +61,7 @@ export class HostGamePageComponent implements OnInit {
     // Disabled because this page is rich in interaction an depends on many services as a consequence
     // eslint-disable-next-line max-params
     constructor(
+        private readonly subscriptionService: SubscriptionService,
         private readonly barChartService: BarChartService,
         materialServicesProvider: MaterialServicesProvider,
         gameServicesProvider: GameServicesProvider,
@@ -101,6 +103,10 @@ export class HostGamePageComponent implements OnInit {
         });
         this.barChartService.flushData();
         this.setupSubscriptions(this.pin);
+    }
+
+    ngOnDestroy() {
+        this.subscriptionService.clear(this.uuid);
     }
 
     isLocked() {
@@ -170,7 +176,14 @@ export class HostGamePageComponent implements OnInit {
     }
 
     private setupSubscriptions(pin: string) {
-        this.eventSubscriptions.push(
+        this.setupGameSubscriptions(pin);
+        this.setupTimerSubscriptions(pin);
+        this.setupPlayerSubscriptions(pin);
+    }
+
+    private setupGameSubscriptions(pin: string) {
+        this.subscriptionService.add(
+            this.uuid,
             this.gameService.onCancelGame(pin, (message) => {
                 this.snackBarService.open(message, '', {
                     duration: NOTICE_DURATION_MS,
@@ -180,15 +193,12 @@ export class HostGamePageComponent implements OnInit {
 
                 this.router.navigate(['home']);
             }),
-
             this.gameService.onQcmToggleChoice(pin, (submissions) => {
                 this.barChartService.updateChartData(submissions);
             }),
-
             this.gameService.onToggleGameLock(pin, (gameState) => {
                 this.gameState = gameState;
             }),
-
             this.gameService.onQcmSubmit(pin, (evaluation) => {
                 if (evaluation.isLast) {
                     this.currentQuestionHasEnded = true;
@@ -196,19 +206,16 @@ export class HostGamePageComponent implements OnInit {
                     this.soundService.stopSound(PANIC_AUDIO_NAME);
                 }
             }),
-
             this.gameService.onQrlEvaluate(pin, (evaluation) => {
                 if (evaluation.isLast) {
                     this.currentQuestionHasEnded = true;
                 }
             }),
-
             this.gameService.onQrlSubmit(pin, (submission) => {
                 if (submission.isLast) {
                     this.timerService.stopTimer(pin);
                 }
             }),
-
             this.gameService.onStartGame(pin, (data) => {
                 this.barChartService.flushData();
                 this.isLastQuestion = data.isLast;
@@ -227,7 +234,6 @@ export class HostGamePageComponent implements OnInit {
                     });
                 }
             }),
-
             this.gameService.onNextQuestion(pin, (data) => {
                 this.isLastQuestion = data.isLast;
                 this.addQuestion(data.question);
@@ -241,15 +247,18 @@ export class HostGamePageComponent implements OnInit {
                 }
                 this.timerService.startTimer(this.pin, TimerEventType.NextQuestion, NEXT_QUESTION_DELAY_SECONDS);
             }),
-
-            this.playerService.onPlayerAbandon(pin, () => {
-                this.gameHttpService.getGameSnapshotByPin(pin).subscribe((snapshot) => {
-                    if (this.isRunning() && snapshot.players.filter((x) => x.state === PlayerState.Playing).length === 0) {
-                        this.gameService.cancelGame(pin);
-                    }
-                });
+            this.gameService.onEndGame(pin, () => {
+                this.handleEndGame();
             }),
+            this.gameService.onQrlInputChange(pin, (submission: BarchartSubmission) => {
+                this.barChartService.updateChartData(submission);
+            }),
+        );
+    }
 
+    private setupTimerSubscriptions(pin: string) {
+        this.subscriptionService.add(
+            this.uuid,
             this.timerService.onTimerTick(pin, (payload) => {
                 if (payload.remainingTime === 0) {
                     if (payload.eventType === TimerEventType.StartGame || payload.eventType === TimerEventType.NextQuestion) {
@@ -257,18 +266,22 @@ export class HostGamePageComponent implements OnInit {
                     }
                 }
             }),
-
             this.timerService.onAccelerateTimer(pin, () => {
-                this.soundService.loadSound(PANIC_AUDIO_NAME, PANIC_AUDIO_SRC);
+                this.soundService.loadSound(PANIC_AUDIO_NAME, environment.panicAudioSrc);
                 this.soundService.playSound(PANIC_AUDIO_NAME);
             }),
+        );
+    }
 
-            this.gameService.onEndGame(pin, () => {
-                this.handleEndGame();
-            }),
-
-            this.gameService.onQrlInputChange(pin, (submission: BarchartSubmission) => {
-                this.barChartService.updateChartData(submission);
+    private setupPlayerSubscriptions(pin: string) {
+        this.subscriptionService.add(
+            this.uuid,
+            this.playerService.onPlayerAbandon(pin, () => {
+                this.gameHttpService.getGameSnapshotByPin(pin).subscribe((snapshot) => {
+                    if (this.isRunning() && snapshot.players.filter((x) => x.state === PlayerState.Playing).length === 0) {
+                        this.gameService.cancelGame(pin);
+                    }
+                });
             }),
         );
     }

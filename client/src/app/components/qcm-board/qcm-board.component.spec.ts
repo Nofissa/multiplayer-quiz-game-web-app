@@ -9,6 +9,7 @@ import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { KeyBindingService } from '@app/services/key-binding/key-binding.service';
 import { PlayerService } from '@app/services/player/player.service';
+import { SubscriptionService } from '@app/services/subscription/subscription.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { lastPlayerEvaluationStub } from '@app/test-stubs/evaluation.stubs';
@@ -54,6 +55,7 @@ describe('QcmBoardComponent', () => {
     let webSocketServiceSpy: jasmine.SpyObj<WebSocketService>;
     let socketServerMock: SocketServerMock;
     let timerServiceMock: jasmine.SpyObj<TimerService>;
+    let subscriptionServiceMock: jasmine.SpyObj<SubscriptionService>;
 
     beforeEach(() => {
         gameHttpServiceMock = jasmine.createSpyObj('GameHttpService', ['getGameSnapshotByPin']);
@@ -66,6 +68,7 @@ describe('QcmBoardComponent', () => {
         routerSpy = jasmine.createSpyObj('Router', ['navigateByUrl']);
         webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', ['emit', 'on'], { socketInstance: io() });
         timerServiceMock = jasmine.createSpyObj('TimerService', ['onTimerTick']);
+        subscriptionServiceMock = jasmine.createSpyObj<SubscriptionService>(['add', 'clear']);
 
         TestBed.configureTestingModule({
             declarations: [QcmBoardComponent, ConfirmationDialogComponent],
@@ -79,6 +82,7 @@ describe('QcmBoardComponent', () => {
                 { provide: Router, useValue: routerSpy },
                 { provide: WebSocketService, useValue: webSocketServiceSpy },
                 { provide: TimerService, useValue: timerServiceMock },
+                { provide: SubscriptionService, useValue: subscriptionServiceMock },
                 MatSnackBar,
             ],
         }).compileComponents();
@@ -137,20 +141,21 @@ describe('QcmBoardComponent', () => {
         expect(component['setupKeyBindings']).toHaveBeenCalled();
     });
 
-    it('should ngOnDestroy', () => {
-        spyOn(component['eventSubscriptions'], 'forEach');
+    it('should unsubscribe from all subscriptions on destroy', () => {
         component.ngOnDestroy();
-        expect(component['eventSubscriptions'].forEach).toHaveBeenCalled();
+
+        expect(subscriptionServiceMock.clear).toHaveBeenCalledWith(component['uuid']);
     });
 
     it('should return if disableShortcuts is true', () => {
-        component['disableShortcuts'] = true;
+        component['hasSubmitted'] = true;
         component.handleKeyboardEvent({} as KeyboardEvent);
         expect(keyBindingServiceMock.getExecutor).not.toHaveBeenCalled();
     });
 
     it('should call executor if disableShortcuts is false', () => {
-        component['disableShortcuts'] = false;
+        component['hasSubmitted'] = false;
+        component['question'].type = 'QCM';
         component.handleKeyboardEvent({} as KeyboardEvent);
         expect(keyBindingServiceMock.getExecutor).toHaveBeenCalled();
     });
@@ -164,12 +169,9 @@ describe('QcmBoardComponent', () => {
         const choice = 1;
         component.toggleSelectChoice(choice);
         expect(gameServiceMock.qcmToggleChoice).toHaveBeenCalled();
-    });
-
-    it('should loadNextQuestion', () => {
-        component['disableShortcuts'] = true;
-        component['loadNextQuestion'](quizStub().questions[0]);
-        expect(component['disableShortcuts']).toBeFalse();
+        component.selectedChoiceIndexes = [0, 1];
+        component.toggleSelectChoice(choice);
+        expect(component.selectedChoiceIndexes.length).toBe(1);
     });
 
     it('should openConfirmationDialog', () => {
@@ -202,5 +204,30 @@ describe('QcmBoardComponent', () => {
         spyOn(component, 'toggleSelectChoice');
         component['setupKeyBindings']();
         expect(component.toggleSelectChoice).toHaveBeenCalled();
+    });
+
+    it('should handle QcmSubmit correctly', () => {
+        const qcmEvaluationPayload: GameEventPayload<QcmEvaluation> = { pin: '123', data: lastPlayerEvaluationStub() };
+
+        component['setupSubscriptions']('123');
+        socketServerMock.emit('submitChoices', qcmEvaluationPayload);
+        playerServiceMock.getCurrentPlayer.and.returnValue(firstPlayerStub());
+        component.player = firstPlayerStub();
+
+        expect(component['cachedEvaluation']).toEqual(qcmEvaluationPayload.data);
+        expect(component.questionIsOver).toBeTrue();
+    });
+
+    it('should update remaining time on onTimerTick', () => {
+        component.pin = '123';
+        spyOn(component, 'submitChoices');
+        timerServiceMock.onTimerTick.and.callFake((_pin: string, callback: (payload: TimerPayload) => void) => {
+            const payload = { remainingTime: 0, eventType: TimerEventType.Question };
+            callback(payload);
+            return of(payload).subscribe(callback);
+        });
+        component['setupSubscriptions']('123');
+        component.hasSubmitted = false;
+        expect(component.submitChoices).toHaveBeenCalled();
     });
 });

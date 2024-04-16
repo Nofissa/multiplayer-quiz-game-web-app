@@ -146,5 +146,5 @@ import { GameSummaryListComponent } from './components/game-summary-list/game-su
 export class AppModule {
     // This is done so the services will be instantiated no matter what
     // eslint-disable-next-line @typescript-eslint/no-useless-constructor, @typescript-eslint/no-empty-function, no-unused-vars
-    constructor(webSocketService: WebSocketService) {}
+    constructor(_webSocketService: WebSocketService) {}
 }

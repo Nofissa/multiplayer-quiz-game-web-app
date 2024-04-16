@@ -7,11 +7,13 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
-import { MAX_MESSAGE_LENGTH } from '@app/constants/constants';
+import { QrlBoardComponent } from '@app/components/qrl-board/qrl-board.component';
+import { MAX_MESSAGE_LENGTH, NOTICE_DURATION_MS } from '@app/constants/constants';
 import { SocketServerMock } from '@app/mocks/socket-server-mock';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { PlayerService } from '@app/services/player/player.service';
+import { SubscriptionService } from '@app/services/subscription/subscription.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { lastPlayerEvaluationStub } from '@app/test-stubs/evaluation.stubs';
@@ -29,13 +31,12 @@ import { QcmSubmission } from '@common/qcm-submission';
 import { QrlEvaluation } from '@common/qrl-evaluation';
 import { QrlSubmission } from '@common/qrl-submission';
 import { Question } from '@common/question';
+import { QuestionType } from '@common/question-type';
 import { Quiz } from '@common/quiz';
 import { TimerEventType } from '@common/timer-event-type';
 import { TimerPayload } from '@common/timer-payload';
-import { Observable, Subscription, of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { io } from 'socket.io-client';
-import { QrlBoardComponent } from './qrl-board.component';
-import { QuestionType } from '@common/question-type';
 
 describe('QrlBoardComponent', () => {
     let component: QrlBoardComponent;
@@ -49,6 +50,7 @@ describe('QrlBoardComponent', () => {
     let webSocketServiceSpy: jasmine.SpyObj<WebSocketService>;
     let socketServerMock: SocketServerMock;
     let timerServiceMock: jasmine.SpyObj<TimerService>;
+    let subscriptionServiceMock: jasmine.SpyObj<SubscriptionService>;
 
     const mockPlayers: Player[] = [
         {
@@ -110,6 +112,7 @@ describe('QrlBoardComponent', () => {
         routerSpy = jasmine.createSpyObj('Router', ['navigateByUrl']);
         webSocketServiceSpy = jasmine.createSpyObj('WebSocketService', ['emit', 'on'], { socketInstance: io() });
         timerServiceMock = jasmine.createSpyObj('TimerService', ['onTimerTick']);
+        subscriptionServiceMock = jasmine.createSpyObj<SubscriptionService>(['add', 'clear']);
 
         TestBed.configureTestingModule({
             imports: [MatSnackBarModule, RouterTestingModule, MatDialogModule, BrowserAnimationsModule],
@@ -123,6 +126,7 @@ describe('QrlBoardComponent', () => {
                 { provide: Router, useValue: routerSpy },
                 { provide: WebSocketService, useValue: webSocketServiceSpy },
                 { provide: TimerService, useValue: timerServiceMock },
+                { provide: SubscriptionService, useValue: subscriptionServiceMock },
                 MatSnackBar,
                 FormBuilder,
             ],
@@ -184,9 +188,7 @@ describe('QrlBoardComponent', () => {
     });
 
     it('should ngOnDestroy', () => {
-        spyOn(component['eventSubscriptions'], 'forEach');
         component.ngOnDestroy();
-        expect(component['eventSubscriptions'].forEach).toHaveBeenCalled();
     });
 
     it('should loadNextQuestion', () => {
@@ -247,14 +249,9 @@ describe('QrlBoardComponent', () => {
     });
 
     it('should unsubscribe from all subscriptions on destroy', () => {
-        const mockSub1 = new Subscription();
-        const mockSub2 = new Subscription();
-        component['eventSubscriptions'].push(mockSub1, mockSub2);
-        expect(mockSub1.closed).toBeFalse();
-        expect(mockSub2.closed).toBeFalse();
         component.ngOnDestroy();
-        expect(mockSub1.closed).toBeTrue();
-        expect(mockSub2.closed).toBeTrue();
+
+        expect(subscriptionServiceMock.clear).toHaveBeenCalledWith(component['uuid']);
     });
 
     it('should add blink-red class for grade 0 and remove it after 3 seconds', (done) => {
@@ -294,5 +291,107 @@ describe('QrlBoardComponent', () => {
     it('should tell if the question is a qrl', () => {
         component.question = qrlQuestionStub()[0];
         expect(component.question.type).toEqual(QuestionType.QRL);
+    });
+
+    it('should open error snackbar', () => {
+        const snackBarSpy = spyOn(TestBed.inject(MatSnackBar), 'open');
+
+        const errorMessage = 'Test error message';
+
+        component['openError'](errorMessage);
+
+        expect(snackBarSpy).toHaveBeenCalledWith(
+            errorMessage,
+            undefined,
+            jasmine.objectContaining({
+                verticalPosition: 'top',
+                duration: NOTICE_DURATION_MS,
+                panelClass: ['error-snackbar'],
+            }),
+        );
+    });
+
+    it('should handle QrlEvaluate correctly', () => {
+        const qrlPayload: GameEventPayload<QrlEvaluation> = {
+            pin: '123',
+            data: { player: firstPlayerStub(), grade: Grade.Good, score: 10, isLast: true },
+        };
+
+        // I have to use any to be able to spy on private method blinktextArea, can't use never because I expect a call with a parameter
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const blinkTextAreaSpy = spyOn<any>(component, 'blinkTextArea');
+
+        component['setupSubscriptions']('123');
+        socketServerMock.emit('qrlEvaluate', qrlPayload);
+
+        component['cachedEvaluation'] = qrlPayload.data;
+        component.player = firstPlayerStub();
+        expect(component['cachedEvaluation']).toEqual(qrlPayload.data);
+        expect(component.isInEvaluation).toBeFalse();
+        expect(blinkTextAreaSpy).toHaveBeenCalledWith(Grade.Good);
+    });
+
+    it('should update remaining time on onTimerTick', () => {
+        component.pin = '123';
+        spyOn(component, 'submitAnswer');
+        timerServiceMock.onTimerTick.and.callFake((_pin: string, callback: (payload: TimerPayload) => void) => {
+            const payload = { remainingTime: 0, eventType: TimerEventType.Question };
+            callback(payload);
+            return of(payload).subscribe(callback);
+        });
+        component['setupSubscriptions']('123');
+        component.hasSubmitted = false;
+        expect(component.submitAnswer).toHaveBeenCalled();
+    });
+
+    it('should open error snackbar', () => {
+        const snackBarSpy = spyOn(TestBed.inject(MatSnackBar), 'open');
+
+        const errorMessage = 'Test error message';
+
+        component['openError'](errorMessage);
+
+        expect(snackBarSpy).toHaveBeenCalledWith(
+            errorMessage,
+            undefined,
+            jasmine.objectContaining({
+                verticalPosition: 'top',
+                duration: NOTICE_DURATION_MS,
+                panelClass: ['error-snackbar'],
+            }),
+        );
+    });
+
+    it('should handle QrlEvaluate correctly', () => {
+        const qrlPayload: GameEventPayload<QrlEvaluation> = {
+            pin: '123',
+            data: { player: firstPlayerStub(), grade: Grade.Good, score: 10, isLast: true },
+        };
+
+        // I have to use any to be able to spy on private method blinktextArea, can't use never because I expect a call with a parameter
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const blinkTextAreaSpy = spyOn<any>(component, 'blinkTextArea');
+
+        component['setupSubscriptions']('123');
+        socketServerMock.emit('qrlEvaluate', qrlPayload);
+
+        component['cachedEvaluation'] = qrlPayload.data;
+        component.player = firstPlayerStub();
+        expect(component['cachedEvaluation']).toEqual(qrlPayload.data);
+        expect(component.isInEvaluation).toBeFalse();
+        expect(blinkTextAreaSpy).toHaveBeenCalledWith(Grade.Good);
+    });
+
+    it('should update remaining time on onTimerTick', () => {
+        component.pin = '123';
+        spyOn(component, 'submitAnswer');
+        timerServiceMock.onTimerTick.and.callFake((_pin: string, callback: (payload: TimerPayload) => void) => {
+            const payload = { remainingTime: 0, eventType: TimerEventType.Question };
+            callback(payload);
+            return of(payload).subscribe(callback);
+        });
+        component['setupSubscriptions']('123');
+        component.hasSubmitted = false;
+        expect(component.submitAnswer).toHaveBeenCalled();
     });
 });

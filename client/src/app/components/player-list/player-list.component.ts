@@ -6,11 +6,12 @@ import { GameServicesProvider } from '@app/providers/game-services.provider';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { PlayerService } from '@app/services/player/player.service';
+import { SubscriptionService } from '@app/services/subscription/subscription.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { Player } from '@common/player';
 import { PlayerState } from '@common/player-state';
 import { TimerEventType } from '@common/timer-event-type';
-import { Subscription } from 'rxjs';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
     selector: 'app-player-list',
@@ -28,14 +29,17 @@ export class PlayerListComponent implements OnInit, OnDestroy {
 
     playerStates = PlayerState;
     playerListSortingOptions = PlayerListSortingOptions;
-    private eventSubscriptions: Subscription[] = [];
 
+    private readonly uuid = uuidv4();
     private readonly gameHttpService: GameHttpService;
     private readonly gameService: GameService;
     private readonly playerService: PlayerService;
     private readonly timerService: TimerService;
 
-    constructor(gameServicesProvider: GameServicesProvider) {
+    constructor(
+        gameServicesProvider: GameServicesProvider,
+        private readonly subscriptionService: SubscriptionService,
+    ) {
         this.gameHttpService = gameServicesProvider.gameHttpService;
         this.gameService = gameServicesProvider.gameService;
         this.playerService = gameServicesProvider.playerService;
@@ -48,15 +52,11 @@ export class PlayerListComponent implements OnInit, OnDestroy {
             this.trySort();
         });
 
-        this.setupSubscription(this.pin);
+        this.setupSubscriptions(this.pin);
     }
 
     ngOnDestroy() {
-        this.eventSubscriptions.forEach((sub) => {
-            if (sub && !sub.closed) {
-                sub.unsubscribe();
-            }
-        });
+        this.subscriptionService.clear(this.uuid);
     }
 
     banPlayer(player: Player) {
@@ -121,8 +121,15 @@ export class PlayerListComponent implements OnInit, OnDestroy {
         }
     }
 
-    private setupSubscription(pin: string) {
-        this.eventSubscriptions.push(
+    private setupSubscriptions(pin: string) {
+        this.setupGameSubscriptions(pin);
+        this.setupTimerSubscriptions(pin);
+        this.setupPlayerSubscriptions(pin);
+    }
+
+    private setupGameSubscriptions(pin: string) {
+        this.subscriptionService.add(
+            this.uuid,
             this.gameService.onQcmSubmit(pin, (evaluation) => {
                 this.upsertPlayer(evaluation.player);
                 if (!this.isTimerFinished) {
@@ -133,41 +140,15 @@ export class PlayerListComponent implements OnInit, OnDestroy {
                     });
                 }
             }),
-
             this.gameService.onQrlEvaluate(pin, (evaluation) => {
                 this.upsertPlayer(evaluation.player);
             }),
-
             this.gameService.onJoinGame(pin, (player) => {
                 this.upsertPlayer(player);
             }),
-
-            this.playerService.onPlayerBan(pin, (player) => {
-                if (player) {
-                    this.upsertPlayer(player);
-                }
-            }),
-
-            this.playerService.onPlayerAbandon(pin, (player) => {
-                if (player) {
-                    this.upsertPlayer(player);
-                }
-            }),
-
-            this.playerService.onPlayerMute(pin, (player) => {
-                this.upsertPlayer(player);
-            }),
-
             this.gameService.onStartGame(pin, () => {
                 this.displayOptions.ban = false;
             }),
-
-            this.timerService.onTimerTick(pin, (payload) => {
-                if (!payload.remainingTime && payload.eventType === TimerEventType.Question) {
-                    this.isTimerFinished = true;
-                }
-            }),
-
             this.gameService.onNextQuestion(pin, () => {
                 this.players.forEach((player) => {
                     player.hasInteracted = false;
@@ -199,6 +180,36 @@ export class PlayerListComponent implements OnInit, OnDestroy {
                         }
                     });
                 }
+            }),
+        );
+    }
+
+    private setupTimerSubscriptions(pin: string) {
+        this.subscriptionService.add(
+            this.uuid,
+            this.timerService.onTimerTick(pin, (payload) => {
+                if (!payload.remainingTime && payload.eventType === TimerEventType.Question) {
+                    this.isTimerFinished = true;
+                }
+            }),
+        );
+    }
+
+    private setupPlayerSubscriptions(pin: string) {
+        this.subscriptionService.add(
+            this.uuid,
+            this.playerService.onPlayerBan(pin, (player) => {
+                if (player) {
+                    this.upsertPlayer(player);
+                }
+            }),
+            this.playerService.onPlayerAbandon(pin, (player) => {
+                if (player) {
+                    this.upsertPlayer(player);
+                }
+            }),
+            this.playerService.onPlayerMute(pin, (player) => {
+                this.upsertPlayer(player);
             }),
         );
     }
