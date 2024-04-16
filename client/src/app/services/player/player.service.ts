@@ -24,7 +24,7 @@ export class PlayerService {
         this.webSocketService.emit('playerAbandon', { pin });
     }
 
-    onPlayerAbandon(pin: string, callback: (quitter: Player | null) => void): Subscription {
+    onPlayerAbandon(pin: string, callback: (quitter: Player) => void): Subscription {
         return this.webSocketService.on('playerAbandon', applyIfPinMatches(pin, callback));
     }
 

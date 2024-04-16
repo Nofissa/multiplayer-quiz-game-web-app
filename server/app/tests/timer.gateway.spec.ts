@@ -66,6 +66,24 @@ describe('TimerGateway', () => {
             expect(broadcastMock.emit).toHaveBeenCalledWith('startTimer', { pin, data: { remainingTime, eventType } });
         });
 
+        it('should start the timer and emit the "startTimer" event with the correct payload if duration is null', () => {
+            const pin = 'mockPin';
+            const eventType = TimerEventType.Question;
+            const duration = null;
+            const remainingTime = gameStub().quiz.duration;
+            gameService.getGame.mockReturnValue(gameStub());
+            // eslint-disable-next-line @typescript-eslint/no-shadow, max-params
+            timerService.startTimer.mockImplementation((socketMock, pin, duration, eventType, callback) => {
+                callback(remainingTime);
+                return duration;
+            });
+            serverMock.to.mockReturnValue(broadcastMock);
+            timerGateway.startTimer(socketMock, { pin, eventType, duration });
+            expect(timerService.startTimer).toHaveBeenCalledWith(socketMock, pin, gameStub().quiz.duration, eventType, expect.any(Function));
+            expect(serverMock.to).toHaveBeenCalledWith(pin);
+            expect(broadcastMock.emit).toHaveBeenCalledWith('startTimer', { pin, data: { remainingTime, eventType } });
+        });
+
         it('should start the timer with the provided duration and emit the "startTimer" event with the correct payload', () => {
             const pin = 'mockPin';
             const eventType = TimerEventType.Question;
