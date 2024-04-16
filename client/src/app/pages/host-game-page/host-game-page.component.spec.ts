@@ -2,6 +2,7 @@
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -35,7 +36,7 @@ import { QrlSubmission } from '@common/qrl-submission';
 import { QuestionPayload } from '@common/question-payload';
 import { TimerEventType } from '@common/timer-event-type';
 import { TimerPayload } from '@common/timer-payload';
-import { Observable, of, throwError } from 'rxjs';
+import { Observable, of, Subject, throwError } from 'rxjs';
 import { io } from 'socket.io-client';
 import { HostGamePageComponent } from './host-game-page.component';
 import SpyObj = jasmine.SpyObj;
@@ -55,6 +56,7 @@ describe('HostGamePageComponent', () => {
     let routerSpy: SpyObj<Router>;
     let webSocketServiceSpy: SpyObj<WebSocketService>;
     let playerServiceSpy: SpyObj<PlayerService>;
+    let dialogSpy: jasmine.SpyObj<MatDialog>;
     let socketServerMock: SocketServerMock;
     let mockSubscriptionService: jasmine.SpyObj<SubscriptionService>;
 
@@ -147,7 +149,8 @@ describe('HostGamePageComponent', () => {
             soundServiceSpy,
         );
 
-        routerSpy = jasmine.createSpyObj<Router>(['navigate']);
+        dialogSpy = jasmine.createSpyObj<MatDialog>(['open']);
+        routerSpy = jasmine.createSpyObj<Router>(['navigate', 'navigateByUrl']);
         routerSpy.navigate.and.stub();
         mockSubscriptionService = jasmine.createSpyObj<SubscriptionService>(['add', 'clear']);
 
@@ -170,6 +173,7 @@ describe('HostGamePageComponent', () => {
                     },
                 },
                 { provide: SubscriptionService, useValue: mockSubscriptionService },
+                { provide: MatDialog, useValue: dialogSpy },
             ],
             imports: [RouterTestingModule, HttpClientTestingModule, BrowserAnimationsModule],
         }).compileComponents();
@@ -299,12 +303,17 @@ describe('HostGamePageComponent', () => {
         expect(timerServiceSpy.stopTimer).toHaveBeenCalled();
     });
 
-    it('should cancelGame cancel game server side', () => {
-        component.cancelGame();
-        expect(gameServiceSpy.cancelGame).toHaveBeenCalledWith(PIN);
-        const payload: GameEventPayload<string> = { pin: PIN, data: 'Un message' };
-        socketServerMock.emit('cancelGame', payload);
-        expect(routerSpy.navigate).toHaveBeenCalledWith(['home']);
+    it('should open confirmation dialog and cancel game when confirmed', () => {
+        const confirmationSubject = new Subject<boolean>();
+        const dialogRefSpyObj = jasmine.createSpyObj({ afterClosed: confirmationSubject });
+        dialogSpy.open.and.returnValue(dialogRefSpyObj);
+
+        component.leaveGame();
+        confirmationSubject.next(true);
+
+        expect(dialogSpy.open).toHaveBeenCalled();
+        expect(gameServiceSpy.cancelGame).toHaveBeenCalledWith(component.pin);
+        expect(routerSpy.navigateByUrl).toHaveBeenCalledWith('/');
     });
 
     it('should endGame end game server side', () => {

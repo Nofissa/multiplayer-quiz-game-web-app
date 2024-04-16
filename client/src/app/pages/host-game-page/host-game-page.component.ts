@@ -1,8 +1,10 @@
 import { HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BarChartSwiperComponent } from '@app/components/bar-chart-swiper/bar-chart-swiper.component';
+import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
 import {
     NEXT_QUESTION_DELAY_SECONDS,
     NOTICE_DURATION_MS,
@@ -12,6 +14,7 @@ import {
 } from '@app/constants/constants';
 import { BarChartData } from '@app/interfaces/bar-chart-data';
 import { GameServicesProvider } from '@app/providers/game-services.provider';
+import { MaterialServicesProvider } from '@app/providers/material-services.provider';
 import { RoutingDependenciesProvider } from '@app/providers/routing-dependencies.provider';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { BarChartService } from '@app/services/game/bar-chart-service/bar-chart.service';
@@ -49,13 +52,15 @@ export class HostGamePageComponent implements OnInit, OnDestroy {
     private readonly timerService: TimerService;
     private readonly playerService: PlayerService;
     private readonly soundService: SoundService;
+    private readonly snackBarService: MatSnackBar;
+    private readonly dialogService: MatDialog;
 
     // Disabled because this page is rich in interaction an depends on many services as a consequence
     // eslint-disable-next-line max-params
     constructor(
         private readonly subscriptionService: SubscriptionService,
         private readonly barChartService: BarChartService,
-        private readonly snackBarService: MatSnackBar,
+        materialServicesProvider: MaterialServicesProvider,
         gameServicesProvider: GameServicesProvider,
         routingDependenciesProvider: RoutingDependenciesProvider,
     ) {
@@ -66,6 +71,8 @@ export class HostGamePageComponent implements OnInit, OnDestroy {
         this.timerService = gameServicesProvider.timerService;
         this.playerService = gameServicesProvider.playerService;
         this.soundService = gameServicesProvider.soundService;
+        this.snackBarService = materialServicesProvider.snackBar;
+        this.dialogService = materialServicesProvider.dialog;
     }
 
     get barCharts(): BarChartData[] {
@@ -119,6 +126,20 @@ export class HostGamePageComponent implements OnInit, OnDestroy {
         this.gameService.startGame(this.pin);
     }
 
+    leaveGame() {
+        const dialogRef = this.dialogService.open(ConfirmationDialogComponent, {
+            width: '300px',
+            data: { prompt: 'Voulez-vous vraiment quitter la partie?' },
+        });
+
+        dialogRef.afterClosed().subscribe((hasConfirmed: boolean) => {
+            if (hasConfirmed) {
+                this.gameService.cancelGame(this.pin);
+                this.router.navigateByUrl('/');
+            }
+        });
+    }
+
     nextQuestion() {
         this.gameState = GameState.Running;
         this.currentQuestionHasEnded = false;
@@ -128,10 +149,6 @@ export class HostGamePageComponent implements OnInit, OnDestroy {
                 this.barChartSwiperComponent.goToEndSlide();
             }
         }, SWIPER_SYNC_DELAY_MS);
-    }
-
-    cancelGame() {
-        this.gameService.cancelGame(this.pin);
     }
 
     endGame() {
