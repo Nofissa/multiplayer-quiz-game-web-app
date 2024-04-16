@@ -7,7 +7,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
-import { MAX_MESSAGE_LENGTH } from '@app/constants/constants';
+import { QrlBoardComponent } from '@app/components/qrl-board/qrl-board.component';
+import { ERROR_DURATION, MAX_MESSAGE_LENGTH } from '@app/constants/constants';
 import { SocketServerMock } from '@app/mocks/socket-server-mock';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
@@ -34,7 +35,6 @@ import { TimerEventType } from '@common/timer-event-type';
 import { TimerPayload } from '@common/timer-payload';
 import { Observable, Subscription, of } from 'rxjs';
 import { io } from 'socket.io-client';
-import { QrlBoardComponent } from './qrl-board.component';
 
 describe('QrlBoardComponent', () => {
     let component: QrlBoardComponent;
@@ -293,5 +293,56 @@ describe('QrlBoardComponent', () => {
     it('should tell if the question is a qrl', () => {
         component.question = qrlQuestionStub()[0];
         expect(component.question.type).toEqual('QRL');
+    });
+
+    it('should open error snackbar', () => {
+        const snackBarSpy = spyOn(TestBed.inject(MatSnackBar), 'open');
+
+        const errorMessage = 'Test error message';
+
+        component['openError'](errorMessage);
+
+        expect(snackBarSpy).toHaveBeenCalledWith(
+            errorMessage,
+            undefined,
+            jasmine.objectContaining({
+                verticalPosition: 'top',
+                duration: ERROR_DURATION,
+                panelClass: ['error-snackbar'],
+            }),
+        );
+    });
+
+    it('should handle QrlEvaluate correctly', () => {
+        const qrlPayload: GameEventPayload<QrlEvaluation> = {
+            pin: '123',
+            data: { player: firstPlayerStub(), grade: Grade.Good, score: 10, isLast: true },
+        };
+
+        // I have to use any to be able to spy on private method blinktextArea, can't use never because I expect a call with a parameter
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const blinkTextAreaSpy = spyOn<any>(component, 'blinkTextArea');
+
+        component['setupSubscriptions']('123');
+        socketServerMock.emit('qrlEvaluate', qrlPayload);
+
+        component['cachedEvaluation'] = qrlPayload.data;
+        component.player = firstPlayerStub();
+        expect(component['cachedEvaluation']).toEqual(qrlPayload.data);
+        expect(component.isInEvaluation).toBeFalse();
+        expect(blinkTextAreaSpy).toHaveBeenCalledWith(Grade.Good);
+    });
+
+    it('should update remaining time on onTimerTick', () => {
+        component.pin = '123';
+        spyOn(component, 'submitAnswer');
+        timerServiceMock.onTimerTick.and.callFake((_pin: string, callback: (payload: TimerPayload) => void) => {
+            const payload = { remainingTime: 0, eventType: TimerEventType.Question };
+            callback(payload);
+            return of(payload).subscribe(callback);
+        });
+        component['setupSubscriptions']('123');
+        component.hasSubmitted = false;
+        expect(component.submitAnswer).toHaveBeenCalled();
     });
 });

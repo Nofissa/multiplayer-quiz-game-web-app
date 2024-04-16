@@ -164,6 +164,9 @@ describe('QcmBoardComponent', () => {
         const choice = 1;
         component.toggleSelectChoice(choice);
         expect(gameServiceMock.qcmToggleChoice).toHaveBeenCalled();
+        component.selectedChoiceIndexes = [0, 1];
+        component.toggleSelectChoice(choice);
+        expect(component.selectedChoiceIndexes.length).toBe(1);
     });
 
     it('should loadNextQuestion', () => {
@@ -202,5 +205,31 @@ describe('QcmBoardComponent', () => {
         spyOn(component, 'toggleSelectChoice');
         component['setupKeyBindings']();
         expect(component.toggleSelectChoice).toHaveBeenCalled();
+    });
+
+    it('should handle QcmSubmit correctly', () => {
+        const qcmEvaluationPayload: GameEventPayload<QcmEvaluation> = { pin: '123', data: lastPlayerEvaluationStub() };
+
+        component['setupSubscriptions']('123');
+        socketServerMock.emit('submitChoices', qcmEvaluationPayload);
+        playerServiceMock.getCurrentPlayer.and.returnValue(firstPlayerStub());
+        component.player = firstPlayerStub();
+
+        expect(component['cachedEvaluation']).toEqual(qcmEvaluationPayload.data);
+        expect(component['disableShortcuts']).toBeTrue();
+        expect(component.questionIsOver).toBeTrue();
+    });
+
+    it('should update remaining time on onTimerTick', () => {
+        component.pin = '123';
+        spyOn(component, 'submitChoices');
+        timerServiceMock.onTimerTick.and.callFake((_pin: string, callback: (payload: TimerPayload) => void) => {
+            const payload = { remainingTime: 0, eventType: TimerEventType.Question };
+            callback(payload);
+            return of(payload).subscribe(callback);
+        });
+        component['setupSubscriptions']('123');
+        component.hasSubmited = false;
+        expect(component.submitChoices).toHaveBeenCalled();
     });
 });
