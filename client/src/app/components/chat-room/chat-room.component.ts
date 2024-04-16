@@ -79,11 +79,13 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
             }
         });
         this.playerService.onPlayerAbandon(this.pin, (player) => {
-            this.chatlogs.push({
-                author: 'Système',
-                message: `${player.username} a abandonné la partie`,
-                date: new Date(),
-            });
+            if (player) {
+                this.chatlogs.push({
+                    author: 'Système',
+                    message: `${player.username} a abandonné la partie`,
+                    date: new Date(),
+                });
+            }
         });
     }
 
