@@ -24,13 +24,14 @@ import { SoundService } from '@app/services/sound/sound.service';
 import { SubscriptionService } from '@app/services/subscription/subscription.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { BarchartSubmission } from '@common/barchart-submission';
+import { BarChartType } from '@common/barchart-type';
 import { GameState } from '@common/game-state';
 import { PlayerState } from '@common/player-state';
 import { Question } from '@common/question';
 import { QuestionType } from '@common/question-type';
 import { TimerEventType } from '@common/timer-event-type';
-import { v4 as uuidv4 } from 'uuid';
 import { environment } from 'src/environments/environment';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
     selector: 'app-host-game-page',
@@ -46,7 +47,7 @@ export class HostGamePageComponent implements OnInit, OnDestroy {
     private gameState: GameState = GameState.Opened;
 
     private readonly uuid: string = uuidv4();
-    private questionType: QuestionType = 'QCM';
+    private questionType: QuestionType;
     private readonly activatedRoute: ActivatedRoute;
     private readonly router: Router;
     private readonly gameHttpService: GameHttpService;
@@ -129,7 +130,7 @@ export class HostGamePageComponent implements OnInit, OnDestroy {
     }
 
     isQRL() {
-        return this.questionType === 'QRL';
+        return this.questionType === QuestionType.QRL;
     }
 
     leaveGame() {
@@ -163,8 +164,8 @@ export class HostGamePageComponent implements OnInit, OnDestroy {
 
     private addQuestion(question: Question) {
         this.questionType = question.type;
-        if (question.type === 'QRL') {
-            this.barChartService.addChart(question, 'ACTIVITY');
+        if (question.type === QuestionType.QRL) {
+            this.barChartService.addChart(question, BarChartType.ACTIVITY);
         } else {
             this.barChartService.addChart(question);
         }
@@ -224,10 +225,11 @@ export class HostGamePageComponent implements OnInit, OnDestroy {
                 if (this.isRandom) {
                     this.router.navigate(['game'], { queryParams: { pin: this.pin } });
                 }
-                if (data.question.type === 'QRL') {
+                if (data.question.type === QuestionType.QRL) {
                     this.gameHttpService.getGameSnapshotByPin(this.pin).subscribe((snapshot) => {
                         for (const player of snapshot.players) {
                             this.barChartService.updateChartData({ clientId: player.socketId, index: 0, isSelected: true });
+                            this.barChartService.updateChartData({ clientId: player.socketId, index: 1, isSelected: false });
                         }
                     });
                 }
@@ -235,10 +237,11 @@ export class HostGamePageComponent implements OnInit, OnDestroy {
             this.gameService.onNextQuestion(pin, (data) => {
                 this.isLastQuestion = data.isLast;
                 this.addQuestion(data.question);
-                if (data.question.type === 'QRL') {
+                if (data.question.type === QuestionType.QRL) {
                     this.gameHttpService.getGameSnapshotByPin(this.pin).subscribe((snapshot) => {
                         for (const player of snapshot.players) {
                             this.barChartService.updateChartData({ clientId: player.socketId, index: 0, isSelected: true });
+                            this.barChartService.updateChartData({ clientId: player.socketId, index: 1, isSelected: false });
                         }
                     });
                 }

@@ -16,6 +16,7 @@ import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { qcmQuestionStub } from '@app/test-stubs/question.stubs';
 import { quizStub } from '@app/test-stubs/quiz.stubs';
 import { Question } from '@common/question';
+import { QuestionType } from '@common/question-type';
 import { Quiz } from '@common/quiz';
 import { Observable, of } from 'rxjs';
 import { io } from 'socket.io-client';
@@ -110,7 +111,7 @@ describe('CreateGamePageComponent', () => {
         questionHttpServiceMock.getAllQuestions.and.returnValue(
             of(
                 Array.from({ length: MIN_QCM_COUNT_TO_ENABLE_RANDOM_MODE }).map(() => {
-                    return { type: 'QCM' } as Question;
+                    return { type: QuestionType.QCM } as Question;
                 }),
             ),
         );
@@ -119,7 +120,7 @@ describe('CreateGamePageComponent', () => {
         questionHttpServiceMock.getAllQuestions.and.returnValue(
             of(
                 Array.from({ length: MIN_QCM_COUNT_TO_ENABLE_RANDOM_MODE + 1 }).map(() => {
-                    return { type: 'QCM' } as Question;
+                    return { type: QuestionType.QCM } as Question;
                 }),
             ),
         );
@@ -130,9 +131,9 @@ describe('CreateGamePageComponent', () => {
     it('should set enableRandomMode to false if less than 5 QCM questions exist', () => {
         questionHttpServiceMock.getAllQuestions.and.returnValue(
             of([
-                { type: 'QRL' } as Question,
+                { type: QuestionType.QRL } as Question,
                 ...Array.from({ length: MIN_QCM_COUNT_TO_ENABLE_RANDOM_MODE - 1 }).map(() => {
-                    return { type: 'QCM' } as Question;
+                    return { type: QuestionType.QCM } as Question;
                 }),
             ]),
         );

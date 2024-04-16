@@ -11,9 +11,11 @@ import { KeyBindingService } from '@app/services/key-binding/key-binding.service
 import { PlayerService } from '@app/services/player/player.service';
 import { SubscriptionService } from '@app/services/subscription/subscription.service';
 import { TimerService } from '@app/services/timer/timer.service';
+import { GameSnapshot } from '@common/game-snapshot';
 import { Player } from '@common/player';
 import { QcmEvaluation } from '@common/qcm-evaluation';
 import { Question } from '@common/question';
+import { QuestionType } from '@common/question-type';
 import { TimerEventType } from '@common/timer-event-type';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -84,7 +86,7 @@ export class QcmBoardComponent implements OnInit, OnDestroy {
         if (player) {
             this.player = player;
         }
-        this.gameHttpService.getGameSnapshotByPin(this.pin).subscribe((snapshot) => {
+        this.gameHttpService.getGameSnapshotByPin(this.pin).subscribe((snapshot: GameSnapshot) => {
             this.loadNextQuestion(snapshot.quiz.questions[snapshot.currentQuestionIndex]);
         });
         this.setupSubscriptions(this.pin);
@@ -122,13 +124,17 @@ export class QcmBoardComponent implements OnInit, OnDestroy {
             data: { prompt: 'Voulez-vous vraiment quitter la partie?' },
         });
 
-        dialogRef.afterClosed().subscribe((result) => {
+        dialogRef.afterClosed().subscribe((result: boolean) => {
             if (result) {
                 this.playerService.playerAbandon(this.pin);
                 const redirect = this.isTest ? '/create-game' : '/home';
                 this.router.navigateByUrl(redirect);
             }
         });
+    }
+
+    isQCM(question: Question) {
+        return question.type === QuestionType.QCM;
     }
 
     private loadNextQuestion(question: Question) {
@@ -146,7 +152,7 @@ export class QcmBoardComponent implements OnInit, OnDestroy {
                 this.loadNextQuestion(data.question);
             }),
             this.gameService.onQcmSubmit(pin, (evaluation) => {
-                if (this.question?.type?.trim()?.toUpperCase() !== 'QCM') {
+                if (this.question?.type !== QuestionType.QCM) {
                     return;
                 }
                 if (this.playerService.getCurrentPlayer(pin)?.socketId === evaluation.player.socketId) {
@@ -160,7 +166,7 @@ export class QcmBoardComponent implements OnInit, OnDestroy {
                 }
             }),
             this.timerService.onTimerTick(pin, (payload) => {
-                if (this.question?.type?.trim()?.toUpperCase() !== 'QCM') {
+                if (this.question?.type !== QuestionType.QCM) {
                     return;
                 }
                 if (!payload.remainingTime && payload.eventType === TimerEventType.Question && !this.hasSubmitted) {
@@ -173,6 +179,9 @@ export class QcmBoardComponent implements OnInit, OnDestroy {
     private setupKeyBindings() {
         ['1', '2', '3', '4'].forEach((x) => {
             this.keyBindingService.registerKeyBinding(x, () => {
+                if (this.question.type !== QuestionType.QCM) {
+                    return;
+                }
                 const choiceIndex = parseInt(x, 10) - 1;
                 this.toggleSelectChoice(choiceIndex);
             });

@@ -8,6 +8,7 @@ import { BarchartSubmission } from '@common/barchart-submission';
 import { GameSnapshot } from '@common/game-snapshot';
 import { Question } from '@common/question';
 import { BarChartService } from './bar-chart.service';
+import { BarChartType } from '@common/barchart-type';
 
 describe('BarChartService', () => {
     let service: BarChartService;
@@ -47,7 +48,7 @@ describe('BarChartService', () => {
         service.addChart(question);
         const mockBarChart: BarChartData = {
             text: question.text,
-            chartType: 'QCM',
+            chartType: BarChartType.QCM,
             chartElements: mockChartElements,
             submissions: [],
         };
@@ -59,11 +60,11 @@ describe('BarChartService', () => {
         const mockChartElements: BarchartElement[] = [{ text: 'inactif' }, { text: 'actif' }];
         const mockBarChart: BarChartData = {
             text: 'Activité pour la question: ' + question.text,
-            chartType: 'ACTIVITY',
+            chartType: BarChartType.ACTIVITY,
             chartElements: mockChartElements,
             submissions: [],
         };
-        service.addChart(question, 'ACTIVITY');
+        service.addChart(question, BarChartType.ACTIVITY);
         expect(service['barChartData']).toEqual([mockBarChart]);
     });
 

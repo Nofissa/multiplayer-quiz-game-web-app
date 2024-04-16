@@ -4,6 +4,7 @@ import { GameService } from '@app/services/game/game.service';
 import { TimerService } from '@app/services/timer/timer.service';
 import { BarchartSubmission } from '@common/barchart-submission';
 import { CreateGamePayload } from '@common/create-game-payload';
+import { GameEvent } from '@common/game-event';
 import { GameEventPayload } from '@common/game-event-payload';
 import { GameState } from '@common/game-state';
 import { JoinGamePayload } from '@common/join-game-payload';
@@ -17,6 +18,7 @@ import { QrlInputChangePayload } from '@common/qrl-input-change-payload';
 import { QrlSubmission } from '@common/qrl-submission';
 import { QrlSubmitPayload } from '@common/qrl-submit-payload';
 import { QuestionPayload } from '@common/question-payload';
+import { GeneralWebSocketEvent } from '@common/general-websocket-event';
 import { ConnectedSocket, MessageBody, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
@@ -41,32 +43,32 @@ export class GameGateway implements OnGatewayDisconnect {
         private readonly gameAutopilotService: GameAutopilotService,
     ) {}
 
-    @SubscribeMessage('createGame')
+    @SubscribeMessage(GameEvent.CreateGame)
     async createGame(@ConnectedSocket() client: Socket, @MessageBody() { quizId }: CreateGamePayload) {
         try {
             const pin = await this.gameService.createGame(client, quizId);
             client.join(pin);
 
-            this.server.emit('createGame', pin);
+            this.server.emit(GameEvent.CreateGame, pin);
         } catch (error) {
-            client.emit('error', error.message);
+            client.emit(GeneralWebSocketEvent.Error, error.message);
         }
     }
 
-    @SubscribeMessage('joinGame')
+    @SubscribeMessage(GameEvent.JoinGame)
     joinGame(@ConnectedSocket() client: Socket, @MessageBody() { pin, username }: JoinGamePayload) {
         try {
             const player = this.gameService.joinGame(client, pin, username);
             const payload: GameEventPayload<Player> = { pin, data: player };
 
             client.join(pin);
-            this.server.to(pin).emit('joinGame', payload);
+            this.server.to(pin).emit(GameEvent.JoinGame, payload);
         } catch (error) {
-            client.emit('error', error.message);
+            client.emit(GeneralWebSocketEvent.Error, error.message);
         }
     }
 
-    @SubscribeMessage('startGame')
+    @SubscribeMessage(GameEvent.StartGame)
     startGame(@ConnectedSocket() client: Socket, @MessageBody() { pin }: PinPayload) {
         try {
             const game = this.gameService.getGame(pin);
@@ -79,120 +81,120 @@ export class GameGateway implements OnGatewayDisconnect {
             const data = this.gameService.startGame(client, pin);
             const payload: GameEventPayload<QuestionPayload> = { pin, data };
 
-            this.server.to(pin).emit('startGame', payload);
+            this.server.to(pin).emit(GameEvent.StartGame, payload);
         } catch (error) {
-            client.emit('error', error.message);
+            client.emit(GeneralWebSocketEvent.Error, error.message);
         }
     }
 
-    @SubscribeMessage('cancelGame')
+    @SubscribeMessage(GameEvent.CancelGame)
     cancelGame(@ConnectedSocket() client: Socket, @MessageBody() { pin }: PinPayload) {
         try {
             this.timerService.stopTimer(client, pin);
             const message = this.gameService.cancelGame(client, pin);
             const payload: GameEventPayload<string> = { pin, data: message };
 
-            this.server.to(pin).emit('cancelGame', payload);
+            this.server.to(pin).emit(GameEvent.CancelGame, payload);
             this.server.socketsLeave(pin);
         } catch (error) {
-            client.emit('error', error.message);
+            client.emit(GeneralWebSocketEvent.Error, error.message);
         }
     }
 
-    @SubscribeMessage('toggleGameLock')
+    @SubscribeMessage(GameEvent.ToggleGameLock)
     toggleGameLock(@ConnectedSocket() client: Socket, @MessageBody() { pin }: PinPayload) {
         try {
             const gameState = this.gameService.toggleGameLock(client, pin);
             const payload: GameEventPayload<GameState> = { pin, data: gameState };
 
-            this.server.to(pin).emit('toggleGameLock', payload);
+            this.server.to(pin).emit(GameEvent.ToggleGameLock, payload);
         } catch (error) {
-            client.emit('error', error.message);
+            client.emit(GeneralWebSocketEvent.Error, error.message);
         }
     }
 
-    @SubscribeMessage('qcmSubmit')
+    @SubscribeMessage(GameEvent.QcmSubmit)
     qcmSubmit(@ConnectedSocket() client: Socket, @MessageBody() { pin }: PinPayload) {
         try {
             const evaluation = this.gameService.evaluateChoices(client, pin);
             const payload: GameEventPayload<QcmEvaluation> = { pin, data: evaluation };
 
-            this.server.to(pin).emit('qcmSubmit', payload);
+            this.server.to(pin).emit(GameEvent.QcmSubmit, payload);
         } catch (error) {
-            client.emit('error', error.message);
+            client.emit(GeneralWebSocketEvent.Error, error.message);
         }
     }
 
-    @SubscribeMessage('nextQuestion')
+    @SubscribeMessage(GameEvent.NextQuestion)
     nextQuestion(@ConnectedSocket() client: Socket, @MessageBody() { pin }: PinPayload) {
         try {
             const data = this.gameService.nextQuestion(client, pin);
             const payload: GameEventPayload<QuestionPayload> = { pin, data };
-            this.server.to(pin).emit('nextQuestion', payload);
+            this.server.to(pin).emit(GameEvent.NextQuestion, payload);
         } catch (error) {
-            client.emit('error', error.message);
+            client.emit(GeneralWebSocketEvent.Error, error.message);
         }
     }
 
-    @SubscribeMessage('qcmToggleChoice')
+    @SubscribeMessage(GameEvent.QcmToggleChoice)
     qcmToggleChoice(@ConnectedSocket() client: Socket, @MessageBody() { pin, choiceIndex }: QcmToggleChoicePayload) {
         try {
             const submission = this.gameService.qcmToggleChoice(client, pin, choiceIndex);
             const organizer = this.gameService.getOrganizer(pin);
             const payload: GameEventPayload<BarchartSubmission> = { pin, data: submission };
 
-            organizer.emit('qcmToggleChoice', payload);
+            organizer.emit(GameEvent.QcmToggleChoice, payload);
         } catch (error) {
-            client.emit('error', error.message);
+            client.emit(GeneralWebSocketEvent.Error, error.message);
         }
     }
 
-    @SubscribeMessage('endGame')
+    @SubscribeMessage(GameEvent.EndGame)
     endGame(@ConnectedSocket() client: Socket, @MessageBody() { pin }: PinPayload) {
         try {
             const game = this.gameService.getGame(pin);
             this.gameService.endGame(client, pin);
             const payload: GameEventPayload<null> = { pin, data: null };
-            this.server.to(pin).emit('endGame', payload);
+            this.server.to(pin).emit(GameEvent.EndGame, payload);
             this.gameSummaryService.addGameSummary().fromGame(game);
         } catch (error) {
-            client.emit('error', error.message);
+            client.emit(GeneralWebSocketEvent.Error, error.message);
         }
     }
 
-    @SubscribeMessage('qrlInputChange')
+    @SubscribeMessage(GameEvent.QrlInputChange)
     qrlInputChange(@ConnectedSocket() client: Socket, @MessageBody() { pin, isTyping }: QrlInputChangePayload) {
         try {
             const chartData = this.gameService.qrlInputChange(client, pin, isTyping);
             const payload: GameEventPayload<BarchartSubmission> = { pin, data: chartData };
 
-            this.server.to(pin).emit('qrlInputChange', payload);
+            this.server.to(pin).emit(GameEvent.QrlInputChange, payload);
         } catch (error) {
-            client.emit('error', error.message);
+            client.emit(GeneralWebSocketEvent.Error, error.message);
         }
     }
 
-    @SubscribeMessage('qrlSubmit')
+    @SubscribeMessage(GameEvent.QrlSubmit)
     qrlSubmit(@ConnectedSocket() client: Socket, @MessageBody() { pin, answer }: QrlSubmitPayload) {
         try {
             const submission = this.gameService.qrlSubmit(client, pin, answer);
             const payload: GameEventPayload<QrlSubmission> = { pin, data: submission };
 
-            this.server.to(pin).emit('qrlSubmit', payload);
+            this.server.to(pin).emit(GameEvent.QrlSubmit, payload);
         } catch (error) {
-            client.emit('error', error.message);
+            client.emit(GeneralWebSocketEvent.Error, error.message);
         }
     }
 
-    @SubscribeMessage('qrlEvaluate')
+    @SubscribeMessage(GameEvent.QrlEvaluate)
     qrlEvaluate(@ConnectedSocket() client: Socket, @MessageBody() { socketId, pin, grade }: QrlEvaluatePayload) {
         try {
             const qrlEvaluation = this.gameService.qrlEvaluate(socketId, pin, grade);
             const payload: GameEventPayload<QrlEvaluation> = { pin, data: qrlEvaluation };
 
-            this.server.to(pin).emit('qrlEvaluate', payload);
+            this.server.to(pin).emit(GameEvent.QrlEvaluate, payload);
         } catch (error) {
-            client.emit('error', error.message);
+            client.emit(GeneralWebSocketEvent.Error, error.message);
         }
     }
 
@@ -205,7 +207,7 @@ export class GameGateway implements OnGatewayDisconnect {
                 this.cancelGame(client, { pin });
             });
         } catch (error) {
-            client.emit('error', error.message);
+            client.emit(GeneralWebSocketEvent.Error, error.message);
         }
     }
 }

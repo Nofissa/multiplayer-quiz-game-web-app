@@ -10,6 +10,7 @@ import { TimerPayload } from '@common/timer-payload';
 import { Observable, Observer, of, Subscription } from 'rxjs';
 import { io } from 'socket.io-client';
 import { PanicModeButtonComponent } from './panic-mode-button.component';
+import { QuestionType } from '@common/question-type';
 
 describe('PanicModeButtonComponent', () => {
     let component: PanicModeButtonComponent;
@@ -97,7 +98,7 @@ describe('PanicModeButtonComponent', () => {
 
     it('should update visibility based on timer events', () => {
         const qcmMinTime = 10;
-        component['currentQuestion'] = { type: 'QCM' } as Question;
+        component['currentQuestion'] = { type: QuestionType.QCM } as Question;
 
         component['updateVisibility'](TimerEventType.Question, qcmMinTime + 1);
         expect(component.isVisible).toBe(true);
@@ -109,7 +110,7 @@ describe('PanicModeButtonComponent', () => {
     it('should update visibility based on timer events for QRL question type', () => {
         const qrlMinTime = 20;
 
-        component['currentQuestion'] = { type: 'QRL' } as Question;
+        component['currentQuestion'] = { type: QuestionType.QRL } as Question;
         component['updateVisibility'](TimerEventType.Question, qrlMinTime + 1);
         expect(component.isVisible).toBe(true);
 
