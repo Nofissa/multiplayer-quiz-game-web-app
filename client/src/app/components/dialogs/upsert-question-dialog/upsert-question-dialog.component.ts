@@ -86,7 +86,7 @@ export class UpsertQuestionDialogComponent {
         }
     }
 
-    doToggle() {
+    toggleQuestionType() {
         this.toggle = !this.toggle;
     }
 
@@ -135,7 +135,7 @@ export class UpsertQuestionDialogComponent {
         if (!this.formGroup.controls.text.valid) {
             snackString += ' question,';
         }
-        if (!this.formGroup.controls.choices.valid) {
+        if (!this.validateChoices()) {
             snackString += ' réponses,';
         }
         if (!this.formGroup.controls.points.valid) {

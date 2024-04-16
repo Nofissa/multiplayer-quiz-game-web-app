@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
@@ -27,6 +27,7 @@ import { TimerPayload } from '@common/timer-payload';
 import { Observable, of } from 'rxjs';
 import { io } from 'socket.io-client';
 import { QcmBoardComponent } from './qcm-board.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 const gameSnapshotStub: GameSnapshot = {
     players: [],
@@ -71,7 +72,7 @@ describe('QcmBoardComponent', () => {
 
         TestBed.configureTestingModule({
             declarations: [QcmBoardComponent, ConfirmationDialogComponent],
-            imports: [RouterTestingModule, MatDialogModule],
+            imports: [MatSnackBarModule, RouterTestingModule, MatDialogModule, BrowserAnimationsModule],
             providers: [
                 { provide: GameHttpService, useValue: gameHttpServiceMock },
                 { provide: PlayerService, useValue: playerServiceMock },

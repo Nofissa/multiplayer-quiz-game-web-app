@@ -206,7 +206,7 @@ describe('UpsertQuestionDialogComponent', () => {
 
     it('should change toggle status in toggle', () => {
         expect(component.qcmToggled).toBeFalsy();
-        component.doToggle();
+        component.toggleQuestionType();
         fixture.detectChanges();
         expect(component.qcmToggled).toBeTruthy();
     });
@@ -217,7 +217,7 @@ describe('UpsertQuestionDialogComponent', () => {
     });
 
     it('should not have answers in dialog when QRL is selected', () => {
-        component.doToggle();
+        component.toggleQuestionType();
         fixture.detectChanges();
         const answersTextArea = fixture.debugElement.queryAll(By.css('.answers-wrapper')).length;
         expect(answersTextArea).toBe(0);
@@ -273,7 +273,7 @@ describe('UpsertQuestionDialogComponent', () => {
     });
 
     it('should submit Qrl question when submit is pressed and question is valid', () => {
-        component.doToggle();
+        component.toggleQuestionType();
         component.submit();
         expect(dialogRefSpy.close).toHaveBeenCalled();
     });

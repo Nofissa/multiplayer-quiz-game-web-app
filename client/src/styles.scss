@@ -107,8 +107,25 @@ body {
     height: auto !important;
 }
 
+.submit-snackbar * {
+    background-color: var(--answer-color-green) !important;
+    color: white !important;
+    text-align: center;
+}
+
 .header {
     position: relative;
 }
 
+::-webkit-scrollbar {
+    width: 5px;
+}
 
+::-webkit-scrollbar-track {
+    background: none;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 20px;
+    background: grey;
+}

@@ -39,6 +39,7 @@ import { TimerPayload } from '@common/timer-payload';
 import { Observable, of, Subject, throwError } from 'rxjs';
 import { io } from 'socket.io-client';
 import { HostGamePageComponent } from './host-game-page.component';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import SpyObj = jasmine.SpyObj;
 
 const PIN = '1234';
@@ -175,7 +176,7 @@ describe('HostGamePageComponent', () => {
                 { provide: SubscriptionService, useValue: mockSubscriptionService },
                 { provide: MatDialog, useValue: dialogSpy },
             ],
-            imports: [RouterTestingModule, HttpClientTestingModule, BrowserAnimationsModule],
+            imports: [RouterTestingModule, HttpClientTestingModule, BrowserAnimationsModule, MatTooltipModule],
         }).compileComponents();
 
         fixture = TestBed.createComponent(HostGamePageComponent);
