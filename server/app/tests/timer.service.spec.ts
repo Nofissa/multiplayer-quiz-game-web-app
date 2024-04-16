@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */ // needed for mocking the socket
+import { Timer } from '@app/classes/timer';
 import { GameService } from '@app/services/game/game.service';
 import { TimerService } from '@app/services/timer/timer.service';
+import { TimerEventType } from '@common/timer-event-type';
 import { ModuleRef } from '@nestjs/core';
+import { Subject } from 'rxjs';
 import { Socket } from 'socket.io';
 import { gameStub } from './stubs/game.stub';
-import { Timer } from '@app/classes/timer';
-import { TimerEventType } from '@common/timer-event-type';
-import { Subject } from 'rxjs';
 
 describe('TimerService', () => {
     let timerService: TimerService;
@@ -49,7 +49,6 @@ describe('TimerService', () => {
 
     describe('startTimer', () => {
         it('should throw an error if the client is not the organizer', () => {
-            // Mock game service to return game with different organizer ID
             const TIME = 10;
             socketMock = { id: 'differentId' } as jest.Mocked<Socket>;
             gameServiceMock.getGame.mockReturnValue(gameStub());
@@ -59,15 +58,13 @@ describe('TimerService', () => {
         });
 
         it('should start the timer and return remaining time', () => {
-            // Mock game service to return game with organizer ID matching client ID
             gameServiceMock.getGame.mockReturnValue(gameStub());
             const setIntervalSpy = jest.spyOn(global, 'setInterval');
             socketMock = { id: 'organizerId' } as jest.Mocked<Socket>;
             const callback = jest.fn();
-            const duration = 10; // Duration in seconds
+            const duration = 10;
 
             const remainingTime = timerService.startTimer(socketMock, 'somePin', duration, TimerEventType.Question, callback);
-            // Verify that the timer started and remaining time is returned
             expect(remainingTime).toEqual(duration);
             expect(setIntervalSpy).toHaveBeenCalledTimes(1);
             timerService.stopTimer(socketMock, 'somePin');
@@ -107,6 +104,16 @@ describe('TimerService', () => {
             socketMock = { id: 'differentId' } as jest.Mocked<Socket>;
             gameServiceMock.getGame.mockReturnValue(gameStub());
             expect(() => timerService.stopTimer(socketMock, pin)).toThrow(`Seul l'organisateur de la partie ${pin} peut arrêter la minuterie`);
+        });
+
+        it('should handle not found pin in timers', () => {
+            const pin = 'somePin';
+            socketMock = { id: 'organizerId' } as jest.Mocked<Socket>;
+            gameServiceMock.getGame.mockReturnValue(gameStub());
+            jest.spyOn(Map.prototype, 'has').mockReturnValue(false);
+            const setSpy = jest.spyOn(Map.prototype, 'set');
+            timerService.stopTimer(socketMock, pin);
+            expect(setSpy).toHaveBeenCalled();
         });
     });
 

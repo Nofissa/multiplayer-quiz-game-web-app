@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */ // needed for mocking the socket
 import { Timer } from '@app/classes/timer';
+import { Subscription } from 'rxjs';
 
 describe('Timer', () => {
     let timer: Timer;
@@ -72,15 +73,12 @@ describe('Timer', () => {
 
     describe('pause', () => {
         it('should clear the interval', () => {
-            jest.useFakeTimers();
-
             const clearIntervalSpy = jest.spyOn(global, 'clearInterval');
             timer.start();
+            const clone = timer['interval'];
             timer.pause();
 
-            jest.runOnlyPendingTimers();
-
-            expect(clearIntervalSpy).toHaveBeenCalledWith(timer['interval']);
+            expect(clearIntervalSpy).toHaveBeenCalledWith(clone);
             clearIntervalSpy.mockRestore();
         });
     });
@@ -105,6 +103,40 @@ describe('Timer', () => {
 
             clearIntervalSpy.mockRestore();
             startSpy.mockRestore();
+        });
+    });
+
+    describe('onTick', () => {
+        it('should unsubscribe if subscription exists', () => {
+            timer['tickSubscription'] = new Subscription();
+            const unsubscribeSpy = jest.spyOn(Subscription.prototype, 'unsubscribe');
+
+            timer.onTick(jest.fn());
+
+            expect(unsubscribeSpy).toHaveBeenCalled();
+        });
+
+        it('should not unsubscribe if no subscription exists', () => {
+            timer['tickSubscription'] = null;
+            const unsubscribeSpy = jest.spyOn(Subscription.prototype, 'unsubscribe');
+
+            timer.onTick(jest.fn());
+
+            expect(unsubscribeSpy).toHaveBeenCalledTimes(0);
+        });
+    });
+
+    describe('isRunning', () => {
+        it('should return false if no interval or interval destroyed', () => {
+            expect(timer.isRunning).toBe(false);
+
+            timer.start();
+
+            expect(timer.isRunning).toBe(true);
+
+            timer.pause();
+
+            expect(timer.isRunning).toBe(false);
         });
     });
 });
