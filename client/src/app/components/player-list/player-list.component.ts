@@ -76,6 +76,9 @@ export class PlayerListComponent implements OnInit, OnDestroy {
         const index = this.players.findIndex((x) => x.socketId === player.socketId);
 
         if (index !== NOT_FOUND_INDEX) {
+            if (this.players[index].hasSubmitted === true) {
+                player.hasSubmitted = true;
+            }
             this.players[index] = player;
         } else {
             this.players.push(player);
