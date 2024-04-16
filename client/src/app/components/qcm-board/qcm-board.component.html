@@ -1,5 +1,5 @@
 <div *ngIf="player && question"
-    [ngClass]="{ 'container': true, 'hidden': question?.type?.trim()?.toUpperCase() !== 'QCM' }">
+    [ngClass]="{ 'container': true, 'hidden': question.type.trim().toUpperCase() !== 'QCM' }">
     <div class="question-box font-color">
         <span id="questionText" class="text-centered">{{ question.text }}</span>
         <span id="value" class="text-centered"><strong>{{ question.points }} points</strong></span>
