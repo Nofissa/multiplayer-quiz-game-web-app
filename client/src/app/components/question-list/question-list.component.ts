@@ -7,6 +7,7 @@ import { QuestionHttpService } from '@app/services/question-http/question-http.s
 import { QuestionInteractionService } from '@app/services/question-interaction/question-interaction.service';
 import { QuestionSharingService } from '@app/services/question-sharing/question-sharing.service';
 import { Question } from '@common/question';
+import { QuestionType } from '@common/question-type';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -71,6 +72,6 @@ export class QuestionListComponent implements OnInit, OnDestroy {
     }
 
     isQcm(question: Question) {
-        return question.type === 'QCM';
+        return question.type === QuestionType.QCM;
     }
 }

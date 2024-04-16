@@ -2,30 +2,14 @@
 /* eslint-disable no-underscore-dangle */
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
+import { qcmQuestionStub } from '@app/test-stubs/question.stubs';
 import { Question } from '@common/question';
 import { QuestionHttpService } from './question-http.service';
 
 describe('QuestionHttpService', () => {
     let service: QuestionHttpService;
     let httpMock: HttpTestingController;
-    const questionsMock: Question[] = [
-        {
-            _id: '1a2b3c',
-            text: 'Sample question 1',
-            type: 'QCM',
-            points: 10,
-            choices: [],
-            lastModification: new Date(),
-        },
-        {
-            _id: '4d5e6f',
-            text: 'Sample question 2',
-            type: 'QCM',
-            points: 60,
-            choices: [],
-            lastModification: new Date(),
-        },
-    ];
+    const questionsMock: Question[] = qcmQuestionStub();
 
     beforeEach(() => {
         TestBed.configureTestingModule({
@@ -55,14 +39,7 @@ describe('QuestionHttpService', () => {
     });
 
     it('should create a question with POST', () => {
-        const questionMock: Question = {
-            _id: '1',
-            text: 'Sample question 1',
-            type: 'QCM',
-            points: 10,
-            choices: [],
-            lastModification: new Date(),
-        };
+        const questionMock: Question = qcmQuestionStub()[0];
 
         service.createQuestion(questionMock).subscribe((question) => {
             expect(question).toEqual(questionMock);

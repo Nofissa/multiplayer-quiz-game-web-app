@@ -40,11 +40,11 @@ describe('SoundService', () => {
         it('should play a loaded sound', () => {
             const name = 'testSound';
             const path = '/assets/sounds/test-sound.mp3';
-            service.loadSound(name, path);
 
             spyOn(service['audioContext'], 'createMediaElementSource').and.callThrough();
-            spyOn(service['audios'].get(name) as HTMLAudioElement, 'play');
+            service.loadSound(name, path);
 
+            spyOn(service['audios'].get(name) as HTMLAudioElement, 'play');
             service.playSound(name);
 
             expect(service['audioContext'].createMediaElementSource).toHaveBeenCalled();

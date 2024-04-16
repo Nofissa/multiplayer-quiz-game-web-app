@@ -7,7 +7,7 @@
                 <app-loader-animation></app-loader-animation>
             </div>
         </div>
-        <app-player-list class="players" [pin]="pin"></app-player-list>
+        <app-player-list class="players" [pin]="pin" [displayOptions]="{ waiting: true }"></app-player-list>
         <button class="leave-button" mat-raised-button color="warn" (click)="leaveGame()">Quitter</button>
     </div>
     <div class="chat-room-container flex-column">

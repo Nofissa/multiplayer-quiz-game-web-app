@@ -6,11 +6,13 @@
                 <mat-label>Question</mat-label>
                 <textarea id="question-input" matInput formControlName="text" value="{{ data.question.text }}" placeholder="Votre question ici">
                 </textarea>
-                <mat-slide-toggle id="qcm-slide-toggle" (click)="toggleQuestionType()">Type de Question: {{ data.question.type }}</mat-slide-toggle>
-                <mat-label *ngIf="qcmToggled"> Réponse Longue</mat-label>
-                <mat-label *ngIf="!qcmToggled"> Choix Multiples</mat-label>
             </mat-form-field>
-            <div *ngIf="!qcmToggled">
+            <mat-radio-group aria-label="Select an option" formControlName="questionType">
+                <div *ngFor="let question of questionTypes" class="flex-row">
+                    <mat-radio-button value="{{question}}" (click)="toggleQuestionType(question)">{{ question }}</mat-radio-button>
+                </div>
+            </mat-radio-group>
+            <div *ngIf="qcm">
                 <div cdkDropListGroup>
                     <p>Veuillez cocher les bonnes réponses</p>
                     <div cdkDropList [cdkDropListData]="choices.controls" (cdkDropListDropped)="drop($event)">

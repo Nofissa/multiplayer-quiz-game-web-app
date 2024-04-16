@@ -1,1 +1,5 @@
-export type BarChartType = 'QCM' | 'QRL' | 'ACTIVITY';
+export enum BarChartType {
+    QCM = 'QCM',
+    QRL = 'QRL',
+    ACTIVITY = 'ACTIVITY',
+}
