@@ -23,6 +23,8 @@ import { qrlSubmissionStub } from './stubs/qrl.submission.stub';
 import { questionStub } from './stubs/question.stubs';
 import { quizStub } from './stubs/quiz.stubs';
 import { submissionStub } from './stubs/submission.stub';
+import { PlayerState } from '@common/player-state';
+import { Player } from '@common/player';
 
 describe('GameService', () => {
     let gameService: GameService;
@@ -184,6 +186,10 @@ describe('GameService', () => {
         it('should throw an error if the player is already in the game', () => {
             gameTest.state = GameState.Opened;
             const playerUsername = 'anotherPlayer';
+            gameTest.clientPlayers.set(socketMock.id, {
+                player: { username: playerUsername, state: PlayerState.Playing } as Player,
+                socket: socketMock,
+            });
             jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(gameTest);
             jest.spyOn(Map.prototype, 'has').mockReturnValue(true);
             expect(() => gameService.joinGame(socketMock, gameTest.pin, playerUsername)).toThrowError('Vous êtes déjà dans cette partie');
