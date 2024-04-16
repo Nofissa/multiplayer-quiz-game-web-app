@@ -1,7 +1,7 @@
 <div class="list-container">
     <div class="list-header">
         <h4>Liste des joueurs</h4>
-        <button mat-icon-button [matMenuTriggerFor]="menu">
+        <button mat-icon-button [matMenuTriggerFor]="menu" *ngIf="!displayOptions.sorted">
             <mat-icon class="sort-icon">sort</mat-icon>
         </button>
         <mat-menu #menu="matMenu">
@@ -39,11 +39,13 @@
             }">
             <div class="row-container">
                 <div class="player-info-wrapper">
-                    <div [ngClass]="{
+                    <div
+                        [ngClass]="{
                             'player-name': !player.hasInteracted && !player.hasSubmitted,
-                            'player-name-interacted': player.hasInteracted && !player.hasSubmitted,
-                            'player-name-submitted': player.hasSubmitted,
-                        }">
+                            'player-name-interacted': player.hasInteracted && !player.hasSubmitted && !displayOptions.results,
+                            'player-name-submitted': player.hasSubmitted && !displayOptions.results
+                        }"
+                    >
                         {{ player.username }}
                     </div>
                     <div class="player-score" *ngIf="displayOptions.score">{{ player.score }} points</div>

@@ -3,7 +3,11 @@
     <div class="main-container flex-column">
         <div class="game-information flex-row">
             <app-bar-chart-swiper class="chart-swiper" *ngIf="chartData" [data]="chartData"></app-bar-chart-swiper>
-            <app-player-list class="players" [pin]="pin" [displayOptions]="{ score: true, speedAwardCount: true, sorted: true }"></app-player-list>
+            <app-player-list
+                class="players"
+                [pin]="pin"
+                [displayOptions]="{ score: true, speedAwardCount: true, sorted: true, results: true }"
+            ></app-player-list>
             <app-chat-room class="chat-room" [pin]="pin"></app-chat-room>
         </div>
 

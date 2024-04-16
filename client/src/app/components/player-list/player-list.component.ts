@@ -76,10 +76,7 @@ export class PlayerListComponent implements OnInit, OnDestroy {
         const index = this.players.findIndex((x) => x.socketId === player.socketId);
 
         if (index !== NOT_FOUND_INDEX) {
-            if (this.players[index].hasSubmitted === true) {
-                player.hasSubmitted = true;
-            }
-            this.players[index] = player;
+            this.players[index] = { ...player, hasInteracted: this.players[index].hasInteracted, hasSubmitted: this.players[index].hasSubmitted };
         } else {
             this.players.push(player);
         }
@@ -151,6 +148,11 @@ export class PlayerListComponent implements OnInit, OnDestroy {
             }),
             this.gameService.onStartGame(pin, () => {
                 this.displayOptions.ban = false;
+                this.players.forEach((player) => {
+                    player.hasInteracted = false;
+                    player.hasSubmitted = false;
+                });
+                this.isTimerFinished = false;
             }),
             this.gameService.onNextQuestion(pin, () => {
                 this.players.forEach((player) => {
@@ -167,6 +169,7 @@ export class PlayerListComponent implements OnInit, OnDestroy {
                 });
             }),
             this.gameService.onQrlInputChange(pin, (barchartSubmission) => {
+                console.log("BUUGGGGs");
                 this.players.forEach((player) => {
                     if (player.socketId === barchartSubmission.clientId) {
                         if (barchartSubmission.isSelected) {
