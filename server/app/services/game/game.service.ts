@@ -93,32 +93,13 @@ export class GameService implements OnModuleInit, OnModuleDestroy {
         const game = this.getGame(pin);
         const clientPlayer = new ClientPlayer(client, username);
         const clientPlayers = Array.from(game.clientPlayers.values());
-        const trimmedUsername = username.trim().toLowerCase();
 
         if (client.id !== game.organizer.id) {
-            if (game.state !== GameState.Opened) {
-                throw new Error(`La partie ${pin} n'est pas ouverte`);
-            }
-
-            if (game.clientPlayers.get(client.id)?.player?.state === PlayerState.Playing) {
-                throw new Error('Vous êtes déjà dans cette partie');
-            }
-
-            if (username.trim().toLowerCase() === 'organisateur') {
-                throw new Error('Le nom "Organisateur" est réservé');
-            }
-
-            if (clientPlayers.some((x) => x.player.username.toLowerCase() === trimmedUsername && x.player.state === PlayerState.Banned)) {
-                throw new Error(`Le nom d'utilisateur "${username}" est banni.`);
-            }
-
-            if (
-                clientPlayers.some(
-                    (x) => x.player.username.trim().toLowerCase() === username.trim().toLowerCase() && x.player.state === PlayerState.Playing,
-                )
-            ) {
-                throw new Error(`Le nom d'utilisateur "${username}" est déjà pris`);
-            }
+            this.ensureGameIsOpen(game);
+            this.ensureNotAlreadyInGame(game, client);
+            this.ensureValidUsername(username);
+            this.ensureNotBannedUsername(clientPlayers, username);
+            this.ensureUniqueUsername(clientPlayers, username);
         }
 
         game.clientPlayers.set(client.id, clientPlayer);
@@ -129,34 +110,26 @@ export class GameService implements OnModuleInit, OnModuleDestroy {
     evaluateChoices(client: Socket, pin: string): QcmEvaluation {
         const game = this.getGame(pin);
         const question = game.currentQuestion;
-        if (question.type !== 'QCM') {
-            return;
-        }
-        const submission = this.getOrCreateSubmission(client, game);
+        this.ensureQcmQuestion(question);
 
-        if (submission.isFinal) {
-            throw new Error('Vous avez déjà soumis vos choix pour cette question');
-        }
+        const submission = this.getOrCreateSubmission(client, game);
+        this.ensureNotAlreadySubmitted(submission);
 
         submission.isFinal = true;
 
-        const gameSubmissions = Array.from(game.currentQuestionQcmSubmissions.values());
         const isCorrect = this.isGoodAnswer(question, submission);
-        const isFirst = gameSubmissions.filter((x) => x.isFinal).length === 1 && this.timerService.getTimer(pin).time !== 0;
-        const isLast =
-            gameSubmissions.filter((x) => x.isFinal).length ===
-            Array.from(game.clientPlayers.values()).filter((x) => x.player.state === PlayerState.Playing).length;
+        const isFirst = this.isFirstSubmission(game) && this.timerService.getTimer(pin).time !== 0;
+        const isLast = this.isLastSubmission(game);
 
-        let score = isCorrect ? question.points : CONSTANTS.noPoints;
-        score *= isFirst ? CONSTANTS.bonusMultiplier : CONSTANTS.noBonusMultiplier;
+        const score = this.calculateScore(question.points, isCorrect, isFirst);
 
         const player = game.clientPlayers.get(client.id).player;
         player.score += score;
         player.speedAwardCount += isCorrect && isFirst ? 1 : 0;
 
-        const evaluation: QcmEvaluation = {
+        const evaluation = {
             player,
-            correctAnswers: question.choices.filter((x) => x.isCorrect),
+            correctAnswers: game.currentQuestion.choices.filter((x) => x.isCorrect),
             score,
             isFirstCorrect: isFirst && isCorrect,
             isLast,
@@ -385,5 +358,68 @@ export class GameService implements OnModuleInit, OnModuleDestroy {
         }
 
         return game.currentQuestionQcmSubmissions.get(client.id);
+    }
+
+    private ensureNotAlreadyInGame(game: Game, client: Socket) {
+        if (game.clientPlayers.has(client.id)) {
+            throw new Error('Vous êtes déjà dans cette partie');
+        }
+    }
+
+    private ensureValidUsername(username: string) {
+        if (username.trim().toLowerCase() === 'organisateur') {
+            throw new Error('Le nom "Organisateur" est réservé');
+        }
+    }
+
+    private ensureGameIsOpen(game: Game) {
+        if (game.state !== GameState.Opened) {
+            throw new Error(`La partie ${game.pin} n'est pas ouverte`);
+        }
+    }
+
+    private ensureUniqueUsername(clientPlayers: ClientPlayer[], username: string) {
+        const usernameExists = clientPlayers.some((x) => x.player.username.toLowerCase() === username.trim().toLowerCase());
+        if (usernameExists) {
+            throw new Error(`Le nom d'utilisateur "${username}" est déjà pris`);
+        }
+    }
+
+    private ensureNotBannedUsername(clientPlayers: ClientPlayer[], username: string) {
+        const usernameBanned = clientPlayers.some(
+            (x) => x.player.username.toLowerCase() === username.trim().toLowerCase() && x.player.state === PlayerState.Banned,
+        );
+        if (usernameBanned) {
+            throw new Error(`Le nom d'utilisateur "${username}" est banni.`);
+        }
+    }
+
+    private ensureQcmQuestion(question: Question) {
+        if (question.type !== 'QCM') {
+            throw new Error("La question n'est pas de type QCM");
+        }
+    }
+
+    private ensureNotAlreadySubmitted(submission: QcmSubmission) {
+        if (submission.isFinal) {
+            throw new Error('Vous avez déjà soumis vos choix pour cette question');
+        }
+    }
+
+    private isFirstSubmission(game: Game): boolean {
+        return Array.from(game.currentQuestionQcmSubmissions.values()).filter((x) => x.isFinal).length === 1;
+    }
+
+    private isLastSubmission(game: Game): boolean {
+        return (
+            Array.from(game.currentQuestionQcmSubmissions.values()).filter((x) => x.isFinal).length ===
+            Array.from(game.clientPlayers.values()).filter((x) => x.player.state === PlayerState.Playing).length
+        );
+    }
+
+    private calculateScore(questionPoints: number, isCorrect: boolean, isFirst: boolean): number {
+        let score = isCorrect ? questionPoints : CONSTANTS.noPoints;
+        score *= isFirst ? CONSTANTS.bonusMultiplier : CONSTANTS.noBonusMultiplier;
+        return score;
     }
 }

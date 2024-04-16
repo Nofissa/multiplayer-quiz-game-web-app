@@ -186,7 +186,6 @@ describe('GameService', () => {
             const playerUsername = 'anotherPlayer';
             jest.spyOn(GameService.prototype, 'getGame').mockReturnValue(gameTest);
             jest.spyOn(Map.prototype, 'has').mockReturnValue(true);
-            gameService.joinGame(socketMock, gameTest.pin, playerUsername);
             expect(() => gameService.joinGame(socketMock, gameTest.pin, playerUsername)).toThrowError('Vous êtes déjà dans cette partie');
         });
 

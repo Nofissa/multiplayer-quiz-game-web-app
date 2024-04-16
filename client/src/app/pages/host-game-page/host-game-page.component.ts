@@ -36,13 +36,12 @@ const PANIC_AUDIO_SRC = 'assets/ticking-timer.wav';
 export class HostGamePageComponent implements OnInit {
     @ViewChild(BarChartSwiperComponent) barChartSwiperComponent: BarChartSwiperComponent;
     pin: string;
-    isRandom: boolean;
-    gameState: GameState = GameState.Opened;
     currentQuestionHasEnded: boolean = false;
     isLastQuestion: boolean = false;
-    question: Question | undefined;
-    nextAvailable: boolean = false;
+    private isRandom: boolean;
+    private gameState: GameState = GameState.Opened;
     private eventSubscriptions: Subscription[] = [];
+
     private readonly activatedRoute: ActivatedRoute;
     private readonly router: Router;
     private readonly gameHttpService: GameHttpService;
@@ -147,6 +146,12 @@ export class HostGamePageComponent implements OnInit {
     }
 
     private setupSubscriptions(pin: string) {
+        this.setupGameSubscriptions(pin);
+        this.setupTimerSubscriptions(pin);
+        this.setupPlayerSubscriptions(pin);
+    }
+
+    private setupGameSubscriptions(pin: string) {
         this.eventSubscriptions.push(
             this.gameService.onCancelGame(pin, (message) => {
                 this.snackBarService.open(message, '', {
@@ -157,15 +162,12 @@ export class HostGamePageComponent implements OnInit {
 
                 this.router.navigate(['home']);
             }),
-
             this.gameService.onQcmToggleChoice(pin, (submissions) => {
                 this.barChartService.updateChartData(submissions);
             }),
-
             this.gameService.onToggleGameLock(pin, (gameState) => {
                 this.gameState = gameState;
             }),
-
             this.gameService.onQcmSubmit(pin, (evaluation) => {
                 if (evaluation.isLast) {
                     this.currentQuestionHasEnded = true;
@@ -173,19 +175,16 @@ export class HostGamePageComponent implements OnInit {
                     this.soundService.stopSound(PANIC_AUDIO_NAME);
                 }
             }),
-
             this.gameService.onQrlEvaluate(pin, (evaluation) => {
                 if (evaluation.isLast) {
                     this.currentQuestionHasEnded = true;
                 }
             }),
-
             this.gameService.onQrlSubmit(pin, (submission) => {
                 if (submission.isLast) {
                     this.timerService.stopTimer(pin);
                 }
             }),
-
             this.gameService.onStartGame(pin, (data) => {
                 this.barChartService.flushData();
                 this.isLastQuestion = data.isLast;
@@ -196,21 +195,22 @@ export class HostGamePageComponent implements OnInit {
                     this.router.navigate(['game'], { queryParams: { pin: this.pin } });
                 }
             }),
-
             this.gameService.onNextQuestion(pin, (data) => {
                 this.isLastQuestion = data.isLast;
                 this.addQuestion(data.question);
                 this.timerService.startTimer(this.pin, TimerEventType.NextQuestion, NEXT_QUESTION_DELAY_SECONDS);
             }),
-
-            this.playerService.onPlayerAbandon(pin, () => {
-                this.gameHttpService.getGameSnapshotByPin(pin).subscribe((snapshot) => {
-                    if (this.isRunning() && snapshot.players.filter((x) => x.state === PlayerState.Playing).length === 0) {
-                        this.gameService.cancelGame(pin);
-                    }
-                });
+            this.gameService.onEndGame(pin, () => {
+                this.handleEndGame();
             }),
+            this.gameService.onQrlInputChange(pin, (submission: BarchartSubmission) => {
+                this.barChartService.updateChartData(submission);
+            }),
+        );
+    }
 
+    private setupTimerSubscriptions(pin: string) {
+        this.eventSubscriptions.push(
             this.timerService.onTimerTick(pin, (payload) => {
                 if (payload.remainingTime === 0) {
                     if (payload.eventType === TimerEventType.StartGame || payload.eventType === TimerEventType.NextQuestion) {
@@ -218,18 +218,21 @@ export class HostGamePageComponent implements OnInit {
                     }
                 }
             }),
-
             this.timerService.onAccelerateTimer(pin, () => {
                 this.soundService.loadSound(PANIC_AUDIO_NAME, PANIC_AUDIO_SRC);
                 this.soundService.playSound(PANIC_AUDIO_NAME);
             }),
+        );
+    }
 
-            this.gameService.onEndGame(pin, () => {
-                this.handleEndGame();
-            }),
-
-            this.gameService.onQrlInputChange(pin, (submission: BarchartSubmission) => {
-                this.barChartService.updateChartData(submission);
+    private setupPlayerSubscriptions(pin: string) {
+        this.eventSubscriptions.push(
+            this.playerService.onPlayerAbandon(pin, () => {
+                this.gameHttpService.getGameSnapshotByPin(pin).subscribe((snapshot) => {
+                    if (this.isRunning() && snapshot.players.filter((x) => x.state === PlayerState.Playing).length === 0) {
+                        this.gameService.cancelGame(pin);
+                    }
+                });
             }),
         );
     }

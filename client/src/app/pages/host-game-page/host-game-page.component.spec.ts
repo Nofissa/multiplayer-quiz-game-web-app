@@ -194,11 +194,9 @@ describe('HostGamePageComponent', () => {
     });
 
     it('should component be initialized correctly', () => {
-        expect(component.gameState).toEqual(GameState.Opened);
+        expect(component['gameState']).toEqual(GameState.Opened);
         expect(component.currentQuestionHasEnded).toEqual(false);
         expect(component.isLastQuestion).toEqual(false);
-        expect(component.question).toEqual(undefined);
-        expect(component.nextAvailable).toEqual(false);
     });
 
     it('should barCharts return all chartData if there is data in the service', () => {
@@ -254,15 +252,15 @@ describe('HostGamePageComponent', () => {
         component.toggleLock();
         const payload: GameEventPayload<GameState> = { pin: PIN, data: GameState.Closed };
         socketServerMock.emit('toggleGameLock', payload);
-        expect(component.gameState).toEqual(GameState.Closed);
+        expect(component['gameState']).toEqual(GameState.Closed);
     });
 
     it('should startGame start server Game', () => {
-        component.isRandom = true;
+        component['isRandom'] = true;
         component.startGame();
         const payload: GameEventPayload<QuestionPayload> = { pin: PIN, data: { question: qcmQuestionStub()[0], isLast: false } };
         socketServerMock.emit('startGame', payload);
-        expect(component.gameState).toEqual(GameState.Running);
+        expect(component['gameState']).toEqual(GameState.Running);
         expect(component.isLastQuestion).toBeFalse();
         expect(barChartServiceSpy.addChart).toHaveBeenCalled();
         expect(timerServiceSpy.startTimer).toHaveBeenCalledWith(PIN, TimerEventType.StartGame, NEXT_QUESTION_DELAY);
@@ -323,7 +321,7 @@ describe('HostGamePageComponent', () => {
     });
 
     it('should playerAbandon should cancelGame if no players are left, do nothing otherwise', () => {
-        component.gameState = GameState.Running;
+        component['gameState'] = GameState.Running;
         const payload: GameEventPayload<Player> = { pin: PIN, data: secondPlayerStub() };
         gameHttpServiceSpy.getGameSnapshotByPin.and.callFake(() => {
             return of(mockSnapshotStubs()[0]);
@@ -339,7 +337,7 @@ describe('HostGamePageComponent', () => {
     });
 
     it('should onTimerTick start timer when ', () => {
-        component.gameState = GameState.Running;
+        component['gameState'] = GameState.Running;
         const payload: GameEventPayload<TimerPayload> = { pin: PIN, data: { remainingTime: 0, eventType: TimerEventType.NextQuestion } };
 
         socketServerMock.emit('timerTick', payload);
@@ -352,13 +350,13 @@ describe('HostGamePageComponent', () => {
 
     it('should set isEnded return true if Game is ended, false otherwise', () => {
         expect(component.isEnded()).toBeFalse();
-        component.gameState = GameState.Ended;
+        component['gameState'] = GameState.Ended;
         expect(component.isEnded()).toBeTrue();
     });
 
     it('should set isLocked return false if game is Openned, false otherwise', () => {
         expect(component.isLocked()).toBeFalse();
-        component.gameState = GameState.Running;
+        component['gameState'] = GameState.Running;
         expect(component.isLocked()).toBeTrue();
     });
 
