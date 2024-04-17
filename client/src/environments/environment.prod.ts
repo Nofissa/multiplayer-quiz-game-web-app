@@ -1,5 +1,5 @@
-import { IEnvironment } from './ienvironment';
 import { PROD_ENVIRONMENT } from '@app/constants/prod-environment';
+import { IEnvironment } from './ienvironment';
 
 export const environment: IEnvironment = {
     production: true,

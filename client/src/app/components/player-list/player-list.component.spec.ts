@@ -183,6 +183,7 @@ describe('PlayerListComponent', () => {
 
     it('should destroy subscriptions', () => {
         component.ngOnDestroy();
+        expect(mockSubscriptionService.clear).toHaveBeenCalled();
     });
 
     it('should ban player', () => {

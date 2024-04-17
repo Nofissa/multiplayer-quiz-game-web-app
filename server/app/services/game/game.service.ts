@@ -119,7 +119,7 @@ export class GameService implements OnModuleInit, OnModuleDestroy {
 
         const isCorrect = this.isGoodAnswer(question, submission);
         const isFirst = this.isFirstSubmission(game) && this.timerService.getTimer(pin).time !== 0;
-        const isLast = this.isLastSubmission(game);
+        const isLast = this.isLastQcmSubmission(game);
 
         const score = this.calculateScore(question.points, isCorrect, isFirst);
 
@@ -228,9 +228,7 @@ export class GameService implements OnModuleInit, OnModuleDestroy {
         const submission: QrlSubmission = { clientId: client.id, answer };
         game.currentQuestionQrlSubmissions.set(client.id, submission);
 
-        const isLast =
-            Array.from(game.currentQuestionQrlSubmissions.values()).length ===
-            Array.from(game.clientPlayers.values()).filter((x) => x.player.state === PlayerState.Playing).length;
+        const isLast = game.currentQuestionQrlSubmissions.size >= game.getActivePlayers().length;
 
         submission.isLast = isLast;
 
@@ -413,11 +411,8 @@ export class GameService implements OnModuleInit, OnModuleDestroy {
         return Array.from(game.currentQuestionQcmSubmissions.values()).filter((x) => x.isFinal).length === 1;
     }
 
-    private isLastSubmission(game: Game): boolean {
-        return (
-            Array.from(game.currentQuestionQcmSubmissions.values()).filter((x) => x.isFinal).length ===
-            Array.from(game.clientPlayers.values()).filter((x) => x.player.state === PlayerState.Playing).length
-        );
+    private isLastQcmSubmission(game: Game): boolean {
+        return game.currentQuestionQcmSubmissions.size >= game.getActivePlayers().length;
     }
 
     private calculateScore(questionPoints: number, isCorrect: boolean, isFirst: boolean): number {

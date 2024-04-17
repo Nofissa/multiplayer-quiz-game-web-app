@@ -204,7 +204,7 @@ describe('ChatRoomComponent', () => {
     it('should notify that a player has abandonned', () => {
         const banchatlog: Chatlog = {
             author: 'Système',
-            message: `${mockPlayers[0].username} a abandonné la partie`,
+            message: `${mockPlayers[0].username} a quitté la partie`,
             date: new Date(),
         };
         mockPlayerService.onPlayerAbandon.calls.mostRecent().args[1](mockPlayers[0]);

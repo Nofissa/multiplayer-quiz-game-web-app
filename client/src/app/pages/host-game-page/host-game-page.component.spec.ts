@@ -273,6 +273,8 @@ describe('HostGamePageComponent', () => {
         expect(playerServiceSpy.onPlayerAbandon).toHaveBeenCalledWith(PIN, jasmine.any(Function));
         expect(gameServiceSpy.onEndGame).toHaveBeenCalledWith(PIN, jasmine.any(Function));
         expect(timerServiceSpy.onTimerTick).toHaveBeenCalledWith(PIN, jasmine.any(Function));
+        expect(timerServiceSpy.onAccelerateTimer).toHaveBeenCalledWith(PIN, jasmine.any(Function));
+        expect(timerServiceSpy.onTogglePauseTimer).toHaveBeenCalledWith(PIN, jasmine.any(Function));
     });
 
     it('should redirect to home page on ngOnInit when successful', () => {

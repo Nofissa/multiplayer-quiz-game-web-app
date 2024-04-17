@@ -43,11 +43,15 @@ describe('QuestionBankComponent', () => {
             'updateQuestion',
             'deleteQuestionById',
             'createQuestion',
+            'onChange',
         ]);
         questionHttpServiceSpy.getAllQuestions.and.returnValue(of([mockQuestions[0]]));
         questionHttpServiceSpy.createQuestion.and.returnValue(mockQuestionSubject);
         questionHttpServiceSpy.updateQuestion.and.returnValue(mockQuestionEditedSubject);
         questionHttpServiceSpy.deleteQuestionById.and.returnValue(of(undefined));
+        questionHttpServiceSpy.onChange.and.callFake((callback: (questions: Question[]) => void) => {
+            return new Subject<Question[]>().subscribe(callback);
+        });
 
         questionSharingServiceSpy = jasmine.createSpyObj(QuestionSharingService, ['share', 'subscribe']);
         questionSharingServiceSpy['shareSubject'] = new Subject();
@@ -115,6 +119,20 @@ describe('QuestionBankComponent', () => {
 
             expect(questionSharingServiceSpy.share).toHaveBeenCalled();
             expect(addQuestionSpy).toHaveBeenCalled();
+        });
+
+        it('should setup change subscription on init', () => {
+            component.ngOnInit();
+
+            expect(questionHttpServiceSpy.onChange).toHaveBeenCalled();
+            expect(component['changeSubscription'].closed).toBe(false);
+        });
+
+        it('should unsubscribe change subscription on destroy', () => {
+            component.ngOnInit();
+            component.ngOnDestroy();
+
+            expect(component['changeSubscription'].closed).toBe(true);
         });
 
         it('should add a question to questions[] when a question is submitted', () => {

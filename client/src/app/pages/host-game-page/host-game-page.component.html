@@ -56,7 +56,7 @@
                         <app-player-list
                             class='player-list'
                             [pin]="pin"
-                            [displayOptions]="{ score: true, ban: true, quitters: true, mute: true }"
+                            [displayOptions]="{ score: true, ban: true, quitters: true, mute: true, waiting: true}"
                         ></app-player-list>
                     </div>
                     <app-bar-chart-swiper *ngIf="isRunning()" class="bar-chart half-view" [data]="barCharts"></app-bar-chart-swiper>

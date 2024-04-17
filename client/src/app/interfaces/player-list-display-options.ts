@@ -5,4 +5,6 @@ export interface PlayerListDisplayOptions {
     ban?: boolean;
     quitters?: boolean;
     mute?: boolean;
+    results?: boolean;
+    waiting?: boolean;
 }
