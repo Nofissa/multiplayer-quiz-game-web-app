@@ -6,7 +6,7 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MAX_CHOICE_COUNT, MIN_CHOICE_COUNT } from '@app/constants/constants';
+import { ID_LENGTH, MAX_CHOICE_COUNT, MIN_CHOICE_COUNT } from '@app/constants/constants';
 import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog-data';
 import { Choice } from '@common/choice';
 import { QuestionType } from '@common/question-type';
@@ -286,5 +286,16 @@ describe('UpsertQuestionDialogComponent', () => {
             { text: 'Choice 2', isCorrect: false },
             { text: 'Choice 1', isCorrect: true },
         ]);
+    });
+
+    it('should generate a random string of default length', () => {
+        const randomString = component['generateRandomString']();
+        expect(randomString.length).toBe(ID_LENGTH);
+    });
+
+    it('should generate a random string of specified length', () => {
+        const length = 10;
+        const randomString = component['generateRandomString'](length);
+        expect(randomString.length).toBe(length);
     });
 });
