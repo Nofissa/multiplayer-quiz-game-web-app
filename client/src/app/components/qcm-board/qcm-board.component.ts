@@ -38,6 +38,7 @@ export class QcmBoardComponent implements OnInit, OnDestroy {
     selectedChoiceIndexes: number[];
 
     private cachedEvaluation: QcmEvaluation | null = null;
+    private isInTransition: boolean;
     private readonly uuid = uuidv4();
     private readonly gameHttpService: GameHttpService;
     private readonly gameService: GameService;
@@ -69,7 +70,7 @@ export class QcmBoardComponent implements OnInit, OnDestroy {
     handleKeyboardEvent(event: KeyboardEvent): void {
         const focusedElement = document.activeElement as HTMLElement;
 
-        if (this.disableShortcuts || focusedElement.tagName.toLowerCase() === 'textarea') {
+        if (this.disableShortcuts || focusedElement.tagName.toLowerCase() === 'textarea' || this.isInTransition) {
             return;
         }
 
@@ -138,11 +139,16 @@ export class QcmBoardComponent implements OnInit, OnDestroy {
     }
 
     private loadNextQuestion(question: Question) {
+        const transitionDuration = 5000;
         this.questionIsOver = false;
         this.hasSubmitted = false;
         this.selectedChoiceIndexes = [];
         this.cachedEvaluation = null;
         this.question = question;
+        this.isInTransition = true;
+        setTimeout(() => {
+            this.isInTransition = false;
+        }, transitionDuration);
     }
 
     private setupSubscriptions(pin: string) {
