@@ -68,8 +68,9 @@ describe('PanicModeButtonComponent', () => {
     });
 
     it('should subscribe to game events', () => {
+        const NUMBER_OF_SUBS = 4;
         component['subscribeToGameEvents']();
-        expect(component['subscriptions'].length).toBe(4);
+        expect(component['subscriptions'].length).toBe(NUMBER_OF_SUBS);
     });
 
     it('should subscribe to timer events', () => {
