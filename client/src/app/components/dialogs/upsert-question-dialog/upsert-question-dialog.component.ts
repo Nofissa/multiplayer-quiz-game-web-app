@@ -67,18 +67,6 @@ export class UpsertQuestionDialogComponent {
         moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
     }
 
-    generateRandomString(length: number = ID_LENGTH): string {
-        const lettersAndDigits = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        let randomString = '';
-
-        for (let i = 0; i < length; i++) {
-            const randomIndex: number = Math.floor(Math.random() * lettersAndDigits.length);
-            randomString += lettersAndDigits.charAt(randomIndex);
-        }
-
-        return randomString;
-    }
-
     addAnswer() {
         if (this.choicesArray.length < MAX_CHOICE_COUNT) {
             this.choicesArray.push(
@@ -123,6 +111,18 @@ export class UpsertQuestionDialogComponent {
         } else {
             this.showValidationErrors();
         }
+    }
+
+    private generateRandomString(length: number = ID_LENGTH): string {
+        const lettersAndDigits = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let randomString = '';
+
+        for (let i = 0; i < length; i++) {
+            const randomIndex: number = Math.floor(Math.random() * lettersAndDigits.length);
+            randomString += lettersAndDigits.charAt(randomIndex);
+        }
+
+        return randomString;
     }
 
     private isFormValid(): boolean {
