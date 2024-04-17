@@ -16,8 +16,10 @@ import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { lastPlayerEvaluationStub } from '@app/test-stubs/evaluation.stubs';
 import { firstPlayerStub } from '@app/test-stubs/player.stubs';
 import { qcmQuestionStub } from '@app/test-stubs/question.stubs';
+import { mockSnapshotStubs } from '@app/test-stubs/snapshot.stubs';
 import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
 import { GameEventPayload } from '@common/game-event-payload';
+import { GameState } from '@common/game-state';
 import { Grade } from '@common/grade';
 import { QcmEvaluation } from '@common/qcm-evaluation';
 import { QrlEvaluation } from '@common/qrl-evaluation';
@@ -25,7 +27,7 @@ import { Question } from '@common/question';
 import { QuestionPayload } from '@common/question-payload';
 import { TimerEventType } from '@common/timer-event-type';
 import { TimerPayload } from '@common/timer-payload';
-import { Observable, throwError } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { io } from 'socket.io-client';
 import { GamePageComponent } from './game-page.component';
 
@@ -72,7 +74,7 @@ describe('GamePageComponent', () => {
             'onAccelerateTimer',
             'onTogglePauseTimer',
         ]);
-        soundServiceSpy = jasmine.createSpyObj<SoundService>(['loadSound', 'playSound', 'stopSound']);
+        soundServiceSpy = jasmine.createSpyObj('SoundService', ['loadSound', 'playSound', 'stopSound']);
         mockSubscriptionService = jasmine.createSpyObj<SubscriptionService>(['add', 'clear']);
 
         await TestBed.configureTestingModule({
@@ -128,6 +130,13 @@ describe('GamePageComponent', () => {
             return webSocketServiceSpy.on('startTimer', applyIfPinMatches(pin, callback));
         });
 
+        timerServiceSpy.onAccelerateTimer.and.callFake((pin, callback) => {
+            return webSocketServiceSpy.on('accelerateTimer', applyIfPinMatches(pin, callback));
+        });
+        timerServiceSpy.onTogglePauseTimer.and.callFake((pin, callback) => {
+            return webSocketServiceSpy.on('togglePauseTimer', applyIfPinMatches(pin, callback));
+        });
+
         gameServiceSpy.onStartGame.and.callFake((pin, callback) => {
             return webSocketServiceSpy.on('startGame', applyIfPinMatches(pin, callback));
         });
@@ -154,6 +163,15 @@ describe('GamePageComponent', () => {
         spyOn(gameHttpService, 'getGameSnapshotByPin').and.returnValue(new Observable());
         component.ngOnInit();
         expect(component['setupSubscriptions']).toHaveBeenCalled();
+    });
+
+    it('should ngOnIt redirect to home is game is Ended', () => {
+        spyOn(component['router'], 'navigateByUrl');
+        const snapshot = mockSnapshotStubs()[0];
+        snapshot.state = GameState.Ended;
+        spyOn(gameHttpService, 'getGameSnapshotByPin').and.returnValue(of(snapshot));
+        component.ngOnInit();
+        expect(component['router'].navigateByUrl).toHaveBeenCalled();
     });
 
     it('should ngOnIt if error status is 404', () => {
@@ -262,5 +280,23 @@ describe('GamePageComponent', () => {
 
         expect(component.isStarting).toBeFalse();
         expect(component['router'].navigateByUrl).toHaveBeenCalled();
+    });
+
+    it('should accelerate Timer load panic sound ', () => {
+        component['setupTimerSubscriptions']('1234');
+        const payload: GameEventPayload<null> = { pin: '1234', data: null };
+        socketServerMock.emit('accelerateTimer', payload);
+        expect(soundServiceSpy.loadSound).toHaveBeenCalled();
+        expect(soundServiceSpy.playSound).toHaveBeenCalled();
+    });
+
+    it('should onTogglePauseTimer play sound ', () => {
+        component['setupTimerSubscriptions']('1234');
+        let payload: GameEventPayload<boolean> = { pin: '1234', data: true };
+        socketServerMock.emit('togglePauseTimer', payload);
+        expect(soundServiceSpy.playSound).toHaveBeenCalled();
+        payload = { pin: '1234', data: false };
+        socketServerMock.emit('togglePauseTimer', payload);
+        expect(soundServiceSpy.stopSound).toHaveBeenCalled();
     });
 });

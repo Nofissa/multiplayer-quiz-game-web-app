@@ -429,7 +429,7 @@ describe('HostGamePageComponent', () => {
         expect(timerServiceSpy.startTimer).toHaveBeenCalled();
     });
 
-    it('should sccelerate Timer load panic sound ', () => {
+    it('should accelerate Timer load panic sound ', () => {
         const payload: GameEventPayload<null> = { pin: PIN, data: null };
         socketServerMock.emit('accelerateTimer', payload);
         expect(soundServiceSpy.loadSound).toHaveBeenCalled();

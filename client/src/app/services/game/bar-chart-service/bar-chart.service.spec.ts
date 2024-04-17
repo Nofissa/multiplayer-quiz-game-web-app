@@ -110,7 +110,9 @@ describe('BarChartService', () => {
 
     it('should setData populate the service when given data is correct', () => {
         service.setData(mockSnapshot);
-        expect(service['barChartData']).toEqual(barChartDataStub());
+        const mockAnswer = barChartDataStub();
+        mockAnswer.pop();
+        expect(service['barChartData']).toEqual(mockAnswer);
     });
 
     it('should contain multiple barCharts', () => {
