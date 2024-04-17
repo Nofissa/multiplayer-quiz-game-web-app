@@ -412,7 +412,7 @@ export class GameService implements OnModuleInit, OnModuleDestroy {
     }
 
     private isLastQcmSubmission(game: Game): boolean {
-        return game.currentQuestionQcmSubmissions.size >= game.getActivePlayers().length;
+        return Array.from(game.currentQuestionQcmSubmissions.values()).filter((x) => x.isFinal).length >= game.getActivePlayers().length;
     }
 
     private calculateScore(questionPoints: number, isCorrect: boolean, isFirst: boolean): number {
