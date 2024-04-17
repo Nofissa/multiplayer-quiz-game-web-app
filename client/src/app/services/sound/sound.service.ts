@@ -23,6 +23,7 @@ export class SoundService {
     }
 
     playSound(name: string): void {
+        this.audioContext.resume();
         const audio = this.audios.get(name);
 
         if (audio) {
@@ -31,6 +32,7 @@ export class SoundService {
     }
 
     stopSound(name: string): void {
+        this.audioContext.suspend();
         const audio = this.audios.get(name);
 
         if (audio) {
