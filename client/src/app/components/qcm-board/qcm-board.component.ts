@@ -62,7 +62,7 @@ export class QcmBoardComponent implements OnInit, OnDestroy {
     }
 
     private get disableShortcuts(): boolean {
-        return this.hasSubmitted || this.question?.type?.trim()?.toUpperCase() !== 'QCM';
+        return this.hasSubmitted || !this.isQCM(this.question);
     }
 
     @HostListener('window:keydown', ['$event'])
@@ -104,7 +104,7 @@ export class QcmBoardComponent implements OnInit, OnDestroy {
     }
 
     toggleSelectChoice(choiceIndex: number) {
-        if (this.question?.type?.trim()?.toUpperCase() !== 'QCM') {
+        if (!this.isQCM(this.question)) {
             return;
         }
         const foundIndex = this.selectedChoiceIndexes.indexOf(choiceIndex);
@@ -134,7 +134,7 @@ export class QcmBoardComponent implements OnInit, OnDestroy {
     }
 
     isQCM(question: Question) {
-        return question.type === QuestionType.QCM;
+        return question?.type === QuestionType.QCM;
     }
 
     private loadNextQuestion(question: Question) {

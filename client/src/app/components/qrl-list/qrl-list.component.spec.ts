@@ -115,7 +115,7 @@ describe('QrlListComponent', () => {
     it('should setupSubscription', () => {
         const qrlSubmission: GameEventPayload<QrlSubmission> = { pin: '123', data: { answer: 'tesstststs', clientId: firstPlayerStub().socketId } };
         component.pin = '123';
-        component.players = [firstPlayerStub()];
+        component['players'] = [firstPlayerStub()];
         component['setupSubscriptions']('123');
         socketServerMock.emit('qrlSubmit', qrlSubmission);
         socketServerMock.emit('nextQuestion', qrlQuestionStub()[0]);

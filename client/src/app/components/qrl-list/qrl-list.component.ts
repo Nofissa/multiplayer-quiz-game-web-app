@@ -3,9 +3,11 @@ import { NOT_FOUND_INDEX } from '@app/constants/constants';
 import { GameServicesProvider } from '@app/providers/game-services.provider';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
+import { PlayerService } from '@app/services/player/player.service';
 import { SubscriptionService } from '@app/services/subscription/subscription.service';
 import { Grade } from '@common/grade';
 import { Player } from '@common/player';
+import { PlayerState } from '@common/player-state';
 import { SwiperComponent } from 'swiper/angular';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -18,16 +20,18 @@ export class QrlListComponent implements OnInit, OnDestroy {
     @ViewChild('swiperRef') swiperRef: SwiperComponent;
     @Input()
     pin: string;
-    players: Player[] = [];
     playersMap: Map<Player, string | undefined> = new Map();
     playersButtons: Map<Player, boolean> = new Map();
     submissionsReceived: number = 0;
     evaluationsDone: number = 0;
     evaluationsSent: boolean = false;
+    lastSubmissionWasReceived: boolean = false;
+    private players: Player[] = [];
 
     private readonly uuid = uuidv4();
     private readonly gameHttpService: GameHttpService;
     private readonly gameService: GameService;
+    private readonly playerService: PlayerService;
 
     constructor(
         gameServicesProvider: GameServicesProvider,
@@ -35,6 +39,11 @@ export class QrlListComponent implements OnInit, OnDestroy {
     ) {
         this.gameHttpService = gameServicesProvider.gameHttpService;
         this.gameService = gameServicesProvider.gameService;
+        this.playerService = gameServicesProvider.playerService;
+    }
+
+    get activePlayers() {
+        return this.players.filter((x) => x.state === PlayerState.Playing);
     }
 
     ngOnInit() {
@@ -53,7 +62,7 @@ export class QrlListComponent implements OnInit, OnDestroy {
             this.swiperRef.swiperRef.slideNext();
         }
         this.evaluationsDone += 1;
-        if (this.evaluationsDone === this.players.length) {
+        if (this.evaluationsDone >= this.activePlayers.length) {
             this.evaluationsSent = true;
             const button = document.querySelector('mySwiper button-container');
             if (button) {
@@ -73,6 +82,9 @@ export class QrlListComponent implements OnInit, OnDestroy {
                 });
             }),
             this.gameService.onQrlSubmit(pin, (submission) => {
+                if (submission.isLast) {
+                    this.lastSubmissionWasReceived = true;
+                }
                 const index = this.players.findIndex((x) => x.socketId === submission.clientId);
                 if (index !== NOT_FOUND_INDEX) {
                     this.submissionsReceived += 1;
@@ -84,6 +96,14 @@ export class QrlListComponent implements OnInit, OnDestroy {
                 this.evaluationsSent = false;
                 this.evaluationsDone = 0;
                 this.submissionsReceived = 0;
+                this.lastSubmissionWasReceived = false;
+            }),
+            this.playerService.onPlayerAbandon(pin, (player) => {
+                const index = this.players.findIndex((x) => x.socketId === player.socketId);
+
+                if (index !== NOT_FOUND_INDEX) {
+                    this.players[index] = player;
+                }
             }),
         );
     }

@@ -57,7 +57,7 @@ describe('BarChartService', () => {
 
     it('should add chart when question is valid and chart tyépe is activity', () => {
         const question = qrlQuestionStub()[0];
-        const mockChartElements: BarchartElement[] = [{ text: 'inactif' }, { text: 'actif' }];
+        const mockChartElements: BarchartElement[] = [{ text: 'Joueurs Inactifs' }, { text: 'Joueurs Actifs' }];
         const mockBarChart: BarChartData = {
             text: 'Activité pour la question: ' + question.text,
             chartType: BarChartType.ACTIVITY,

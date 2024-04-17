@@ -30,7 +30,8 @@ export class QuestionBankComponent implements OnInit, OnDestroy {
     questions: Question[] = [];
     displayedQuestions: Question[] = [];
 
-    shareSubscription: Subscription = new Subscription();
+    private shareSubscription: Subscription = new Subscription();
+    private changeSubscription: Subscription;
 
     private readonly dialogService: MatDialog;
     private readonly snackBarService: MatSnackBar;
@@ -51,12 +52,15 @@ export class QuestionBankComponent implements OnInit, OnDestroy {
     ngOnInit() {
         this.loadQuestions();
         this.setupServices();
+        this.changeSubscription = this.questionHttpService.onChange((questions) => {
+            this.questions = questions;
+            this.displayedQuestions = questions;
+        });
     }
 
     ngOnDestroy() {
-        if (!this.shareSubscription?.closed) {
-            this.shareSubscription.unsubscribe();
-        }
+        this.shareSubscription?.unsubscribe();
+        this.changeSubscription?.unsubscribe();
     }
 
     openAddQuestionDialog() {

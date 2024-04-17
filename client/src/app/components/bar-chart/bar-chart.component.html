@@ -23,9 +23,9 @@
                 matBadgeColor="primary"
                 matBadgeSize="large"
             >
-                <p class="card-content-text">
+                <span class="card-content-text">
                     {{ element.text }}
-                </p>
+                </span>
             </mat-card-content>
             <mat-card-content
                 class="card-content"
@@ -35,15 +35,15 @@
                 matBadgeColor="warn"
                 matBadgeSize="large"
             >
-                <p class="card-content-text">
+                <span class="card-content-text">
                     {{ element.text }}
-                </p>
+                </span>
             </mat-card-content>
             <mat-card-content *ngIf="element.isCorrect === undefined" class="card-content">
-                <p class="card-content-text">
+                <span class="card-content-text">
                     {{ element.text }}
-                </p></mat-card-content
-            >
+                </span>
+            </mat-card-content>
         </mat-card>
     </div>
 </div>

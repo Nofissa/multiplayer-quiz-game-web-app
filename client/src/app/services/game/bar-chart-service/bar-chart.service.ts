@@ -46,8 +46,8 @@ export class BarChartService {
                 break;
 
             case BarChartType.ACTIVITY:
-                newBarchartData.chartElements.push({ text: 'inactif' });
-                newBarchartData.chartElements.push({ text: 'actif' });
+                newBarchartData.chartElements.push({ text: 'Joueurs Inactifs' });
+                newBarchartData.chartElements.push({ text: 'Joueurs Actifs' });
                 break;
         }
 
