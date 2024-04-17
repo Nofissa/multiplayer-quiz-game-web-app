@@ -23,15 +23,17 @@
 
 .chat-room {
     height: 100%;
-    width: 30%;
+    max-width: 400px;
 }
 
 .chart-swiper {
-    width: 45%;
+    min-width: 500px;
+    max-width: 600px;
 }
 
 .players {
-    width: 45%;
+    min-width: 500px;
+    max-width: 600px;
 }
 
 .nav-bar {
@@ -46,4 +48,10 @@
 
 .leave-button:hover {
     transform: scale(0.96);
+}
+
+.stats-wrapper {
+    flex-grow: 1;
+    justify-content: center;
+    align-items: center;
 }
