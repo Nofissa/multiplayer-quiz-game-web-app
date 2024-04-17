@@ -50,6 +50,16 @@ export class PanicModeButtonComponent implements OnInit, OnDestroy {
                 this.updateCurrentQuestion(question);
                 this.reset();
             }),
+            this.gameService.onQcmSubmit(this.pin, (evaluation) => {
+                if (evaluation.isLast) {
+                    this.isVisible = false;
+                }
+            }),
+            this.gameService.onQrlSubmit(this.pin, (submission) => {
+                if (submission.isLast) {
+                    this.isVisible = false;
+                }
+            }),
         );
     }
 
