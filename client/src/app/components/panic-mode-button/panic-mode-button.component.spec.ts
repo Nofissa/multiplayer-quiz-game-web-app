@@ -11,6 +11,8 @@ import { Observable, Observer, of, Subscription } from 'rxjs';
 import { io } from 'socket.io-client';
 import { PanicModeButtonComponent } from './panic-mode-button.component';
 import { QuestionType } from '@common/question-type';
+import { QcmEvaluation } from '@common/qcm-evaluation';
+import { QrlSubmission } from '@common/qrl-submission';
 
 describe('PanicModeButtonComponent', () => {
     let component: PanicModeButtonComponent;
@@ -21,7 +23,7 @@ describe('PanicModeButtonComponent', () => {
     let socketServerMock: SocketServerMock;
 
     beforeEach(async () => {
-        gameServiceMock = jasmine.createSpyObj('GameService', ['onStartGame', 'onNextQuestion']);
+        gameServiceMock = jasmine.createSpyObj('GameService', ['onStartGame', 'onNextQuestion', 'onQcmSubmit', 'onQrlSubmit']);
         timerServiceMock = jasmine.createSpyObj('TimerService', ['onStartTimer', 'onTimerTick', 'accelerateTimer']);
         webSocketServiceMock = jasmine.createSpyObj('WebSocketService', ['emit', 'on'], {
             socketInstance: io(),
@@ -67,7 +69,7 @@ describe('PanicModeButtonComponent', () => {
 
     it('should subscribe to game events', () => {
         component['subscribeToGameEvents']();
-        expect(component['subscriptions'].length).toBe(2);
+        expect(component['subscriptions'].length).toBe(4);
     });
 
     it('should subscribe to timer events', () => {
@@ -158,6 +160,34 @@ describe('PanicModeButtonComponent', () => {
 
         expect(updateCurrentQuestionSpy).toHaveBeenCalled();
         expect(resetSpy).toHaveBeenCalled();
+    });
+
+    it('should be invisible if last QCM was submitted', () => {
+        gameServiceMock.onQcmSubmit.and.callFake((_pin: string, callback: (evaluation: QcmEvaluation) => void) => {
+            const payload = { isLast: true } as QcmEvaluation;
+            callback(payload);
+
+            return of(payload).subscribe(callback);
+        });
+
+        component.ngOnInit();
+        socketServerMock.emit('qcmSubmit', {} as never);
+
+        expect(component['isVisible']).toBeFalse();
+    });
+
+    it('should be invisible if last QRL was submitted', () => {
+        gameServiceMock.onQrlSubmit.and.callFake((_pin: string, callback: (submission: QrlSubmission) => void) => {
+            const payload = { isLast: true } as QrlSubmission;
+            callback(payload);
+
+            return of(payload).subscribe(callback);
+        });
+
+        component.ngOnInit();
+        socketServerMock.emit('qrlSubmit', {} as never);
+
+        expect(component['isVisible']).toBeFalse();
     });
 
     it('should call updateVisibility on startTimer event', () => {
