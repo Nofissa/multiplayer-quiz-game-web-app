@@ -127,7 +127,7 @@ export class ChatRoomComponent implements OnInit, OnDestroy {
                 if (player) {
                     this.chatlogs.push({
                         author: 'Système',
-                        message: `${player.username} a abandonné la partie`,
+                        message: `${player.username} a quitté la partie`,
                         date: new Date(),
                     });
                 }

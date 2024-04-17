@@ -156,3 +156,9 @@
 .green-badge ::ng-deep .mat-badge-content {
     background-color: green !important;
 }
+
+.mat-mdc-card-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
