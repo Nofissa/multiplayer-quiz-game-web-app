@@ -412,7 +412,12 @@ export class GameService implements OnModuleInit, OnModuleDestroy {
     }
 
     private isLastQcmSubmission(game: Game): boolean {
-        return game.currentQuestionQcmSubmissions.size >= game.getActivePlayers().length;
+        const activePlayers = game.getActivePlayers();
+        return (
+            Array.from(game.currentQuestionQcmSubmissions.entries()).filter(([clientId, submission]) => {
+                return activePlayers.some((activePlayer) => activePlayer.socket.id === clientId) && submission.isFinal;
+            }).length >= activePlayers.length
+        );
     }
 
     private calculateScore(questionPoints: number, isCorrect: boolean, isFirst: boolean): number {
