@@ -1,14 +1,14 @@
 import { TestBed } from '@angular/core/testing';
+import { BarChartData } from '@app/interfaces/bar-chart-data';
+import { BarchartElement } from '@app/interfaces/barchart-element';
 import { barChartDataStub } from '@app/test-stubs/bar-chart-data.stubs';
 import { qcmQuestionStub, qrlQuestionStub } from '@app/test-stubs/question.stubs';
 import { mockSnapshotStubs } from '@app/test-stubs/snapshot.stubs';
-import { BarChartData } from '@app/interfaces/bar-chart-data';
-import { BarchartElement } from '@app/interfaces/barchart-element';
 import { BarchartSubmission } from '@common/barchart-submission';
+import { BarChartType } from '@common/barchart-type';
 import { GameSnapshot } from '@common/game-snapshot';
 import { Question } from '@common/question';
 import { BarChartService } from './bar-chart.service';
-import { BarChartType } from '@common/barchart-type';
 
 describe('BarChartService', () => {
     let service: BarChartService;
@@ -55,7 +55,7 @@ describe('BarChartService', () => {
         expect(service['barChartData']).toEqual([mockBarChart]);
     });
 
-    it('should add chart when question is valid and chart tyépe is activity', () => {
+    it('should add chart when question is valid and chart type is activity', () => {
         const question = qrlQuestionStub()[0];
         const mockChartElements: BarchartElement[] = [{ text: 'inactif' }, { text: 'actif' }];
         const mockBarChart: BarChartData = {
@@ -87,20 +87,7 @@ describe('BarChartService', () => {
     });
 
     it('should update chart toggle active state in the barchart submissions for and ACTIVITY chart', () => {
-        const newChartSubmission: BarchartSubmission[] = [
-            {
-                clientId: 'Some Id',
-                index: 0,
-                isSelected: true,
-            },
-            {
-                clientId: 'Some Id',
-                index: 1,
-                isSelected: false,
-            },
-        ];
-        const mockBarChart: BarChartData = barChartDataStub()[0];
-        mockBarChart.submissions = newChartSubmission;
+        const mockBarChart: BarChartData = barChartDataStub()[4];
         service['barChartData'] = [mockBarChart];
         service.updateChartData({
             clientId: 'Some Id',

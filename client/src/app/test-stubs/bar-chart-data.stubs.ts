@@ -1,9 +1,9 @@
 import { BarChartData } from '@app/interfaces/bar-chart-data';
 import { BarchartElement } from '@app/interfaces/barchart-element';
 import { BarchartSubmission } from '@common/barchart-submission';
+import { BarChartType } from '@common/barchart-type';
 import { firstPlayerStub, secondPlayerStub } from './player.stubs';
 import { qcmQuestionStub, qrlQuestionStub } from './question.stubs';
-import { BarChartType } from '@common/barchart-type';
 
 const mockQuestionElements0: BarchartElement[] = [];
 qcmQuestionStub()[0].choices?.forEach((choice) => {
@@ -73,6 +73,23 @@ export const barChartDataStub = (): BarChartData[] => {
             chartElements: [{ text: '0' }, { text: '50' }, { text: '100' }],
             chartType: BarChartType.QRL,
             submissions: barchartSubmissionStubs()[3],
+        },
+        {
+            text: 'stuff',
+            chartElements: [{ text: 'inactif' }, { text: 'actif' }],
+            chartType: BarChartType.ACTIVITY,
+            submissions: [
+                {
+                    clientId: 'Some Id',
+                    index: 0,
+                    isSelected: true,
+                },
+                {
+                    clientId: 'Some Id',
+                    index: 1,
+                    isSelected: false,
+                },
+            ],
         },
     ];
 };
