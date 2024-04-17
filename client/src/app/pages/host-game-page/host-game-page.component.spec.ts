@@ -27,6 +27,7 @@ import { qcmQuestionStub, qrlQuestionStub } from '@app/test-stubs/question.stubs
 import { mockSnapshotStubs } from '@app/test-stubs/snapshot.stubs';
 import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
 import { BarchartSubmission } from '@common/barchart-submission';
+import { BarChartType } from '@common/barchart-type';
 import { GameEventPayload } from '@common/game-event-payload';
 import { GameState } from '@common/game-state';
 import { Grade } from '@common/grade';
@@ -41,7 +42,6 @@ import { Observable, Subject, of, throwError } from 'rxjs';
 import { io } from 'socket.io-client';
 import { HostGamePageComponent } from './host-game-page.component';
 import SpyObj = jasmine.SpyObj;
-import { BarChartType } from '@common/barchart-type';
 
 const PIN = '1234';
 const NEXT_QUESTION_DELAY = 5;
@@ -144,6 +144,9 @@ describe('HostGamePageComponent', () => {
             'onTogglePauseTimer',
         ]);
         timerServiceSpy.onTimerTick.and.callFake((pin, callback) => {
+            return webSocketServiceSpy.on('timerTick', applyIfPinMatches(pin, callback));
+        });
+        timerServiceSpy.onAccelerateTimer.and.callFake((pin, callback) => {
             return webSocketServiceSpy.on('timerTick', applyIfPinMatches(pin, callback));
         });
         soundServiceSpy = jasmine.createSpyObj<SoundService>(['loadSound', 'playSound', 'stopSound']);
@@ -264,6 +267,8 @@ describe('HostGamePageComponent', () => {
         expect(playerServiceSpy.onPlayerAbandon).toHaveBeenCalledWith(PIN, jasmine.any(Function));
         expect(gameServiceSpy.onEndGame).toHaveBeenCalledWith(PIN, jasmine.any(Function));
         expect(timerServiceSpy.onTimerTick).toHaveBeenCalledWith(PIN, jasmine.any(Function));
+        expect(timerServiceSpy.onAccelerateTimer).toHaveBeenCalledWith(PIN, jasmine.any(Function));
+        expect(timerServiceSpy.onTogglePauseTimer).toHaveBeenCalledWith(PIN, jasmine.any(Function));
     });
 
     it('should redirect to home page on ngOnInit when successful', () => {
