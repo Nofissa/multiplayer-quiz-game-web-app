@@ -1,11 +1,11 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { quizStub } from '@app/TestStubs/quiz.stubs';
 import { GameTransitionDisplayOptions } from '@app/interfaces/game-transition-display-options';
 import { GameServicesProvider } from '@app/providers/game-services.provider';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { TimerService } from '@app/services/timer/timer.service';
+import { quizStub } from '@app/test-stubs/quiz.stubs';
 import { GameSnapshot } from '@common/game-snapshot';
 import { GameState } from '@common/game-state';
 import { TimerEventType } from '@common/timer-event-type';
@@ -19,7 +19,9 @@ const gameSnapshotStub: GameSnapshot = {
     quiz: quizStub(),
     state: GameState.Paused,
     currentQuestionIndex: 0,
-    questionSubmissions: [],
+    questionQcmSubmissions: [],
+    questionQrlSubmission: [],
+    questionQrlEvaluation: [],
 };
 
 describe('GameTransitionComponent', () => {

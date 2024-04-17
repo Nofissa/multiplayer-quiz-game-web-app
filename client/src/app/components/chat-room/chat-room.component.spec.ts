@@ -1,21 +1,23 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormBuilder } from '@angular/forms';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MAX_MESSAGE_LENGTH } from '@app/constants/constants';
 import { GameHttpService } from '@app/services/game-http/game-http.service';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { MessageService } from '@app/services/message/message.service';
 import { PlayerService } from '@app/services/player/player.service';
+import { SubscriptionService } from '@app/services/subscription/subscription.service';
 import { Chatlog } from '@common/chatlog';
 import { GameSnapshot } from '@common/game-snapshot';
 import { GameState } from '@common/game-state';
 import { Player } from '@common/player';
 import { PlayerState } from '@common/player-state';
+import { QcmSubmission } from '@common/qcm-submission';
+import { QrlSubmission } from '@common/qrl-submission';
 import { Quiz } from '@common/quiz';
-import { Submission } from '@common/submission';
-import { Subscription, of } from 'rxjs';
+import { of } from 'rxjs';
 import { ChatRoomComponent } from './chat-room.component';
-
-const MAX_MESSAGE_LENGTH = 200;
 
 describe('ChatRoomComponent', () => {
     let component: ChatRoomComponent;
@@ -24,6 +26,7 @@ describe('ChatRoomComponent', () => {
     let mockMessageService: jasmine.SpyObj<MessageService>;
     let mockGameService: jasmine.SpyObj<GameService>;
     let mockPlayerService: jasmine.SpyObj<PlayerService>;
+    let mockSubscriptionService: jasmine.SpyObj<SubscriptionService>;
 
     const mockChatlogs: Chatlog[] = [
         {
@@ -40,6 +43,10 @@ describe('ChatRoomComponent', () => {
             state: PlayerState.Playing,
             score: 10,
             speedAwardCount: 1,
+            hasInteracted: false,
+            isTyping: false,
+            hasSubmitted: false,
+            isMuted: false,
         },
     ];
 
@@ -56,7 +63,8 @@ describe('ChatRoomComponent', () => {
 
     const mockState: GameState = GameState.Opened;
 
-    const mockQuestionSubmissions: Submission[][] = [[{ choices: [{ index: 0, isSelected: true }], isFinal: false }]];
+    const mockQuestionSubmissions: QcmSubmission[][] = [[{ clientId: 'Hello', choices: [{ payload: 0, isSelected: true }], isFinal: false }]];
+    const mockQuestionQrlSubmissions: QrlSubmission[][] = [[{ answer: 'hello', clientId: 'playerId' }]];
 
     const mockGameSnapshot: GameSnapshot = {
         players: mockPlayers,
@@ -64,26 +72,30 @@ describe('ChatRoomComponent', () => {
         quiz: mockQuiz,
         state: mockState,
         currentQuestionIndex: 0,
-        questionSubmissions: mockQuestionSubmissions,
+        questionQcmSubmissions: mockQuestionSubmissions,
+        questionQrlSubmission: mockQuestionQrlSubmissions,
+        questionQrlEvaluation: [],
     };
 
     beforeEach(() => {
         mockGameHttpService = jasmine.createSpyObj('GameHttpService', ['getGameSnapshotByPin']);
         mockMessageService = jasmine.createSpyObj('MessageService', ['onSendMessage']);
         mockGameService = jasmine.createSpyObj('GameService', ['onStartGame']);
-        mockPlayerService = jasmine.createSpyObj('PlayerService', ['getCurrentPlayer']);
+        mockPlayerService = jasmine.createSpyObj('PlayerService', ['getCurrentPlayer', 'onPlayerMute', 'onPlayerBan', 'onPlayerAbandon']);
+        mockSubscriptionService = jasmine.createSpyObj<SubscriptionService>(['add', 'clear']);
 
         TestBed.configureTestingModule({
-            imports: [MatSnackBarModule],
             declarations: [ChatRoomComponent],
             providers: [
                 { provide: GameHttpService, useValue: mockGameHttpService },
                 { provide: MessageService, useValue: mockMessageService },
                 { provide: GameService, useValue: mockGameService },
                 { provide: PlayerService, useValue: mockPlayerService },
-                { provide: MatSnackBarModule, useValue: jasmine.createSpyObj('MatSnackBar', ['open']) },
+                { provide: SubscriptionService, useValue: mockSubscriptionService },
                 FormBuilder,
+                MatSnackBar,
             ],
+            imports: [BrowserAnimationsModule],
         });
         fixture = TestBed.createComponent(ChatRoomComponent);
         component = fixture.componentInstance;
@@ -166,14 +178,36 @@ describe('ChatRoomComponent', () => {
         expect(component.chatlogs).toContain(testChatlog);
     });
 
-    it('should unsubscribe from all subscriptions on destroy', () => {
-        const mockSub1 = new Subscription();
-        const mockSub2 = new Subscription();
-        component['eventSubscriptions'].push(mockSub1, mockSub2);
-        expect(mockSub1.closed).toBeFalse();
-        expect(mockSub2.closed).toBeFalse();
+    it('should unsubscribe clear subscriptions on destroy', () => {
         component.ngOnDestroy();
-        expect(mockSub1.closed).toBeTrue();
-        expect(mockSub2.closed).toBeTrue();
+
+        expect(mockSubscriptionService.clear).toHaveBeenCalledWith(component['uuid']);
+    });
+
+    it('should notify muted player', () => {
+        spyOn(component['snackBarService'], 'open');
+        mockPlayerService.getCurrentPlayer.and.returnValue(mockPlayers[0]);
+        mockPlayerService.onPlayerMute.calls.mostRecent().args[1](mockPlayers[0]);
+        expect(mockPlayerService.getCurrentPlayer).toHaveBeenCalled();
+        expect(component['snackBarService'].open).toHaveBeenCalled();
+    });
+
+    it('should notify that a player has been banned', () => {
+        const banchatlog: Chatlog = {
+            author: 'Système',
+            message: `${mockPlayers[0].username} a été banni`,
+            date: new Date(),
+        };
+        mockPlayerService.onPlayerBan.calls.mostRecent().args[1](mockPlayers[0]);
+        expect(component.chatlogs).toContain(banchatlog);
+    });
+    it('should notify that a player has abandonned', () => {
+        const banchatlog: Chatlog = {
+            author: 'Système',
+            message: `${mockPlayers[0].username} a quitté la partie`,
+            date: new Date(),
+        };
+        mockPlayerService.onPlayerAbandon.calls.mostRecent().args[1](mockPlayers[0]);
+        expect(component.chatlogs).toContain(banchatlog);
     });
 });

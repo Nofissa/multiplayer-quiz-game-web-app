@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { QuestionBankComponent } from './question-bank.component';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { allQuestionTypeStub, qcmQuestionStub, qrlQuestionStub } from '@app/test-stubs/question.stubs';
 import { MaterialServicesProvider } from '@app/providers/material-services.provider';
 import { QuestionServicesProvider } from '@app/providers/question-services.provider';
+import { QuestionHttpService } from '@app/services/question-http/question-http.service';
+import { QuestionInteractionService } from '@app/services/question-interaction/question-interaction.service';
 import { QuestionSharingService } from '@app/services/question-sharing/question-sharing.service';
 import { Question } from '@common/question';
 import { Subject, of, throwError } from 'rxjs';
+import { QuestionBankComponent } from './question-bank.component';
 import SpyObj = jasmine.SpyObj;
-import { QuestionHttpService } from '@app/services/question-http/question-http.service';
-import { QuestionInteractionService } from '@app/services/question-interaction/question-interaction.service';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { questionStub } from '@app/TestStubs/question.stubs';
 
 describe('QuestionBankComponent', () => {
     let component: QuestionBankComponent;
@@ -32,7 +32,7 @@ describe('QuestionBankComponent', () => {
     let booleanSubject: Subject<boolean>;
 
     beforeEach(async () => {
-        mockQuestions = questionStub();
+        mockQuestions = qcmQuestionStub();
 
         mockQuestionSubject = new Subject();
         mockQuestionEditedSubject = new Subject();
@@ -43,11 +43,15 @@ describe('QuestionBankComponent', () => {
             'updateQuestion',
             'deleteQuestionById',
             'createQuestion',
+            'onChange',
         ]);
         questionHttpServiceSpy.getAllQuestions.and.returnValue(of([mockQuestions[0]]));
         questionHttpServiceSpy.createQuestion.and.returnValue(mockQuestionSubject);
         questionHttpServiceSpy.updateQuestion.and.returnValue(mockQuestionEditedSubject);
         questionHttpServiceSpy.deleteQuestionById.and.returnValue(of(undefined));
+        questionHttpServiceSpy.onChange.and.callFake((callback: (questions: Question[]) => void) => {
+            return new Subject<Question[]>().subscribe(callback);
+        });
 
         questionSharingServiceSpy = jasmine.createSpyObj(QuestionSharingService, ['share', 'subscribe']);
         questionSharingServiceSpy['shareSubject'] = new Subject();
@@ -115,6 +119,20 @@ describe('QuestionBankComponent', () => {
 
             expect(questionSharingServiceSpy.share).toHaveBeenCalled();
             expect(addQuestionSpy).toHaveBeenCalled();
+        });
+
+        it('should setup change subscription on init', () => {
+            component.ngOnInit();
+
+            expect(questionHttpServiceSpy.onChange).toHaveBeenCalled();
+            expect(component['changeSubscription'].closed).toBe(false);
+        });
+
+        it('should unsubscribe change subscription on destroy', () => {
+            component.ngOnInit();
+            component.ngOnDestroy();
+
+            expect(component['changeSubscription'].closed).toBe(true);
         });
 
         it('should add a question to questions[] when a question is submitted', () => {
@@ -224,6 +242,24 @@ describe('QuestionBankComponent', () => {
             booleanSubject.next(true);
             expect(questionHttpServiceSpy.deleteQuestionById).toHaveBeenCalled();
             expect(component.questions).toEqual([]);
+        });
+
+        it('should filterQuestions filter only QCM questions', () => {
+            component.questions = allQuestionTypeStub();
+            component.filterQuestions('QCM');
+            expect(component.displayedQuestions).toEqual(qcmQuestionStub());
+        });
+
+        it('should filterQuestions filter only QRL questions', () => {
+            component.questions = allQuestionTypeStub();
+            component.filterQuestions('QRL');
+            expect(component.displayedQuestions).toEqual(qrlQuestionStub());
+        });
+
+        it('should filterQuestions filter all questions when both types are selected', () => {
+            component.questions = allQuestionTypeStub();
+            component.filterQuestions('BOTH');
+            expect(component.displayedQuestions).toEqual(allQuestionTypeStub());
         });
     });
 });

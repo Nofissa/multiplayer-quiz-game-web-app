@@ -1,15 +1,20 @@
 import { ChoiceDto } from '@app/model/dto/choice/choice.dto';
 import { ValidationArguments, ValidationOptions, ValidatorConstraint, ValidatorConstraintInterface, registerDecorator } from 'class-validator';
 
+export
 @ValidatorConstraint({ name: 'isValidChoices', async: false })
 class IsValidChoicesConstraint implements ValidatorConstraintInterface {
     // _ could be used, optional parameter
     // eslint-disable-next-line no-unused-vars
     validate(choices: ChoiceDto[], _: ValidationArguments) {
-        const hasTrue = choices.some((x) => x.isCorrect === true);
-        const hasFalse = choices.some((x) => x.isCorrect === false);
+        if (choices) {
+            const hasTrue = choices.some((x) => x.isCorrect);
+            const hasFalse = choices.some((x) => !x.isCorrect);
 
-        return hasTrue && hasFalse;
+            return hasTrue && hasFalse;
+        }
+
+        return true;
     }
 }
 

@@ -1,17 +1,11 @@
 import { TestBed } from '@angular/core/testing';
 import { QuestionInteractionService } from './question-interaction.service';
 import { Question } from '@common/question';
+import { qcmQuestionStub } from '@app/test-stubs/question.stubs';
 
 describe('QuestionInteractionService', () => {
     let service: QuestionInteractionService;
-    const questionMock: Question = {
-        _id: '1',
-        text: 'Sample question 1',
-        type: 'QCM',
-        points: 10,
-        choices: [],
-        lastModification: new Date(),
-    };
+    const questionMock: Question = qcmQuestionStub()[0];
 
     beforeEach(() => {
         TestBed.configureTestingModule({

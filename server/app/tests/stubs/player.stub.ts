@@ -8,5 +8,9 @@ export const playerstub = (): Player => {
         state: PlayerState.Playing,
         score: 0,
         speedAwardCount: 0,
+        hasSubmitted: false,
+        hasInteracted: false,
+        isTyping: false,
+        isMuted: false,
     };
 };

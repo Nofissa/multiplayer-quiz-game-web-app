@@ -1,11 +1,15 @@
 import { Injectable } from '@angular/core';
 import { WebSocketService } from '@app/services/web-socket/web-socket.service';
 import { applyIfPinMatches } from '@app/utils/conditional-applications/conditional-applications';
-import { Evaluation } from '@common/evaluation';
+import { BarchartSubmission } from '@common/barchart-submission';
+import { GameEvent } from '@common/game-event';
 import { GameState } from '@common/game-state';
+import { Grade } from '@common/grade';
 import { Player } from '@common/player';
+import { QcmEvaluation } from '@common/qcm-evaluation';
+import { QrlEvaluation } from '@common/qrl-evaluation';
+import { QrlSubmission } from '@common/qrl-submission';
 import { QuestionPayload } from '@common/question-payload';
-import { Submission } from '@common/submission';
 import { Subscription } from 'rxjs';
 
 @Injectable({
@@ -14,95 +18,99 @@ import { Subscription } from 'rxjs';
 export class GameService {
     constructor(private readonly webSocketService: WebSocketService) {}
 
-    createGame(quizId: string) {
-        this.webSocketService.emit('createGame', { quizId });
+    createGame(quizId?: string) {
+        this.webSocketService.emit(GameEvent.CreateGame, { quizId });
     }
 
     onCreateGame(callback: (pin: string) => void): Subscription {
-        return this.webSocketService.on('createGame', callback);
+        return this.webSocketService.on(GameEvent.CreateGame, callback);
     }
 
     joinGame(pin: string, username: string) {
-        this.webSocketService.emit('joinGame', { pin, username });
+        this.webSocketService.emit(GameEvent.JoinGame, { pin, username });
     }
 
     onJoinGame(pin: string, callback: (player: Player) => void): Subscription {
-        return this.webSocketService.on('joinGame', applyIfPinMatches(pin, callback));
+        return this.webSocketService.on(GameEvent.JoinGame, applyIfPinMatches(pin, callback));
     }
 
     cancelGame(pin: string) {
-        this.webSocketService.emit('cancelGame', { pin });
+        this.webSocketService.emit(GameEvent.CancelGame, { pin });
     }
 
     onCancelGame(pin: string, callback: (message: string) => void): Subscription {
-        return this.webSocketService.on('cancelGame', applyIfPinMatches(pin, callback));
+        return this.webSocketService.on(GameEvent.CancelGame, applyIfPinMatches(pin, callback));
     }
 
     startGame(pin: string) {
-        this.webSocketService.emit('startGame', { pin });
+        this.webSocketService.emit(GameEvent.StartGame, { pin });
     }
 
     onStartGame(pin: string, callback: (data: QuestionPayload) => void): Subscription {
-        return this.webSocketService.on('startGame', applyIfPinMatches(pin, callback));
+        return this.webSocketService.on(GameEvent.StartGame, applyIfPinMatches(pin, callback));
     }
 
-    playerAbandon(pin: string) {
-        this.webSocketService.emit('playerAbandon', { pin });
+    qcmToggleChoice(pin: string, choiceIndex: number) {
+        this.webSocketService.emit(GameEvent.QcmToggleChoice, { pin, choiceIndex });
     }
 
-    onPlayerAbandon(pin: string, callback: (quitter: Player) => void): Subscription {
-        return this.webSocketService.on('playerAbandon', applyIfPinMatches(pin, callback));
+    onQcmToggleChoice(pin: string, callback: (payload: BarchartSubmission) => void): Subscription {
+        return this.webSocketService.on(GameEvent.QcmToggleChoice, applyIfPinMatches(pin, callback));
     }
 
-    playerBan(pin: string, username: string) {
-        this.webSocketService.emit('playerBan', { pin, username });
+    qcmSubmit(pin: string) {
+        this.webSocketService.emit(GameEvent.QcmSubmit, { pin });
     }
 
-    onPlayerBan(pin: string, callback: (bannedPlayer: Player) => void): Subscription {
-        return this.webSocketService.on('playerBan', applyIfPinMatches(pin, callback));
+    onQcmSubmit(pin: string, callback: (evaluation: QcmEvaluation) => void): Subscription {
+        return this.webSocketService.on(GameEvent.QcmSubmit, applyIfPinMatches(pin, callback));
     }
 
-    toggleSelectChoice(pin: string, choiceIndex: number) {
-        this.webSocketService.emit('toggleSelectChoice', { pin, choiceIndex });
+    qrlInputChange(pin: string, isTyping: boolean) {
+        this.webSocketService.emit(GameEvent.QrlInputChange, { pin, isTyping });
     }
 
-    onToggleSelectChoice(pin: string, callback: (payload: Submission[]) => void): Subscription {
-        return this.webSocketService.on('toggleSelectChoice', applyIfPinMatches(pin, callback));
+    onQrlInputChange(pin: string, callback: (submission: BarchartSubmission) => void): Subscription {
+        return this.webSocketService.on(GameEvent.QrlInputChange, applyIfPinMatches(pin, callback));
     }
 
-    submitChoices(pin: string) {
-        this.webSocketService.emit('submitChoices', { pin });
+    qrlSubmit(pin: string, answer: string) {
+        this.webSocketService.emit(GameEvent.QrlSubmit, { pin, answer });
     }
 
-    onSubmitChoices(pin: string, callback: (evaluation: Evaluation) => void): Subscription {
-        return this.webSocketService.on('submitChoices', applyIfPinMatches(pin, callback));
+    onQrlSubmit(pin: string, callback: (qrlSubmission: QrlSubmission) => void): Subscription {
+        return this.webSocketService.on(GameEvent.QrlSubmit, applyIfPinMatches(pin, callback));
+    }
+
+    qrlEvaluate(socketId: string, pin: string, grade: Grade) {
+        this.webSocketService.emit(GameEvent.QrlEvaluate, { socketId, pin, grade });
+    }
+
+    onQrlEvaluate(pin: string, callback: (evaluation: QrlEvaluation) => void): Subscription {
+        return this.webSocketService.on(GameEvent.QrlEvaluate, applyIfPinMatches(pin, callback));
     }
 
     nextQuestion(pin: string) {
-        this.webSocketService.emit('nextQuestion', { pin });
+        this.webSocketService.emit(GameEvent.NextQuestion, { pin });
     }
 
     onNextQuestion(pin: string, callback: (data: QuestionPayload) => void): Subscription {
-        return this.webSocketService.on('nextQuestion', applyIfPinMatches(pin, callback));
+        return this.webSocketService.on(GameEvent.NextQuestion, applyIfPinMatches(pin, callback));
     }
 
     toggleGameLock(pin: string) {
-        this.webSocketService.emit('toggleGameLock', { pin });
+        this.webSocketService.emit(GameEvent.ToggleGameLock, { pin });
     }
 
     onToggleGameLock(pin: string, callback: (gameState: GameState) => void): Subscription {
-        return this.webSocketService.on('toggleGameLock', applyIfPinMatches(pin, callback));
-    }
-
-    playerLeaveGameEnd(pin: string) {
-        this.webSocketService.emit('playerLeaveGame', { pin });
+        return this.webSocketService.on(GameEvent.ToggleGameLock, applyIfPinMatches(pin, callback));
     }
 
     endGame(pin: string) {
-        this.webSocketService.emit('endGame', { pin });
+        this.webSocketService.emit(GameEvent.EndGame, { pin });
     }
 
     onEndGame(pin: string, callback: () => void): Subscription {
-        return this.webSocketService.on('endGame', applyIfPinMatches(pin, callback));
+        return this.webSocketService.on(GameEvent.EndGame, applyIfPinMatches(pin, callback));
     }
 }

@@ -1,0 +1,19 @@
+<button
+    *ngIf="isVisible"
+    class="toggle-timer-pause-button"
+    mat-raised-button
+    (click)="togglePause()"
+    #tooltip="matTooltip"
+    matTooltip="Suspendre Minuterie"
+    [matTooltipPosition]="'below'"
+    matTooltipShowDelay="1000"
+    matTooltipHideDelay="300"
+>
+    <div *ngIf="isRunning; then runningBlock; else notRunningBlock"></div>
+    <ng-template #runningBlock>
+        <mat-icon class="icon" fontIcon="pause"></mat-icon>
+    </ng-template>
+    <ng-template #notRunningBlock>
+        <mat-icon class="icon" fontIcon="play_arrow"></mat-icon>
+    </ng-template>
+</button>

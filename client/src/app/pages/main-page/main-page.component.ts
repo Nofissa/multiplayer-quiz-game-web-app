@@ -4,6 +4,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { JoinGameDialogComponent } from '@app/components/dialogs/join-game-dialog/join-game-dialog.component';
 import { PromptDialogComponent } from '@app/components/dialogs/prompt-dialog/prompt-dialog.component';
+import { GameServicesProvider } from '@app/providers/game-services.provider';
 import { MaterialServicesProvider } from '@app/providers/material-services.provider';
 import { SecurityServicesProvider } from '@app/providers/security-services.provider';
 import { AuthService } from '@app/services/auth/auth.service';
@@ -18,20 +19,23 @@ import { AuthPayload } from '@common/auth-payload';
     styleUrls: ['./main-page.component.scss'],
 })
 export class MainPageComponent {
+    private readonly gameService: GameService;
+    private readonly playerService: PlayerService;
     private readonly authService: AuthService;
     private readonly sessionService: SessionService;
     private readonly dialogService: MatDialog;
     private readonly snackBarService: MatSnackBar;
 
-    // needs multiple services to work
+    // Depends on many services
     // eslint-disable-next-line max-params
     constructor(
-        private readonly playerService: PlayerService,
-        private readonly gameService: GameService,
+        gameServicesProvider: GameServicesProvider,
         securityServicesProvider: SecurityServicesProvider,
         materialServicesProvider: MaterialServicesProvider,
         private readonly router: Router,
     ) {
+        this.gameService = gameServicesProvider.gameService;
+        this.playerService = gameServicesProvider.playerService;
         this.authService = securityServicesProvider.auth;
         this.sessionService = securityServicesProvider.session;
         this.dialogService = materialServicesProvider.dialog;

@@ -1,0 +1,14 @@
+<button
+    *ngIf="isVisible || hasActivatedPanicMode"
+    class="panic-button"
+    mat-raised-button
+    (click)="startPanicMode()"
+    [disabled]="hasActivatedPanicMode"
+    #tooltip="matTooltip"
+    matTooltip="Mode Panique"
+    [matTooltipPosition]="'below'"
+    matTooltipShowDelay="1000"
+    matTooltipHideDelay="300"
+>
+    <mat-icon fontset="material-symbols-outlined" fontIcon="crisis_alert"></mat-icon>
+</button>

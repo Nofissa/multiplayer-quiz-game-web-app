@@ -1,0 +1,214 @@
+textarea {
+    width: 100%;
+    height: 150px;
+    padding: 12px 20px;
+    box-sizing: border-box;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    background-color: #f8f8f8;
+    font-size: 16px;
+    resize: none;
+}
+
+.question-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    height: 100px;
+    border: 1px solid black;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 25px;
+    background-color: aliceblue;
+    overflow-wrap: break-word;
+    overflow-y: auto;
+}
+
+mat-icon {
+    position: absolute;
+    height: fit-content;
+    width: fit-content;
+    color: var(--main-fg-color);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2rem;
+}
+
+.text-centered {
+    text-align: center;
+}
+
+.timer-wrapper {
+    display: flex;
+    justify-content: center;
+}
+
+.buttons-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 15px;
+}
+
+.buttons-wrapper > * {
+    margin: 0px 10px;
+}
+
+.game-button {
+    font-size: 1.5rem;
+    padding: 25px;
+}
+
+.disable-click {
+    pointer-events: none;
+}
+
+.font-color {
+    font-weight: bold;
+    color: black;
+}
+
+.logo {
+    width: 5rem;
+    height: 5rem;
+    margin: 0.5%;
+    margin-bottom: 0;
+}
+
+#score {
+    margin-top: 3%;
+    font-size: x-large;
+}
+
+.correct-answer-mark {
+    color: green;
+    font-size: 2em;
+    margin-left: 5px;
+}
+
+.invisible {
+    visibility: hidden;
+}
+
+form {
+    width: 100%;
+    padding: 0px 10px;
+    box-sizing: border-box;
+}
+
+mat-form-field {
+    width: 100%;
+}
+
+.write-message {
+    resize: none;
+}
+
+.notification {
+    position: absolute;
+    transform: translateX(-50%);
+    background-color: rgb(19, 183, 19);
+    color: white;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    margin-left: 9%;
+}
+
+.notification-average {
+    position: absolute;
+    transform: translateX(-50%);
+    background-color: rgb(205, 207, 49);
+    color: white;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    margin-left: 9%;
+}
+
+.notification-bad {
+    position: absolute;
+    transform: translateX(-50%);
+    background-color: rgb(175, 46, 46);
+    color: white;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    margin-left: 9%;
+}
+
+textarea.blink {
+    animation: blinkAnimation 1.5s 3;
+}
+
+@keyframes blinkAnimation {
+    0%,
+    100% {
+        background-color: transparent;
+    }
+    50% {
+        background-color: rgb(19, 183, 19);
+    }
+}
+
+textarea.blink-yellow {
+    animation: blinkAnimationYellow 1.5s 3;
+}
+
+@keyframes blinkAnimationYellow {
+    0%,
+    100% {
+        background-color: transparent;
+    }
+    50% {
+        background-color: rgb(205, 207, 49);
+    }
+}
+
+textarea.blink-red {
+    animation: blinkAnimationRed 1.5s 3;
+}
+
+@keyframes blinkAnimationRed {
+    0%,
+    100% {
+        background-color: transparent;
+    }
+    50% {
+        background-color: rgb(175, 46, 46);
+    }
+}
+
+::ng-deep .mat-mdc-text-field-wrapper {
+    height: 160px !important;
+}
+
+// source of the code below: https://css-loaders.com/classic/
+.loader {
+    width: fit-content;
+    font-weight: bold;
+    font-family: monospace;
+    font-size: 30px;
+    color: #0000;
+    background: linear-gradient(90deg, #000 25%, #8a9b0f 0 50%, #c02942 0 75%, #00a0b0 0) 0 0/400% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: l10 5s infinite cubic-bezier(0.3, 1, 0, 1);
+}
+.loader:before {
+    content: 'Évaluation en cours...';
+}
+@keyframes l10 {
+    25% {
+        background-position: calc(1 * 100% / 3) 0;
+    }
+    50% {
+        background-position: calc(2 * 100% / 3) 0;
+    }
+    75% {
+        background-position: calc(3 * 100% / 3) 0;
+    }
+    100% {
+        background-position: calc(4 * 100% / 3) 0;
+    }
+}

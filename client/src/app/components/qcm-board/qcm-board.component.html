@@ -1,0 +1,39 @@
+<div *ngIf="player && question"
+    [ngClass]="{ 'container': true, 'hidden': !isQCM(question) }">
+    <div class="question-box font-color">
+        <span id="questionText" class="text-centered">{{ question.text }}</span>
+        <span id="value" class="text-centered"><strong>{{ question.points }} points</strong></span>
+    </div>
+    <div class="answers-grid">
+        <div *ngFor="let choice of question.choices; index as i" [ngClass]="{
+                'highlight-selected': selectedChoiceIndexes.includes(i),
+                'answer-box': true,
+                'answer-box1': (i + 1) % 4 === 1,
+                'answer-box2': (i + 1) % 4 === 2,
+                'answer-box3': (i + 1) % 4 === 3,
+                'answer-box4': (i + 1) % 4 === 0
+            }" [class.highlight-validated]="hasSubmitted && selectedChoiceIndexes.includes(i)"
+            (click)="toggleSelectChoice(i)" [class.disable-click]="hasSubmitted">
+            <div class="box-content-wrapper">
+                <span>{{ i + 1 }}. {{ choice.text }}</span>
+                <div class="icon-wrapper">
+                    <mat-icon [style.color]="questionIsOver && choice.isCorrect ? 'green' : 'red'"
+                        [ngClass]="{ invisible: !questionIsOver }">
+                        {{ choice.isCorrect ? 'check' : 'clear' }}
+                    </mat-icon>
+                </div>
+            </div>
+        </div>
+        <div class="timer-wrapper">
+            <app-timer [pin]="pin"></app-timer>
+        </div>
+    </div>
+    <div class="buttons-wrapper">
+        <button mat-flat-button id="validateButton" class="game-button" *ngIf="!hasSubmitted" (click)="submitChoices()">
+            Valider <i class="fas fa-check-circle"></i>
+        </button>
+        <button button mat-flat-button color="warn" id="giveUpButton" class="game-button"
+            (click)="openConfirmationDialog()">Abandonner</button>
+    </div>
+    <div id="score" class="text-centered">Votre score: {{ player.score }} points</div>
+</div>

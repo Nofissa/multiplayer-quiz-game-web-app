@@ -1,21 +1,69 @@
 <div class="list-container">
-    <h4>Liste des joueurs</h4>
-    <mat-list>
+    <div class="list-header">
+        <h4>Liste des joueurs</h4>
+        <button mat-icon-button [matMenuTriggerFor]="menu" *ngIf="!displayOptions.sorted">
+            <mat-icon class="sort-icon">sort</mat-icon>
+        </button>
+        <mat-menu #menu="matMenu">
+            <button mat-menu-item (click)="sortPlayers(playerListSortingOptions.NameAscending)">
+                <mat-icon>arrow_downward</mat-icon>
+                <span>Alphabetique (a..z)</span>
+            </button>
+            <button mat-menu-item (click)="sortPlayers(playerListSortingOptions.ScoreAscending)">
+                <mat-icon>arrow_downward</mat-icon>
+                <span>Pointage (9..1)</span>
+            </button>
+            <button mat-menu-item (click)="sortPlayers(playerListSortingOptions.StatusAscending)">
+                <mat-icon>arrow_downward (actif..abandon)</mat-icon>
+                <span>État</span>
+            </button>
+            <button mat-menu-item (click)="sortPlayers(playerListSortingOptions.NameDescending)">
+                <mat-icon>arrow_upward</mat-icon>
+                <span>Alphabétique (z..a)</span>
+            </button>
+            <button mat-menu-item (click)="sortPlayers(playerListSortingOptions.ScoreDescending)">
+                <mat-icon>arrow_upward</mat-icon>
+                <span>Pointage (1..9)</span>
+            </button>
+            <button mat-menu-item (click)="sortPlayers(playerListSortingOptions.StatusDescending)">
+                <mat-icon>arrow_upward</mat-icon>
+                <span>État (abandon..actif)</span>
+            </button>
+        </mat-menu>
+    </div>
+    <mat-list class="list-item-container">
         <mat-list-item *ngFor="let player of players" [ngClass]="{
-                'hidden': player.state === playerStates.Banned || player.state === playerStates.Abandonned && !displayOptions.quitters,
-                'playing': player.state === playerStates.Playing,
-                'abandoned': player.state === playerStates.Abandonned,
+                hidden: player.state === playerStates.Banned || (player.state === playerStates.Abandonned && !displayOptions.quitters),
+                playing: player.state === playerStates.Playing,
+                abandoned: player.state === playerStates.Abandonned
             }">
             <div class="row-container">
                 <div class="player-info-wrapper">
-                    <div class="player-name">
+                    <div
+                        [ngClass]="{
+                            'player-name': !player.hasInteracted && !player.hasSubmitted,
+                            'player-name-interacted': player.hasInteracted && !player.hasSubmitted,
+                            'player-name-submitted': player.hasSubmitted,
+                            'black' : displayOptions.results || displayOptions.waiting
+                        }"
+                    >
                         {{ player.username }}
                     </div>
                     <div class="player-score" *ngIf="displayOptions.score">{{ player.score }} points</div>
                     <div class="player-speedAwardCount" *ngIf="displayOptions.speedAwardCount">{{ player.speedAwardCount
-                        }}
-                        bonus</div>
+                        }} bonus</div>
                 </div>
+                <button mat-flat-button color="accent" (click)="mutePlayer(player)" [ngClass]="{
+                        invisible: player.state !== playerStates.Playing || !displayOptions.mute
+                    }">
+                    <div *ngIf="player.isMuted; then thenBlock; else elseBlock"></div>
+                    <ng-template #thenBlock>
+                        <mat-icon>volume_off</mat-icon>
+                    </ng-template>
+                    <ng-template #elseBlock>
+                        <mat-icon>volume_up</mat-icon>
+                    </ng-template>
+                </button>
                 <button mat-flat-button color="warn" (click)="banPlayer(player)" [ngClass]="{
                         hidden: !displayOptions.ban,
                         invisible: player.state !== playerStates.Playing || !displayOptions.ban

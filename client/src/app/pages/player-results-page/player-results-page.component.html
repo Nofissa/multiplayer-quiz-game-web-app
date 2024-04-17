@@ -1,15 +1,15 @@
 <div class="container flex-column">
-    <app-nav-header class="nav-bar" [backArrow]="false"></app-nav-header>
-    <div class="game-information flex-column">
-        <app-bar-chart-swiper class="chart-swiper" *ngIf="chartData" [data]="chartData"></app-bar-chart-swiper>
-        <app-player-list
-            class="players"
-            [pin]="pin"
-            [displayOptions]="{ score: true, speedAwardCount: true, sorted: true }"
-        ></app-player-list>
-        <button class="leave-button" mat-raised-button color="warn" (click)="leaveGame()">Quitter</button>
-    </div>
-    <div class="chat-room-container flex-column">
-        <app-chat-room [pin]="pin"></app-chat-room>
+    <app-nav-header class="nav-bar" [backArrow]="false" [isActive]="false"></app-nav-header>
+    <div class="main-container flex-column">
+        <div class="game-information flex-row">
+            <div class="stats-wrapper flex-column">
+                <app-player-list class="players" [pin]="pin"
+                    [displayOptions]="{ score: true, speedAwardCount: true, sorted: true, results: true, waiting: true }"></app-player-list>
+                <app-bar-chart-swiper class="chart-swiper" *ngIf="chartData" [data]="chartData"></app-bar-chart-swiper>
+            </div>
+            <app-chat-room class="chat-room" [pin]="pin"></app-chat-room>
+        </div>
+
+        <button class="leave-button button" mat-raised-button color="warn" (click)="leaveGame()">Quitter</button>
     </div>
 </div>

@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { NOTICE_DURATION_MS } from '@app/constants/constants';
 import { Observable, Subscription } from 'rxjs';
 import { Socket, io } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
-
-const ERROR_NOTICE_DURATION_MS = 5000;
 
 @Injectable({ providedIn: 'root' })
 export class WebSocketService {
@@ -15,7 +14,7 @@ export class WebSocketService {
 
         this.socketInstance.on('error', (error) => {
             this.snackBarService.open(error, '', {
-                duration: ERROR_NOTICE_DURATION_MS,
+                duration: NOTICE_DURATION_MS,
                 verticalPosition: 'top',
                 panelClass: ['error-snackbar'],
             });

@@ -1,0 +1,42 @@
+<div *ngIf="player && question" [ngClass]="{ container: true, hidden: !isQRL(question) }">
+    <div class="question-box font-color">
+        <span id="questionText" class="text-centered">{{ question.text }}</span>
+        <span id="value" class="text-centered"
+            ><strong>{{ question.points }} points</strong></span
+        >
+    </div>
+    <div class="timer-wrapper">
+        <app-timer [pin]="pin"></app-timer>
+    </div>
+    <form [formGroup]="formGroup" style="margin-top: 4%">
+        <mat-form-field appearance="fill">
+            <mat-label *ngIf="remainingInputCount < 200">{{ remainingInputCount }}</mat-label>
+            <mat-label *ngIf="remainingInputCount === 200">Réponse</mat-label>
+            <textarea
+                #textarea
+                matInput
+                rows="5"
+                id="chattingArea"
+                [(ngModel)]="input"
+                (keydown)="updateRemainingInputCount()"
+                formControlName="message"
+                class="write-message"
+                placeholder="Entrez votre réponse ici..."
+                [readonly]="hasSubmitted"
+                maxlength="200"
+            >
+            </textarea>
+        </mat-form-field>
+    </form>
+    <span *ngIf="isInEvaluation && !isTest" class="loader"></span>
+    <div *ngIf="showNotification100" class="notification">Vous avez eu 100%! ({{ question.points }} points)</div>
+    <div *ngIf="showNotification50" class="notification-average">Vous avez eu 50% ({{ question.points / 2 }} points)</div>
+    <div *ngIf="showNotification0" class="notification-bad">Vous n'avez eu aucun point</div>
+    <div class="buttons-wrapper">
+        <button mat-flat-button id="validateButton" class="game-button" *ngIf="!hasSubmitted" (click)="submitAnswer()">
+            Valider <i class="fas fa-check-circle"></i>
+        </button>
+        <button button mat-flat-button color="warn" id="giveUpButton" class="game-button" (click)="openConfirmationDialog()">Abandonner</button>
+    </div>
+    <div id="score" class="text-centered">Votre score: {{ player.score }} points</div>
+</div>

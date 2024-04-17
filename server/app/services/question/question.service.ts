@@ -21,7 +21,6 @@ export class QuestionService {
         if (!(await this.validateQuestion(dto))) {
             return Promise.reject('Invalid question');
         }
-
         delete dto._id;
         dto.lastModification = new Date();
 
@@ -59,10 +58,6 @@ export class QuestionService {
         const regex = new RegExp(`^${escapedText}$`, 'i'); // for case unsensitive search
         const question = await this.model.findOne({ text: { $regex: regex } });
 
-        if (question === null) {
-            return true;
-        } else {
-            return question._id === dto._id;
-        }
+        return question === null ? true : question._id === dto._id;
     }
 }

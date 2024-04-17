@@ -3,11 +3,10 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { PromptDialogComponent } from '@app/components/dialogs/prompt-dialog/prompt-dialog.component';
-import { Quiz } from '@app/interfaces/quiz';
+import { NOTICE_DURATION_MS } from '@app/constants/constants';
+import { Quiz } from '@common/quiz';
 import { QuizHttpService } from '@app/services/quiz-http/quiz-http.service';
 import { Observable } from 'rxjs';
-
-const SNACKBAR_DURATION = 5000;
 
 @Component({
     selector: 'app-quiz-list',
@@ -118,7 +117,7 @@ export class QuizListComponent implements OnInit {
 
     private handleSnackbarError(error: string) {
         this.snackbar.open(error, 'Fermer', {
-            duration: SNACKBAR_DURATION,
+            duration: NOTICE_DURATION_MS,
             verticalPosition: 'top',
         });
     }

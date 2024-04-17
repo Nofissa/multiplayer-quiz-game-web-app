@@ -1,42 +1,18 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CdkDrag, CdkDragDrop, CdkDropList, DragDropModule } from '@angular/cdk/drag-drop';
-import { QuestionListComponent } from './question-list.component';
-import { Question } from '@common/question';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { QuestionInteractionService } from '@app/services/question-interaction/question-interaction.service';
 import { QuestionSharingService } from '@app/services/question-sharing/question-sharing.service';
+import { qcmQuestionStub, qrlQuestionStub } from '@app/test-stubs/question.stubs';
+import { Question } from '@common/question';
 import { of } from 'rxjs';
+import { QuestionListComponent } from './question-list.component';
 
 describe('QuestionListComponent', () => {
     let component: QuestionListComponent;
     let fixture: ComponentFixture<QuestionListComponent>;
     let interactionService: QuestionInteractionService;
     let sharingService: QuestionSharingService;
-    const questionMocks: Question[] = [
-        {
-            _id: '1',
-            text: 'Sample question 1',
-            type: 'QCM',
-            points: 10,
-            choices: [],
-            lastModification: new Date(),
-        },
-        {
-            _id: '2',
-            text: 'Sample question 2',
-            type: 'QCM',
-            points: 10,
-            choices: [],
-            lastModification: new Date(),
-        },
-        {
-            _id: '3',
-            text: 'Sample question 3',
-            type: 'QCM',
-            points: 10,
-            choices: [],
-            lastModification: new Date(),
-        },
-    ];
+    const questionMocks: Question[] = qcmQuestionStub();
 
     beforeEach(async () => {
         const interactionServiceMock = {
@@ -107,10 +83,16 @@ describe('QuestionListComponent', () => {
         expect(component.isShared(notSharedQuestion)).toBeFalse();
     });
 
+    it('should isQCM verify if the question is a QCM', () => {
+        let response = component.isQcm(questionMocks[0]);
+        expect(response).toBeTrue();
+        response = component.isQcm(qrlQuestionStub()[0]);
+        expect(response).toBeFalse();
+    });
+
     it('should move item in array on drop', () => {
         const firstQuestion = questionMocks[0];
         const secondQuestion = questionMocks[1];
-        const thirdQuestion = questionMocks[2];
 
         component.questions = questionMocks;
 
@@ -136,6 +118,5 @@ describe('QuestionListComponent', () => {
         expect(component.drop).toHaveBeenCalledWith(dropEvent);
         expect(questionMocks[0].text).toBe(secondQuestion.text);
         expect(questionMocks[1].text).toBe(firstQuestion.text);
-        expect(questionMocks[2].text).toBe(thirdQuestion.text);
     });
 });

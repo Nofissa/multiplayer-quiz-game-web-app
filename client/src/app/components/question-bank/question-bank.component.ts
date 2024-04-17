@@ -5,6 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
 import { UpsertQuestionDialogComponent } from '@app/components/dialogs/upsert-question-dialog/upsert-question-dialog.component';
+import { NOTICE_DURATION_MS, NOT_FOUND_INDEX } from '@app/constants/constants';
 import { QuestionListOptions } from '@app/interfaces/question-list-options';
 import { UpsertQuestionDialogData } from '@app/interfaces/upsert-question-dialog-data';
 import { MaterialServicesProvider } from '@app/providers/material-services.provider';
@@ -13,10 +14,8 @@ import { QuestionHttpService } from '@app/services/question-http/question-http.s
 import { QuestionInteractionService } from '@app/services/question-interaction/question-interaction.service';
 import { QuestionSharingService } from '@app/services/question-sharing/question-sharing.service';
 import { Question } from '@common/question';
+import { QuestionType } from '@common/question-type';
 import { Subscription } from 'rxjs';
-
-const NOT_FOUND_INDEX = -1;
-const SNACK_BAR_DURATION_MS = 3000;
 
 @Component({
     selector: 'app-question-bank',
@@ -29,8 +28,10 @@ export class QuestionBankComponent implements OnInit, OnDestroy {
     options: QuestionListOptions;
 
     questions: Question[] = [];
+    displayedQuestions: Question[] = [];
 
-    shareSubscription: Subscription = new Subscription();
+    private shareSubscription: Subscription = new Subscription();
+    private changeSubscription: Subscription;
 
     private readonly dialogService: MatDialog;
     private readonly snackBarService: MatSnackBar;
@@ -51,12 +52,15 @@ export class QuestionBankComponent implements OnInit, OnDestroy {
     ngOnInit() {
         this.loadQuestions();
         this.setupServices();
+        this.changeSubscription = this.questionHttpService.onChange((questions) => {
+            this.questions = questions;
+            this.displayedQuestions = questions;
+        });
     }
 
     ngOnDestroy() {
-        if (!this.shareSubscription?.closed) {
-            this.shareSubscription.unsubscribe();
-        }
+        this.shareSubscription?.unsubscribe();
+        this.changeSubscription?.unsubscribe();
     }
 
     openAddQuestionDialog() {
@@ -64,7 +68,7 @@ export class QuestionBankComponent implements OnInit, OnDestroy {
             title: 'Ajouter une question',
             question: {
                 _id: '',
-                type: 'QCM',
+                type: QuestionType.QCM,
                 text: '',
                 choices: [
                     { text: '', isCorrect: true },
@@ -126,6 +130,16 @@ export class QuestionBankComponent implements OnInit, OnDestroy {
         });
     }
 
+    filterQuestions(type: string) {
+        if (type.trim().toUpperCase() === 'QCM' || type.trim().toUpperCase() === 'QRL') {
+            this.displayedQuestions = this.questions.filter(
+                (question) => question.type === (type.trim().toUpperCase() === 'QCM' ? QuestionType.QCM : QuestionType.QRL),
+            );
+        } else {
+            this.displayedQuestions = this.questions;
+        }
+    }
+
     private setupServices() {
         this.shareSubscription = this.questionSharingService.subscribe((sharedQuestion: Question) => {
             if (!this.questions.includes(sharedQuestion)) {
@@ -153,6 +167,7 @@ export class QuestionBankComponent implements OnInit, OnDestroy {
     private loadQuestions() {
         this.questionHttpService.getAllQuestions().subscribe((questions: Question[]) => {
             this.questions = questions;
+            this.displayedQuestions = questions;
         });
     }
 
@@ -165,7 +180,7 @@ export class QuestionBankComponent implements OnInit, OnDestroy {
                 this.snackBarService.open("Échec de l'ajout de la question à la Banque de Questions", 'OK', {
                     verticalPosition: 'top',
                     panelClass: ['base-snackbar'],
-                    duration: SNACK_BAR_DURATION_MS,
+                    duration: NOTICE_DURATION_MS,
                 });
             },
         });

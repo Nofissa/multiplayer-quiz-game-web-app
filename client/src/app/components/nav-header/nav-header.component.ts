@@ -1,5 +1,5 @@
 import { Location } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
     selector: 'app-nav-header',
@@ -8,14 +8,21 @@ import { Component, Input } from '@angular/core';
 })
 export class NavHeaderComponent {
     @Input()
-    backArrow = true;
-
-    @Input()
     pin: string | null = null;
+    @Input()
+    isActive = true;
+    @Input()
+    backArrow = true;
+    @Output()
+    navigation: EventEmitter<void> = new EventEmitter<void>();
 
     constructor(private readonly location: Location) {}
 
     back() {
         this.location.back();
+    }
+
+    emitNavigationEvent() {
+        this.navigation.emit();
     }
 }

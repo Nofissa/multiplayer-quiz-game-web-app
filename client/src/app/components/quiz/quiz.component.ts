@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
-import { Quiz } from '@app/interfaces/quiz';
+import { Quiz } from '@common/quiz';
 import { QuizHttpService } from '@app/services/quiz-http/quiz-http.service';
 import { saveAs } from 'file-saver';
 

@@ -19,11 +19,7 @@ export class QuizService {
     }
 
     async getQuizById(id: string, visibleOnly?: boolean): Promise<Quiz> {
-        if (!visibleOnly) {
-            return await this.model.findOne({ _id: id });
-        }
-
-        return await this.model.findOne({ _id: id, isHidden: false });
+        return visibleOnly ? await this.model.findOne({ _id: id, isHidden: false }) : await this.model.findOne({ _id: id });
     }
 
     async addQuiz(dto: QuizDto): Promise<Quiz> {

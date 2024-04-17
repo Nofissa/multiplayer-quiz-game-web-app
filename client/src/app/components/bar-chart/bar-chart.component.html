@@ -1,26 +1,49 @@
 <div class="bar-chart">
-    <h3 class="question-container">{{ data.question.text }}</h3>
+    <h3 class="question-container">{{ data.text }}</h3>
 
     <div class="bar-chart-container">
-        <div *ngFor="let choice of data.question.choices; let i = index" class="bar-container">
+        <div *ngFor="let element of data.chartElements; let i = index" class="bar-container">
             <mat-progress-bar
                 class="progress-bar-{{ i }}"
                 value="{{ adjust(i) }}"
-                [class.correct]="choice.isCorrect"
-                [class.incorrect]="!choice.isCorrect"
+                [class.correct]="element.isCorrect"
+                [class.incorrect]="!element.isCorrect"
             ></mat-progress-bar>
             <p>{{ playersSelected(i) }}</p>
         </div>
     </div>
 
     <div class="choice-container">
-        <mat-card *ngFor="let choice of data.question.choices; let i = index" class="choice-{{ i }} choice flex-row">
-            <mat-card-content *ngIf="choice.isCorrect" matBadge="✔" matBadgePosition="above after" matBadgeColor="primary" matBadgeSize="large">{{
-                choice.text
-            }}</mat-card-content>
-            <mat-card-content *ngIf="!choice.isCorrect" matBadge="✘" matBadgePosition="above after" matBadgeColor="warn" matBadgeSize="large">{{
-                choice.text
-            }}</mat-card-content>
+        <mat-card *ngFor="let element of data.chartElements; let i = index" class="choice-{{ i }} choice flex-row">
+            <mat-card-content
+                class="card-content"
+                *ngIf="element.isCorrect"
+                matBadge="✔"
+                matBadgePosition="above after"
+                matBadgeColor="primary"
+                matBadgeSize="large"
+            >
+                <span class="card-content-text">
+                    {{ element.text }}
+                </span>
+            </mat-card-content>
+            <mat-card-content
+                class="card-content"
+                *ngIf="element.isCorrect === false"
+                matBadge="✘"
+                matBadgePosition="above after"
+                matBadgeColor="warn"
+                matBadgeSize="large"
+            >
+                <span class="card-content-text">
+                    {{ element.text }}
+                </span>
+            </mat-card-content>
+            <mat-card-content *ngIf="element.isCorrect === undefined" class="card-content">
+                <span class="card-content-text">
+                    {{ element.text }}
+                </span>
+            </mat-card-content>
         </mat-card>
     </div>
 </div>

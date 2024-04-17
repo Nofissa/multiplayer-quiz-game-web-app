@@ -1,3 +1,4 @@
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -5,7 +6,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '@app/services/auth/auth.service';
 import { GameService } from '@app/services/game/game-service/game.service';
 import { SessionService } from '@app/services/session/session.service';
-import { firstPlayerStub } from '@app/TestStubs/player.stubs';
+import { firstPlayerStub } from '@app/test-stubs/player.stubs';
 import { of, Subscription, throwError } from 'rxjs';
 import { MainPageComponent } from './main-page.component';
 
@@ -30,6 +31,7 @@ describe('MainPage', () => {
                 { provide: SessionService, useValue: jasmine.createSpyObj('SessionService', ['getSession', 'setSession']) },
                 { provide: GameService, useValue: jasmine.createSpyObj('GameService', ['joinGame', 'onJoinGame']) },
             ],
+            imports: [HttpClientTestingModule],
         }).compileComponents();
 
         routerSpy = TestBed.inject(Router) as jasmine.SpyObj<Router>;
@@ -48,12 +50,9 @@ describe('MainPage', () => {
 
     afterEach(() => {
         routerSpy.navigate.calls.reset();
-        routerSpy.navigate.calls.reset();
         dialogServiceSpy.open.calls.reset();
         snackBarServiceSpy.open.calls.reset();
-        authServiceSpy.verify.calls.reset();
         authServiceSpy.login.calls.reset();
-        sessionServiceSpy.getSession.calls.reset();
         sessionServiceSpy.setSession.calls.reset();
     });
 
@@ -178,7 +177,7 @@ describe('MainPage', () => {
             const fakeSubscription = new Subscription();
 
             dialogServiceSpy.open.and.returnValue(dialogRefSpyObj);
-            gameServiceSpy.onJoinGame.and.callFake((pinArg, callback) => {
+            gameServiceSpy.onJoinGame.and.callFake((_pinArg, callback) => {
                 callback(firstPlayerStub());
                 return fakeSubscription;
             });

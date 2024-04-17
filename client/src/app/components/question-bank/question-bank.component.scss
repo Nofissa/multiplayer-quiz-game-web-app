@@ -1,6 +1,6 @@
 .container {
     height: auto;
-    max-height: 66vh;
+    max-height: 75vh;
     width: 50vw;
     max-width: 500px;
     background-color: white;
@@ -12,13 +12,19 @@
 .text-centered {
     display: block;
     text-align: center;
+    height: fit-content;
+    text-decoration: underline;
 }
 
 .title-wrapper {
-    display: flex;
     align-items: center;
     justify-content: center;
-    height: 5vh;
-    max-height: 50px;
     color: var(--secondary-fg-color);
+    margin-bottom: 10px;
+}
+
+.button-wrapper {
+    width: 100%;
+    justify-content: space-around;
+    align-items: center;
 }

@@ -4,7 +4,7 @@ import { ComponentFixture, TestBed, fakeAsync, flush, tick } from '@angular/core
 import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { Quiz } from '@app/interfaces/quiz';
+import { Quiz } from '@common/quiz';
 import { QuizHttpService } from '@app/services/quiz-http/quiz-http.service';
 import { of, throwError } from 'rxjs';
 import { QuizListComponent } from './quiz-list.component';
@@ -56,6 +56,7 @@ describe('QuizListComponent', () => {
         component = fixture.componentInstance;
         fixture.detectChanges();
         component.quizzes = mockQuizzes;
+        // To spy on method
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         parseQuizSpy = spyOn<any>(component, 'parseQuiz').and.callThrough();
         handleImportSubscriptionSpy = spyOn(component, 'handleImportSubscription').and.callThrough();

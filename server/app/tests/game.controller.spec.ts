@@ -1,5 +1,4 @@
-/* eslint-disable no-underscore-dangle */
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable no-underscore-dangle */ // For MongoDB _id fields
 import { GameController } from '@app/controllers/game/game.controller';
 import { GameService } from '@app/services/game/game.service';
 import { GameSnapshot } from '@common/game-snapshot';
@@ -10,12 +9,12 @@ import { gameStub } from './stubs/game.stub';
 
 describe('GameController', () => {
     let app: INestApplication;
-    let gameServiceMock: Partial<GameService>;
+    let gameServiceMock: jest.Mocked<GameService>;
     beforeEach(async () => {
         const gameTest = gameStub();
         gameServiceMock = {
             getGame: jest.fn().mockReturnValue(gameTest),
-        };
+        } as never;
 
         const module: TestingModule = await Test.createTestingModule({
             controllers: [GameController],
@@ -62,8 +61,11 @@ describe('GameController', () => {
                         };
                     }),
                 },
-                questionSubmissions: game.questionSubmissions.map((x) => Array.from(x.values())),
+                questionQcmSubmissions: game.qcmSubmissions.map((x) => Array.from(x.values())),
+                questionQrlSubmission: game.qrlSubmissions.map((x) => Array.from(x.values())),
+                questionQrlEvaluation: game.qrlEvaluations.map((x) => Array.from(x.values())),
             };
+
             const response = await request(app.getHttpServer()).get('/games/mockPin/snapshot');
             expect(response.status).toBe(HttpStatus.OK);
             expect(JSON.stringify(response.body)).toEqual(JSON.stringify(snapshotTest));
@@ -78,6 +80,6 @@ describe('GameController', () => {
         const response = await request(app.getHttpServer()).get('/games/nonExistentPin/snapshot');
 
         expect(response.status).toBe(HttpStatus.NOT_FOUND);
-        expect(response.text).toBe('Cannot find game');
+        expect(response.text).toBe('La partie est introuvable');
     });
 });
