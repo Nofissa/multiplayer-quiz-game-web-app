@@ -1,11 +1,10 @@
 import { CdkDrag, CdkDragDrop, CdkDropList, DragDropModule } from '@angular/cdk/drag-drop';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { QuestionHttpService } from '@app/services/question-http/question-http.service';
 import { QuestionInteractionService } from '@app/services/question-interaction/question-interaction.service';
 import { QuestionSharingService } from '@app/services/question-sharing/question-sharing.service';
 import { qcmQuestionStub, qrlQuestionStub } from '@app/test-stubs/question.stubs';
 import { Question } from '@common/question';
-import { Subject, of } from 'rxjs';
+import { of } from 'rxjs';
 import { QuestionListComponent } from './question-list.component';
 
 describe('QuestionListComponent', () => {
@@ -13,7 +12,6 @@ describe('QuestionListComponent', () => {
     let fixture: ComponentFixture<QuestionListComponent>;
     let interactionService: QuestionInteractionService;
     let sharingService: QuestionSharingService;
-    let questionHttpService: QuestionHttpService;
     const questionMocks: Question[] = qcmQuestionStub();
 
     beforeEach(async () => {
@@ -27,19 +25,12 @@ describe('QuestionListComponent', () => {
             share: jasmine.createSpy('share').and.returnValue(of(null)),
         };
 
-        const questionHttpServiceMock = {
-            onChange: jasmine.createSpy('onChange').and.callFake((callback: (questions: Question[]) => void) => {
-                return new Subject<Question[]>().subscribe(callback);
-            }),
-        };
-
         await TestBed.configureTestingModule({
             declarations: [QuestionListComponent],
             imports: [DragDropModule],
             providers: [
                 { provide: QuestionInteractionService, useValue: interactionServiceMock },
                 { provide: QuestionSharingService, useValue: sharingServiceMock },
-                { provide: QuestionHttpService, useValue: questionHttpServiceMock },
             ],
         }).compileComponents();
     });
@@ -49,7 +40,6 @@ describe('QuestionListComponent', () => {
         component = fixture.componentInstance;
         interactionService = TestBed.inject(QuestionInteractionService);
         sharingService = TestBed.inject(QuestionSharingService);
-        questionHttpService = TestBed.inject(QuestionHttpService);
         component.interactionService = interactionService;
         component.options = { create: true, edit: true, delete: true, share: true, drag: true, numberOrder: true, displayLastModified: true };
         fixture.detectChanges();
@@ -57,20 +47,6 @@ describe('QuestionListComponent', () => {
 
     it('should create', () => {
         expect(component).toBeTruthy();
-    });
-
-    it('should setup change subscription on init', () => {
-        component.ngOnInit();
-
-        expect(questionHttpService.onChange).toHaveBeenCalled();
-        expect(component['changeSubscription'].closed).toBe(false);
-    });
-
-    it('should unsubscribe change subscription on destroy', () => {
-        component.ngOnInit();
-        component.ngOnDestroy();
-
-        expect(component['changeSubscription'].closed).toBe(true);
     });
 
     it('should invoke interaction service on add question', () => {
