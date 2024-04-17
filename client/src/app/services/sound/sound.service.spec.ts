@@ -16,7 +16,7 @@ describe('SoundService', () => {
     describe('loadSound', () => {
         it('should load a sound', () => {
             const name = 'testSound';
-            const path = '/assets/sounds/test-sound.mp3';
+            const path = '/assets/sounds/test-sound.wav';
 
             service.loadSound(name, path);
 
@@ -25,7 +25,7 @@ describe('SoundService', () => {
 
         it('should not load a sound if it already exists', () => {
             const name = 'testSound';
-            const path = '/assets/sounds/test-sound.mp3';
+            const path = '/assets/sounds/test-sound.wav';
 
             service.loadSound(name, path);
             const sizeBefore = service['audios'].size;
@@ -39,7 +39,7 @@ describe('SoundService', () => {
     describe('playSound', () => {
         it('should play a loaded sound', () => {
             const name = 'testSound';
-            const path = '/assets/sounds/test-sound.mp3';
+            const path = '/assets/sounds/test-sound.wav';
 
             spyOn(service['audioContext'], 'createMediaElementSource').and.callThrough();
             service.loadSound(name, path);
@@ -65,7 +65,7 @@ describe('SoundService', () => {
     describe('stopSound', () => {
         it('should stop a playing sound', () => {
             const name = 'testSound';
-            const path = '/assets/sounds/test-sound.mp3';
+            const path = '/assets/sounds/test-sound.wav';
             service.loadSound(name, path);
 
             spyOn(service['audios'].get(name) as HTMLAudioElement, 'pause');

@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ConfirmationDialogComponent } from '@app/components/dialogs/confirmation-dialog/confirmation-dialog.component';
@@ -22,13 +23,12 @@ import { GameSnapshot } from '@common/game-snapshot';
 import { GameState } from '@common/game-state';
 import { QcmEvaluation } from '@common/qcm-evaluation';
 import { Question } from '@common/question';
+import { QuestionType } from '@common/question-type';
 import { TimerEventType } from '@common/timer-event-type';
 import { TimerPayload } from '@common/timer-payload';
 import { Observable, of } from 'rxjs';
 import { io } from 'socket.io-client';
 import { QcmBoardComponent } from './qcm-board.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { QuestionType } from '@common/question-type';
 
 const gameSnapshotStub: GameSnapshot = {
     players: [],
@@ -154,8 +154,9 @@ describe('QcmBoardComponent', () => {
         expect(keyBindingServiceMock.getExecutor).not.toHaveBeenCalled();
     });
 
-    it('should call executor if disableShortcuts is false', () => {
+    it('should call executor if disableShortcuts is false and isInTransition is true', () => {
         component['hasSubmitted'] = false;
+        component['isInTransition'] = false;
         component['question'].type = QuestionType.QCM;
         component.handleKeyboardEvent({} as KeyboardEvent);
         expect(keyBindingServiceMock.getExecutor).toHaveBeenCalled();

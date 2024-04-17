@@ -6,20 +6,25 @@
                 <h3 class="header-item">Création de Quiz</h3>
                 <mat-form-field id="text-editables" class="flex-column">
                     <mat-label>Titre du Quiz</mat-label>
-                    <input matInput id="title" type="text" class="text-edit" placeholder="Votre titre ici"
-                        formControlName="title" required />
+                    <input matInput id="title" type="text" class="text-edit" placeholder="Votre titre ici" formControlName="title" required />
                 </mat-form-field>
                 <mat-form-field id="text-editables" class="flex-column">
                     <mat-label>Description du Quiz</mat-label>
-                    <textarea matInput id="description" class="text-edit" placeholder="Votre description ici"
-                        formControlName="description" required></textarea>
+                    <textarea
+                        matInput
+                        id="description"
+                        class="text-edit"
+                        placeholder="Votre description ici"
+                        formControlName="description"
+                        required
+                    ></textarea>
                 </mat-form-field>
                 <div class="flex-column slider-container">
                     <label>Durée du Quiz</label>
                     <div class="flex-row">
                         <label>10</label>
                         <mat-slider matInput id="duration" min="10" max="60" step="1" discrete required>
-                            <input matSliderThumb formControlName="duration">
+                            <input matSliderThumb formControlName="duration" />
                         </mat-slider>
                         <label>60</label>
                     </div>
@@ -27,18 +32,19 @@
 
                 <div id="questions-container" class="flex-column">
                     <label>Questions</label>
-                    <app-question-list id="question-list" [questions]="questionsContainer"
+                    <app-question-list
+                        id="question-list"
+                        [questions]="questionsContainer"
                         [interactionService]="questionInteractionService"
-                        [options]="{share: true, create: true, edit: true, delete: true, drag:true, numberOrder: true}"></app-question-list>
+                        [options]="{ share: true, create: true, edit: true, delete: true, drag: true, numberOrder: true }"
+                    ></app-question-list>
                 </div>
-                <button id="submit-quiz" (mouseUp)="submitQuiz()" mat-flat-button>
-                    Soumettre
-                </button>
+                <button id="submit-quiz" (mouseUp)="submitQuiz()" mat-flat-button>Enregistrer</button>
             </form>
         </div>
         <div class="question-bank-wrapper">
             <div>
-                <app-question-bank [options]="{share: true}"></app-question-bank>
+                <app-question-bank [options]="{ share: true }"></app-question-bank>
             </div>
         </div>
     </div>
