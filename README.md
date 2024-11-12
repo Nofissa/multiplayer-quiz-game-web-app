@@ -39,7 +39,7 @@ This project is a quiz game platform built as part of the LOG2990 course require
 
 # Usage
 
-- Running the Application
+## Running the application
 1. **Start the Frontend** : 
     `cd client`
     `npm start`
