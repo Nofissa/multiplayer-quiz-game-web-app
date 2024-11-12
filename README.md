@@ -76,9 +76,7 @@ This project is a quiz game platform built as part of the LOG2990 course require
     - Run `ng build` for production builds.
     - Development server: `ng serve` accessible at http://localhost:4200.
 
-## Backend (NestJS/Express)
-
-- API Documentation: Accessible at /api/docs (OpenAPI/Swagger format).
+## Backend (NestJS)
 - Real-Time Updates: Uses WebSocket for real-time gameplay interactions and chat.
 - Database: MongoDB for persistent data storage.
 - Test Framework: Mocha, Chai, Sinon, and Supertest for API testing.
