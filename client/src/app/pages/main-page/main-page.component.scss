@@ -1,0 +1,81 @@
+:root {
+    --back-color : #121212;
+    --objet-color : aliceblue;
+}
+
+.logo {
+    width: 400px;
+    height: 400px;
+}
+
+.container {
+    height: 100vh;
+}
+
+.justified {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.admin-container {
+    margin-top: auto;
+    margin-left: auto;
+}
+
+.button {
+    width: 550px;
+    height: 120px;
+    padding: 8px 22px;
+    border-radius: 6px;
+    background-color: aliceblue;
+    transition: all 0.2s ease;
+    margin-top: 10px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+
+.button:hover {
+    transform: scale(0.96);
+}
+
+.button.admin-button {
+    width: 200px;
+    height: 80px;
+    text-align: center;
+}
+
+
+.team-name {
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.footer-item {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+    color: aliceblue;
+    font-weight: bold;
+}
+
+.trademark {
+    display: flex;
+    flex-direction: column;
+
+}
+
+.server-message {
+    justify-content: center;
+    width: 20%;
+    min-height: min-content;
+}
+
+.header {
+    height: 500px;
+    justify-content: center;
+}

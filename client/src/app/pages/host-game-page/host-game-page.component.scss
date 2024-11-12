@@ -1,0 +1,136 @@
+.container {
+    height: 100vh;
+}
+
+.main-container {
+    display: grid;
+    grid-template-columns: 70% 30%;
+    grid-template-areas: 'game-information chat-room';
+    flex-grow: 1;
+    justify-content: center;
+}
+
+.game-information {
+    width: 100%;
+    grid-area: game-information;
+    justify-content: flex-start;
+}
+
+.buttons-wrapper {
+    position: absolute;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+    height: 100px;
+}
+
+.lock-button {
+    height: 75px;
+    width: 75px;
+    justify-self: center;
+}
+
+.lock-button.mat-mdc-raised-button.mat-unthemed {
+    --mdc-protected-button-label-text-color: white;
+    background-color: rgb(76, 124, 206);
+}
+
+@keyframes blink {
+    0% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+.blink {
+    animation: blink 1.5s infinite;
+}
+
+.start-button {
+    background-color: white;
+    justify-self: right;
+}
+
+.next-button {
+    background-color: white;
+    justify-self: right;
+}
+
+.end-button {
+    width: 75px;
+    height: 75px;
+    margin-left: 20px;
+}
+
+.end-button.mat-mdc-raised-button.mat-unthemed {
+    background-color: var(--main-bg-color);
+    --mdc-protected-button-label-text-color: white;
+}
+
+.end-button.mat-mdc-raised-button.mat-unthemed:hover {
+    background-color: red;
+}
+
+.icon {
+    font-size: 150px;
+    left: 5px;
+}
+
+.nav-header {
+    grid-area: nav-header;
+    padding-bottom: 20px;
+}
+
+.bar-chart {
+    width: 50%;
+}
+
+.chat-room {
+    height: 65%;
+    grid-area: chat-room;
+    align-items: end;
+}
+
+.player-list-container {
+    display: flex;
+    width: 100%;
+}
+
+.qrl-list-container {
+    height: 35%;
+    width: auto;
+    margin-bottom: 20px;
+}
+
+.player-list {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    width: 100%;
+}
+
+.app-component {
+    justify-self: center;
+    width: 70%;
+}
+
+.half-view {
+    width: 45%;
+    align-content: center;
+}
+
+.half-view-container {
+    margin-top: 5%;
+    justify-content: space-evenly;
+    display: flex;
+    align-content: center;
+}
+
+.waiting-period-container {
+    justify-self: center;
+}

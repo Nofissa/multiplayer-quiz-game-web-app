@@ -1,0 +1,131 @@
+@use '@angular/material' as mat;
+@include mat.core();
+
+$client-primary: mat.define-palette(mat.$indigo-palette);
+$client-accent: mat.define-palette(mat.$pink-palette, A200, A100, A400);
+$client-warn: mat.define-palette(mat.$red-palette);
+
+$client-theme: mat.define-light-theme(
+    (
+        color: (
+            primary: $client-primary,
+            accent: $client-accent,
+            warn: $client-warn,
+        ),
+    )
+);
+
+@include mat.all-component-themes($client-theme);
+
+:root {
+    --main-bg-color: #121212;
+    --secondary-bg-color: #ffffff;
+    --main-fg-color: #ffffff;
+    --secondary-fg-color: #121212;
+    --answer-color-red: #dc4d66;
+    --answer-color-blue: #63c5ea;
+    --answer-color-green: #9cd172;
+    --answer-color-yellow: #e69d2e;
+}
+
+html,
+body {
+    height: 100%;
+}
+body {
+    margin: 0;
+    background-color: var(--main-bg-color);
+    color: aliceblue;
+    font-family: Roboto, 'Helvetica Neue', sans-serif;
+}
+
+.button {
+    padding: 8px 22px;
+    border-radius: 6px;
+    background-color: aliceblue;
+    transition: all 0.2s ease;
+    margin-top: 10px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.justified {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.flex-row {
+    display: flex;
+    flex-direction: row;
+}
+
+.flex-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.invisible {
+    visibility: hidden;
+}
+
+.hidden {
+    display: none;
+}
+
+.base-snackbar * {
+    background-color: aliceblue !important;
+}
+
+.base-snackbar button {
+    color: var(--answer-color-blue) !important;
+}
+
+.base-snackbar .mat-mdc-snack-bar-label {
+    color: #000000 !important;
+}
+
+.base-snackbar .mat-mdc-button-touch-target {
+    height: auto !important;
+}
+
+.error-snackbar * {
+    background-color: var(--answer-color-red) !important;
+}
+
+.error-snackbar button {
+    color: var(--main-fg-color) !important;
+}
+
+.error-snackbar .mat-mdc-snack-bar-label {
+    color: var(--main-fg-color) !important;
+}
+
+.error-snackbar .mat-mdc-button-touch-target {
+    height: auto !important;
+}
+
+.submit-snackbar * {
+    background-color: var(--answer-color-green) !important;
+    color: white !important;
+    text-align: center;
+}
+
+.header {
+    position: relative;
+}
+
+::-webkit-scrollbar {
+    width: 5px;
+}
+
+::-webkit-scrollbar-track {
+    background: none;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 20px;
+    background: grey;
+}

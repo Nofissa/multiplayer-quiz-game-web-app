@@ -1,0 +1,30 @@
+<div class="create-game-page-wrapper">
+    <app-nav-header></app-nav-header>
+    <div class="create-game-container">
+        <div class="createGameSwiper">
+            <div class="slider-effectCoverFlow">
+                <swiper [effect]="'coverflow'" [grabCursor]="true" [centeredSlides]="true" [slideToClickedSlide]="true"
+                    [slidesPerView]="'auto'" [coverflowEffect]="{
+                        rotate: 50,
+                        stretch: 0,
+                        depth: 100,
+                        modifier: 1,
+                        slideShadows: true
+                    }" [pagination]="true" [navigation]="true" class="mySwiper">
+                    <ng-template *ngIf="enableRandomMode" swiperSlide>
+                        <div class="game-slide" (click)="openRandomGameDetails()">
+                            <h2 class="quiz-title">Mode Aléatoire</h2>
+                        </div>
+                    </ng-template>
+                    <ng-template swiperSlide *ngFor="let quiz of quizzArray; let i = index">
+                        <div class="game-slide" (click)="openQuizDetails(quiz)">
+                            <h2 class="quiz-title">Quiz {{ i + 1 }}</h2>
+                            <p class="quiz-subtitle">{{ quiz.title }}</p>
+                        </div>
+                    </ng-template>
+                    >
+                </swiper>
+            </div>
+        </div>
+    </div>
+</div>

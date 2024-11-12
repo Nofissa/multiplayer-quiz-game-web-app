@@ -1,0 +1,12 @@
+<div class="container column">
+    <div class="title-wrapper flex-column">
+        <h3 class="text-centered">Banque de Questions</h3>
+        <div class="flex-row button-wrapper">
+            <p>Filtrer par type de question :</p>
+            <button mat-raised-button (click)="filterQuestions('QCM')">QCM</button>
+            <button mat-raised-button (click)="filterQuestions('QRL')">QRL</button>
+            <button mat-raised-button (click)="filterQuestions('BOTH')">Tous</button>
+        </div>
+    </div>
+    <app-question-list [questions]="displayedQuestions" [options]="options" [interactionService]="questionInteractionService"> </app-question-list>
+</div>

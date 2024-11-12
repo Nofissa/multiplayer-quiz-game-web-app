@@ -1,0 +1,38 @@
+.quiz-buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    padding: 20px;
+    align-items: center;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.quizzes-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    width: 100%;
+    height: 100%;
+
+    > * {
+        flex: 1 1 auto;
+        width: 100%;
+        max-width: 900px;
+        box-sizing: border-box;
+        padding: 0 20px;
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+}
+
+.add-button {
+    background-color: var(--answer-color-green);
+}
+
+.import-button {
+    background-color: var(--main-bg-color);
+}

@@ -1,0 +1,59 @@
+<h2 mat-dialog-title>{{ data.title }}</h2>
+<form [formGroup]="formGroup">
+    <mat-dialog-content>
+        <div class="form-wrapper flex-row">
+            <mat-form-field appearance="outline">
+                <mat-label>Question</mat-label>
+                <textarea id="question-input" matInput formControlName="text" value="{{ data.question.text }}" placeholder="Votre question ici">
+                </textarea>
+                <mat-slide-toggle id="qcm-slide-toggle" (click)="toggleQuestionType()">Type de Question: {{ data.question.type }}</mat-slide-toggle>
+                <mat-label *ngIf="qcmToggled"> Réponse Longue</mat-label>
+                <mat-label *ngIf="!qcmToggled"> Choix Multiples</mat-label>
+            </mat-form-field>
+            <div *ngIf="!qcmToggled">
+                <div cdkDropListGroup>
+                    <p>Veuillez cocher les bonnes réponses</p>
+                    <div cdkDropList [cdkDropListData]="choices.controls" (cdkDropListDropped)="drop($event)">
+                        <div *ngFor="let answerGroup of choices.controls; let i = index" cdkDrag class="answers-wrapper">
+                            <mat-form-field appearance="outline" class="answer">
+                                <mat-label>Réponse {{ i + 1 }}</mat-label>
+                                <div class="flex-row" [formGroup]="answerGroup">
+                                    <input matInput type="text" formControlName="text" placeholder="Votre réponse ici" />
+                                    <input type="checkbox" formControlName="isCorrect" />
+                                </div>
+                            </mat-form-field>
+                            <div class="row-actions-wrapper">
+                                <mat-icon
+                                    *ngIf="choicesControls.length > 2"
+                                    aria-hidden="false"
+                                    class="action action-remove"
+                                    aria-label="Retirer"
+                                    fontIcon="remove"
+                                    (click)="removeAnswerAt(i)"
+                                ></mat-icon>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <mat-icon
+                    aria-hidden="false"
+                    *ngIf="choicesControls.length < 4"
+                    class="action"
+                    aria-label="Ajouter"
+                    fontIcon="add"
+                    (click)="addAnswer()"
+                ></mat-icon>
+            </div>
+            <mat-form-field appearance="outline">
+                <mat-label>Nombre de points</mat-label>
+                <input matInput type="number" min="10" max="100" step="10" formControlName="points" value="{{ data.question.points }}" />
+            </mat-form-field>
+        </div>
+    </mat-dialog-content>
+    <mat-dialog-actions>
+        <div class="actions-wrapper">
+            <button mat-raised-button (click)="cancel()">Annuler</button>
+            <button mat-raised-button (click)="submit()">Confirmer</button>
+        </div>
+    </mat-dialog-actions>
+</form>

@@ -1,0 +1,95 @@
+.list-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--secondary-bg-color);
+    border-radius: 15px;
+    width: 100%;
+    max-width: 600px;
+    height: fit-content;
+    max-height: 400px;
+}
+
+.list-item-container {
+    height: 200px;
+    overflow: auto;
+}
+
+.player-info-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.row-container {
+    align-items: center;
+    display: flex;
+}
+
+.row-container > * {
+    margin: 0px 5px;
+}
+
+.invisible {
+    visibility: hidden;
+}
+
+mat-list {
+    width: 100%;
+}
+
+mat-list-item {
+    color: #000;
+    width: 100%;
+}
+
+h4 {
+    margin: 10px 0px;
+    font-weight: bold;
+    color: var(--secondary-fg-color);
+}
+
+.playing .player-name {
+    color: red;
+}
+
+.playing .player-name-interacted {
+    color: 	#938200;
+}
+
+.playing .player-name-submitted {
+    color: green;
+}
+
+.abandoned .player-name {
+    color: #000;
+    text-decoration: line-through;
+}
+
+.hidden {
+    display: none;
+}
+
+.sort-buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    font-size: small;
+    size: 80%;
+}
+.sort-icon {
+    color: #000;
+}
+.list-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 0px 10px;
+    background-color: var(--primary-bg-color);
+    border-radius: 15px 15px 0px 0px;
+}

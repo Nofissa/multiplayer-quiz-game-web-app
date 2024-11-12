@@ -1,0 +1,51 @@
+.nav-header-container {
+    position: relative;
+    height: 100px;
+    width: 100vw;
+    align-items: center;
+}
+
+.back-button {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translate(0%, -50%);
+    background-color: #191919;
+}
+
+.back-arrow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem !important;
+}
+
+.logo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100px;
+    height: 100px;
+}
+
+.mat-mdc-card {
+    --mdc-elevated-card-container-color: var(--answer-color-green);
+}
+
+.pin-container {
+    width: 105px;
+    position: absolute;
+    top: 25%;
+    right: 20px;
+}
+
+.mat-mdc-card-content {
+    text-align: center;
+    color: black;
+    font-weight: bold;
+}
+
+.clickable:hover {
+    cursor: pointer;
+}

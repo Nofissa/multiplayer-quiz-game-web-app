@@ -1,0 +1,47 @@
+.admin-page-wrapper {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.admin-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-grow: 1;
+}
+
+.mat-mdc-tab-body-wrapper {
+    height: 100%;
+}
+
+.question-bank-tab .mat-mdc-tab-body-content {
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+}
+
+app-question-bank {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.tabs {
+    overflow-x: hidden;
+    overflow-y: auto;
+    width: 80%;
+    height: 100%;
+    max-width: 800px;
+    background-color: var(--secondary-bg-color);
+    border-radius: 15px;
+}
+
+.mdc-tab__text-label {
+    color: white;
+}
+
+.header {
+    height: 100px;
+}

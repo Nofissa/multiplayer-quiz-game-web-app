@@ -1,0 +1,68 @@
+@import 'swiper/scss';
+@import 'swiper/scss/navigation';
+@import 'swiper/scss/pagination';
+@import 'swiper/css/effect-coverflow';
+
+.barChartSwiper {
+    .slider-effectCoverFlow {
+        .swiper {
+            max-width: 500px;
+            padding-top: 2%;
+            padding-bottom: 5%;
+        }
+
+        .swiper-slide,
+        .game-slide {
+            background-color: transparent !important;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            transition:
+                transform 0.3s ease,
+                box-shadow 0.3s ease,
+                background-color 0.3s ease;
+        }
+
+        .swiper-slide img {
+            display: block;
+            width: 100%;
+        }
+
+        .swiper-button-next,
+        .swiper-button-prev {
+            color: white;
+            background-color: grey;
+            width: 40px;
+            height: 40px;
+            border-radius: 100%;
+            opacity: 50%;
+        }
+
+        .swiper-pagination-bullet-active {
+            background-color: white;
+        }
+
+        .swiper-pagination-bullet {
+            background-color: #4bb4de;
+            width: 10px;
+            height: 10px;
+        }
+
+        .swiper-button-next:after,
+        .swiper-button-prev::after {
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        app-bar-chart {
+            width: 100%;
+            max-width: 100%;
+        }
+    }
+}

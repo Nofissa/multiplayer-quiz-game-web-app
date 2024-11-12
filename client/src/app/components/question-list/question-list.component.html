@@ -1,0 +1,127 @@
+<div *ngIf="options.drag" CDKDropListGroup class="drag-container container">
+    <div cdkDropList [cdkDropListData]="questions" (cdkDropListDropped)="drop($event)" class="list scrollable column">
+        <div *ngFor="let question of questions; let i = index" class="question-container flex-row" cdkDrag>
+            <div class="left-area">
+                <mat-icon *ngIf="isQcm(question)" fontIcon="checklist"></mat-icon>
+                <mat-icon *ngIf="!isQcm(question)" fontIcon="edit_note"></mat-icon>
+                <p *ngIf="options.numberOrder">{{ i + 1 }}</p>
+            </div>
+            <div class="question-body column">
+                <div class="question-content">
+                    <span class="text-centered">{{ question.text }}</span>
+                </div>
+                <div *ngIf="options.displayLastModified" class="last-modified-wrapper">
+                    <span class="text-centered">
+                        <span>Modifiée le:</span>
+                        <span *ngIf="question.lastModification" class="last-modified-date-text">
+                            {{
+                                question.lastModification.toLocaleString('fr-CA', {
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric',
+                                    hour: 'numeric',
+                                    minute: 'numeric'
+                                })
+                            }}
+                        </span>
+                    </span>
+                </div>
+            </div>
+            <div *ngIf="options.edit || options.delete || options.share" class="overlay">
+                <div class="actions">
+                    <div *ngIf="options.edit" class="action-wrapper" (click)="invokeOnEditQuestion(question)">
+                        <mat-icon aria-hidden="true" aria-label="Modifier" fontIcon="edit" class="action action-edit"></mat-icon>
+                    </div>
+                    <div *ngIf="options.delete" class="action-wrapper" (click)="invokeOnDeleteQuestion(question)">
+                        <mat-icon aria-hidden="true" aria-label="Supprimer" fontIcon="delete" class="action action-delete"></mat-icon>
+                    </div>
+                    <div *ngIf="options.share" class="share-wrapper" (click)="share(question)">
+                        <mat-icon
+                            *ngIf="!isShared(question)"
+                            aria-hidden="true"
+                            aria-label="Partager"
+                            fontIcon="sync_alt"
+                            class="action action-share"
+                        ></mat-icon>
+                        <mat-icon
+                            *ngIf="isShared(question)"
+                            aria-hidden="true"
+                            aria-label="Partagée"
+                            fontIcon="sync_alt"
+                            class="action shared-active"
+                        ></mat-icon>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="options.create" class="list-bottom">
+        <div class="action-wrapper" (click)="invokeOnAddQuestion()">
+            <mat-icon aria-hidden="true" aria-label="Ajouter" fontIcon="add_circle" class="action action-add"></mat-icon>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="!options.drag" class="container">
+    <div class="list scrollable column">
+        <div *ngFor="let question of questions; let i = index" class="question-container flex-row">
+            <div class="left-area">
+                <mat-icon *ngIf="isQcm(question)" fontIcon="checklist"></mat-icon>
+                <mat-icon *ngIf="!isQcm(question)" fontIcon="edit_note"></mat-icon>
+                <p *ngIf="options.numberOrder">{{ i + 1 }}</p>
+            </div>
+            <div class="question-body column">
+                <div class="question-content">
+                    <span class="text-centered">{{ question.text }}</span>
+                </div>
+                <div *ngIf="options.displayLastModified" class="last-modified-wrapper">
+                    <span class="text-centered">
+                        <span>Modifiée le:</span>
+                        <span *ngIf="question.lastModification" class="last-modified-date-text">
+                            {{
+                                question.lastModification.toLocaleString('fr-CA', {
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric',
+                                    hour: 'numeric',
+                                    minute: 'numeric'
+                                })
+                            }}
+                        </span>
+                    </span>
+                </div>
+            </div>
+            <div *ngIf="options.edit || options.delete || options.share" class="overlay">
+                <div class="actions">
+                    <div *ngIf="options.edit" class="action-wrapper" (click)="invokeOnEditQuestion(question)">
+                        <mat-icon aria-hidden="true" aria-label="Modifier" fontIcon="edit" class="action action-edit"></mat-icon>
+                    </div>
+                    <div *ngIf="options.delete" class="action-wrapper" (click)="invokeOnDeleteQuestion(question)">
+                        <mat-icon aria-hidden="true" aria-label="Supprimer" fontIcon="delete" class="action action-delete"></mat-icon>
+                    </div>
+                    <div *ngIf="options.share" class="share-wrapper" (click)="share(question)">
+                        <mat-icon
+                            *ngIf="!isShared(question)"
+                            aria-hidden="true"
+                            aria-label="Partager"
+                            fontIcon="sync_alt"
+                            class="action action-share"
+                        ></mat-icon>
+                        <mat-icon
+                            *ngIf="isShared(question)"
+                            aria-hidden="true"
+                            aria-label="Partagée"
+                            fontIcon="sync_alt"
+                            class="action shared-active"
+                        ></mat-icon>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="options.create" class="list-bottom">
+        <div class="action-wrapper" (click)="invokeOnAddQuestion()">
+            <mat-icon aria-hidden="true" aria-label="Ajouter" fontIcon="add_circle" class="action action-add"></mat-icon>
+        </div>
+    </div>
+</div>

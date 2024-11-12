@@ -1,0 +1,32 @@
+<mat-expansion-panel hideToggle class="quiz-container">
+    <mat-expansion-panel-header>
+        <mat-panel-title class="title">
+            {{ quiz.title }}
+        </mat-panel-title>
+        <mat-panel-description>
+            {{ quiz.lastModification.toLocaleString('fr-CA', { year: 'numeric', month: 'long', day: 'numeric', hour:
+            'numeric', minute: 'numeric' }) }}
+        </mat-panel-description>
+        <mat-slide-toggle [checked]="!quiz.isHidden" (change)="onToggleChange()">{{ quiz.isHidden ?
+            'Caché' : 'Visible'
+            }}</mat-slide-toggle>
+    </mat-expansion-panel-header>
+    <span>
+        {{ quiz.description }}
+    </span>
+
+    <div class="buttons-wrapper">
+        <button mat-fab extended class="edit-button" (click)="editQuiz()">
+            <mat-icon>mode_edit</mat-icon>
+            Modifier
+        </button>
+        <button mat-fab extended class="export-button" (click)="exportQuiz()">
+            <mat-icon>file_download</mat-icon>
+            Exporter
+        </button>
+        <button mat-fab extended class="delete-button" (click)="openDeleteQuizDialog()">
+            <mat-icon>delete</mat-icon>
+            Suprimmer
+        </button>
+    </div>
+</mat-expansion-panel>

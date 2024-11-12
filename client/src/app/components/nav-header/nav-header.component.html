@@ -1,0 +1,13 @@
+<div class="nav-header-container">
+    <button *ngIf="backArrow && isActive" mat-mini-fab (click)="back()" class="back-button"
+        (click)="emitNavigationEvent()">
+        <mat-icon class="back-arrow" aria-hidden="false" aria-label="Retour" fontIcon="arrow_back"></mat-icon>
+    </button>
+    <img *ngIf="!isActive" class="logo" src="https://imed-bennour.github.io/logo-for-game-log2990/logo.png"
+        alt="Logo Projet" (click)="emitNavigationEvent()" />
+    <img *ngIf="isActive" class="logo clickable" src="https://imed-bennour.github.io/logo-for-game-log2990/logo.png"
+        alt="Logo Projet" routerLink="/" (click)="emitNavigationEvent()" />
+    <mat-card class="pin-container" *ngIf="pin">
+        <mat-card-content>Pin : {{ pin }}</mat-card-content>
+    </mat-card>
+</div>

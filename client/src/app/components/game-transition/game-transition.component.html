@@ -1,0 +1,34 @@
+<div [ngClass]="{ hidden: displayOptions.transitionalOnly && !isStartingGame && !isLoadingNextQuestion }">
+    <div class="content-wrapper">
+        <div *ngIf="!displayOptions.hostGameComponent" class="timer-wrapper-transition">
+            <app-timer [pin]="pin" [ngClass]="{
+                    hidden:
+                        (displayOptions.hideTimerOnStartingGame && isStartingGame) ||
+                        (displayOptions.hideTimerOnLoadingNextQuestion && isLoadingNextQuestion)
+                }"></app-timer>
+        </div>
+        <div *ngIf="displayOptions.hostGameComponent" class="timer-wrapper-host">
+            <app-timer [pin]="pin" [ngClass]="{
+                    hidden:
+                        (displayOptions.hideTimerOnStartingGame && isStartingGame) ||
+                        (displayOptions.hideTimerOnLoadingNextQuestion && isLoadingNextQuestion)
+                }"></app-timer>
+        </div>
+        <div *ngIf="snapshot && !displayOptions.hostGameComponent" class="text-wrapper-transition">
+            <h2 *ngIf="isStartingGame && !displayOptions.keepDisplayingCurrentQuestion">
+                {{ snapshot.quiz.title }}
+            </h2>
+            <h2 *ngIf="isLoadingNextQuestion || displayOptions.keepDisplayingCurrentQuestion">
+                {{ snapshot.quiz.questions[snapshot.currentQuestionIndex].text }}
+            </h2>
+        </div>
+        <div *ngIf="snapshot && displayOptions.hostGameComponent" class="text-wrapper-host">
+            <h2 *ngIf="isStartingGame && !displayOptions.keepDisplayingCurrentQuestion">
+                {{ snapshot.quiz.title }}
+            </h2>
+            <h2 *ngIf="isLoadingNextQuestion || displayOptions.keepDisplayingCurrentQuestion">
+                {{ snapshot.quiz.questions[snapshot.currentQuestionIndex].text }}
+            </h2>
+        </div>
+    </div>
+</div>

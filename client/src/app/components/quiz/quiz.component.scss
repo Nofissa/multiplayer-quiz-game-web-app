@@ -1,0 +1,26 @@
+.buttons-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.title {
+    height: 100%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    font-size: small;
+}
+
+.edit-button {
+    background-color: var(--answer-color-blue);
+}
+
+.export-button {
+    background-color: var(--main-bg-color);
+}
+
+.delete-button {
+    background-color: var(--answer-color-red);
+}

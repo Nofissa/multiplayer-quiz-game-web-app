@@ -1,0 +1,28 @@
+<div class="admin-page-wrapper">
+    <app-nav-header></app-nav-header>
+    <div class="admin-container">
+        <h1 class="header-item">Vue de création d'une partie</h1>
+        <mat-tab-group class="tabs" color="accent">
+            <mat-tab label="Quiz">
+                <div>
+                    <app-quiz-list></app-quiz-list>
+                </div>
+            </mat-tab>
+            <mat-tab label="Questions" bodyClass="question-bank-tab">
+                <app-question-bank [options]="{ create: true, edit: true, delete: true, displayLastModified: true }"></app-question-bank>
+            </mat-tab>
+            <mat-tab label="Historique des parties">
+                <div>
+                    <app-game-summary-list></app-game-summary-list>
+                </div>
+            </mat-tab>
+        </mat-tab-group>
+        <footer class="footer-item">
+            <h4 class="team-name">Équipe 206</h4>
+            <p>
+                <span>Loris Ponderand</span>, <span>Imed-Eddine Bennour</span>, <span>Nofissa Khaif</span>, <span>Romaine Brand</span>,
+                <span>Dimitri Mansour</span>, <span>Jérémie Bolduc</span>
+            </p>
+        </footer>
+    </div>
+</div>
